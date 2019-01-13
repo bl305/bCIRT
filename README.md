@@ -1,4 +1,4 @@
-#Balazs's Computer Incident Response Tool (bCIRT)
+# Balazs's Computer Incident Response Tool (bCIRT)
 
 ## What is it?
 This is an incident response team tool, that can be utilized to\
