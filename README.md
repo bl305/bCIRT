@@ -8,6 +8,9 @@ It will be integrated it with external tools via scripts and APIs.
 It is not a SIEM or a log management tool. It's purpose is not to collect logs from other systems, however I plan integration with SIEM tools.
 It is not a helpdesk system either, there are cool solutions out there.
 
+## Screenshots
+Will be available soon in my website, some are at the bottom or in the bCIRT_Screenshots folder.
+
 ## License
 I provide this tool for free of charge for ANYONE who needs it.\
 I will NOT restrict it, because I want everyone to benefit from it who wants.
@@ -137,3 +140,10 @@ django-tinymce4-lite (MIT): https://github.com/romanvm/django-tinymce4-lite
 misaka (MIT): https://pypi.org/project/misaka/
 weasyprint (BSD): https://weasyprint.org PyPI: https://pypi.org/project/WeasyPrint/
 
+### Screenshots
+![Pic1](https://github.com/bl305/bCIRT/blob/master/bCIRT_Screenshots/Screenshot%20from%202019-03-11%2023-17-53.png)
+![Pic1](https://github.com/bl305/bCIRT/blob/master/bCIRT_Screenshots/Screenshot%20from%202019-03-11%2023-18-13.png)
+![Pic1](https://github.com/bl305/bCIRT/blob/master/bCIRT_Screenshots/Screenshot%20from%202019-03-11%2023-18-45.png)
+![Pic1](https://github.com/bl305/bCIRT/blob/master/bCIRT_Screenshots/Screenshot%20from%202019-03-11%2023-19-36.png)
+![Pic1](https://github.com/bl305/bCIRT/blob/master/bCIRT_Screenshots/Screenshot%20from%202019-03-11%2023-20-24.png)
+![Pic1](https://github.com/bl305/bCIRT/blob/master/bCIRT_Screenshots/Screenshot%20from%202019-03-11%2023-20-49.png)
