@@ -128,17 +128,17 @@ First of all I used this website a lot, a LOT, many thanks: https://simpleisbett
 Favourite editors for home users: https://www.jetbrains.com/pycharm/, https://atom.io/
 
 Tools integrated in the bCIRT:
-bootstrap (MIT): https://getbootstrap.com/
-bootstrap table (MIT): https://github.com/wenzhixin/bootstrap-table
-bootstrap-datepicker (Apache 2.0): https://github.com/uxsolutions/bootstrap-datepicker
-bootstrap-select (MIT): https://github.com/snapappointments/bootstrap-select/
-Fontawesome (Free/Open source GPL friendly): https://github.com/FortAwesome/Font-Awesome
-jquery (MIT): https://jquery.com
-jquery UI (MIT): https://jqueryui.com
-django-bootstrap-4 (BSD-3-Clause): https://github.com/zostera/django-bootstrap4
-django-tinymce4-lite (MIT): https://github.com/romanvm/django-tinymce4-lite
-misaka (MIT): https://pypi.org/project/misaka/
-weasyprint (BSD): https://weasyprint.org PyPI: https://pypi.org/project/WeasyPrint/
+bootstrap (MIT): https://getbootstrap.com/  
+bootstrap table (MIT): https://github.com/wenzhixin/bootstrap-table  
+bootstrap-datepicker (Apache 2.0): https://github.com/uxsolutions/bootstrap-datepicker  
+bootstrap-select (MIT): https://github.com/snapappointments/bootstrap-select  
+Fontawesome (Free/Open source GPL friendly): https://github.com/FortAwesome/Font-Awesome  
+jquery (MIT): https://jquery.com  
+jquery UI (MIT): https://jqueryui.com  
+django-bootstrap-4 (BSD-3-Clause): https://github.com/zostera/django-bootstrap4  
+django-tinymce4-lite (MIT): https://github.com/romanvm/django-tinymce4-lite  
+misaka (MIT): https://pypi.org/project/misaka  
+weasyprint (BSD): https://weasyprint.org PyPI: https://pypi.org/project/WeasyPrint  
 
 ### Screenshots
 ![Pic1](https://github.com/bl305/bCIRT/blob/master/bCIRT_Screenshots/Screenshot%20from%202019-03-11%2023-18-13.png)
