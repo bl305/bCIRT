@@ -141,9 +141,8 @@ misaka (MIT): https://pypi.org/project/misaka/
 weasyprint (BSD): https://weasyprint.org PyPI: https://pypi.org/project/WeasyPrint/
 
 ### Screenshots
-![Pic1](https://github.com/bl305/bCIRT/blob/master/bCIRT_Screenshots/Screenshot%20from%202019-03-11%2023-17-53.png)
 ![Pic1](https://github.com/bl305/bCIRT/blob/master/bCIRT_Screenshots/Screenshot%20from%202019-03-11%2023-18-13.png)
-![Pic1](https://github.com/bl305/bCIRT/blob/master/bCIRT_Screenshots/Screenshot%20from%202019-03-11%2023-18-45.png)
-![Pic1](https://github.com/bl305/bCIRT/blob/master/bCIRT_Screenshots/Screenshot%20from%202019-03-11%2023-19-36.png)
-![Pic1](https://github.com/bl305/bCIRT/blob/master/bCIRT_Screenshots/Screenshot%20from%202019-03-11%2023-20-24.png)
-![Pic1](https://github.com/bl305/bCIRT/blob/master/bCIRT_Screenshots/Screenshot%20from%202019-03-11%2023-20-49.png)
+![Pic2](https://github.com/bl305/bCIRT/blob/master/bCIRT_Screenshots/Screenshot%20from%202019-03-11%2023-18-45.png)
+![Pic3](https://github.com/bl305/bCIRT/blob/master/bCIRT_Screenshots/Screenshot%20from%202019-03-11%2023-19-36.png)
+![Pic4](https://github.com/bl305/bCIRT/blob/master/bCIRT_Screenshots/Screenshot%20from%202019-03-11%2023-20-24.png)
+![Pic5](https://github.com/bl305/bCIRT/blob/master/bCIRT_Screenshots/Screenshot%20from%202019-03-11%2023-20-49.png)
