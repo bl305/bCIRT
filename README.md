@@ -1,15 +1,15 @@
 # Balazs's Computer Incident Response Tool (bCIRT)
 
 ## What is it?
-This is an incident response team tool, that can be utilized to automate the response procedures and keep record of the performed actions.
-It will be integrated it with external tools via scripts and APIs.
+This is an incident response team case management "tool", that can be utilized to automate the response procedures and keep record of the performed actions.
+It will be integrated with external tools via scripts and APIs.
 
 ## What is it not?
 It is not a SIEM or a log management tool. It's purpose is not to collect logs from other systems, however I plan integration with SIEM tools.
 It is not a helpdesk system either, there are cool solutions out there.
 
 ## Screenshots
-Will be available soon in my website, some are at the bottom or in the bCIRT_Screenshots folder.
+See them at the bottom of this page or in the bCIRT_Screenshots folder.
 
 ## License
 I provide this tool for free of charge for ANYONE who needs it.\
@@ -41,21 +41,19 @@ Don't install this on a server where the users of it should not have admin acces
 * Playbook creation
 * Email notification
 * External authentication (minimum Active Directory, maybe SAML)
-* potentially internationalize the strings
+* Potentially internationalize the strings
 
 ## Issue/Bug tracking and TODO/NEXT list:
 1. integrate MITRE/ATTACK framework
 2. create indicators like url, file, hash etc for evidences
-3. remove buttons based on permissions and fix any permission issues - not tested in detail yet
-4. work on the actions module to support command line tools
-5. action module delete scripts after removing database record
-6. command history/logging
-7. concurrent edit of records in two browsers/windows - latest wins
-8. builtin scripts/task templates etc
-9. field validation for future indicators
-10. GET/POST request additional value validation on the server side
-11. workflow controls, like don't allow to close an investigation with open tasks
-12. a few more fixes
+3. remove buttons based on permissions and fix any potential permission issues - not tested in detail yet
+4. enable command history/logging
+5. concurrent edit of records in two browsers/windows - latest wins
+6. builtin scripts/task templates etc
+7. field validation for future indicators
+8. GET/POST request additional value validation on the server side
+9. workflow controls, like don't allow to close an investigation with open tasks
+10. a few more fixes
 
 ## Install guide for demo-ing
 Key steps to get going:
@@ -78,14 +76,14 @@ python3 -m virtualenv env
 source env/bin/activate
 ```
 
-### 3. Install Djang oand other python packages
+### 3. Install Django and other python packages
 Go to the virtual environment by activating it, then:
 ```python
 pip install django
 ```
 The next will install a bunch of dependencies and you might need to do some additional stuff to get weasyprint run, then go to https://weasyprint.readthedocs.io/en/stable/install.html
 ```python
-pip install weasyprint cairocffi django-bootstrap-4 django-tinymce4-lite misaka
+pip install django-weasyprint cairocffi django-bootstrap-4 django-tinymce4-lite misaka import-export
 ```
 ### 4. Change default values
 Go to the bCIRT/settings.py and change the followings:
@@ -99,7 +97,6 @@ PROJECT_ROOT='/home/bali/PycharmProjects/bCIRT'
 Go to the bCIRT/custom_params.py and change:
 ```text
 ALLOWED_HOSTS = '127.0.0.1'
-PROJECT_PATH = '/home/bali/PycharmProjects/bCIRT'
 ```
 
 ### 5. Init database
