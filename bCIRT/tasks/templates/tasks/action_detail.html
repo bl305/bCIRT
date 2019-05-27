@@ -23,10 +23,12 @@
                         </div>
                         <strong>&nbsp;Action Details | {{ action.pk }}</strong>
                         <div class="btn-group inline ">
-                            <a href="{% url 'tasks:act_edit' pk=action.pk %}?next1={{ request.get_full_path|urlencode }}" class="btn btn-warning btn-xs">
+                            <div class="btn btn-warning btn-xs">
+                            <a style="color:white" href="{% url 'tasks:act_edit' pk=action.pk %}?next1={{ request.get_full_path|urlencode }}">
                             <span class="glyphicon glyphicon-pencil"></span>
                             Edit
                             </a>
+                            </div>
                         </div>
                     </div>
                 </header>

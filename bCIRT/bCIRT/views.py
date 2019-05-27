@@ -31,7 +31,9 @@ class HomePage(LoginRequiredMixin, TemplateView):
         kwargs['user'] = self.request.user
         kwargs['invs'] = Inv.objects.filter(user=self.request.user, status=3)
         kwargs['uinvs'] = Inv.objects.exclude(status=3).exclude(status=2)
+        kwargs['oinvs'] = Inv.objects.filter(status=3).exclude(user=self.request.user)
         kwargs['tasks'] = Task.objects.filter(user=self.request.user).exclude(status=1).exclude(type=1)
         kwargs['utasks'] = Task.objects.filter(status=1).exclude(type=1)
+        kwargs['otasks'] = Task.objects.exclude(user=self.request.user).exclude(status=1).exclude(type=1)
         kwargs['rtasks'] = Task.objects.filter(user=self.request.user).order_by('-modified_at')
         return super(HomePage, self).get_context_data(**kwargs)
