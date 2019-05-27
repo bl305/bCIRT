@@ -28,6 +28,7 @@ Although it is about information security, the tool is heavily leveraging Django
 I am NOT a developer, I am far away from being one! So this code is probably not the most effective, "ugly", "bad". If you wish to educate me, you are more than welcome, I appreciate any advice.
 This is a tool in development, not intended for production use. It will likely not lose any data, but anyways, use it at your own risk!
 Don't install this on a server where the users of it should not have admin access, as the current controls allow easy takeover of the host server (via script executions). This will be managed later, right now I don't have issue with being admin of the server.
+Updates to the packages should be allowed to be installed, the version stated in the requirements.txt are the versions used during development and will continuously be updated as I update the development environment.
 
 ## What is the driver of this project:
 * learn the Python Django framework because it's cool
