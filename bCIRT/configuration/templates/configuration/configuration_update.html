@@ -1,0 +1,18 @@
+{% extends "base.html"  %}
+{% block content %}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="well">
+            <p><strong>Current version: {% include 'version.html' %}</strong></p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="well">
+            <p><strong>Upload Update</strong></p>
+            {% include 'configuration/configuration_form_upload.html' %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

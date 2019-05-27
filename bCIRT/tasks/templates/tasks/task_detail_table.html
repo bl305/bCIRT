@@ -1,0 +1,150 @@
+{% if task.pk %}
+    <tr>
+        <td><strong>Task ID</strong><br> {{ task.pk }} </td>
+        <td><strong>Title</strong><br> {{ task.title }} </td>
+        <td><strong>Priority</strong><br> {{ task.priority }} </td>
+        <td><strong>Parent</strong><br>
+        {% if task.parent %}
+            <a class="badge" href="{% url 'tasks:tsk_detail' pk=task.parent %}?next1={{ request.get_full_path|urlencode }}">
+                {{ task.parent }}
+            </a>
+        {% else %}
+            -
+        {% endif %}
+        </td>
+        <td><strong>Status</strong><br> {{ task.status }} </td>
+        <td><strong>Assigned to</strong><br> {{ task.user }} </td>
+        <td>
+            <strong>Duration</strong><br>
+            {% if task.taskduration %}
+                {{ task.taskdurationprint }}
+            {% else %}
+                -
+            {% endif %}
+        </td>
+    </tr>
+    <tr>
+
+        <td colspan="2"><strong>Investigation</strong><br>
+            {% if task.inv %}
+            <a class="badge" href="{% url 'invs:inv_detail' pk=task.inv.pk %}?next1={{ request.get_full_path|urlencode }}">
+                {{ task.inv }}
+            </a>
+            {% else %}
+            -
+            {% endif %}
+        </td>
+
+        <td colspan="2"><strong>Category</strong><br> {{ task.category }} </td>
+        <td colspan="1"><strong>Input Task</strong><br>
+            {% if task.inputfrom %}
+            <a class="badge" href="{% url 'tasks:play_detail' pk=task.inputfrom.pk %}?next1={{ request.get_full_path|urlencode }}">
+                {{ task.inputfrom }}
+            </a>
+            {% else %}
+                -
+            {% endif %}
+        </td>
+        <td><strong>Task start</strong><br> {{ task.starttime|date:"Y/m/d H:i:s" }} </td>
+        <td><strong>Task end</strong><br> {{ task.endtime|date:"Y/m/d H:i:s" }} </td>
+    </tr>
+    <tr>
+        <td colspan="2"><strong>Playbook</strong><br>
+            {% if task.playbook %}
+            <a class="badge" href="{% url 'tasks:play_detail' pk=task.playbook.pk %}?next1={{ request.get_full_path|urlencode }}">
+                {{ task.playbook }}
+            </a>
+            {% else %}
+                -
+            {% endif %}
+        </td>
+        <td colspan="2">
+            <strong>Action <span class="glyphicon glyphicon-arrow-right"></span> Target Task </strong>
+            <tooltip data-toggle="tooltip" data-placement="top"
+                     title="Action will be executed on the target task:
+1. by default on the first evidence in the target task
+2. custom if an OUTPUT variable 'ActionTarget' is defined in this Task as a 'string' with the value of:
+    a. first
+    b. last
+    c. evidence id integer value">
+                <span class="glyphicon glyphicon-question-sign"></span>
+            </tooltip>
+            <br>
+            {% if task.action %}
+            <a class="badge" href="{% url 'tasks:act_detail' pk=task.action.pk %}?next1={{ request.get_full_path|urlencode }}">
+                {{ task.action }}
+            </a>
+            <span class="glyphicon glyphicon-arrow-right"></span>
+            {% if task.actiontarget %}
+            <a class="badge" href="{% url 'tasks:tsk_detail' pk=task.actiontarget.pk %}?next1={{ request.get_full_path|urlencode }}">
+                {{ task.actiontarget }}
+            </a>
+            {% else %}
+                -
+            {% endif %}
+            {% if task.action.code_file %}
+                {% if task.actev %}
+                    {% if task.action.script_category.pk == 2 and task.actiontarget.evidence_task.all.first.fileName or task.action.script_category.pk == 1 %}
+                        {% if task.inv %}
+                            <a href="{% url 'tasks:act_exec_script' pk=task.action.pk inv_pk=task.inv.pk task_pk=task.pk ev_pk=task.actev %}"
+                               class="btn btn-success btn-xs">
+                                <span class="glyphicon glyphicon-play"></span>
+                            </a>
+                        {% else %}
+                            <a href="{% url 'tasks:act_exec_script' pk=task.action.pk inv_pk=0 task_pk=task.pk ev_pk=task.actev %}"
+                               class="btn btn-success btn-xs">
+                                <span class="glyphicon glyphicon-play"></span>
+                            </a>
+                        {% endif %}
+                    {% else %}
+                        (No file)
+                    {% endif %}
+                {% else %}
+                (No evidence in task)
+                {% endif %}
+            {% endif %}
+
+            {% else %}
+                -
+            {% endif %}
+        </td>
+        <td colspan="1"></td>
+
+        <td><strong>Modified on</strong><br> {{ task.modified_at|date:"Y/m/d H:i:s" }} </td>
+        <td><strong>Modified by</strong><br> {{ task.modified_by }} </td>
+    </tr>
+    <tr>
+        <td colspan="4"><strong></strong><br> </td>
+        <td colspan="1"></td>
+        <td><strong>Created on</strong><br> {{ task.created_at|date:"Y/m/d H:i:s" }} </td>
+        <td><strong>Created by</strong><br> {{ task.created_by }} </td>
+    </tr>
+    <tr>
+        <td colspan="7">
+            <div class="row">
+            <div class="container invdescription">
+                <strong>Description</strong><br>
+                {{ task.description_html|safe }}
+            </div>
+            </div>
+
+        </td>
+    </tr>
+    <tr>
+        <td colspan="7">
+            <div class="row">
+                <div class="container invdescription">
+                <strong>Summary</strong><br>
+                {% if task.summary %}
+                    {{ task.summary|safe }}
+                {% else %}
+                    -
+                {% endif %}
+
+                </div>
+            </div>
+        </td>
+    </tr>
+{% else %}
+    <tr><td>No Header available!</td></tr>
+{% endif %}

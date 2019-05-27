@@ -1,0 +1,50 @@
+{% extends "base.html"  %}
+
+{% block ptitle %}Configuration{% endblock %}
+
+{% load bootstrap4 %}
+
+{% block content %}
+
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link" href="#">Credentials</a>
+        </li>
+        <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#">Theme<span class="caret"></span></a>
+            <ul class="dropdown-menu">
+                <li><a href="#">Dark -default</a></li>
+                <li><a href="#">Light</a></li>
+            </ul>
+        </li>
+        <li class="nav-item {% block configurationmenu_active %}{% endblock configurationmenu_active%}" >
+            <a class="nav-link" href="{% url 'configuration:conf_logging' %}">Logging</a>
+        </li>
+
+        <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#">Update<span class="caret"></span></a>
+            <ul class="dropdown-menu">
+                <li>
+                    <a href="{% url 'configuration:conf_updatecreate' %}">
+                      <span class="glyphicon glyphicon-th-list"></span>
+                      Upload Update
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'configuration:conf_updatelist' %}">
+                      <span class="glyphicon glyphicon-th-list"></span>
+                      List Updates
+                    </a>
+                </li>
+            </ul>
+        </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">etc</a>
+      </li>
+    </ul>
+
+    {% block preconfiguration %}{% endblock %}
+    {% block configuration_content %}{% endblock %}
+    {% block postconfiguration %}{% endblock %}
+
+{% endblock %}

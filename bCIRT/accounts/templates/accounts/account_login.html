@@ -1,0 +1,21 @@
+{% extends "base.html"  %}.xxxx {
+    min-height:500px;
+}
+
+{% load bootstrap4 %}
+
+{% block title %}{% endblock %}
+
+{% block content %}
+<div class="container myregister">
+    <h1>Login</h1>
+    <form method="POST">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        <input type="submit" value="Login" class="btn btn btn-default">
+    </form>
+    <p><a href="{% url 'password_reset' %}">Lost password? TBD</a></p>
+    <p><a href="{% url 'accounts:register' %}">Register</a></p>
+    <br>
+</div>
+{% endblock %}

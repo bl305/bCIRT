@@ -1,0 +1,93 @@
+{% extends "tasks/task_base.html" %}
+
+{% block tasks_content %}
+
+
+<div class="container-fluid investigations-container">
+    <div>
+        <form action="" method="post">
+            {% csrf_token %}
+            <div class="alert alert-danger">Are you sure you want to delete this item and all attributes?
+            <input class='btn btn-danger' type="submit" value="Delete" />
+            <a href="javascript:history.go(-1)" class="btn btn-primary">
+                <span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>
+                <span>Cancel</span>
+            </a>
+                </div>
+        </form>
+    </div>
+    <div class="row">
+        <!-- Left Investigation Info -->
+        <div class="col-sm-12 col-md-12">
+            <div class="panel panel-primary">
+                <header class = "panel-heading">
+                    <div class="panel-title text-center">
+                        <strong>&nbsp;Delete Task Template | {{ tasktemplate.pk }}</strong>
+                    </div>
+                </header>
+                <div class="panel-body inv-panel-body" id="xxx">
+                    <table class="table" id="investigations-invh">
+                        <tbody>
+                            {% include 'tasks/tasktemplate_detail_table.html' %}
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row">
+
+        <!-- Right Investigation Info -->
+        <div class="col-sm-12 col-md-12">
+            <div class="panel panel-primary">
+                <div class = "panel-heading">
+                    <div class="panel-title text-center">
+                         <div class="btn-group inline pull-left">
+                              <a href="{% url 'tasks:tvar_create' task_pk=0 tasktmp_pk=tasktemplate.pk %}?next1={{ request.get_full_path|urlencode }}" class="btn btn-default btn-xs">
+                                  <span class="glyphicon glyphicon-plus"></span>
+                                  New Variable
+                              </a>
+                          </div>
+                         <strong>&nbsp;Related Variables | {{ tasktemplate.taskvar_tasktemplate.all.count }} item(s)</strong>
+                    </div>
+                </div>
+                <div class="panel-body">
+
+                    {% if error_message %}
+                        <p><strong>{{ error_message }}</strong></p>
+                    {% endif %}
+
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>TaskVarID</th>
+                            <th>Category</th>
+                            <th>Type</th>
+                            <th>Name</th>
+                            <th>Value</th>
+                            <th>Required</th>
+                            <th>Enabled</th>
+                            <th>Task</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                             {% include 'tasks/tasktemplate_detail_taskvar_table.html' %}
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+
+</div>
+
+
+{% endblock tasks_content %}

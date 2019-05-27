@@ -1,0 +1,9 @@
+<div style="color:black">
+  {% if widget.is_initial %}
+    <a href="{{ widget.value.url }}">{{ widget.value }}</a>
+    {% if not widget.required %}
+      <input type="checkbox" name="{{ widget.checkbox_name }}" id="{{ widget.checkbox_id }}">
+      <label for="{{ widget.checkbox_id }}">Remove</label>{% endif %}<br>
+    {% endif %}
+  <input type="{{ widget.type }}" name="{{ widget.name }}"{% include "django/forms/widgets/attrs.html" %}>
+</div>

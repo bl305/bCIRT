@@ -1,0 +1,57 @@
+{% if playbook.task_playbook.all %}
+
+{% for playbookitem in playbook.task_playbook.all %}
+    <!-- Guardian authentication check -->
+            <!-- |dictsortreversed:"id" -->
+                <tr class="mylist-meta" style="background-color:#e6e6e6" id="item-{{ playbookitem.pk }}">
+                    <!-- e.g.: #item-7 -->
+                  <td>
+                      <a class="badge" href="{% url 'tasks:tsk_detail' pk=playbookitem.pk %}?next1={{ request.get_full_path|urlencode }}">
+                          {{ playbookitem.pk }}
+                      </a>
+                  </td>
+                  <td>
+                      {{ playbookitem.title }}
+                  </td>
+                  <td>
+                      {{ playbookitem.status }}
+                  </td>
+                  <td>
+                      {{ playbookitem.user }}
+                  </td>
+                    <td>
+                        {{ playbookitem.created_at|date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                        {{ playbookitem.created_by }}
+                    </td>
+                    <td>
+                        {{ playbookitem.modified_at|date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                        {{ playbookitem.modified_by }}
+                    </td>
+                  <td>
+                      <div>
+                          <a href="{% url 'tasks:tsk_edit' pk=playbookitem.pk %}?next1={{ request.get_full_path|urlencode }}"
+                              class="btn btn-warning btn-xs">
+                          <span class="glyphicon glyphicon-pencil" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
+                          </a>
+                          <a href="{% url 'tasks:tsk_remove' pk=playbookitem.pk %}?next1={{ request.get_full_path|urlencode }}"
+                              class="btn btn-danger btn-xs pull-right">
+                          <span class="glyphicon glyphicon-trash" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
+                          </a>
+                      </div>
+                  </td>
+                </tr>
+
+                <tr class="invev-detail">
+                  <td colspan="8">{{ playbookitem.description|safe }}</td>
+                </tr>
+{% endfor %}
+{% else %}
+          <tr>
+            <td colspan="10" class="text-center bg-warning">No matching record found</td>
+          </tr>
+{% endif %}
+

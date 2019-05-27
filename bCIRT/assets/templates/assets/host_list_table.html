@@ -1,0 +1,61 @@
+{% if object_list %}
+{% for host in object_list %}
+                <tr>
+                    <td>
+                        <a class="badge" href="{% url 'assets:host_detail' pk=host.pk %}#?next1={{ request.get_full_path|urlencode }}">{{ host.pk }}</a>
+                    </td>
+                    <td>
+                        {{ host.name }}
+                    </td>
+                    <td>
+                        {% for hosts in host.hostname_hosts.all %}
+                            {{ hosts.name }}
+                            <br>
+                        {% endfor%}
+                    </td>
+                    <td>
+                        {% for ips in host.ipaddress_hosts.all %}
+                            {{ ips.ip }}
+                            <br>
+                        {% endfor%}
+                    </td>
+                    <td>
+                        {{ host.created_at|date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                        {{ host.created_by }}
+                    </td>
+                    <td>
+                        {{ host.modified_at|date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                        {{ host.modified_by }}
+                    </td>
+                    <td>
+                        na
+                    </td>
+                    <td>
+                        na
+                    </td>
+                    <td>
+	                	{% if user.is_authenticated %}
+                        <div>
+                            <a href="{% url 'assets:host_edit' pk=host.pk %}"
+                               class="btn btn-warning btn-xs">
+                                <span class="glyphicon glyphicon-pencil"></span>
+                            </a>
+                            <a href="{% url 'assets:host_remove' pk=host.pk %}" title="delete"
+                               class="btn btn-danger btn-xs pull-right">
+                                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                                <span class="icon-label"></span>
+                            </a>
+                        </div>
+                        {% endif %}
+                    </td>
+              </tr>
+{% endfor %}
+{% else %}
+          <tr>
+              <td colspan="8" class="text-center bg-warning">No Hosts</td>
+          </tr>
+{% endif %}

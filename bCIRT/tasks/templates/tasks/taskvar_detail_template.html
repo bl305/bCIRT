@@ -1,0 +1,39 @@
+{% if taskvar.pk %}
+    <tr>
+        <td><strong>Name</strong><br> {{ taskvar.name }} </td>
+        <td><strong>TaskVar ID</strong><br> {{ taskvar.pk }} </td>
+        <td><strong>Category</strong><br> {{ taskvar.category }} </td>
+        <td><strong>Required</strong><br> {{ taskvar.required }}</td>
+        <td><strong>Enabled</strong><br> {{ taskvar.enabled }} </td>
+        {% if taskvar.task %}
+        <td>
+            <strong>Task</strong><br>
+            <a class="badge"
+               href="{% url 'tasks:tsk_detail' pk=taskvar.task.pk %}?next1={{ request.get_full_path|urlencode }}">{{ taskvar.task }}
+            </a>
+        </td>
+        {% elif taskvar.tasktemplate %}
+        <td>
+            <strong>Task Template</strong><br>
+            <a class="badge"
+               href="{% url 'tasks:tmp_detail' pk=taskvar.tasktemplate.pk %}?next1={{ request.get_full_path|urlencode }}">{{ taskvar.tasktemplate }}
+            </a>
+        </td>
+        {% endif %}
+    </tr>
+    <tr>
+        <td colspan="6"><strong>Value</strong><br> {{ taskvar.value }} </td>
+    </tr>
+    <tr>
+        <td colspan="6">
+            <div class="row">
+            <div class="container invdescription">
+                <strong>Description</strong><br>
+                {{ taskvar.description_html|safe }}
+            </div>
+            </div>
+        </td>
+    </tr>
+{% else %}
+    <tr><td>No Header available!</td></tr>
+{% endif %}

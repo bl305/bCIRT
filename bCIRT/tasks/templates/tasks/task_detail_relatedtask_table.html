@@ -1,0 +1,104 @@
+{% if task.parent %}
+
+   <!-- Guardian authentication check -->
+            <!-- |dictsortreversed:"id" -->
+                <tr class="mylist-meta" style="background-color:#e6e6e6" id="item-p{{ task.parent.pk }}">
+                    <!-- e.g.: #item-7 -->
+                    <td>
+                      <a class="badge" href="{% url 'tasks:tsk_detail' pk=task.parent.pk %}?next1={{ request.get_full_path|urlencode }}">{{ task.parent.pk }}</a>
+                    </td>
+                    <td>
+                        Parent
+                    </td>
+                    <td>
+                      {{ task.parent.status }}
+                    </td>
+                    <td>
+                      {{ task.parent.created_at }}
+                    </td>
+                    <td>
+                      {{ task.parent.created_by }}
+                    </td>
+                    <td>
+                      {{ task.parent.modified_at }}
+                    </td>
+                    <td>
+                      {{ task.parent.modified_by }}
+                    </td>
+                    <td>
+                      <div>
+                          <a href="{% url 'tasks:tsk_detail' pk=task.parent.pk %}?next1={{ request.get_full_path|urlencode }}"
+                              class="btn btn-success btn-xs">
+                          <span class="glyphicon glyphicon-eye-open" data-toggle="tooltip" data-placement="top" title="View item"></span>
+                          </a>
+                          <a href="{% url 'tasks:tsk_edit' pk=task.parent.pk %}?next1={{ request.get_full_path|urlencode }}"
+                              class="btn btn-warning btn-xs">
+                          <span class="glyphicon glyphicon-pencil" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
+                          </a>
+                          <a href="{% url 'tasks:tsk_remove' pk=task.parent.pk %}#?next1={{ request.get_full_path|urlencode }}"
+                              class="btn btn-danger btn-xs pull-right">
+                          <span class="glyphicon glyphicon-trash" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
+                          </a>
+                      </div>
+                    </td>
+                </tr>
+
+          <!--<tr>-->
+            <!--<td colspan="8" class="text-center bg-warning">No Investigation</td>-->
+          <!--</tr>-->
+{% elif task.task_parent.all %}
+{% for child in task.task_parent.all %}
+
+                <tr class="mylist-meta" style="background-color:#e6e6e6" id="item-c{{ child.pk }}">
+                    <!-- e.g.: #item-7 -->
+                    <td>
+                      <a class="badge" href="{% url 'tasks:tsk_detail' pk=child.pk %}?next1={{ request.get_full_path|urlencode }}">{{ child.pk }}</a>
+                    </td>
+                    <td>
+                        Child
+                    </td>
+                    <td>
+                      {{ child.status }}
+                    </td>
+                    <td>
+                      {{ child.created_at }}
+                    </td>
+                    <td>
+                      {{ child.created_by }}
+                    </td>
+                    <td>
+                      {{ child.modified_at }}
+                    </td>
+                    <td>
+                      {{ child.modified_by }}
+                    </td>
+                    <td>
+                      <div>
+                          <a href="{% url 'tasks:tsk_detail' pk=child.pk %}?next1={{ request.get_full_path|urlencode }}"
+                              class="btn btn-success btn-xs">
+                          <span class="glyphicon glyphicon-eye-open" data-toggle="tooltip" data-placement="top" title="View item"></span>
+                          </a>
+                          <a href="{% url 'tasks:tsk_edit' pk=child.pk %}?next1={{ request.get_full_path|urlencode }}"
+                              class="btn btn-warning btn-xs">
+                          <span class="glyphicon glyphicon-pencil" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
+                          </a>
+                          <a href="{% url 'tasks:tsk_remove' pk=child.pk %}#?next1={{ request.get_full_path|urlencode }}"
+                              class="btn btn-danger btn-xs pull-right">
+                          <span class="glyphicon glyphicon-trash" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
+                          </a>
+                      </div>
+                    </td>
+                </tr>
+
+                <tr class="invev-detail">
+                  <td colspan="9">{{ taskvar.description|safe }}</td>
+                </tr>
+
+
+{% endfor %}
+{% else %}
+          <tr>
+            <td colspan="9" class="text-center bg-warning">No matching record found</td>
+          </tr>
+{% endif %}
+

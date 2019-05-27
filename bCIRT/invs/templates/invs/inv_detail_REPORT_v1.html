@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+
+{% load staticfiles %}
+
+<html lang="en">
+<head>
+        <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>bCIRT{% block ptitle %}{% endblock %}</title>
+    <style>
+    table.bcirttable {
+      width: 100%;
+      background-color: #ffffff;
+      border-collapse: collapse;
+      border-width: 2px;
+      border-color: #000000;
+      border-style: solid;
+      color: black;
+    }
+
+    table.bcirttable td, table.bcirttable th {
+      border-width: 2px;
+      border-color: #000000;
+      border-style: solid;
+      padding: 3px;
+    }
+
+    table.bcirttable thead {
+      background-color: #000000;
+      color: white;
+    }
+
+    .printheader {
+      background:green;
+      color:white;
+    }
+    </style>
+
+</head>
+<body>
+<div class="row">
+    {% include 'invs/inv_detail_tab_detail_REPORT_v1.html' %}
+</div>
+<div class="row">
+    {% include 'invs/inv_detail_tab_investigations_REPORT_v1.html' %}
+</div>
+<div class="row">
+    {% include 'invs/inv_detail_tab_profile_REPORT_v1.html' %}
+</div>
+<div class="row">
+    {% include 'invs/inv_detail_tab_playbooks_REPORT_v1.html' %}
+</div>
+<div class="row">
+    {% include 'invs/inv_detail_tab_tasks_REPORT_v1.html' %}
+</div>
+<div class="row">
+    {% include 'invs/inv_detail_tab_evidences_REPORT_v1.html' %}
+</div>
+
+</body>
+
+</html>

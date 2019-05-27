@@ -1,0 +1,87 @@
+{% if object_list %}
+{% for profile in object_list %}
+                <tr>
+                    <td>
+                        <a class="badge" href="{% url 'assets:prof_detail' pk=profile.pk %}#?next1={{ request.get_full_path|urlencode }}">
+                            {{ profile.pk }}
+                        </a>
+                    </td>
+                    <td>
+                        {% if profile.username %}
+                            {{ profile.username }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if profile.userid %}
+                            {{ profile.userid }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if profile.email %}
+                            {{ profile.email }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if profile.host %}
+                            {{ profile.host }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if profile.ip %}
+                            {{ profile.ip }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if profile.inv %}
+                        <a class="badge" href="{% url 'invs:inv_detail' pk=profile.inv.pk %}#?next1={{ request.get_full_path|urlencode }}">
+                            {{ profile.inv }}
+                        </a>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ profile.created_at|date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                        {{ profile.created_by }}
+                    </td>
+                    <td>
+                        {{ profile.modified_at|date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                        {{ profile.modified_by }}
+                    </td>
+                    <td>
+	                	{% if user.is_authenticated %}
+                        <div>
+                            <a href="{% url 'assets:prof_edit' pk=profile.pk %}"
+                               class="btn btn-warning btn-xs">
+                                <span class="glyphicon glyphicon-pencil"></span>
+                            </a>
+                            <a href="{% url 'assets:prof_remove' pk=profile.pk %}" title="delete"
+                               class="btn btn-danger btn-xs pull-right">
+                                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                                <span class="icon-label"></span>
+                            </a>
+                        </div>
+                        {% endif %}
+
+                    </td>
+              </tr>
+{% endfor %}
+{% else %}
+          <tr>
+              <td colspan="12" class="text-center bg-warning">No Profiles</td>
+          </tr>
+{% endif %}

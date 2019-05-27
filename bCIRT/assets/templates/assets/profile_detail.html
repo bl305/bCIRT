@@ -1,0 +1,56 @@
+{% extends "assets/asset_base.html" %}
+
+{% block assetslist_active %}active{% endblock assetslist_active%}
+
+{% block preassets %}
+
+{% endblock %}
+
+
+{% block assets_content %}
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="panel panel-primary">
+                <div class = "panel-heading">
+                    <div class="panel-title text-center" >
+                        <div class="btn-group inline pull-left">
+
+                        </div>
+                        <strong> Profile # {{ profile.pk }}</strong>
+                    </div>
+                </div>
+                <div class="panel-body inv-panel-body">
+                    <table class="table table-hover table-striped table-condensed" id="investigations-inve">
+                        <thead>
+                            <tr class="mylist-header">
+                                <th>ProfileID</th>
+                                <th>Username</th>
+                                <th>UserID</th>
+                                <th>Email</th>
+                                <th>Host</th>
+                                <th>IP</th>
+                                <th>Location</th>
+                                <th>Department</th>
+                                <th>Location Contact</th>
+                                <th>Inv</th>
+                                <th>Created on</th>
+                                <th>Created by</th>
+                                <th>Modified on</th>
+                                <th>Modified by</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% include "assets/profile_detail_table.html" %}
+                        </tbody>
+                    </table>
+                    <a href="javascript:history.go(-1)" class="btn btn-primary pull-right">
+                        <span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>
+                        <span>Back</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

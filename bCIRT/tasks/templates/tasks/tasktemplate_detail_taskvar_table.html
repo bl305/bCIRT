@@ -1,0 +1,53 @@
+{% if tasktemplate.taskvar_tasktemplate.all %}
+
+{% for taskvar in tasktemplate.taskvar_tasktemplate.all %}
+                <tr class="mylist-meta" style="background-color:#e6e6e6" id="item-{{ taskvar.pk }}">
+                  <td>
+                      <a class="badge" href="{% url 'tasks:tvar_detail' pk=taskvar.pk %}?next1={{ request.get_full_path|urlencode }}">{{ taskvar.pk }}</a>
+                  </td>
+                  <td>
+                      {{ taskvar.category }}
+                  </td>
+                  <td>
+                      {{ taskvar.type }}
+                  </td>
+                  <td>
+                      {{ taskvar.name }}
+                  </td>
+                  <td>
+                      {{ taskvar.value }}
+                  </td>
+                  <td>
+                      {{ taskvar.required }}
+                  </td>
+                  <td>
+                      {{ taskvar.enabled }}
+                  </td>
+                  <td>
+                      {{ taskvar.task }}
+                  </td>
+                  <td>
+                      <div>
+                          <a href="{% url 'tasks:tvar_detail' pk=taskvar.pk %}?next1={{ request.get_full_path|urlencode }}"
+                              class="btn btn-success btn-xs">
+                          <span class="glyphicon glyphicon-eye-open" data-toggle="tooltip" data-placement="top" title="View item"></span>
+                          </a>
+                          <a href="{% url 'tasks:tvar_edit' pk=taskvar.pk %}?next1={{ request.get_full_path|urlencode }}"
+                              class="btn btn-warning btn-xs">
+                          <span class="glyphicon glyphicon-pencil" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
+                          </a>
+                          <a href="{% url 'tasks:tvar_remove' pk=taskvar.pk %}?next1={{ request.get_full_path|urlencode }}"
+                              class="btn btn-danger btn-xs pull-right">
+                          <span class="glyphicon glyphicon-trash" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
+                          </a>
+                      </div>
+                  </td>
+                </tr>
+                <tr class="invev-detail">
+                  <td colspan="9">{{ taskvar.description|safe }}</td>
+                </tr>
+{% endfor %}
+{% else %}
+
+{% endif %}
+

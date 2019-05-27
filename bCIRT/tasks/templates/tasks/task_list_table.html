@@ -1,0 +1,197 @@
+{% if object_list %}
+{% for task in object_list %}
+                <tr data-toggle="collapse" data-target="#mytasks{{task.pk}}" class="accordion-toggle" id="item-task-{{task.pk}}">
+                    <td>
+                        <li class="dropdown" onclick="incrow({{task.pk}},'item-task-','150px')">
+                            <!--<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Dropdown <span class="caret"></span></a>-->
+                            <!--<button class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">-->
+                                <!--Dropdown -->
+                                <!--<span class="caret"></span>-->
+                            <!--</button>-->
+                            <div>
+                            <div class="btn-group">
+                             <button class="btn btn-default btn-xs dropdown-toggle dropdown-toggle-split" onclick="filterFunctionTask()" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
+                                {{ task.pk }}<span class="caret"></span>
+                            </button>
+
+                                <ul class="dropdown-menu" role="menu">
+                                    {% if task.status.name != "Completed" %}
+                                        <li>
+                                            {% if task.inv %}
+                                            <a href="{% url 'tasks:ev_create' inv_pk=task.inv.pk task_pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                               class="btn btn-default btn-xs">
+                                                New Evidence
+                                                <span class="glyphicon glyphicon-plus"></span>
+                                            </a>
+                                            {% else %}
+                                            <a href="{% url 'tasks:ev_create' inv_pk=0 task_pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                               class="btn btn-default btn-xs">
+                                                New Evidence
+                                                <span class="glyphicon glyphicon-plus"></span>
+                                            </a>
+                                            {% endif %}
+                                        </li>
+                                    {% endif %}
+                                    <li>
+                                        <a href="{% url 'tasks:tsk_detail' pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                            class="btn btn-default btn-xs">
+                                            Open&nbsp;
+                                            <span class="glyphicon glyphicon-eye-open" data-toggle="tooltip" data-placement="top" title="Open item"></span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{% url 'tasks:tsk_edit' pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                          class="btn btn-default btn-xs">
+                                          Edit&nbsp;
+                                          <span class="glyphicon glyphicon-pencil" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        {% if task.action.code_file %}
+                                            {% if task.actev %}
+                                                {% if task.action.script_category.pk == 2 and task.actiontarget.evidence_task.all.first.fileName or task.action.script_category.pk == 1 %}
+                                                    {% if task.inv %}
+                                                        <a href="{% url 'tasks:act_exec_script' pk=task.action.pk inv_pk=task.inv.pk task_pk=task.pk ev_pk=task.actev %}"
+                                                           class="btn btn-success btn-xs">
+                                                                Run
+                                                            <span class="glyphicon glyphicon-play"></span>
+                                                        </a>
+                                                    {% else %}
+                                                        <a href="{% url 'tasks:act_exec_script' pk=task.action.pk inv_pk=0 task_pk=task.pk ev_pk=task.actev %}"
+                                                           class="btn btn-success btn-xs">
+                                                                Run
+                                                            <span class="glyphicon glyphicon-play"></span>
+                                                        </a>
+                                                    {% endif %}
+                                                {% else %}
+                                                    (No file)
+                                                {% endif %}
+                                            {% else %}
+                                                <a href="#"
+                                                    class="btn btn-disabled btn-xs">
+                                                    Actionxxx
+                                                    <span class="glyphicon glyphicon-ban-circle" data-toggle="tooltip" data-placement="top" title="Open item"></span>
+                                                </a>
+                                            {% endif %}
+                                        {% endif %}
+                                    </li>
+                                    <li>&nbsp;</li>
+                                    <li>
+                                          <a href="{% url 'tasks:tsk_remove' pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                              class="btn btn-danger btn-xs">
+                                          <span class="glyphicon glyphicon-trash" data-toggle="tooltip" data-placement="top" title="Edit item">
+                                              Delete
+                                          </span>
+                                          </a>
+                                    </li>
+                                </ul>
+                                </div>
+                            </div>
+                        </li> <!-- .dropdown -->
+
+                    </td>
+                    <td>
+                        <a class="badge" href="{% url 'tasks:tsk_detail' pk=task.pk %}?next1={{ request.get_full_path|urlencode }}">
+                            {{ task.title }}
+                        </a>
+                    </td>
+                    <td>
+                        <div class="container inv-index">
+                            {{ task.description_html|safe }}
+
+                        </div>
+                    </td>
+                    <td>
+                        <li class="dropdown">
+                            <button class="btn btn-default btn-xs dropdown-toggle" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
+                                {{ task.status }}
+                                <span class="caret"></span>
+                            </button>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li>
+                                          <a href="{% url 'tasks:tsk_open' pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                              class="btn btn-default btn-xs">
+                                              Open
+                                              <span class="glyphicon glyphicon-plus" data-toggle="tooltip" data-placement="top" title="Edit item">
+                                          </span>
+                                          </a>
+                                    </li>
+                                    <li>&nbsp;</li>
+                                    <li>
+                                          <a href="{% url 'tasks:tsk_assign' pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                              class="btn btn-default btn-xs">
+                                              Assign
+                                              <span class="glyphicon glyphicon-plus" data-toggle="tooltip" data-placement="top" title="Edit item">
+                                          </span>
+                                          </a>
+                                    </li>
+                                    <li>&nbsp;</li>
+                                    <li>
+                                        <a href="{% url 'tasks:tsk_close' pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                            class="btn btn-default btn-xs">
+                                            Complete
+                                            <span class="glyphicon glyphicon-eye-open" data-toggle="tooltip" data-placement="top" title="Open item"></span>
+                                        </a>
+                                    </li>
+                                </ul>
+                        </li> <!-- .dropdown -->
+
+                    </td>
+                    <td>
+                        {{ task.priority }}
+                    </td>
+                    <td>
+                        {% if task.user %}
+                            {{ task.user }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if task.playbook %}
+                        <a class="badge" href="{% url 'tasks:play_detail' pk=task.playbook.pk %}?next1={{ request.get_full_path|urlencode }}">
+                            {{ task.playbook }}
+                        </a>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if task.starttime %}
+                            {{ task.starttime|date:"Y/m/d H:i:s" }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ task.created_at|date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                        {{ task.modified_at|date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                        {{ task.modified_by }}
+                    </td>
+                    <td>
+                        {% if task.parent %}
+                            {{ task.parent }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="12" class="hiddenRow">
+                        <div class="accordian-body collapse" id="mytasks{{task.pk}}">
+                            <div class="invdescription2" style="max-width:25vw">
+                            {{ task.description|safe }}
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+{% endfor %}
+{% else %}
+          <tr>
+            <td colspan="12" class="text-center bg-warning">No Tasks</td>
+          </tr>
+{% endif %}

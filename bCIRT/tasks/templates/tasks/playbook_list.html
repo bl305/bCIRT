@@ -1,0 +1,98 @@
+{% extends "tasks/task_base.html" %}
+
+{% block taskslist_active %}active{% endblock taskslist_active %}
+
+{% block pretasks %}
+		{% if user.is_authenticated %}
+
+	    {% endif %}
+{% endblock pretasks %}
+
+{% block tasks_content %}
+<div class="row">
+    <div class="col-sm-12">
+        <div align="center">
+            <div class="panel panel-primary">
+                <div class = "panel-heading">
+                    <div class="panel-title">
+                          <div class="btn-group inline pull-left">
+                              {% if user.is_authenticated %}
+                               <div>
+
+                                <div class="dropdown">
+                                    <button class="btn btn-default btn-xs dropdown-toggle" onclick="filterFunction()" type="button" data-toggle="dropdown">
+                                        <span class="glyphicon glyphicon-plus-sign"></span> New Playbook
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-content" id="myDropdown">
+                                        <input type="text" placeholder="Search.." id="myInput" onkeyup="filterFunction()">
+                                        {% for ptmp in playbooktmp %}
+                                          <li>
+                                              <a href="{% url 'tasks:play_create' inv_pk=0 tmp_pk=ptmp.pk %}?next1={{ request.get_full_path|urlencode }}">
+                                                  <span></span>
+                                                  {{ ptmp.pk }} - {{ ptmp.name }}
+                                              </a>
+                                          </li>
+                                          <!--<li class="divider"></li>-->
+                                        {% endfor %}
+<!--</div>-->
+                                                  </ul>
+                                </div>
+                                </div>
+                              {% endif %}
+                           </div>
+                    </div>
+                        <strong>Playbook for {{ user }} at {% now "Y/m/d H:i:s" %} (UTC)</strong>
+                </div>
+                <div class="panel-body" style="color:black;height:80%;width:100%;overflow:auto;">
+
+
+                    <table class="table table-hover display order-column" id="investigations-invi"
+
+                        data-toggle="table"
+                        data-classes="table table-no-bordered"
+                        data-pagination="true"
+                        data-search="true"
+
+                        data-show-refresh="true"
+                        data-show-toggle="true"
+                        data-show-columns="true"
+                        data-minimum-count-columns="2"
+                        data-show-pagination-switch="true"
+                        data-id-field="id"
+                        data-page-list="[10, 25, 50, 100, ALL]"
+                        data-show-footer="false"
+                        data-side-pagination="client"
+                        >
+                        <thead>
+                        <tr>
+                            <th data-field="id" data-sortable="true">ID</th>
+                            <th data-field="name" data-sortable="true">Playbook</th>
+                            <th data-field="owner" data-sortable="true">Owner</th>
+                            <th data-field="version" data-sortable="true">Version</th>
+                            <th data-field="inv" data-sortable="true">Investigation</th>
+                            <th data-field="created" data-sortable="true">Created (UTC)</th>
+                            <th data-field="createdby" data-sortable="true">Created by</th>
+                            <th data-field="modified" data-sortable="true">Modified (UTC)</th>
+                            <th data-field="modifiedby" data-sortable="true">Modified by</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            {% include 'tasks/playbook_list_table.html' %}
+                        </tbody>
+                    </table>
+
+                    <div class="modal fade" id="modal-investigations-invi">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+
+                        </div>
+                      </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock tasks_content %}

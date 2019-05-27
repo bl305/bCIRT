@@ -1,0 +1,84 @@
+{% if object_list %}
+{% for updatepackageitem in object_list %}
+                <tr id="ev_{{updatepackageitem.pk}}">
+                    <td>
+                        <li class="dropdown" onclick="incrow({{updatepackageitem.pk}},'ev_','300px')">
+                            <!--<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Dropdown <span class="caret"></span></a>-->
+                            <!--<button class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">-->
+                                <!--Dropdown -->
+                                <!--<span class="caret"></span>-->
+                            <!--</button>-->
+
+                            <button class="btn btn-default btn-xs dropdown-toggle" onclick="filterFunction()" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
+                                {{ updatepackageitem.pk }}
+                                <span class="caret"></span>
+                            </button>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li>
+                                        <a href="{% url 'configuration:conf_updatedetail' pk=updatepackageitem.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                            class="btn btn-default btn-xs">
+                                            Open&nbsp;
+                                            <span class="glyphicon glyphicon-eye-open" data-toggle="tooltip" data-placement="top" title="Open item"></span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{% url 'configuration:conf_updateedit' pk=updatepackageitem.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                          class="btn btn-default btn-xs">
+                                          Edit&nbsp;
+                                          <span class="glyphicon glyphicon-pencil" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
+                                        </a>
+                                    </li>
+                                    <li>&nbsp;</li>
+                                    <li>
+                                          <a href="{% url 'configuration:conf_updateremove' pk=updatepackageitem.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                              class="btn btn-danger btn-xs">
+                                          <span class="glyphicon glyphicon-trash" data-toggle="tooltip" data-placement="top" title="Edit item">
+                                              Delete
+                                          </span>
+                                          </a>
+                                    </li>
+                                </ul>
+                        </li> <!-- .dropdown -->
+
+                    </td>
+                    <td>
+                        {{ updatepackageitem.user }}
+                    </td>
+                    <td>
+                        {{ updatepackageitem.created_at|date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                        {{ updatepackageitem.created_by }}
+                    </td>
+                    <td>
+                        {{ updatepackageitem.modified_at|date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                        {{ updatepackageitem.modified_by }}
+                    </td>
+                    <td>
+                        {% if updatepackageitem.fileRef %}
+<!--                            <a href="{{BASE_URL}}{{MEDIA_URL}}{{ evidence.fileRef.name }}"-->
+<!--                                class="btn btn-default btn-xs" target="_blank">-->
+<!--                                <span class="glyphicon glyphicon-floppy-disk">{{ evidence.fileName }}</span>-->
+<!--                            </a>-->
+                            {{ updatepackageitem.fileName }}
+                            <a href="#?next1={{ request.get_full_path|urlencode }}"
+                                class="btn btn-default btn-xs" target="_blank">
+                                <span class="glyphicon glyphicon-floppy-disk"> </span>
+                            </a>
+                            <a href="#?next1={{ request.get_full_path|urlencode }}"
+                                class="btn btn-default btn-xs" target="_blank">
+                                <span class="glyphicon glyphicon-compressed"> </span>
+                            </a>
+                        {% else %}
+                        -
+                        {% endif %}
+                    </td>
+              </tr>
+{% endfor %}
+{% else %}
+          <tr>
+            <td colspan="10" class="text-center bg-warning">No UpdatePackages</td>
+          </tr>
+{% endif %}

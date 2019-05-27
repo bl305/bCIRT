@@ -1,0 +1,55 @@
+{% extends "configuration/configuration_base.html" %}
+
+{% block configurationlist_active %}active{% endblock configurationlist_active%}
+
+{% block preconfiguration %}
+
+{% endblock %}
+
+
+{% block configuration_content %}
+    <div class="row">
+
+        <div class="col-md-12 col-md-12">
+                <div class="panel panel-primary">
+                    <div class = "panel-heading">
+                        <div class="panel-title text-center">
+                              <div class="btn-group inline pull-left">
+                                <!--<div class="dropdown">-->
+
+                                <!--</div>-->
+                              </div>
+                            <strong> UpdatePackage # {{ updatepackage.pk }}</strong>
+                        </div>
+                    </div>
+
+                    <div class="panel-body ev-panel-body">
+                        <table class="table table-hover table-striped table-condensed" id="configuration-eve">
+                            <thead>
+                                <tr class="mylist-header">
+                                    <th>UpdatePackageID</th>
+                                    <th>Created on</th>
+                                    <th>Created by</th>
+                                    <th>Modified on</th>
+                                    <th>Modified by</th>
+                                    <th>Attachment</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% include "configuration/updatepackage_detail_table.html" %}
+                            </tbody>
+                        </table>
+                        <a href="javascript:history.go(-1)" class="btn btn-primary pull-right">
+                            <span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>
+                            <span>Back</span>
+                        </a>
+
+
+                    </div>
+                </div>
+
+
+        </div>
+    </div>
+
+{% endblock configuration_content %}

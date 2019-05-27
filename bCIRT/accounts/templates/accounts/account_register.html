@@ -1,0 +1,15 @@
+{% extends "base.html"  %}
+
+{% load bootstrap4 %}
+
+
+{% block content %}
+<div class="container myregister">
+    <h1>Register </h1><p>(user is created as disabled, use the admin page to enable it)</p>
+    <form method="POST">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        <input type="submit" value="Register" class="btn btn-default">
+    </form>
+</div>
+{% endblock %}

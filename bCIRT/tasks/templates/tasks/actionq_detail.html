@@ -1,0 +1,42 @@
+{% extends "tasks/action_base.html" %}
+
+{% block actionslist_active %}active{% endblock actionslist_active %}
+
+{% block preactions %}
+		{% if user.is_authenticated %}
+
+	    {% endif %}
+{% endblock %}
+
+{% block actions_content %}
+
+    <div class="row">
+        <!-- Left Investigation Info -->
+        <div class="col-sm-12 col-md-12">
+            <div class="panel panel-primary">
+                <header class = "panel-heading">
+                    <div class="panel-title text-center">
+                        <div class="btn-group inline pull-left">
+                        </div>
+                        <strong>&nbsp;Action Results</strong>
+                        <div class="btn-group inline ">
+                        </div>
+                    </div>
+                </header>
+                <div class="panel-body inv-panel-body" id="xxx">
+                    <table class="table" id="investigations-invh">
+                        <tbody>
+                            {% include 'tasks/actionq_detail_table.html' %}
+                        </tbody>
+                    </table>
+                        <a href="javascript:history.go(-1)" class="btn btn-primary pull-right">
+                            <span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>
+                            <span>Back</span>
+                        </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}

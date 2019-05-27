@@ -1,0 +1,50 @@
+                <tr class="mylist-meta" style="background-color:#e6e6e6" id="item-{{ playbooktemplate.pk }}">
+                    <!-- e.g.: #item-7 -->
+                    <td>
+                        {{ playbooktemplate.pk }}
+                    </td>
+                    <td>
+                        {{ playbooktemplate.name }}
+                    </td>
+                    <td>
+                        {{ playbooktemplate.user }}
+                    </td>
+                    <td>
+                        {{ playbooktemplate.version }}
+                    </td>
+                    <td>
+                      {{ playbooktemplate.created_at|date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                      {{ playbooktemplate.created_by }}
+                    </td>
+                    <td>
+                       {{ playbooktemplate.modified_at|date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                       {{ playbooktemplate.modified_by }}
+                    </td>
+                    <td>
+                      <div>
+                          <a href="{% url 'tasks:playtmp_edit' pk=playbooktemplate.pk %}"
+                              class="btn btn-warning btn-xs">
+                          <span class="glyphicon glyphicon-pencil" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
+                          </a>
+                          <a href="{% url 'tasks:playtmp_remove' pk=playbooktemplate.pk %}"
+                              class="btn btn-danger btn-xs pull-right">
+                          <span class="glyphicon glyphicon-trash" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
+                          </a>
+                      </div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="9">
+                        <div class="row">
+                        <div class="container invdescription">
+                            {{ playbooktemplate.description_html|safe }}
+                        </div>
+                        </div>
+
+                    </td>
+                </tr>

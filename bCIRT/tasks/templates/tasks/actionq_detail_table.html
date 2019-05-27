@@ -1,0 +1,120 @@
+    <tr>
+        <td><strong>Action</strong><br>
+            <a class="badge" href="{% url 'tasks:act_detail' pk=actionq.actionid.pk %}?next1={{ request.get_full_path|urlencode }}">
+                {{ actionq.actionid.title }}
+            </a>
+        </td>
+        <td><strong>Evidence</strong><br>
+            {% if actionq.evid %}
+                {% if actionq.oldevid %}
+                    <a class="badge" href="{% url 'tasks:ev_detail' pk=actionq.oldevid.pk %}?next1={{ request.get_full_path|urlencode }}">
+                        {{ actionq.oldevid.pk }}
+                    </a>
+                {% endif %}
+                ->
+                <a class="badge" href="{% url 'tasks:ev_detail' pk=actionq.evid.pk %}?next1={{ request.get_full_path|urlencode }}">
+                    {{ actionq.evid.pk }}
+                </a>
+            {% else %}
+                -
+            {% endif %}
+        </td>
+        <td><strong>Task</strong><br>
+            {% if actionq.taskid %}
+                <a class="badge" href="{% url 'tasks:tsk_detail' pk=actionq.taskid.pk %}?next1={{ request.get_full_path|urlencode }}">
+                    {{ actionq.taskid.title }}
+                </a>
+            {% else %}
+                -
+            {% endif %}
+        </td>
+        <td><strong>Investigation</strong><br>
+            {% if actionq.invid %}
+                <a class="badge" href="{% url 'invs:inv_detail' pk=actionq.invid.pk %}?next1={{ request.get_full_path|urlencode }}">
+                    {{ actionq.invid }}
+                </a>
+            {% else %}
+                -
+            {% endif %}
+        </td>
+        <td><strong>ActionQ Related</strong><br>
+            {% if actionq.parent %}
+                <a class="badge" href="{% url 'tasks:actq_detail' pk=actionq.parent %}">
+                    {{ actionq.parent }}
+                </a>
+            {% else %}
+                -
+            {% endif %}
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>Status</strong><br> {{ actionq.status }}
+        </td>
+        <td>
+            <strong>Created</strong><br> {{ actionq.created_at|date:"Y/m/d H:i:s" }}
+        </td>
+        <td>
+            <strong>Created by</strong><br> {{ actionq.created_by }}
+        </td>
+        <td>
+            <strong>PID</strong><br> {{ actionq.cmdpid }}
+        </td>
+        <td>
+            <strong>Interpreter</strong><br> {{ actionq.actionid.script_type }}
+        </td>
+    </tr>
+    <tr>
+        <td colspan="5">
+            <div class="row">
+            <div class="container invdescription">
+                <strong>Command Error</strong><br>
+                {{ actionq.cmderror }}
+            </div>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="5">
+            <div class="row">
+            <div class="container invdescription">
+                <strong>Arguments</strong><br>
+                {{ actionq.argument }}
+            </div>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="5">
+            <div class="row">
+            <div class="container invdescription">
+                <strong>Arguments Dynamic</strong><br>
+                {% if actionq.argdyn %}
+                    {{ actionq.argdyn }}
+                {% else %}
+                    -
+                {% endif %}
+            </div>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="5">
+            <div class="row">
+            <div class="container invdescription">
+                <strong>Full Command</strong><br>
+                {{ actionq.command }}
+            </div>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="5">
+            <div class="row">
+            <div class="container invdescription">
+                <strong>Output</strong><br>
+                {{ actionq.cmdoutput|linebreaks }}
+            </div>
+            </div>
+        </td>
+    </tr>

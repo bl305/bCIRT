@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block ptitle %}Actions{% endblock %}
+
+{% block actions_active %}active{% endblock actions_active %}
+
+{% load bootstrap4 %}
+
+{% block title %}{% endblock title %}
+
+{% block content %}
+
+    {% block preactions %}{% endblock preactions %}
+    {% block actions_content %}{% endblock actions_content %}
+    {% block postactions %}{% endblock postactions %}
+
+{% endblock %}

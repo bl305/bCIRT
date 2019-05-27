@@ -1,0 +1,64 @@
+{% if object_list %}
+{% for action in object_list %}
+                <tr>
+                    <td>
+                        <a class="badge" href="{% url 'tasks:act_detail' pk=action.pk %}?next1={{ request.get_full_path|urlencode }}">{{ action.pk }}</a>
+                    </td>
+                    <td>
+                        {{ action.user }}
+                    </td>
+                    <td>
+                        {{ action.title }}
+                    </td>
+                    <td>
+                        {{ action.type }}
+                    </td>
+                    <td>
+                        {{ action.script_category }}
+                    </td>
+                    <td>
+                        {{ action.outputtarget.name }}
+                    </td>
+                    <td>
+                        {{ action.script_type }}
+                    </td>
+                    <td>
+                        {{ action.created_at|date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                        {{ action.created_by }}
+                    </td>
+                    <td>
+                        {{ action.modified_at|date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                        {{ action.modified_by }}
+                    </td>
+                    <td>
+	                	{% if user.is_authenticated %}
+                        <div>
+                            {% if action.code_file %}
+                            <a href="{% url 'tasks:act_exec_script' pk=action.pk inv_pk=0 task_pk=0 ev_pk=0 %}"
+                               class="btn btn-success btn-xs">
+                                <span class="glyphicon glyphicon-play"></span>
+                            </a>
+                            {% endif %}
+                            <a href="{% url 'tasks:act_edit' pk=action.pk %}"
+                               class="btn btn-warning btn-xs">
+                                <span class="glyphicon glyphicon-pencil"></span>
+                            </a>
+                            <a href="{% url 'tasks:act_remove' pk=action.pk %}" title="delete" class="btn btn-danger btn-xs pull-right">
+                                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                                <span class="icon-label"></span>
+                            </a>
+                        </div>
+                        {% endif %}
+
+                    </td>
+              </tr>
+{% endfor %}
+{% else %}
+          <tr>
+              <td colspan="11" class="text-center bg-warning">No Actions</td>
+          </tr>
+{% endif %}

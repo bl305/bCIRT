@@ -1,0 +1,43 @@
+{% extends "tasks/task_base.html" %}
+
+{% block tasks_content %}
+<div class="container-fluid investigations-container">
+    <div>
+        <form action="" method="post">
+            {% csrf_token %}
+            <div class="alert alert-danger">Are you sure you want to delete this item and all attributes?
+            <input class='btn btn-danger' type="submit" value="Delete" />
+            <a href="javascript:history.go(-1)" class="btn btn-primary">
+                <span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>
+                <span>Cancel</span>
+            </a>
+                </div>
+        </form>
+    </div>
+
+    <div class="row">
+
+        <!-- Left Investigation Info -->
+        <div class="col-sm-12 col-md-12">
+            <div class="panel panel-primary">
+                <header class = "panel-heading">
+                    <div class="panel-title text-center">
+                        <strong>&nbsp;Delete Task | #{{ task.pk }}</strong>
+                    </div>
+                </header>
+                <div class="panel-body inv-panel-body" id="xxx">
+                    <table class="table" id="investigations-invh">
+                        <tbody>
+                            {% include 'tasks/task_detail_table.html' %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+
+{% endblock tasks_content %}

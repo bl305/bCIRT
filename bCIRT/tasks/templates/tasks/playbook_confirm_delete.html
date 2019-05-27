@@ -1,0 +1,96 @@
+{% extends "tasks/task_base.html" %}
+
+{% block tasks_content %}
+<div class="container-fluid investigations-container">
+    <div>
+        <form action="" method="post">
+            {% csrf_token %}
+            <div class="alert alert-danger">Are you sure you want to delete this item and all attributes?
+            <input class='btn btn-danger' type="submit" value="Delete" />
+            <a href="javascript:history.go(-1)" class="btn btn-primary">
+                <span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>
+                <span>Cancel</span>
+            </a>
+                </div>
+        </form>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+
+                <div class="panel panel-primary">
+                    <div class = "panel-heading">
+                        <div class="panel-title text-center" >
+                            <strong> Playbook # {{ playbook.pk }} | {{ playbook.name }} | {{ user }} at {% now "Y/m/d H:i:s" %} (UTC)</strong>
+                        </div>
+                    </div>
+                    <div class="panel-body inv-panel-body">
+                        <table class="table table-hover table-striped table-condensed" id="investigations-inve">
+                            <thead>
+                                <tr class="mylist-header">
+                                    <th>ID</th>
+                                    <th>Investigation</th>
+                                    <th>Owner</th>
+                                    <th>Version</th>
+                                    <th>Created on</th>
+                                    <th>Created by</th>
+                                    <th>Modified on</th>
+                                    <th>Modified by</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% include "tasks/playbook_detail_table.html" %}
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+
+        </div>
+    </div>
+
+    <div class="row">
+
+        <!-- Right Investigation Info -->
+        <div class="col-sm-12 col-md-12">
+            <div class="panel panel-primary">
+                <div class = "panel-heading">
+                    <div class="panel-title text-center">
+                         <strong>&nbsp;Playbook Steps | {{ playbook.task_playbook.all.count }} item{{ playbook.task_playbook.all.count|pluralize }}</strong>
+                    </div>
+                </div>
+                <div class="panel-body">
+
+                    {% if error_message %}
+                        <p><strong>{{ error_message }}</strong></p>
+                    {% endif %}
+
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>ItemID</th>
+                            <th>Title</th>
+                            <th>Status</th>
+                            <th>Owner</th>
+                            <th>Created</th>
+                            <th>Created By</th>
+                            <th>Modified</th>
+                            <th>Modified By</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                             {% include 'tasks/playbook_detail_playbookitem_table.html' %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock tasks_content %}

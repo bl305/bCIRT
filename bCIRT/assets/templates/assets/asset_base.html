@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block ptitle %}Assets{% endblock %}
+
+{% block assets_active %}active{% endblock assets_active %}
+
+{% load bootstrap4 %}
+
+{% block title %}{% endblock title %}
+
+{% block content %}
+
+    {% block preassets %}{% endblock preassets %}
+    {% block assets_content %}{% endblock assets_content %}
+    {% block postassets %}{% endblock postassets %}
+
+{% endblock %}

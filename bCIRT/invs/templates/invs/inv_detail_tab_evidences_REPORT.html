@@ -1,0 +1,33 @@
+    <div class="row">
+        <div class="col-sm-12">
+
+                <div class="panel panel-primary">
+                    <div class = "panel-heading">
+                        <div class="panel-title text-center" >
+                            <strong>&nbsp;Evidences |  {{ inv.evidence_inv.count }} item{{ inv.evidence_inv.count|pluralize }} | {{ user }} at {% now "Y/m/d H:i:s" %} (UTC)</strong>
+                        </div>
+                    </div>
+                    <div class="panel-body inv-panel-body">
+
+                        <table class="table table-striped table-condensed" id="investigations-inve">
+                            <thead>
+                                <tr class="mylist-header">
+                                    <th>EvidenceID</th>
+                                    <th>Created on</th>
+                                    <th>Created by</th>
+                                    <th>Modified on</th>
+                                    <th>Modified by</th>
+                                    <th>Attachment</th>
+                                    <th>Task</th>
+                                    <th>Attributes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% include 'invs/inv_detail_evidence_table_REPORT.html' %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+        </div>
+    </div>

@@ -1,0 +1,59 @@
+{% extends "tasks/action_base.html" %}
+
+{% block actionslist_active %}active{% endblock actionslist_active%}
+
+{% block preactions %}
+
+{% endblock %}
+
+
+{% block actions_content %}
+    <div class="row">
+        <!-- Left Investigation Info -->
+        <div class="col-sm-12 col-md-12">
+            <div class="panel panel-primary">
+                <header class = "panel-heading">
+                    <div class="panel-title text-center">
+                        <div class="btn-group inline pull-left">
+                            <a href="{% url 'tasks:act_create' %}?next1={{ request.get_full_path|urlencode }}"
+                               class="btn btn-default btn-xs">
+                            <span class="glyphicon glyphicon-plus"></span>
+                            New Action Script
+                            </a>
+                        </div>
+                        <strong>&nbsp;Action Details | {{ action.pk }}</strong>
+                        <div class="btn-group inline ">
+                            <a href="{% url 'tasks:act_edit' pk=action.pk %}?next1={{ request.get_full_path|urlencode }}" class="btn btn-warning btn-xs">
+                            <span class="glyphicon glyphicon-pencil"></span>
+                            Edit
+                            </a>
+                        </div>
+                    </div>
+                </header>
+                <div class="panel-body inv-panel-body">
+                    <table class="table" id="actions-detail">
+                        <tbody >
+                            {% include 'tasks/action_detail_table.html' %}
+                        </tbody>
+                    </table>
+                    {% if action.code_file %}
+                    <a href="{% url 'tasks:act_exec_script' pk=action.pk inv_pk=0 task_pk=0 ev_pk=0 %}"
+                       class="btn btn-success btn-sm">
+                        <span class="glyphicon glyphicon-play"></span>
+                    </a>
+                    {% endif %}
+                    <a href="{% url 'tasks:act_list' %}" class="btn btn-primary pull-right">
+                        <span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>
+                        <span>Actions list</span>
+                    </a>
+                    <div class="modal fade" id="modal-investigations-invh">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

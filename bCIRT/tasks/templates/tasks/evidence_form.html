@@ -1,0 +1,135 @@
+{% extends "tasks/evidence_base.html" %}
+
+{% block evidenceslist_active %}active{% endblock evidenceslist_active %}
+
+{% load bootstrap4 %}
+
+<!-- BL start -->
+{{ form.media }}
+<!-- BL end -->
+
+{% block preevidences %}
+	<div class="container myregister">
+    </div>
+{% endblock preevidences %}
+
+{% block evidences_content %}
+<!--To remove the TinyMCE if it is a raw text evidence-->
+{% if evidence.evidenceformat.pk == 1 %}
+      <script type="text/javascript">
+            window.addEventListener("load", function(){
+                tinyMCE.activeEditor.remove();
+            });
+      </script>
+{% endif %}
+{% if evidence.evidenceformat.pk == 2 %}
+      <script type="text/javascript">
+            window.addEventListener("load", function(){
+                tinyMCE.activeEditor.show();
+            });
+      </script>
+{% endif %}
+
+
+
+<script>
+function editorRAW(){
+//  var editorId='id_evidenceformat';
+//  tinyMCE.activeEditor.remove();
+    tinymce.remove();
+
+}
+
+function editorTINYMCE(){
+//    alert("TINY");
+
+//ok tinymce.EditorManager.execCommand('mceToggleEditor', true, 'id_evidenceformat');
+//    var edId='id_evidenceformat';
+    //tinymce.execCommand('mceRemoveControl', true, 'ed_evidenceformat');
+//    tinymce.EditorManager.execCommand('mceToggleEditor', true, edId);
+//tinymce.EditorManager.editors = [];
+//tinymce.init({selector:"#id_evidenceformat"});
+
+
+(function($){function tinymce4_init(selector){var tinymce4_config={setup:function(editor){editor.on('change',function(){editor.save();});},"language":"en","directionality":"ltr","height":360,"width":"95%","cleanup_on_startup":true,"custom_undo_redo_levels":20,"selector":"textarea#id_description","theme":"modern","plugins":"\n            paste textcolor save link image media preview codesample contextmenu\n            table code lists fullscreen  insertdatetime  nonbreaking\n            contextmenu directionality searchreplace wordcount visualblocks\n            visualchars code fullscreen autolink lists  charmap print  hr\n            anchor pagebreak\n            ","toolbar1":"\n            fullscreen preview bold italic underline | fontselect,\n            fontsizeselect  | forecolor backcolor | alignleft alignright |\n            aligncenter alignjustify | indent outdent | bullist numlist table |\n            | link image media | codesample |\n            ","toolbar2":"\n            visualblocks visualchars |\n            charmap hr pagebreak nonbreaking anchor |  code |\n            ","contextmenu":"formats | link image","menubar":true,"statusbar":true};if(typeof selector!='undefined'){tinymce4_config['selector']=selector;}
+tinymce.init(tinymce4_config);}
+tinymce4_init();})();
+
+//    alert("OK");
+
+}
+
+</script>
+<!--To manage the evidence types-->
+
+<ul class="smooth-scroll list-unstyled">
+    <div class="container-fluid">
+
+        <div class="row">
+
+            <div class="col-sm-2 col-md-10">
+                <div class="panel panel-primary">
+                    <div class = "panel-heading text-center" style="background-color:#4682B4">
+                        <h3 class="panel-title" style="font-weight:bold;">Edit Evidence #{{ evidence.pk }} | {{ evidence.evidenceformat.name }} </h3>
+                    </div>
+                    <div class="panel-body">
+                        {% if error_message %}
+                            <p><strong>{{ error_message }}</strong></p>
+                        {% endif %}
+                        <form class="form-horizontal" role="form" action="" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {% include 'invs/inv_form_template.html' %}
+                            <!--To redirect to the previous page-->
+                            <input type="hidden" name="next" value="{{ request.GET.next1 }}">
+
+                            <div class="form-group">
+                                <div class="col-sm-offset-1 col-sm-11">
+                                    <button type="submit" class="btn btn-success md">Save</button>
+                                    <a href="javascript:history.go(-1)" class="btn btn-primary pull-right">
+                                        <span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>
+                                        <span>Cancel</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-10 col-md-2">
+                <div class="panel panel-default" style="color:black">
+                    <div class="panel-body">
+                        <h3>Evidence Update?</h3>
+                        <p>Evidence details can be updated using this form.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+<script>
+
+
+
+//$(function(){
+//alert(1);
+//    $("#id_evidenceformat").change(
+//        function(){
+//            if ($(this).val() == 1) {
+//                tinyMCE.activeEditor.remove();
+//                }
+//            if ($(this).val() == 2) {
+//                (function($){function tinymce4_init(selector){var tinymce4_config={setup:function(editor){editor.on('change',function(){editor.save();});},"language":"en","directionality":"ltr","height":360,"width":"95%","cleanup_on_startup":true,"custom_undo_redo_levels":20,"selector":"textarea#id_description","theme":"modern","plugins":"\n            paste textcolor save link image media preview codesample contextmenu\n            table code lists fullscreen  insertdatetime  nonbreaking\n            contextmenu directionality searchreplace wordcount visualblocks\n            visualchars code fullscreen autolink lists  charmap print  hr\n            anchor pagebreak\n            ","toolbar1":"\n            fullscreen preview bold italic underline | fontselect,\n            fontsizeselect  | forecolor backcolor | alignleft alignright |\n            aligncenter alignjustify | indent outdent | bullist numlist table |\n            | link image media | codesample |\n            ","toolbar2":"\n            visualblocks visualchars |\n            charmap hr pagebreak nonbreaking anchor |  code |\n            ","contextmenu":"formats | link image","menubar":true,"statusbar":true};if(typeof selector!='undefined'){tinymce4_config['selector']=selector;}
+//                tinymce.init(tinymce4_config);}
+//                tinymce4_init();})();        }
+//        }
+//);
+
+
+
+</script>
+
+
+</ul>
+{% endblock evidences_content %}

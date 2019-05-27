@@ -1,0 +1,65 @@
+                <tr class="mylist-meta" style="background-color:#e6e6e6" id="item-{{ profile.pk }}">
+                    <!-- e.g.: #item-7 -->
+                    <td>
+                        {{ profile.pk }}
+                    </td>
+                    <td>
+                        {{ profile.username }}
+                    </td>
+                    <td>
+                        {{ profile.userid }}
+                    </td>
+                    <td>
+                        {{ profile.email }}
+                    </td>
+                    <td>
+                        {{ profile.host }}
+                    </td>
+                    <td>
+                        {{ profile.ip }}
+                    </td>
+                    <td>
+                        {{ profile.location }}
+                    </td>
+                    <td>
+                        {{ profile.department }}
+                    </td>
+                    <td>
+                        {{ profile.location_contact }}
+                    </td>
+                    <td>
+                        {% if profile.inv %}
+                          <a class="badge" href="{% url 'invs:inv_detail' pk=profile.inv.pk %}#?next1={{ request.get_full_path|urlencode }}">
+                              {{ profile.inv }}
+                          </a>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ profile.created_at|date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                        {{ profile.created_by }}
+                    </td>
+                    <td>
+                         {{ profile.modified_at|date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                         {{ profile.modified_by }}
+                    </td>
+                    <td>
+                        <div>
+                            <a href="{% url 'assets:prof_edit' pk=profile.pk %}"
+                               class="btn btn-warning btn-xs">
+                                <span class="glyphicon glyphicon-pencil" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
+                            </a>
+                            <a href="{% url 'assets:prof_remove' pk=profile.pk %}"
+                               class="btn btn-danger btn-xs pull-right">
+                                <span class="glyphicon glyphicon-trash" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr class="invev-detail">
+                    <td colspan="14">{{ profile.description|safe }}</td>
+                </tr>

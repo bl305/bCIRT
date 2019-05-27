@@ -1,0 +1,62 @@
+{% if object_list %}
+{% for inv in object_list %}
+                <tr>
+                    <td>
+                        <a class="badge" href="{% url 'invs:inv_detail' pk=inv.pk %}?next1={{ request.get_full_path|urlencode }}">
+                            {{ inv.invid }}
+                        </a>
+                    </td>
+                    <td>
+                        {{ inv.status }}
+                    </td>
+                    <td>
+                        {{ inv.priority }}
+                    </td>
+                    <td>
+                        <div class="container inv-index">
+                            {{ inv.description_html|safe }}
+
+                        </div>
+                    </td>
+                    <td>
+                        {% if inv.parent %}
+                        <a class="badge" href="{% url 'invs:inv_detail' pk=inv.parent.pk %}?next1={{ request.get_full_path|urlencode }}">
+                            {{ inv.parent }}
+                        </a>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ inv.phase }}
+                    </td>
+                    <td>
+                        {% if inv.user %}
+                            {{ inv.user }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if inv.starttime %}
+                            {{ inv.starttime|date:"Y/m/d H:i:s" }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ inv.created_at|date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                        {{ inv.modified_at|date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                        {{ inv.modified_by }}
+                    </td>
+              </tr>
+{% endfor %}
+{% else %}
+          <tr>
+            <td colspan="11" class="text-center bg-warning">No Investigation</td>
+          </tr>
+{% endif %}

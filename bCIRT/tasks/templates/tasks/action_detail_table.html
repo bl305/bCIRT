@@ -1,0 +1,54 @@
+{% if action.pk %}
+    <tr>
+        <td><strong>Action ID</strong><br> {{ action.pk }} </td>
+        <td><strong>Owner</strong><br> {{ action.user }} </td>
+        <td><strong>Title</strong><br> {{ action.title }} </td>
+        <td><strong>Version</strong><br> {{ action.version }} </td>
+        <td><strong>Script Type</strong><br> {{ action.script_type }} </td>
+        <td><strong>Script Category</strong><br> {{ action.script_category }} </td>
+    </tr>
+    <tr>
+        <td><strong>Exec Ready</strong><br> {{ action.code_file }} </td>
+        <td><strong>Created on</strong><br> {{ action.created_at|date:"Y/m/d H:i:s" }} </td>
+        <td><strong>Created by</strong><br> {{ action.created_by }} </td>
+        <td><strong>Modified on</strong><br> {{ action.modified_at|date:"Y/m/d H:i:s" }} </td>
+        <td><strong>Modified by</strong><br> {{ action.modified_by }} </td>
+        <td><strong>Output Target</strong><br> {{ action.outputtarget }} </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <strong>Attachment<br></strong>
+            {% if action.fileRef %}
+                <a href="{{BASE_URL}}{{MEDIA_URL}}{{ action.fileRef.name }}"
+                  class="btn btn-default btn-xs" target="_blank">
+                  <span class="glyphicon glyphicon-floppy-disk">{{ action.fileName }}</span>
+                </a>
+            {% else %}
+                None
+            {% endif %}
+        </td>
+        <td colspan="2">
+            <strong>Arguments</strong><br> {{ action.argument }}
+        </td>
+        <td colspan="2">
+            <div class="row">
+            <div class="container invdescription2">
+                <strong>Description</strong>
+                {{ action.description_html|safe }}
+            </div>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="6">
+            <div class="row">
+                <div class="container invdescription">
+                <strong>Code</strong><br>
+                    <textarea readonly style="width:100%;height:300px">{{ action.code }}</textarea>
+                </div>
+            </div>
+        </td>
+    </tr>
+{% else %}
+    <tr><td colspan="6">No Header available!</td></tr>
+{% endif %}

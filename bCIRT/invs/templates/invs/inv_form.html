@@ -1,0 +1,58 @@
+{% extends "invs/inv_base.html" %}
+
+{% block invslist_active %}active{% endblock invslist_active %}
+
+{% load bootstrap4 %}
+
+<!-- BL start -->
+{{ form.media }}
+<!-- BL end -->
+
+{% block preinvs %}
+	<div class="container myregister">
+    </div>
+{% endblock preinvs %}
+
+{% block invs_content %}
+<ul class="smooth-scroll list-unstyled">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-2 col-md-10">
+                <div class="panel panel-primary">
+                    <div class = "panel-heading text-center" style="background-color:#4682B4">
+                        <h3 class="panel-title" style="font-weight:bold;">Edit an Investigation</h3>
+                        <strong>&nbsp;Investigations for {{ user }} at {% now "Y/m/d H:i:s" %} (UTC)</strong>
+                    </div>
+                    <div class="panel-body">
+                        {% if error_message %}
+                            <p><strong>{{ error_message }}</strong></p>
+                        {% endif %}
+                        <form class="form-horizontal" role="form" action="" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {% include 'invs/inv_form_template.html' %}
+                            <div class="form-group">
+                                <div class="col-sm-offset-1 col-sm-11">
+                                    <button type="submit" class="btn btn-success md">Save</button>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                    <a href="javascript:history.go(-1)" class="btn btn-primary pull-right">
+                                        <span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>
+                                        <span>Back</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-10 col-md-2">
+                <div class="panel panel-default" style="color:black">
+                    <div class="panel-body">
+                        <h3>Investigation Update?</h3>
+                        <p>Investigation details can be created/updated using this form.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ul>
+{% endblock invs_content %}

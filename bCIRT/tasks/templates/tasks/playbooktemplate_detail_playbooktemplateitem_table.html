@@ -1,0 +1,80 @@
+{% if playbooktemplate.playbooktemplateitem_playbooktemplate.all %}
+
+{% for playbooktemplateitem in playbooktemplate.playbooktemplateitem_playbooktemplate.all|dictsort:"itemorder" %}
+
+    <!-- Guardian authentication check -->
+            <!-- |dictsortreversed:"id" -->
+                <tr class="mylist-meta" style="background-color:#e6e6e6" id="item-{{ playbookitem.pk }}">
+                    <!-- e.g.: #item-7 -->
+                  <td>
+                      <a class="badge" href="{% url 'tasks:playittmp_detail' pk=playbooktemplateitem.pk %}?next1={{ request.get_full_path|urlencode }}">
+                          {{ playbooktemplateitem.pk }}
+                      </a>
+                  </td>
+                  <td>
+                      {% if playbooktemplateitem.acttask %}
+                      <a class="badge" href="{% url 'tasks:tmp_detail' pk=playbooktemplateitem.acttask.pk %}?next1={{ request.get_full_path|urlencode }}">
+                          {{ playbooktemplateitem.acttask }}
+                      </a>
+                        {% else %}
+                        -
+                      {% endif %}
+                  </td>
+                  <td>
+                      {% if playbooktemplateitem.itemorder %}
+                          {{ playbooktemplateitem.itemorder }}
+                        {% else %}
+                        -
+                      {% endif %}
+                  </td>
+                  <td>
+                      {% if playbooktemplateitem.prevtask %}
+                          <a class="badge" href="{% url 'tasks:playittmp_detail' pk=playbooktemplateitem.prevtask.pk %}?next1={{ request.get_full_path|urlencode }}">
+                              {{ playbooktemplateitem.prevtask.pk }}
+                          </a>
+                        {% else %}
+                        -
+                      {% endif %}
+                  </td>
+                  <td>
+                      {% if playbooktemplateitem.nexttask %}
+                          <a class="badge" href="{% url 'tasks:playittmp_detail' pk=playbooktemplateitem.nexttask.pk %}?next1={{ request.get_full_path|urlencode }}">
+                              {{ playbooktemplateitem.nexttask.pk }}
+                          </a>
+                        {% else %}
+                        -
+                      {% endif %}
+                  </td>
+                  <td>
+                      {{ playbooktemplateitem.user }}
+                  </td>
+                    <td>
+                        {{ playbooktemplateitem.modified_at|date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                        {{ playbooktemplateitem.modified_by }}
+                    </td>
+                  <td>
+                      <div>
+                          <a href="{% url 'tasks:playittmp_edit' pk=playbooktemplateitem.pk %}?next1={{ request.get_full_path|urlencode }}"
+                              class="btn btn-warning btn-xs">
+                          <span class="glyphicon glyphicon-pencil" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
+                          </a>
+                          <a href="{% url 'tasks:playittmp_remove' pk=playbooktemplateitem.pk %}?next1={{ request.get_full_path|urlencode }}"
+                              class="btn btn-danger btn-xs pull-right">
+                          <span class="glyphicon glyphicon-trash" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
+                          </a>
+                      </div>
+                  </td>
+                </tr>
+
+                <tr class="invev-detail">
+                  <td colspan="9">{{ playbooktemplateitem.description|safe }}</td>
+                </tr>
+{% endfor %}
+{% else %}
+          <tr>
+            <td colspan="9" class="text-center bg-warning">No matching record found</td>
+          </tr>
+{% endif %}
+

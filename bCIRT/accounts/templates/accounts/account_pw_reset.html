@@ -1,0 +1,23 @@
+{% extends "base.html"  %}
+
+{% block title %}<h1>Reset Password</h1>{% endblock %}
+
+{% block content %}
+<br>
+<div>
+    <form action="" method="post">
+            <div style="display:none">
+                <input type="hidden" value="{{ csrf_token }}" name="csrfmiddlewaretoken">
+            </div>
+
+            {% if form.email.errors %}
+                {{ form.email.errors }}
+            {% endif %}
+            <p><label for="id_email">E-mail address:</label>{{ form.email }}</p>
+            <br>
+            <input type="submit" class="btn btn-default btn" value="Reset password" />
+
+    </form>
+</div>
+
+{% endblock %}

@@ -1,0 +1,109 @@
+{% extends "tasks/task_base.html" %}
+
+{% block taskslist_active %}active{% endblock taskslist_active %}
+
+{% block pretasks %}
+		{% if user.is_authenticated %}
+
+	    {% endif %}
+{% endblock %}
+
+{% block tasks_content %}
+
+<div class="row">
+    <div class="col-sm-12">
+        <div align="center">
+            <div class="panel panel-primary">
+                <div class = "panel-heading">
+                    <div class="panel-title">
+                          <div class="btn-group inline pull-left">
+                              {% if user.is_authenticated %}
+                                <!--<div>-->
+                                <div>
+                                <a href="{% url 'tasks:tsk_create' inv_pk=0 %}?next1={{ request.get_full_path|urlencode }}" class="btn btn-default btn-xs">
+                                    <span class="glyphicon glyphicon-plus-sign"></span>
+                                    New Task
+                                </a>
+                                <!--</div>-->
+                                &nbsp;
+                                <div class="dropdown">
+                                    <button class="btn btn-default btn-xs dropdown-toggle" onclick="filterFunction()" type="button" data-toggle="dropdown">
+                                        <span class="glyphicon glyphicon-plus-sign"></span> New from Template
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-content" id="myDropdown">
+                                        <input type="text" placeholder="Search.." id="myInput" onkeyup="filterFunction()">
+                                        {% for tc in templatecategories %}
+                                          <li>
+                                              <a href="{% url 'tasks:tmp_add' pk=tc.pk inv_pk=0 play_pk=0 %}?next1={{ request.get_full_path|urlencode }}">
+                                                  <span></span>
+                                                  {{ tc.category }} - {{ tc.title }}
+                                              </a>
+                                          </li>
+                                          <!--<li class="divider"></li>-->
+                                        {% endfor %}
+<!--</div>-->
+                                                  </ul>
+                                </div>
+                                </div>
+                              {% endif %}
+                          </div>
+                    </div>
+                    <strong>&nbsp;Tasks for {{ user }} at {% now "Y/m/d H:i:s" %} (UTC)</strong>
+                </div>
+                <div class="panel-body inv-panel-body">
+
+                        <table class="table table-hover display order-column" id="investigations-invi"
+                               style="min-height:45vh"
+                        data-toggle="table"
+                        data-classes="table table-no-bordered"
+                        data-pagination="true"
+                        data-search="true"
+
+                        data-show-refresh="true"
+                        data-show-toggle="true"
+                        data-show-columns="true"
+                        data-minimum-count-columns="2"
+                        data-show-pagination-switch="true"
+                        data-id-field="id"
+                        data-page-list="[10, 25, 50, 100, ALL]"
+                        data-show-footer="false"
+                        data-side-pagination="client"
+                        >
+                        <thead>
+                        <tr>
+                            <th data-field="id" data-sortable="true">Task ID</th>
+                            <th data-field="name" data-sortable="true">Task Name</th>
+                            <th data-field="desc" data-sortable="true" data-visible="false">Description</th>
+                            <th data-field="stat" data-sortable="true">Status</th>
+                            <th data-field="pri" data-sortable="true">Priority</th>
+                            <th data-field="ass" data-sortable="true">Assigned</th>
+                            <th data-field="playbook" data-sortable="true">Playbook</th>
+                            <th data-field="start" data-sortable="true">Task Start</th>
+                            <th data-field="cre" data-sortable="true">Created (UTC)</th>
+                            <th data-field="mod" data-sortable="true">Modified (UTC)</th>
+                            <th data-field="modby" data-sortable="true">Modified by</th>
+                            <th data-field="par" data-sortable="true">Parent</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                                {% include 'tasks/task_list_table.html' %}
+                        </tbody>
+                    </table>
+
+
+
+                    <div class="modal fade" id="modal-investigations-invi">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+
+                        </div>
+                      </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

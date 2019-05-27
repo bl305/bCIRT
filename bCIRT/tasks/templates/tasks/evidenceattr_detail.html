@@ -1,0 +1,58 @@
+{% extends "tasks/evidence_base.html" %}
+
+{% block evidenceslist_active %}active{% endblock evidenceslist_active%}
+
+{% block preevidences %}
+
+{% endblock %}
+
+
+{% block evidences_content %}
+    <div class="row">
+
+        <div class="col-md-12 col-md-12">
+                <div class="panel panel-primary">
+                    <div class = "panel-heading">
+                        <div class="panel-title text-center">
+                              <div class="btn-group inline pull-left">
+                                <!--<div class="dropdown">-->
+
+                                <!--</div>-->
+                              </div>
+                            <strong> Evidence Attribute # {{ evidenceattr.pk }} | Evidence #{{ evidenceattr.ev.pk }}</strong>
+                        </div>
+                    </div>
+
+                    <div class="panel-body ev-panel-body">
+                        <table class="table table-hover table-striped table-condensed" id="evidences-eve">
+                            <thead>
+                                <tr class="mylist-header">
+                                    <th>EvidenceAttrID</th>
+                                    <th>Assigned</th>
+                                    <th>Evidence</th>
+                                    <th>Type</th>
+                                    <th>Value</th>
+                                    <th>Created on</th>
+                                    <th>Created by</th>
+                                    <th>Modified on</th>
+                                    <th>Modified by</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% include "tasks/evidenceattr_detail_table.html" %}
+                            </tbody>
+                        </table>
+                        <a href="javascript:history.go(-1)" class="btn btn-primary pull-right">
+                            <span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>
+                            <span>Back</span>
+                        </a>
+
+
+                    </div>
+                </div>
+
+
+        </div>
+    </div>
+
+{% endblock %}

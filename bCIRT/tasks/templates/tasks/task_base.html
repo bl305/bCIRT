@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block ptitle %}Tasks{% endblock %}
+
+{% block tasks_active %}active{% endblock tasks_active %}
+
+{% load bootstrap4 %}
+
+{% block title %}{% endblock title %}
+
+{% block content %}
+
+    {% block pretasks %}{% endblock pretasks %}
+    {% block tasks_content %}{% endblock tasks_content %}
+    {% block posttasks %}{% endblock posttasks %}
+
+{% endblock %}

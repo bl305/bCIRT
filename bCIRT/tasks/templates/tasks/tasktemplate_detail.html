@@ -1,0 +1,140 @@
+{% extends "tasks/task_base.html" %}
+
+{% block taskslist_active %}active{% endblock taskslist_active%}
+
+{% block pretasks %}
+
+{% endblock %}
+
+{% block tasks_content %}
+
+
+    <div class="row">
+
+        <!-- Left Investigation Info -->
+        <div class="col-sm-12 col-md-12">
+            <div class="panel panel-primary">
+                <header class = "panel-heading">
+                    <div class="panel-title text-center">
+                        <div class="btn-group inline pull-left">
+
+                            <li class="dropdown">
+                                <!--<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Dropdown <span class="caret"></span></a>-->
+                                <!--<button class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">-->
+                                    <!--Dropdown -->
+                                    <!--<span class="caret"></span>-->
+                                <!--</button>-->
+                                <div>
+                                <div class="btn-group">
+                                 <button class="btn btn-default btn-xs dropdown-toggle dropdown-toggle-split" onclick="filterFunctionTask()" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
+                                    Actions <span class="caret"></span>
+                                </button>
+
+                                    <ul class="dropdown-menu" role="menu">
+                                        <li>
+                                            <a href="{% url 'tasks:tmp_create' %}?next1={{ request.get_full_path|urlencode }}"
+                                               class="btn btn-default btn-xs">
+                                                New TaskTemplate
+                                                <span class="glyphicon glyphicon-plus"></span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="{% url 'tasks:tvar_create' task_pk=0 tasktmp_pk=tasktemplate.pk %}?next1={{ request.get_full_path|urlencode }}" class="btn btn-default btn-xs">
+                                              New Variable
+                                              <span class="glyphicon glyphicon-plus"></span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="{% url 'tasks:tmp_edit' pk=tasktemplate.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                              class="btn btn-default btn-xs">
+                                              Edit&nbsp;
+                                              <span class="glyphicon glyphicon-pencil" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
+                                            </a>
+                                        </li>
+
+                                        <li>&nbsp;</li>
+                                        <li>
+                                              <a href="{% url 'tasks:tmp_remove' pk=tasktemplate.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                                  class="btn btn-danger btn-xs">
+                                              <span class="glyphicon glyphicon-trash" data-toggle="tooltip" data-placement="top" title="Edit item">
+                                                  Delete
+                                              </span>
+                                              </a>
+                                        </li>
+                                    </ul>
+                                    </div>
+                                </div>
+                            </li> <!-- .dropdown -->
+
+                        </div>
+                        <strong>&nbsp;Task Template Details | #{{ tasktemplate.pk }}</strong>
+                        <div class="btn-group inline ">
+                        </div>
+                    </div>
+                </header>
+                <div class="panel-body inv-panel-body" id="xxx">
+                    <table class="table" id="investigations-invh">
+                        <tbody>
+                            {% include 'tasks/tasktemplate_detail_table.html' %}
+                        </tbody>
+                    </table>
+                    <div class="modal fade" id="modal-investigations-invh">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="row">
+
+        <!-- Right Investigation Info -->
+        <div class="col-sm-12 col-md-12">
+            <div class="panel panel-primary">
+                <div class = "panel-heading">
+                    <div class="panel-title text-center">
+                         <div class="btn-group inline pull-left">
+                          </div>
+                         <strong>&nbsp;Related Variables | {{ tasktemplate.taskvar_tasktemplate.all.count }} item(s)</strong>
+                    </div>
+                </div>
+                <div class="panel-body">
+
+                    {% if error_message %}
+                        <p><strong>{{ error_message }}</strong></p>
+                    {% endif %}
+
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>TaskVarID</th>
+                            <th>Category</th>
+                            <th>Type</th>
+                            <th>Name</th>
+                            <th>Value</th>
+                            <th>Required</th>
+                            <th>Enabled</th>
+                            <th>Task</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                             {% include 'tasks/tasktemplate_detail_taskvar_table.html' %}
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+{% endblock tasks_content %}

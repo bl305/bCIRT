@@ -1,0 +1,79 @@
+{% if object_list %}
+{% for pb in object_list %}
+                <tr id="item-pb-{{pb.pk}}">
+                    <td>
+                        <li class="dropdown" onclick="incrow({{pb.pk}},'item-pb-','150px')">
+                            <div>
+                            <div class="btn-group">
+                             <button class="btn btn-default btn-xs dropdown-toggle dropdown-toggle-split" onclick="filterFunctionTask()" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
+                                {{ pb.pk }} <span class="caret"></span>
+                            </button>
+
+                                <ul class="dropdown-menu" role="menu">
+                                    <li>
+                                        <a href="{% url 'tasks:play_detail' pk=pb.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                           class="btn btn-default btn-xs">
+                                            Open
+                                            <span class="glyphicon glyphicon-eye-open"></span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{% url 'tasks:play_edit' pk=pb.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                          class="btn btn-default btn-xs">
+                                          Edit&nbsp;
+                                          <span class="glyphicon glyphicon-pencil" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
+                                        </a>
+                                    </li>
+
+                                    <li>&nbsp;</li>
+                                    <li>
+                                          <a href="{% url 'tasks:play_remove' pk=pb.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                              class="btn btn-danger btn-xs">
+                                          <span class="glyphicon glyphicon-trash" data-toggle="tooltip" data-placement="top" title="Edit item">
+                                              Delete
+                                          </span>
+                                          </a>
+                                    </li>
+                                </ul>
+                                </div>
+                            </div>
+                        </li> <!-- .dropdown -->
+
+                    </td>
+                    <td>
+                        {{ pb.name }}
+                    </td>
+                    <td>
+                        {{ pb.user }}
+                    </td>
+                    <td>
+                        {{ pb.version }}
+                    </td>
+                    <td>
+                        {% if pb.inv %}
+                        <a class="badge" href="{% url 'invs:inv_detail' pk=pb.inv.pk %}?next1={{ request.get_full_path|urlencode }}">
+                        {{ pb.inv }}
+                        </a>
+                        {% else %}
+                        -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ pb.created_at|date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                        {{ pb.created_by }}
+                    </td>
+                    <td>
+                        {{ pb.modified_at|date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                        {{ pb.modified_by }}
+                    </td>
+              </tr>
+{% endfor %}
+{% else %}
+          <tr>
+            <td colspan="8" class="text-center bg-warning">No Playbooks</td>
+          </tr>
+{% endif %}

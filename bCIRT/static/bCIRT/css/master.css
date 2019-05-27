@@ -1,0 +1,475 @@
+body {
+  margin: 0;
+  overflow: visible;
+  background-color: transparent;
+  color:gray;
+  max-width:100%;
+}
+
+.myheight{
+  min-height:87vh;
+}
+
+.mynav {
+  //background-color: black;
+  // background-color: white;
+}
+
+.input{
+//    border:1px solid #ddd !important;
+    background-color:transparent;
+//    background-color:gray;
+    cursor:pointer;
+//    color:#fff;
+//    padding:10px;
+  }
+
+.form-control{
+//  color:gray;
+}
+
+.inv-index{
+ max-width:250px;
+ word-wrap:break-word;
+ margin:1px;
+}
+
+.inv-panel-body{
+ color:black;
+ height:80%;
+ width:100%;
+ overflow:auto;
+}
+
+.ev-panel-body{
+ color:black;
+ height:80%;
+ width:100%;
+ overflow:auto;
+}
+
+.inv-index-row{
+  max-width:100%;
+ }
+
+.invdescription {
+  margin:1px;
+  word-wrap:break-word;
+  overflow-wrap:break-word;
+}
+
+.invdescription2 {
+  margin:1px;
+  word-wrap:break-word;
+  overflow-wrap:break-word;
+  width: 80%;
+}
+
+.invdescription3 {
+  margin:1px;
+  word-wrap:break-word;
+  overflow-wrap:break-word;
+  width: 70%;
+}
+
+
+//EVIDENCES
+.ev-detail{
+
+}
+
+
+.navbar{
+    border-radius: 0;
+    position: fixed;
+    top: 0px;
+    width: 100%;
+}
+
+.navbar-brand{
+    font-family: 'Satisfy',cursive;
+}
+
+//Navbar tab settings
+/* tab color */
+.tabhead {
+  background-color: black;
+  color: red;
+  //border-color: #777777;
+  //color:#fff;
+}
+
+.main {
+//  padding: 2px;
+  margin-top: 50px;
+  width: 100%;
+  overflow-x: hidden;
+//  height: 1500px; /* Used in this example to enable scrolling */
+}
+
+.myregister {
+    max-width:500px;
+}
+
+.footer
+{
+    position: relative;
+    clear:both;
+    color: gray;
+    text-align: center;
+    bottom: 0;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  //background-color: #f6f6f6;
+  min-width: 230px;
+  overflow: auto;
+  border: 1px solid grey;
+  z-index: 1;
+}
+
+.dropdown-content a {
+  color: black;
+//  padding: 12px 16px;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+//.dropdown a:hover {background-color: #ddd;}
+.dropdown a:hover {background-color: green;}
+
+
+// ########## nice buttons, thanks
+// ########## https://codepen.io/davidelvar
+// ########## https://codepen.io/davidelvar/pen/dYMgrR
+.btn {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+/* Boostrap Buttons Styling */
+a.btn {
+  font-size: 13px;
+  //color: rgba(108, 88, 179, 0.75);
+  color: black;
+  letter-spacing: 1px;
+  line-height: 15px;
+  // border: 2px solid rgba(108, 89, 179, 0.75);
+  border: 2px solid black;
+  border-radius: 40px;
+  background: light-grey;
+  transition: all 0.3s ease 0s;
+}
+
+a.btn:hover {
+  color: white;
+  background: green;
+  border: 2px solid black;
+}
+
+.btn-default {
+//  font-family: Raleway-SemiBold;
+  font-size: 13px;
+  //color: rgba(108, 88, 179, 0.75);
+  color: black;
+  letter-spacing: 1px;
+  line-height: 15px;
+  // border: 2px solid rgba(108, 89, 179, 0.75);
+  border: 2px solid black;
+  border-radius: 40px;
+  background: light-grey;
+  transition: all 0.3s ease 0s;
+}
+
+.btn-default:hover {
+  // color: #FFF;
+  color: white;
+  // background: rgba(108, 88, 179, 0.75);
+  // background: rgba(252, 185, 65, 1);
+  background: green;
+  // border: 2px solid rgba(108, 89, 179, 0.75);
+  border: 2px solid black;
+}
+
+.btn-primary {
+//  font-family: Raleway-SemiBold;
+  font-size: 13px;
+  color: rgba(58, 133, 191, 0.75);
+  letter-spacing: 1px;
+  line-height: 15px;
+  border: 2px solid rgba(58, 133, 191, 0.75);
+  border-radius: 40px;
+  background: transparent;
+  transition: all 0.3s ease 0s;
+}
+
+.btn-primary:hover {
+  color: #FFF;
+  background: rgba(58, 133, 191, 0.75);
+  border: 2px solid rgba(58, 133, 191, 0.75);
+}
+
+.btn-success {
+//  font-family: Raleway-SemiBold;
+  font-size: 13px;
+  color: rgba(103, 192, 103, 0.75);
+  letter-spacing: 1px;
+  line-height: 15px;
+  border: 2px solid rgba(103, 192, 103, 0.75);
+  border-radius: 40px;
+  background: transparent;
+  transition: all 0.3s ease 0s;
+}
+
+.btn-success-bl:hover {
+  color: #FFF;
+  background: rgb(103, 192, 103, 0.75);
+  border: 2px solid rgb(103, 192, 103, 0.75);
+}
+
+.btn-info {
+//  font-family: Raleway-SemiBold;
+  font-size: 13px;
+  color: rgba(91, 192, 222, 0.75);
+  letter-spacing: 1px;
+  line-height: 15px;
+  border: 2px solid rgba(91, 192, 222, 0.75);
+  border-radius: 40px;
+  background: transparent;
+  transition: all 0.3s ease 0s;
+}
+
+.btn-info-bl:hover {
+  color: #FFF;
+  background: rgba(91, 192, 222, 0.75);
+  border: 2px solid rgba(91, 192, 222, 0.75);
+}
+
+.btn-warning {
+//  font-family: Raleway-SemiBold;
+  font-size: 13px;
+  color: rgba(240, 173, 78, 0.75);
+  letter-spacing: 1px;
+  line-height: 15px;
+  border: 2px solid rgba(240, 173, 78, 0.75);
+  border-radius: 40px;
+  background: transparent;
+  transition: all 0.3s ease 0s;
+}
+
+.btn-warning:hover {
+  color: #FFF;
+  background: rgb(240, 173, 78, 0.75);
+  border: 2px solid rgba(240, 173, 78, 0.75);
+}
+
+.btn-danger {
+//  font-family: Raleway-SemiBold;
+  font-size: 13px;
+  color: rgba(217, 83, 78, 0.75);
+  letter-spacing: 1px;
+  line-height: 15px;
+  border: 2px solid rgba(217, 83, 78, 0.75);
+  border-radius: 40px;
+  background: transparent;
+//  background: rgba(217, 83, 78, 0.75);
+  transition: all 0.3s ease 0s;
+}
+
+.btn-danger:hover {
+  color: #FFF;
+  background: rgba(217, 83, 78, 0.75);
+  border: 2px solid rgba(217, 83, 78, 0.75);
+}
+
+// ########## buttons end
+
+
+
+//############ Dropdown filter
+//#https://www.w3schools.com/howto/tryit.asp?filename=tryhow_css_js_dropdown_filter
+//.dropbtn {
+//  background-color: #4CAF50;
+//  color: white;
+//  padding: 16px;
+//  font-size: 16px;
+//  border: none;
+//  cursor: pointer;
+//}
+
+//.dropbtn:hover, .dropbtn:focus {
+//  background-color: #3e8e41;
+//}
+
+#myInput {
+  border-box: box-sizing;
+//  background-image: url('searchicon.png');
+  background-position: 14px 12px;
+  background-color: transparent;
+  background-repeat: no-repeat;
+//  font-size: 16px;
+//  padding: 14px 20px 12px 45px;
+  padding: 8px 15px 6px 10px;
+  border: none;
+  border-bottom: 1px solid #ddd;
+  color: black;
+  width: 100%;
+}
+
+#myInput:focus {outline: 3px solid #ddd;}
+#myInput:hover {color:green; background-color:yellow;}
+
+#myInput2 {
+  border-box: box-sizing;
+//  background-image: url('searchicon.png');
+  background-position: 14px 12px;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  padding: 8px 15px 6px 10px;
+  border: none;
+  border-bottom: 1px solid #ddd;
+  color: black;
+  width: 100%;
+}
+
+#myInput2:focus {outline: 3px solid #ddd;}
+#myInput2:hover {color:green; background-color:yellow;}
+
+#myInputInv {
+  border-box: box-sizing;
+  //background-image: url('searchicon.png');
+  background-position: 14px 12px;
+  background-color: transparent;
+  background-repeat: no-repeat;
+//  font-size: 16px;
+//  padding: 14px 20px 12px 45px;
+  padding: 8px 15px 6px 10px;
+  border: none;
+  border-bottom: 1px solid #ddd;
+  color: black;
+  width: 100%;
+}
+
+#myInputInv:focus {outline: 3px solid #ddd;}
+#myInputInv:hover {color:green; background-color:yellow;}
+
+#myInputTaskTemplate {
+  border-box: box-sizing;
+//  background-image: url('searchicon.png');
+  background-position: 14px 12px;
+  background-color: transparent;
+  background-repeat: no-repeat;
+//  font-size: 16px;
+//  padding: 14px 20px 12px 45px;
+  padding: 8px 15px 6px 10px;
+  border: none;
+  border-bottom: 1px solid #ddd;
+  color: black;
+  width: 100%;
+}
+
+#myInputTaskTemplate:focus {outline: 3px solid #ddd;}
+#myInputTaskTemplate:hover {color:green; background-color:yellow;}
+
+#myInputTask {
+  border-box: box-sizing;
+//  background-image: url('searchicon.png');
+  background-position: 14px 12px;
+  background-color: transparent;
+  background-repeat: no-repeat;
+//  font-size: 16px;
+//  padding: 14px 20px 12px 45px;
+  padding: 8px 15px 6px 10px;
+  border: none;
+  border-bottom: 1px solid #ddd;
+  color: black;
+  width: 100%;
+}
+
+#myInputTask:focus {outline: 3px solid #ddd;}
+#myInputTask:hover {color:green; background-color:yellow;}
+
+#myInputPlay {
+  border-box: box-sizing;
+//  background-image: url('searchicon.png');
+  background-position: 14px 12px;
+  background-color: transparent;
+  background-repeat: no-repeat;
+//  font-size: 16px;
+//  padding: 14px 20px 12px 45px;
+  padding: 8px 15px 6px 10px;
+  border: none;
+  border-bottom: 1px solid #ddd;
+  color: black;
+  width: 100%;
+}
+
+#myInputPlay:focus {outline: 3px solid #ddd;}
+#myInputPlay:hover {color:green; background-color:yellow;}
+
+#myInputEv {
+  border-box: box-sizing;
+  background-image: url('searchicon.png');
+  background-position: 14px 12px;
+  background-color: transparent;
+  background-repeat: no-repeat;
+//  font-size: 16px;
+//  padding: 14px 20px 12px 45px;
+  padding: 8px 15px 6px 10px;
+  border: none;
+  border-bottom: 1px solid #ddd;
+  color: black;
+  width: 100%;
+}
+
+#myInputEv:focus {outline: 3px solid #ddd;}
+#myInputEv:hover {color:green; background-color:yellow;}
+
+#myInputEvAttr {
+  border-box: box-sizing;
+//  background-image: url('searchicon.png');
+  background-position: 14px 12px;
+  background-color: transparent;
+  background-repeat: no-repeat;
+//  font-size: 16px;
+//  padding: 14px 20px 12px 45px;
+  padding: 8px 15px 6px 10px;
+  border: none;
+  border-bottom: 1px solid #ddd;
+  color: black;
+  width: 100%;
+}
+
+#myInputEvAttr:focus {outline: 3px solid #ddd;}
+#myInputEvAttr:hover {color:green; background-color:yellow;}
+
+
+#myInputEvFile {
+  border-box: box-sizing;
+//  background-image: url('searchicon.png');
+  background-position: 14px 12px;
+  background-color: transparent;
+  background-repeat: no-repeat;
+//  font-size: 16px;
+//  padding: 14px 20px 12px 45px;
+  padding: 8px 15px 6px 10px;
+  border: none;
+  border-bottom: 1px solid #ddd;
+  color: black;
+  width: 100%;
+}
+
+#myInputEvFile:focus {outline: 3px solid #ddd;}
+#myInputEvFile:hover {color:green; background-color:yellow;}
+
+
+.show {display: block;}
+
+############# dropdown actions

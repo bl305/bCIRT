@@ -1,0 +1,44 @@
+                <tr class="mylist-meta" style="background-color:#e6e6e6" id="item-{{ playbook.pk }}">
+                    <!-- e.g.: #item-7 -->
+                    <td>
+                        {{ playbook.pk }}
+                    </td>
+                    <td>
+                        {% if playbook.inv %}
+                        <a class="badge" href="{% url 'invs:inv_detail' pk=playbook.inv.pk %}?next1={{ request.get_full_path|urlencode }}">
+                            {{ playbook.inv }}
+                        </a>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ playbook.user }}
+                    </td>
+                    <td>
+                        {{ playbook.version }}
+                    </td>
+                    <td>
+                      {{ playbook.created_at|date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                      {{ playbook.created_by }}
+                    </td>
+                    <td>
+                       {{ playbook.modified_at|date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                       {{ playbook.modified_by }}
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="8">
+                        <div class="row">
+                        <div class="container invdescription">
+                            {{ playbook.description_html|safe }}
+                        </div>
+                        </div>
+
+                    </td>
+                </tr>

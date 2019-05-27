@@ -1,0 +1,77 @@
+                <tr class="ev-detail-table" style="background-color:#e6e6e6" id="item-ev-{{ updatepackage.pk }}">
+                    <td>
+                        <li class="dropdown" onclick="incrow({{updatepackage.pk}},'item-ev-','180px')">
+                            <button class="btn btn-default btn-xs dropdown-toggle" onclick="filterFunctionEv()" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
+                                {{ updatepackage.pk }}
+                                <span class="caret"></span>
+                            </button>
+
+                            <ul class="dropdown-menu" role="menu">
+                                    <li>
+                                        <a href="{% url 'configuration:conf_updateedit' pk=updatepackage.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                            class="btn btn-default btn-xs">
+                                            Edit
+                                            <span class="glyphicon glyphicon-pencil" data-toggle="tooltip" data-placement="top" title="Edit item">
+                                            </span>
+                                        </a>
+                                    </li>
+                                <li>&nbsp;</li>
+                                <li>
+                                      <a href="{% url 'configuration:conf_updateremove' pk=updatepackage.pk %}"
+                                          class="btn btn-danger btn-xs">
+                                      <span class="glyphicon glyphicon-trash" data-toggle="tooltip" data-placement="top" title="Edit item">
+                                          Delete
+                                      </span>
+                                      </a>
+                                </li>
+                            </ul>
+                        </li> <!-- .dropdown -->
+                    </td>
+                    <td>
+                        {{ updatepackage.created_at|date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                        {{ updatepackage.created_by }}
+                    </td>
+                    <td>
+                       {{ updatepackage.modified_at|date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                       {{ updatepackage.modified_by }}
+                    </td>
+                    <td>
+                        {% if updatepackage.fileRef %}
+<!--                            <a href="{{BASE_URL}}{{MEDIA_URL}}{{ updatepackage.fileRef.name }}"-->
+<!--                                class="btn btn-default btn-xs" target="_blank">-->
+<!--                                <span class="glyphicon glyphicon-floppy-disk">{{ updatepackage.fileName }}</span>-->
+<!--                            </a>-->
+                            {{ updatepackage.fileName }}
+                            <a href="#?next1={{ request.get_full_path|urlencode }}"
+                                class="btn btn-default btn-xs" target="_blank">
+                                <span class="glyphicon glyphicon-info-sign">TBD</span>
+                            </a>
+
+                            <a href="#?next1={{ request.get_full_path|urlencode }}"
+                                class="btn btn-default btn-xs" target="_blank">
+                                <span class="glyphicon glyphicon-floppy-disk"> </span>
+                            </a>
+                            <a href="#?next1={{ request.get_full_path|urlencode }}"
+                                class="btn btn-default btn-xs" target="_blank">
+                                <span class="glyphicon glyphicon-compressed"> </span>
+                            </a>
+                            <a href="#?next1={{ request.get_full_path|urlencode }}"
+                                class="btn btn-default btn-xs" target="_blank">
+                                <span class="glyphicon glyphicon-lock"> TBD</span>
+                            </a>
+                        {% else %}
+                        -
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr class="ev-detail" id="item-evdetail-{{ updatepackage.pk}}">
+                    <td colspan="9">
+                        <div class="invdescription2" style="max-width:1200px;min-height:150px">
+                                {{ updatepackage.description|safe }}
+                        </div>
+                    </td>
+                </tr>

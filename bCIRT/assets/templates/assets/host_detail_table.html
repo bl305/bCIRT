@@ -1,0 +1,62 @@
+                <tr class="mylist-meta" style="background-color:#e6e6e6" id="item-{{ evidence.pk }}">
+                    <!-- e.g.: #item-7 -->
+                    <td>
+                        {{ host.pk }}
+                    </td>
+                    <td>
+                        {{ host.name }}
+                    </td>
+                    <td>
+                        {% for hosts in host.hostname_hosts.all %}
+                            {{ hosts.name }}<br>
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {% for ips in host.ipaddress_hosts.all %}
+                            {{ ips.ip }}<br>
+                        {% endfor %}
+                    </td>
+
+                    <td>
+                        {% if host.inv %}
+                        <a href="">{{ host.inv }}</a>
+                        {% else %}
+                        NA
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if host.task %}
+                        <a href="#">{{ host.task }}</a>
+                        {% else %}
+                        NA
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ host.created_at|date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                        {{ host.created_by }}
+                    </td>
+                    <td>
+                         {{ host.modified_at|date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                         {{ host.modified_by }}
+                    </td>
+                    <td>
+                        <div>
+                            <a href="{% url 'assets:host_edit' pk=host.pk %}"
+                                class="btn btn-warning btn-xs">
+                            <span class="glyphicon glyphicon-pencil" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
+                            </a>
+                            <a href="{% url 'assets:host_remove' pk=host.pk %}"
+                                class="btn btn-danger btn-xs pull-right">
+                            <span class="glyphicon glyphicon-trash" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr class="invev-detail">
+                    <td colspan="10">{{ host.description|safe }}</td>
+                </tr>

@@ -1,0 +1,104 @@
+{% if tasktemplate.pk %}
+    <tr>
+        <td><strong>Task ID</strong><br> {{ tasktemplate.pk }} </td>
+        <td><strong>Title</strong><br> {{ tasktemplate.title }} </td>
+        <td><strong>Priority</strong><br> {{ tasktemplate.priority }} </td>
+        {% if tasktemplate.parent %}
+            <a class="badge" href="{% url 'tasks:tmp_detail' pk=tasktemplate.parent %}?next1={{ request.get_full_path|urlencode }}">
+                {{ tasktemplate.parent }}
+            </a>
+        {% else %}
+            {{ tasktemplate.parent }}
+        {% endif %}
+        </td>
+        <td><strong>Status</strong><br> {{ tasktemplate.status }} </td>
+        <td><strong>Assigned to</strong><br> {{ tasktemplate.user }} </td>
+        <td></td>
+    </tr>
+    <tr>
+
+        <td colspan="2"><strong>Investigation</strong><br>
+            {% if tasktemplate.inv %}
+            <a class="badge" href="{% url 'invs:inv_detail' pk=tasktemplate.inv.pk %}?next1={{ request.get_full_path|urlencode }}">{{ tasktemplate.inv }}</a>
+            {% else %}
+            -
+            {% endif %}
+        </td>
+
+        <td colspan="2"><strong>Category</strong><br> {{ tasktemplate.category }} </td>
+        <td><strong>Modified on</strong><br> {{ tasktemplate.modified_at|date:"Y/m/d H:i:s" }} </td>
+        <td><strong>Modified by</strong><br> {{ tasktemplate.modified_by }} </td>
+    </tr>
+    <tr>
+ <td colspan="4">
+            <strong>Action <span class="glyphicon glyphicon-arrow-right"></span> Target Task </strong>
+            <tooltip data-toggle="tooltip" data-placement="top"
+                     title="Action will be executed on the target tasktemplate:
+1. by default on the first evidence in the target tasktemplate
+2. custom if an OUTPUT variable 'ActionTarget' is defined in this Tasktemplate as a 'string' with the value of:
+    a. first
+    b. last
+    c. evidence id integer value">
+                <span class="glyphicon glyphicon-question-sign"></span>
+            </tooltip>
+            <br>
+            {% if tasktemplate.action %}
+            <a class="badge" href="{% url 'tasks:act_detail' pk=tasktemplate.action.pk %}?next1={{ request.get_full_path|urlencode }}">
+                {{ tasktemplate.action }}
+            </a>
+            <span class="glyphicon glyphicon-arrow-right"></span>
+            {% if tasktemplate.actiontarget %}
+            <a class="badge" href="{% url 'tasks:tmp_detail' pk=tasktemplate.actiontarget.pk %}?next1={{ request.get_full_path|urlencode }}">
+                {{ tasktemplate.actiontarget }}
+            </a>
+            {% else %}
+                -
+            {% endif %}
+            {% if tasktemplate.action.code_file %}
+                {% if tasktemplate.actev %}
+                    {% if tasktemplate.inv %}
+                        <a href="{% url 'tasks:act_exec_script' pk=tasktemplate.action.pk inv_pk=tasktemplate.inv.pk task_pk=task.pk ev_pk=task.actev %}"
+                           class="btn btn-success btn-xs">
+                            <span class="glyphicon glyphicon-play"></span>
+                        </a>
+                    {% else %}
+                        <a href="{% url 'tasks:act_exec_script' pk=tasktemplate.action.pk inv_pk=0 task_pk=tasktemplate.pk ev_pk=task.actev %}"
+                           class="btn btn-success btn-xs">
+                            <span class="glyphicon glyphicon-play"></span>
+                        </a>
+                    {% endif %}
+
+                {% endif %}
+            {% endif %}
+
+            {% else %}
+                -
+            {% endif %}
+        </td>
+        <td><strong>Created on</strong><br> {{ tasktemplate.created_at|date:"Y/m/d H:i:s" }} </td>
+        <td><strong>Created by</strong><br> {{ tasktemplate.created_by }} </td>
+    </tr>
+    <tr>
+        <td colspan="6">
+            <div class="row">
+                <div class="container invdescription">
+                <strong>Summary</strong><br>
+                {{ tasktemplate.summary|safe }}
+                </div>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="6">
+            <div class="row">
+            <div class="container invdescription">
+                <strong>Description</strong><br>
+                {{ tasktemplate.description_html|safe }}
+            </div>
+            </div>
+
+        </td>
+    </tr>
+{% else %}
+    <tr><td>No Header available!</td></tr>
+{% endif %}

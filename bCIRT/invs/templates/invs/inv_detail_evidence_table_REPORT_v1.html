@@ -1,0 +1,91 @@
+{% if inv.evidence_inv %}
+
+{% for invevidence in inv.evidence_inv.all %}
+    <!-- Guardian authentication check -->
+            <!-- |dictsortreversed:"id" -->
+                <tr class="mylist-meta" style="background-color:#e6e6e6" id="item-inve{{ invevidence.pk }}">
+                   <!-- e.g.: #item-7 -->
+                  <td>
+                      {{ invevidence.pk }}
+                  </td>
+                  <td>
+                      {{ invevidence.created_at|date:"Y/m/d H:i:s" }}
+                  </td>
+                  <td>
+                      {{ invevidence.created_by }}
+                  </td>
+                  <td>
+                       {{ invevidence.modified_at|date:"Y/m/d H:i:s" }}
+                  </td>
+                  <td>
+                       {{ invevidence.modified_by }}
+                  </td>
+                  <td>
+                        {% if invevidence.fileRef %}
+                            {{ invevidence.fileName }}
+                        {% else %}
+                        -
+                        {% endif %}
+                  </td>
+                  <td>
+                      {% if invevidence.task %}
+                      <a class="badge" href="{% url 'tasks:tsk_detail' pk=invevidence.task.pk %}?next1={{ request.get_full_path|urlencode }}">
+                          {{ invevidence.task }}
+                      </a>
+                      {% else %}
+                      -
+                      {% endif %}
+                  </td>
+                    <td>
+                        {% if invevidence.actionq_evidence.last %}
+                            Action:
+                            <a class="badge" href="{% url 'tasks:actq_detail' pk=invevidence.actionq_evidence.last.pk %}?next1={{ request.get_full_path|urlencode }}">
+                                {{ invevidence.actionq_evidence.last }}
+                            </a>
+                        {% endif %}
+                    </td>
+
+                </tr>
+                <tr>
+                    <td colspan="8">
+                        <table class="bcirttable">
+                            <tbody>
+                            {% for attr in invevidence.evattr_evidence.all %}
+                                <tr id="item-attr-{{attr.pk}}">
+                                    <td>
+                                        {{ attr.evattrformat }}
+                                    </td>
+                                    <td>
+                                        <a class="badge" href="{% url 'tasks:evattr_detail' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}">
+                                            {{ attr.evattrvalue }}
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+
+                <tr class="invev-detail" id="item-invev-detail{{ invevidence.pk }}">
+                  <td colspan="8">
+                      <div class="invdescription2" style="max-width:1400px">
+                        {% if invevidence.evidenceformat.pk == 2 %}
+                            {{ invevidence.description|safe }}
+                        {% else %}
+                            {% if invevidence.evidenceformat.pk == 1 %}
+                                {{ invevidence.description|linebreaks }}
+                            {% else %}
+                                Uknown evidence format!!!
+                            {% endif %}
+                        {% endif %}
+                      </div>
+                  </td>
+                </tr>
+{% endfor %}
+{% else %}
+          <tr>
+            <td colspan="8" class="text-center bg-warning">No matching record found</td>
+          </tr>
+{% endif %}
+

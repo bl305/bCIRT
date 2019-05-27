@@ -1,0 +1,41 @@
+    <div class="row">
+
+        <!-- Right Investigation Info -->
+        <div class="col-sm-12 col-md-12">
+            <div class="panel panel-primary">
+                <div class = "panel-heading">
+                    <div class="panel-title text-center">
+                         <strong>&nbsp;Related Investigations </strong>
+                    </div>
+                </div>
+                <div class="panel-body">
+
+                    {% if error_message %}
+                        <p><strong>{{ error_message }}</strong></p>
+                    {% endif %}
+
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>IncID</th>
+                            <th>Type</th>
+                            <th>IncStatus</th>
+                            <th>Created on</th>
+                            <th>Created by</th>
+                            <th>Modified on</th>
+                            <th>Modified by</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            {% include 'invs/inv_detail_relatedinv_table.html' %}
+
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>

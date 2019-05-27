@@ -1,0 +1,88 @@
+{% if object_list %}
+{% for taskvar in object_list %}
+                <tr id="item-taskvar-{{ taskvar.pk }}">
+                    <td>
+                        <li class="dropdown" onclick="incrow({{taskvar.pk}},'item-taskvar-','150px')">
+                            <div>
+                            <div class="btn-group">
+                             <button class="btn btn-default btn-xs dropdown-toggle dropdown-toggle-split" onclick="filterFunctionTask()" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
+                                {{ taskvar.pk }} <span class="caret"></span>
+                            </button>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li>
+                                        <a href="{% url 'tasks:tvar_detail' pk=taskvar.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                           class="btn btn-default btn-xs">
+                                            Open
+                                            <span class="glyphicon glyphicon-eye-open"></span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{% url 'tasks:tvar_edit' pk=taskvar.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                          class="btn btn-default btn-xs">
+                                          Edit&nbsp;
+                                          <span class="glyphicon glyphicon-pencil" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
+                                        </a>
+                                    </li>
+                                    <li>&nbsp;</li>
+                                    <li>
+                                          <a href="{% url 'tasks:tvar_remove' pk=taskvar.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                              class="btn btn-danger btn-xs">
+                                          <span class="glyphicon glyphicon-trash" data-toggle="tooltip" data-placement="top" title="Edit item">
+                                              Delete
+                                          </span>
+                                          </a>
+                                    </li>
+                                </ul>
+                                </div>
+                            </div>
+                        </li> <!-- .dropdown -->
+                    </td>
+                    <td>
+                        {{ taskvar.name }}
+                    </td>
+                    <td>
+                        {{ taskvar.value }}
+                    </td>
+                    <td>
+                        <div class="container inv-index">
+                            {{ task.description_html|safe }}
+
+                        </div>
+                    </td>
+                    <td>
+                        {{ taskvar.category }}
+                    </td>
+                    <td>
+                        {{ taskvar.type }}
+                    </td>
+                    <td>
+                        {% if taskvar.task %}
+                            <a class="badge" href="{% url 'tasks:tsk_detail' pk=taskvar.task %}?next1={{ request.get_full_path|urlencode }}">
+                                {{ taskvar.task }}
+                            </a>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if taskvar.tasktemplate %}
+                            <a class="badge" href="{% url 'tasks:tmp_detail' pk=taskvar.tasktemplate.pk %}?next1={{ request.get_full_path|urlencode }}">
+                                {{ taskvar.tasktemplate }}
+                            </a>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ taskvar.required }}
+                    </td>
+                    <td>
+                        {{ taskvar.enabled }}
+                    </td>
+              </tr>
+{% endfor %}
+{% else %}
+          <tr>
+            <td colspan="11" class="text-center bg-warning">No Tasks</td>
+          </tr>
+{% endif %}
