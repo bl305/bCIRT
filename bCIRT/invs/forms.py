@@ -26,7 +26,7 @@ class InvForm(forms.ModelForm):
 
     status = forms.ModelChoiceField(
         label='Status*',
-        queryset=InvStatus.objects.filter(enabled=True),
+        queryset=InvStatus.objects.filter(enabled=True).order_by('name'),
         empty_label="--Select--",
         widget=forms.Select(
             attrs={

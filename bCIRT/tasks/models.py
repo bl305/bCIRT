@@ -60,6 +60,7 @@ def upload_to_evidence(instance, filename):
     now = timezone_now()
     filename_base, filename_ext = os.path.splitext(filename)
     # return 'evidences/uploads/evidences/{}_{}_{}_{}{}'.format(
+    # this is also used in the script, so if changed here, need to change when attaching files
     return 'uploads/evidences/{}_{}_{}_{}{}'.format(
         instance.pk,
         filename.lower(),
@@ -74,8 +75,8 @@ def timediff(pdate1, pdate2):
         diff = pdate2 - pdate1
 
         days, seconds = diff.days, diff.seconds
-        print(days)
-        print(seconds)
+        # print(days)
+        # print(seconds)
         retval = seconds + days * 60 * 60 * 24
         # hours = days * 24 + seconds // 3600
         # minutes = (seconds % 3600) // 60
@@ -348,8 +349,8 @@ class Task(models.Model):
 
         if self.starttime is not None and self.endtime is not None:
             self.taskduration = timediff(self.starttime, self.endtime)
-            print(self.starttime)
-            print(self.endtime)
+            # print(self.starttime)
+            # print(self.endtime)
         else:
             self.taskduration = None
         self.description_html = misaka.html(self.description)
@@ -616,7 +617,7 @@ class ExtractAttr():
             pass
         elif self.pselector == 3:
             #  run on the file attachment
-            print("file")
+            # print("file")
             pass
         # add_evattr(self, self.pevidence, self.pattr, self.pfile, 2, 1, 1)
         for oneip in ip4:
@@ -1061,14 +1062,16 @@ def add_task_from_template(atitle, astatus, aplaybook, auser, ainv, aaction, aac
     return obj
 
 
-def new_evidence(puser, ptask, pinv, pcreated_by, pmodified_by, pdescription):
+def new_evidence(puser, ptask, pinv, pcreated_by, pmodified_by, pdescription, pfilename=None, pfileref=None):
     newev = Evidence.objects.create(
         user=puser,
         task=ptask,
         inv=pinv,
         created_by=pcreated_by,
         modified_by=pmodified_by,
-        description=pdescription
+        description=pdescription,
+        # fileName=pfilename,
+        # fileRef=pfileref
     )
     return newev
 
@@ -1162,10 +1165,6 @@ def remove_html_markup(s):
     return out
 
 
-# def export_action(pactpk):
-#     act_obj = Action.objects.filter(pk=pactpk).values()
-# #xxx
-#     pass
 def run_action(pactuser, pactusername, pev_pk, ptask_pk, pact_pk, pinv_pk, pargdyn, pattr):
     actuser = pactuser  #  self.request.user
     actusername = pactusername  # self.request.user.get_username()
@@ -1223,6 +1222,7 @@ def run_action(pactuser, pactusername, pev_pk, ptask_pk, pact_pk, pinv_pk, pargd
         argument = argumentm
     argument_cleartext = ""
     # this is needed to be able to display it and save it clear-text
+    destoutdirname = None
     if argument != "None":
         if action_obj.script_category.pk == 1:
             '''
@@ -1280,15 +1280,18 @@ def run_action(pactuser, pactusername, pev_pk, ptask_pk, pact_pk, pinv_pk, pargd
 
             # argument = argument.replace('$FILE$', destfile_clean)
             argument = argument.replace('$FILE$', destfile)
+            # argument replace the $OUTDIR$ with the standard dir where output files will be stored
+            # destoutdir = os.path.join(destdir, "bcirtoutdir")
+            destoutdirname = tempfile.mkdtemp()
+            destoutdirname = str(destoutdirname) + "/"
+            argument = argument.replace('$OUTDIR$', destoutdirname)
 
         cmdin = [interpreter, cmd, argument]
     else:
         cmdin = [interpreter, cmd]
 
     scripttype = action_obj.script_type
-    actionq_startid = new_actionq(actuser, action_obj, task_obj, inv_obj, oldev_obj, None, action_obj.title,
-                                  scripttype, cmdin, argument_cleartext, argumentdynamic, None, None, None, None,
-                                  ActionQStatus.objects.get(name="Started"), actuser)
+    actionq_startid = None
     results = ""
     if action_obj.type.pk == 1:  # Command
         # /bin/bash -c "`cat /tmp/cmd` -c3 8.8.8.8"
@@ -1305,23 +1308,33 @@ def run_action(pactuser, pactusername, pev_pk, ptask_pk, pact_pk, pinv_pk, pargd
         # ExtractAttr(4, self.request.user, self.request.user.get_username(), 2, 2).extract_ip()
         pass
 
+
     rescommand = results.get('command')
     reserror = results.get('error')
     resstatus = results.get('status')
     resoutput = results.get('output')
     respid = results.get('pid')
-    if action_obj.scriptoutput.delimiter:
-        resoutput = OutputProcessor().split_delimiter(resoutput, action_obj.scriptoutput.delimiter)
+    if action_obj.scriptoutput:
+        if action_obj.scriptoutput.delimiter:
+            resoutput = OutputProcessor().split_delimiter(resoutput, action_obj.scriptoutput.delimiter)
     # save action to the actionQ
 
-    actionq_stopid = new_actionq(actuser, action_obj, task_obj, inv_obj, oldev_obj, actionq_startid,
-                                 action_obj.title, scripttype, rescommand, argument_cleartext, argumentdynamic,
-                                 reserror, resstatus, resoutput, respid,
-                                 ActionQStatus.objects.get(name="Finished"), actuser)
+    actionq_stopid=None
     evid = None
-    ActionQ.objects.filter(pk=actionq_startid.pk).update(parent=actionq_stopid)
     # if argumentoutput == "None":
     if action_outputtarget == 1:
+        # create the actionQ items
+        actionq_startid = new_actionq(actuser, action_obj, task_obj, inv_obj, oldev_obj, None, action_obj.title,
+                                      scripttype, cmdin, argument_cleartext, argumentdynamic, None, None, None, None,
+                                      ActionQStatus.objects.get(name="Started"), actuser)
+
+        actionq_stopid = new_actionq(actuser, action_obj, task_obj, inv_obj, oldev_obj, actionq_startid,
+                                     action_obj.title, scripttype, rescommand, argument_cleartext, argumentdynamic,
+                                     reserror, resstatus, resoutput, respid,
+                                     ActionQStatus.objects.get(name="Finished"), actuser)
+        # update the actionQ with the parent value
+        ActionQ.objects.filter(pk=actionq_startid.pk).update(parent=actionq_stopid)
+
         #  Output to Description field in new evidence
         evid = new_evidence(actuser, task_obj, inv_obj, actusername, actusername, resoutput)
         ActionQ.objects.filter(pk=actionq_stopid.pk).update(evid=evid.pk)
@@ -1329,6 +1342,16 @@ def run_action(pactuser, pactusername, pev_pk, ptask_pk, pact_pk, pinv_pk, pargd
         if oldev_obj:
             Evidence.objects.filter(pk=evid.pk).update(prevev=oldev_obj.pk)
     elif action_outputtarget == 2:
+        # create the actionQ item
+        actionq_startid = new_actionq(actuser, action_obj, task_obj, inv_obj, oldev_obj, None, action_obj.title,
+                                      scripttype, cmdin, argument_cleartext, argumentdynamic, None, None, None, None,
+                                      ActionQStatus.objects.get(name="Started"), actuser)
+        actionq_stopid = new_actionq(actuser, action_obj, task_obj, inv_obj, oldev_obj, actionq_startid,
+                                     action_obj.title, scripttype, rescommand, argument_cleartext, argumentdynamic,
+                                     reserror, resstatus, resoutput, respid,
+                                     ActionQStatus.objects.get(name="Finished"), actuser)
+        # update the actionQ with the parent value
+        ActionQ.objects.filter(pk=actionq_startid.pk).update(parent=actionq_stopid)
         #  Output to the attribute in the same evidence
         ActionQ.objects.filter(pk=actionq_stopid.pk).update(evid=oldev_obj.pk)
         currevattrformat = EvidenceAttrFormat.objects.get(name='Unknown')
@@ -1341,8 +1364,52 @@ def run_action(pactuser, pactusername, pev_pk, ptask_pk, pact_pk, pinv_pk, pargd
         for item1 in resoutput.splitlines():
             add_evattr(actuser, oldev_obj, item1, currevattrformat, actusername, actusername)
     elif action_outputtarget == 3:
-        #  Output to file TBD
-        pass
+        #  Output to file
+        # list of files to be saved
+        outputfiles = os.listdir(destoutdirname)
+        for fname in outputfiles:
+            actionq_startid = new_actionq(actuser, action_obj, task_obj, inv_obj, oldev_obj, None, action_obj.title,
+                                          scripttype, cmdin, argument_cleartext, argumentdynamic, None, None, None,
+                                          None,
+                                          ActionQStatus.objects.get(name="Started"), actuser)
+            # create the actionQ item
+            actionq_stopid = new_actionq(actuser, action_obj, task_obj, inv_obj, oldev_obj, actionq_startid,
+                                         action_obj.title, scripttype, rescommand, argument_cleartext, argumentdynamic,
+                                         reserror, resstatus, resoutput, respid,
+                                         ActionQStatus.objects.get(name="Finished"), actuser)
+            # update the actionQ with the parent value
+            ActionQ.objects.filter(pk=actionq_startid.pk).update(parent=actionq_stopid)
+
+            # copy files to the evidences folder
+            evfolder = 'uploads/evidences'
+            srcfilename1=os.path.join(destoutdirname,fname)
+            dstfilename1 = os.path.join(MEDIA_ROOT, evfolder, fname)
+            # if os.path.isfile(srcfilename1):
+            #     copy(srcfilename1, dstfilename1)
+            # copy(srcfilename1,dstfilename1)
+            from django.core.files import File
+            # dstfileref = os.path.join(evfolder,fname)
+            dstfileref = File(open(srcfilename1, 'rb'))
+            evfid = new_evidence(
+                puser=actuser,
+                ptask=task_obj,
+                pinv=inv_obj,
+                pcreated_by=actusername,
+                pmodified_by=actusername,
+                pdescription="Automatic file output from evidence: "+str(oldev_obj.pk),
+                # pfilename=fname,
+                # pfileref=dstfileref
+            )
+            evfid.fileRef.save(fname, dstfileref)
+            Evidence.objects.filter(pk=evfid.pk).update(fileName=fname)
+            if os.path.isfile(dstfilename1):
+                #  This makes the files readonly
+                os.chmod(dstfilename1, S_IREAD | S_IRGRP | S_IROTH)
+            # manage the actionQ
+            ActionQ.objects.filter(pk=actionq_stopid.pk).update(evid=evfid.pk)
+
+            if oldev_obj:
+                Evidence.objects.filter(pk=evfid.pk).update(prevev=oldev_obj.pk)
     else:
         # Output to be dropped
         pass
