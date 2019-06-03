@@ -28,6 +28,7 @@
                             <thead>
                                 <tr class="mylist-header">
                                     <th>UpdatePackageID</th>
+                                    <th>Version</th>
                                     <th>Created on</th>
                                     <th>Created by</th>
                                     <th>Modified on</th>
@@ -39,6 +40,11 @@
                                 {% include "configuration/updatepackage_detail_table.html" %}
                             </tbody>
                         </table>
+                        <a href="{% url 'configuration:conf_updateinstall' pk=updatepackage.pk %}"
+                           class="btn btn-success btn-sm">
+                            <span class="glyphicon glyphicon-play"></span>
+                        </a>
+
                         <a href="javascript:history.go(-1)" class="btn btn-primary pull-right">
                             <span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>
                             <span>Back</span>

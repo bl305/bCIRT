@@ -28,7 +28,7 @@
         <td colspan="2"><strong>Investigation</strong><br>
             {% if task.inv %}
             <a class="badge" href="{% url 'invs:inv_detail' pk=task.inv.pk %}?next1={{ request.get_full_path|urlencode }}">
-                {{ task.inv }}
+                {{ task.inv.id }}-{{ task.inv.invid }}
             </a>
             {% else %}
             -

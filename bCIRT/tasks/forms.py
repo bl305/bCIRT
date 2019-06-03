@@ -219,6 +219,7 @@ class TaskForm(forms.ModelForm):
             # self.fields['actiontarget'].queryset = Task.objects.all().exclude(pk=current_pk)
         # else:
         #     current_pk = 0
+        self.fields['user'].initial = user
 
     status = forms.ModelChoiceField(
         label='Status*',
@@ -638,6 +639,7 @@ class TaskVarForm(forms.ModelForm):
         logger.info("TaskVarForm - "+str(user))
         self.fields['task'].initial = task_pk
         self.fields['tasktemplate'].initial = tasktmp_pk
+        self.fields['user'].initial = user
 
     task = forms.ModelChoiceField(
         label='Task',

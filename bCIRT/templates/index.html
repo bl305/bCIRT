@@ -222,15 +222,24 @@
                     <thead>
                         <tr>
                             <th>#</th>
+                            <th>Owner</th>
                             <th>Status</th>
                             <th>Modified</th>
+                            <th>Assign</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for oinv in ooinvs %}
+                        {% for oinv in oinvs %}
                         <tr data-toggle="collapse" data-target="#myoinvs{{oinv.pk}}" class="accordion-toggle">
                             <td>
-                                <a class="badge" href="{% url 'oinvs:oinv_detail' pk=oinv.pk %}">{{ oinv.oinvid }}</a>
+                                <a class="badge" href="{% url 'invs:inv_detail' pk=oinv.pk %}">{{ oinv.invid }}</a>
+                            </td>
+                            <td>
+                                {% if oinv.user %}
+                                    {{ oinv.user }}
+                                {% else %}
+                                    -
+                                {% endif %}
                             </td>
                             <td>
                                 {{ oinv.status }}
@@ -238,6 +247,13 @@
                             <td>
                                 {{ oinv.modified_at|date:"Y/m/d H:i:s" }}
                             </td>
+                            <td>
+                                <a href="{% url 'invs:inv_assign' pk=oinv.pk %}?next1={{ request.get_full_path|urlencode }}" title="assign"
+                                   class="btn btn-default btn-xs">
+                                    <span class="icon-label">Assign</span>
+                                </a>
+                            </td>
+
                         </tr>
                         <tr >
                             <td colspan="3" class="hiddenRow">
@@ -269,6 +285,13 @@
                         <tr data-toggle="collapse" data-target="#myotasks{{otask.pk}}" class="accordion-toggle">
                             <td>
                                 <a class="badge" href="{% url 'otasks:tsk_detail' pk=otask.pk %}">{{ otask.pk }}</a>
+                            </td>
+                            <td>
+                                {% if otask.user %}
+                                    {{ otask.user }}
+                                {% else %}
+                                    -
+                                {% endif %}
                             </td>
                             <td>
                                 {{ otask.title }}

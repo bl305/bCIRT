@@ -3,7 +3,7 @@
                 <tr>
                     <td>
                         <a class="badge" href="{% url 'invs:inv_detail' pk=inv.pk %}?next1={{ request.get_full_path|urlencode }}">
-                            {{ inv.invid }}
+                            {{ inv.id }}-{{ inv.invid }}
                         </a>
                     </td>
                     <td>

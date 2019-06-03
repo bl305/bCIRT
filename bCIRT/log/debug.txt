@@ -1,1 +1,0 @@
-[2019-05-26 17:51:57] INFO forms [PID:10553] [log_file_verbose.__init__:25] InvForm - None

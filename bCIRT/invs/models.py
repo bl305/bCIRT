@@ -228,4 +228,8 @@ class Inv(models.Model):
             # set investigation close date
             if self.endtime is None:
                 self.endtime = timezone_now()
+        if self.status.name == "Assigned" and self.user is None:
+            raise ValidationError(_('If status is "Assigned", an "Assigned to" user must be selected.'))
+        if self.status.name == "Open" and self.user is not None:
+            raise ValidationError(_('If status is "Open", the "Assigned to" user must be empty too.'))
         super(Inv, self).clean()

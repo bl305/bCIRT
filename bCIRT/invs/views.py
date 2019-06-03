@@ -174,6 +174,15 @@ class InvCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateV
         # Checks pass, let http method handlers process the request
         return super(InvCreateView, self).dispatch(request, *args, **kwargs)
 
+    def get_form_kwargs(self):
+        """This method is what injects forms with their keyword
+            arguments."""
+        # grab the current set of form #kwargs
+        kwargs = super(InvCreateView, self).get_form_kwargs()
+        # Update the kwargs with the user_id
+        # kwargs['inv_pk'] = self.kwargs.get('inv_pk')
+        kwargs['user'] = self.request.user
+        return kwargs
 
 class InvDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailView):
     model = Inv

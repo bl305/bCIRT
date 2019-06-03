@@ -652,7 +652,7 @@ class TaskCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Create
             inv_pk = 0
 
         kwargs['inv_pk'] = inv_pk
-        # kwargs['user'] = self.request.user
+        kwargs['user'] = self.request.user
         return kwargs
 
 
@@ -726,6 +726,15 @@ class TaskUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Update
         self.object.modified_by = self.request.user.get_username()
         self.object.save()
         return super(TaskUpdateView, self).form_valid(form)
+
+    def get_form_kwargs(self):
+        """This method is what injects forms with their keyword
+            arguments."""
+        # grab the current set of form #kwargs
+        kwargs = super(TaskUpdateView, self).get_form_kwargs()
+        # Update the kwargs with the user_id
+        kwargs['user'] = self.request.user
+        return kwargs
 
 
 class TaskRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView):
@@ -827,6 +836,15 @@ class TaskTemplateCreateView(LoginRequiredMixin, PermissionRequiredMixin, generi
         # Checks pass, let http method handlers process the request
         return super(TaskTemplateCreateView, self).dispatch(request, *args, **kwargs)
 
+    def get_form_kwargs(self):
+        """This method is what injects forms with their keyword
+            arguments."""
+        # grab the current set of form #kwargs
+        kwargs = super(TaskTemplateCreateView, self).get_form_kwargs()
+        # Update the kwargs with the user_id
+        kwargs['user'] = self.request.user
+        return kwargs
+
 
 class TaskTemplateDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailView):
     model = TaskTemplate
@@ -897,6 +915,15 @@ class TaskTemplateUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generi
         self.object.modified_by = self.request.user.get_username()
         self.object.save()
         return super(TaskTemplateUpdateView, self).form_valid(form)
+
+    def get_form_kwargs(self):
+        """This method is what injects forms with their keyword
+            arguments."""
+        # grab the current set of form #kwargs
+        kwargs = super(TaskTemplateUpdateView, self).get_form_kwargs()
+        # Update the kwargs with the user_id
+        kwargs['user'] = self.request.user
+        return kwargs
 
 
 class TaskTemplateRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView):
@@ -1140,7 +1167,7 @@ class TaskVarCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Cre
 
         kwargs['task_pk'] = task_pk
         kwargs['tasktmp_pk'] = tasktmp_pk
-        # kwargs['user'] = self.request.user
+        kwargs['user'] = self.request.user
         return kwargs
 
 
@@ -1210,6 +1237,15 @@ class TaskVarUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Upd
         # self.object.modified_by = self.request.user.get_username()
         self.object.save()
         return super(TaskVarUpdateView, self).form_valid(form)
+
+    def get_form_kwargs(self):
+        """This method is what injects forms with their keyword
+            arguments."""
+        # grab the current set of form #kwargs
+        kwargs = super(TaskVarUpdateView, self).get_form_kwargs()
+        # Update the kwargs with the user_id
+        kwargs['user'] = self.request.user
+        return kwargs
 
 
 class TaskVarRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView):

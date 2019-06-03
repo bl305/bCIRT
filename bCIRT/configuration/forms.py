@@ -19,6 +19,7 @@ class UpdatePackageForm(forms.ModelForm):
         super(UpdatePackageForm, self).__init__(*args, **kwargs)
         logger.info("UpdatePackageForm - "+str(user))
         self.fields['user'].initial = user
+
         # self.fields['conf_pk'].initial = conf_pk
 
     user = forms.ModelChoiceField(
@@ -37,9 +38,10 @@ class UpdatePackageForm(forms.ModelForm):
     )
 
     class Meta:
-        fields = ("user", "description", "fileRef")
+        fields = ("updateversion", "user", "description", "fileRef")
         model = UpdatePackage
         labels = {
+            "updateversion": "Version*",
             "description": "Description*",
             "fileRef": "Attachment",
         }
@@ -52,4 +54,10 @@ class UpdatePackageForm(forms.ModelForm):
                     'style': 'padding-right: 100px',
                 }
             ),
+            'updateversion': forms.TextInput(attrs={
+                'size': 18,
+                'style': 'width:50%;',
+                'class': 'form-control'}
+            ),
+
         }

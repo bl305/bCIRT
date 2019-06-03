@@ -11,6 +11,7 @@ urlpatterns = [
     url(r"^update/detail/(?P<pk>\d+)/$", views.UpdatePackageDetailView.as_view(), name="conf_updatedetail"),
     url(r'^update/edit/(?P<pk>\d+)/$', views.UpdatePackageUpdateView.as_view(), name='conf_updateedit'),
     url(r'^update/remove/(?P<pk>\d+)/$', views.UpdatePackageRemoveView.as_view(), name='conf_updateremove'),
+    url(r'^update/install/(?P<pk>\d+)/$',views.InstallPackageRedirectView.as_view(), name="conf_updateinstall"),
 
     url(r"logging$", views.ConfigurationLoggingPage.as_view(), name='conf_logging'),
 ]
