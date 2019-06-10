@@ -25,8 +25,10 @@ class InvForm(forms.ModelForm):
         logger.info("InvForm - "+str(user))
         self.fields['user'].initial = user
         self.fields['status'].initial = 3
+        self.fields['phase'].initial = 1
         self.fields['severity'].initial = 2
         self.fields['priority'].initial = 1
+
 
     status = forms.ModelChoiceField(
         label='Status*',

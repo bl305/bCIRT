@@ -5,7 +5,7 @@
     <div class="row">
         <div class="col-md-4">
             <div class="well">
-                <p><strong>My Investigations</strong></p>
+                <p><strong>My Investigations ({{ invs.count }})</strong></p>
                 <table class="table table-condensed" style="border-collapse:collapse;">
                     <thead>
                         <tr>
@@ -43,7 +43,7 @@
         </div>
         <div class="col-md-4">
             <div class="well">
-                <p><strong>My Tasks (manual)</strong></p>
+                <p><strong>My Manual Tasks ({{ tasks.count }})</strong></p>
                 <table class="table table-condensed" style="border-collapse:collapse;">
                     <thead>
                         <tr>
@@ -121,7 +121,7 @@
     <div class="row">
         <div class="col-md-4">
             <div class="well">
-                <p><strong>Unassigned Investigations</strong></p>
+                <p><strong>Unassigned Investigations ({{ uinvs.count }})</strong></p>
                 <table class="table table-condensed" style="border-collapse:collapse;">
                     <thead>
                         <tr>
@@ -166,7 +166,7 @@
         </div>
         <div class="col-md-4">
             <div class="well">
-                <p><strong>Unassigned Tasks (manual)</strong></p>
+                <p><strong>Unassigned Manual Tasks ({{ utasks.count }})</strong></p>
                 <table class="table table-condensed" style="border-collapse:collapse;">
                     <thead>
                         <tr>
@@ -217,7 +217,7 @@
     <div class="row">
         <div class="col-md-4">
             <div class="well">
-                <p><strong>Other Investigations</strong></p>
+                <p><strong>Other Investigations ({{ oinvs.count }})</strong></p>
                 <table class="table table-condensed" style="border-collapse:collapse;">
                     <thead>
                         <tr>
@@ -271,11 +271,12 @@
         </div>
         <div class="col-md-4">
             <div class="well">
-                <p><strong>Other Tasks (manual)</strong></p>
+                <p><strong>Other Manual Tasks ({{ otasks.count }})</strong></p>
                 <table class="table table-condensed" style="border-collapse:collapse;">
                     <thead>
                         <tr>
                             <th>#</th>
+                            <th>Owner</th>
                             <th>Title</th>
                             <th>Modified</th>
                         </tr>
@@ -284,7 +285,7 @@
                         {% for otask in otasks %}
                         <tr data-toggle="collapse" data-target="#myotasks{{otask.pk}}" class="accordion-toggle">
                             <td>
-                                <a class="badge" href="{% url 'otasks:tsk_detail' pk=otask.pk %}">{{ otask.pk }}</a>
+                                <a class="badge" href="{% url 'tasks:tsk_detail' pk=otask.pk %}">{{ otask.pk }}</a>
                             </td>
                             <td>
                                 {% if otask.user %}

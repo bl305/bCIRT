@@ -32,8 +32,8 @@ urlpatterns = [
 
     url(r'^tinymce/', include('tinymce.urls')),
 
-
     url(r"^configuration/", include("configuration.urls", namespace="configuration")),
+    url(r"^reports/", include("reports.urls", namespace="reports")),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

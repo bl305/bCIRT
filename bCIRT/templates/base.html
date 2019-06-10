@@ -76,7 +76,7 @@ Menu - dropdown
 
                     <li class="dropdown {% block tasks_active %}{% endblock tasks_active%}">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                            <span class="glyphicon glyphicon glyphicon-folder-open" aria-hidden="true"></span>&nbsp;
+                            <span class="glyphicon glyphicon glyphicon-edit" aria-hidden="true"></span>&nbsp;
                             Tasks
                             <b class="caret"></b>
                         </a>
@@ -135,7 +135,7 @@ Menu - dropdown
 
                     <li class="dropdown {% block evidences_active %}{% endblock evidences_active%}">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                            <span class="glyphicon glyphicon glyphicon-folder-open" aria-hidden="true"></span>&nbsp;
+                            <span class="glyphicon glyphicon glyphicon-file" aria-hidden="true"></span>&nbsp;
                             Evidences
                             <b class="caret"></b>
                         </a>
@@ -165,7 +165,7 @@ Menu - dropdown
 
                     <li class="dropdown {% block actions_active %}{% endblock actions_active%}">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                            <span class="glyphicon glyphicon glyphicon-folder-open" aria-hidden="true"></span>&nbsp;
+                            <span class="glyphicon glyphicon glyphicon-play-circle" aria-hidden="true"></span>&nbsp;
                             Actions
                             <b class="caret"></b>
                         </a>
@@ -188,7 +188,7 @@ Menu - dropdown
 
                     <li class="dropdown {% block assets_active %}{% endblock assets_active%}">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                            <span class="glyphicon glyphicon glyphicon-folder-open" aria-hidden="true"></span>&nbsp;
+                            <span class="glyphicon glyphicon glyphicon-book" aria-hidden="true"></span>&nbsp;
                             Assets
                             <b class="caret"></b>
                         </a>
@@ -250,9 +250,25 @@ Menu - dropdown
 Search menu
 -->
                 <ul class="nav navbar-nav navbar-right">
+                    <li class="dropdown {% block reports_active %}{% endblock reports_active%}">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            <span class="glyphicon glyphicon glyphicon-signal" aria-hidden="true"></span>&nbsp;
+                            Reports
+                            <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="{% url 'reports:rep_dashboard' %}">
+                                    <span class="glyphicon glyphicon-signal"></span>
+                                    Dashboard
+                                </a>
+                            </li>
+                            <li class="divider"></li>
+                        </ul>
+                    </li>
                     <li class="dropdown {% block config_active %}{% endblock config_active%}">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                            <span class="glyphicon glyphicon glyphicon-folder-open" aria-hidden="true"></span>&nbsp;
+                            <span class="glyphicon glyphicon glyphicon-cog" aria-hidden="true"></span>&nbsp;
                             Config
                             <b class="caret"></b>
                         </a>

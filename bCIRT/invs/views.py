@@ -10,7 +10,7 @@ from django.contrib.auth.mixins import (
 from django.views import generic
 import logging
 from django.utils.http import is_safe_url
-from bCIRT import custom_params
+from bCIRT.settings import ALLOWED_HOSTS, PROJECT_ROOT
 # check remaining session time
 from django.contrib.sessions.models import Session
 from datetime import datetime, timezone
@@ -39,7 +39,7 @@ class MyPDFView(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailView)
 
         # rendered_html = html_template.render(self.context)
         #
-        # css_path = custom_params.PROJECT_PATH + '/static/bCIRT/bootstrap-3.3.7/css/bootstrap.min.css'
+        # css_path = custom_params.PROJECT_ROOT + '/static/bCIRT/bootstrap-3.3.7/css/bootstrap.min.css'
         # pdf_file = HTML(string=rendered_html).write_pdf(stylesheets=[CSS(css_path)])
         # # pdf_file = HTML(string=rendered_html).write_pdf()
 
@@ -76,7 +76,7 @@ class MyPDFView_weasyprint(LoginRequiredMixin, PermissionRequiredMixin, generic.
 
         rendered_html = html_template.render(self.context)
 
-        css_path = custom_params.PROJECT_PATH + '/static/bCIRT/bootstrap-3.3.7/css/bootstrap.min.css'
+        css_path = PROJECT_ROOT + '/static/bCIRT/bootstrap-3.3.7/css/bootstrap.min.css'
         pdf_file = HTML(string=rendered_html).write_pdf(stylesheets=[CSS(css_path)])
         # pdf_file = HTML(string=rendered_html).write_pdf()
 
@@ -140,7 +140,7 @@ class InvCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateV
     def get_success_url(self):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
-            if not is_safe_url(url=redirect_to, allowed_hosts=custom_params.ALLOWED_HOSTS):
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
                 return reverse(self.success_url)
         else:
             return reverse(self.success_url)
@@ -171,6 +171,8 @@ class InvCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateV
         elif not self.request.user.has_perm('invs.add_inv'):
             messages.error(self.request, "No permission to add a record !!!")
             return redirect('invs:inv_list')
+        else:
+            pass
         # Checks pass, let http method handlers process the request
         return super(InvCreateView, self).dispatch(request, *args, **kwargs)
 
@@ -222,7 +224,7 @@ class InvUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateV
     def get_success_url(self):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
-            if not is_safe_url(url=redirect_to, allowed_hosts=custom_params.ALLOWED_HOSTS):
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
                 return reverse(self.success_url)
         else:
             return reverse(self.success_url)
@@ -304,7 +306,7 @@ class InvAssignView(LoginRequiredMixin, PermissionRequiredMixin, generic.Redirec
     def get_redirect_url(self, *args, **kwargs):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
-            if not is_safe_url(url=redirect_to, allowed_hosts=custom_params.ALLOWED_HOSTS):
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
                 return reverse(self.success_url)
         else:
             return reverse(self.success_url)

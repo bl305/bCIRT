@@ -7,7 +7,7 @@ from .models import UpdatePackage
 from django.views import generic
 from django.utils.http import is_safe_url
 from django.shortcuts import reverse, redirect
-from bCIRT import custom_params
+from bCIRT.settings import ALLOWED_HOSTS
 from django.contrib.sessions.models import Session
 from datetime import datetime, timezone
 from django.contrib import messages
@@ -49,7 +49,7 @@ class UpdatePackageCreateView(LoginRequiredMixin, PermissionRequiredMixin, Creat
     def get_success_url(self):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
-            if not is_safe_url(url=redirect_to, allowed_hosts=custom_params.ALLOWED_HOSTS):
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
                 return reverse(self.success_url)
         else:
             return reverse(self.success_url)
@@ -122,13 +122,13 @@ class UpdatePackageUpdateView(LoginRequiredMixin, PermissionRequiredMixin, Updat
     login_url = '/'
     form_class = UpdatePackageForm
     model = UpdatePackage
-    permission_required = ('configuration.change_updatepackage',)
+    permission_required = ('configuration.view_updatepackage', 'configuration.change_updatepackage',)
     success_url = 'configuration:conf_updatelist'
 
     def get_success_url(self):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
-            if not is_safe_url(url=redirect_to, allowed_hosts=custom_params.ALLOWED_HOSTS):
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
                 return reverse(self.success_url)
         else:
             return reverse(self.success_url)
@@ -180,7 +180,7 @@ class UpdatePackageRemoveView(LoginRequiredMixin, PermissionRequiredMixin, Delet
     def get_success_url(self):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
-            if not is_safe_url(url=redirect_to, allowed_hosts=custom_params.ALLOWED_HOSTS):
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
                 return reverse(self.success_url)
         else:
             return reverse(self.success_url)
@@ -210,7 +210,7 @@ class InstallPackageRedirectView(LoginRequiredMixin, PermissionRequiredMixin, ge
     """
     This class performs the "action" execution and records the output in the ActionQ table.
     """
-    permission_required = ('configuration.view_updatepackage')
+    permission_required = ('configuration.view_updatepackage', 'configuration.change_updatepackage')
     success_url = 'configuration:conf_updatelist'
 
     def dispatch(self, request, *args, **kwargs):
@@ -236,7 +236,7 @@ class InstallPackageRedirectView(LoginRequiredMixin, PermissionRequiredMixin, ge
     def get_redirect_url(self, *args, **kwargs):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
-            if not is_safe_url(url=redirect_to, allowed_hosts=custom_params.ALLOWED_HOSTS):
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
                 return reverse(self.success_url)
         else:
             return reverse(self.success_url)

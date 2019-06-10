@@ -110,8 +110,8 @@ def timediff(pdate1, pdate2):
     if pdate1 and pdate2:
         diff = pdate2 - pdate1
         days, seconds = diff.days, diff.seconds
-        print(days)
-        print(seconds)
+        # print(days)
+        # print(seconds)
         retval = seconds + days * 60 * 60 * 24
     else:
         retval = None
@@ -177,8 +177,8 @@ class Inv(models.Model):
 
         if self.starttime is not None and self.endtime is not None:
             self.invduration = timediff(self.starttime, self.endtime)
-            print(self.starttime)
-            print(self.endtime)
+            if self.invduration < 0:
+                self.invduration = 0
         else:
             self.invduration = None
 
@@ -187,16 +187,19 @@ class Inv(models.Model):
         super(Inv, self).save(force_insert, force_update, *args, **kwargs)
         self.__original_status = self.status
 
+    def xxx(self):
+        return 'xxx'
+
     def invdurationprint(self):
         if self.invduration:
             tduration = self.invduration
-            day = tduration // (24 * 3600)
+            day = int(tduration // (24 * 3600))
             tduration = tduration % (24 * 3600)
-            hour = tduration // 3600
+            hour = int(tduration // 3600)
             tduration %= 3600
-            minutes = tduration // 60
+            minutes = int(tduration // 60)
             tduration %= 60
-            seconds = tduration
+            seconds = int(tduration)
             retval = str(day)+"d"+str(hour)+"h"+str(minutes)+"m"+str(seconds)+"s"
         else:
             retval = "-"
@@ -214,18 +217,19 @@ class Inv(models.Model):
         if self.invid == '':
             raise ValidationError(_('You must enter an Investigation ID.'))
         if self.status.name == "Closed":
-            # status changed to closed, check if all tasks are closed
-            anyopen = 0
-            for atask in self.task_inv.all():
-                if (atask.status.name == 'Completed') or (atask.status.name == 'Skipped'):
-                    pass
-                else:
-                    anyopen += 1
-            if anyopen:
-                raise ValidationError(_('Cannot close the Investigation with open Tasks.'))
-            if self.user is None:
-                raise ValidationError(_('Assign field cannot be empty.'))
-            # set investigation close date
+            if self.task_inv.all():
+                # status changed to closed, check if all tasks are closed
+                anyopen = 0
+                for atask in self.task_inv.all():
+                    if (atask.status.name == 'Completed') or (atask.status.name == 'Skipped'):
+                        pass
+                    else:
+                        anyopen += 1
+                if anyopen:
+                    raise ValidationError(_('Cannot close the Investigation with open Tasks.'))
+                if self.user is None:
+                    raise ValidationError(_('Assign field cannot be empty.'))
+                # set investigation close date
             if self.endtime is None:
                 self.endtime = timezone_now()
         if self.status.name == "Assigned" and self.user is None:

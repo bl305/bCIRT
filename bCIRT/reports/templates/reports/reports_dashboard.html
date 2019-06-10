@@ -1,0 +1,440 @@
+{% extends "reports/reports_base.html" %}
+
+{% block prereports %}
+<div class="container">
+	<div class="col-md-12">
+		<div class="content">
+			<h2>Report Dashboard</h2>
+		</div>
+	</div>
+{% endblock %}
+{% block reports_content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="well">
+                <p><strong>Investigations by Status All</strong></p>
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for inv_closed in invs_closed %}
+                        <tr data-toggle="collapse" data-target="#myinvs{{inv_closed.pk}}" class="accordion-toggle">
+                            <td>
+                                {{ inv_closed.status__name }}
+                            </td>
+                            <td>
+                                {{ inv_closed.status__count }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+			</div>
+		</div>
+        <div class="col-md-4">
+            <div class="well">
+                <p><strong>Investigations by Status last 30 days</strong></p>
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for inv_closed_30 in invs_closed_30 %}
+                        <tr data-toggle="collapse" data-target="#myinvs{{inv_closed_30.pk}}" class="accordion-toggle">
+                            <td>
+                                {{ inv_closed_30.status__name }}
+                            </td>
+                            <td>
+                                {{ inv_closed_30.status__count }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+			</div>
+		</div>
+        <div class="col-md-4">
+            <div class="well">
+                <p><strong>Investigations by Status last 90 days</strong></p>
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for inv_closed_90 in invs_closed_90 %}
+                        <tr data-toggle="collapse" data-target="#myinvs{{inv_closed_90.pk}}" class="accordion-toggle">
+                            <td>
+                                {{ inv_closed_90.status__name }}
+                            </td>
+                            <td>
+                                {{ inv_closed_90.status__count }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+			</div>
+		</div>
+	</div>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="well">
+                <p><strong>Investigations Duration All</strong></p>
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>Minimum</th>
+							<th>Average</th>
+							<th>Maximum</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-toggle="collapse" data-target="#myinvs{{inv_closed_stats.pk}}" class="accordion-toggle">
+                            <td>
+								{{ invs_closed_stats_min }}
+							</td>
+							<td>
+								{{ invs_closed_stats_avg }}
+							</td>
+							<td>
+								{{ invs_closed_stats_max }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+			</div>
+		</div>
+        <div class="col-md-4">
+            <div class="well">
+                <p><strong>Investigations Duration last 30 days</strong></p>
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>Minimum</th>
+							<th>Average</th>
+							<th>Maximum</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-toggle="collapse" data-target="#myinvs{{inv_closed_stats30.pk}}" class="accordion-toggle">
+                            <td>
+								{{ invs_closed_stats30_min }}
+							</td>
+							<td>
+								{{ invs_closed_stats30_avg }}
+							</td>
+							<td>
+								{{ invs_closed_stats30_max }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+			</div>
+		</div>
+        <div class="col-md-4">
+            <div class="well">
+                <p><strong>Investigations Duration last 90 days</strong></p>
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>Minimum</th>
+							<th>Average</th>
+							<th>Maximum</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-toggle="collapse" data-target="#myinvs{{inv_closed_stats90.pk}}" class="accordion-toggle">
+                            <td>
+								{{ invs_closed_stats90_min }}
+							</td>
+							<td>
+								{{ invs_closed_stats90_avg }}
+							</td>
+							<td>
+								{{ invs_closed_stats90_max }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+			</div>
+		</div>
+	</div>
+	<hr class="thick">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="well">
+				<p><strong>Tasks per Investigation All last 30 days</strong></p>
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>Minimum</th>
+							<th>Average</th>
+							<th>Maximum</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-toggle="collapse" data-target="#mytasks{{inv_closed_tasks.pk}}" class="accordion-toggle">
+                            <td>
+								{{ invs_closed_tasks_min }}
+							</td>
+							<td>
+								{{ invs_closed_tasks_avg }}
+							</td>
+							<td>
+								{{ invs_closed_tasks_max }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+			</div>
+		</div>
+        <div class="col-md-4">
+            <div class="well">
+				<p><strong>Tasks per Investigation Manual last 30 days</strong></p>
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>Minimum</th>
+							<th>Average</th>
+							<th>Maximum</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-toggle="collapse" data-target="#mytasks{{inv_closed_tasks_manual.pk}}" class="accordion-toggle">
+                            <td>
+								{{ invs_closed_tasks_manual_min }}
+							</td>
+							<td>
+								{{ invs_closed_tasks_manual_avg }}
+							</td>
+							<td>
+								{{ invs_closed_tasks_manual_max }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+			</div>
+		</div>
+        <div class="col-md-4">
+            <div class="well">
+				<p><strong>Tasks per Investigation Auto last 30 days</strong></p>
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>Minimum</th>
+							<th>Average</th>
+							<th>Maximum</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-toggle="collapse" data-target="#mytasks{{inv_closed_tasks_auto.pk}}" class="accordion-toggle">
+                            <td>
+								{{ invs_closed_tasks_auto_min }}
+							</td>
+							<td>
+								{{ invs_closed_tasks_auto_avg }}
+							</td>
+							<td>
+								{{ invs_closed_tasks_auto_max }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+			</div>
+		</div>
+	</div>
+
+	<hr class="thick">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="well">
+                <p><strong>Tasks by Status All</strong></p>
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for task_closed in tasks_closed %}
+                        <tr data-toggle="collapse" data-target="#mytasks{{task_closed.pk}}" class="accordion-toggle">
+                            <td>
+                                {{ task_closed.status__name }}
+                            </td>
+                            <td>
+                                {{ task_closed.status__count }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+			</div>
+		</div>
+        <div class="col-md-4">
+            <div class="well">
+                <p><strong>Tasks by Status last 30 days</strong></p>
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for task_closed_30 in tasks_closed_30 %}
+                        <tr data-toggle="collapse" data-target="#mytasks{{task_closed_30.pk}}" class="accordion-toggle">
+                            <td>
+                                {{ task_closed_30.status__name }}
+                            </td>
+                            <td>
+                                {{ task_closed_30.status__count }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+			</div>
+		</div>
+        <div class="col-md-4">
+            <div class="well">
+                <p><strong>Tasks by Status last 90 days</strong></p>
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for task_closed_90 in tasks_closed_90 %}
+                        <tr data-toggle="collapse" data-target="#mytasks{{task_closed_90.pk}}" class="accordion-toggle">
+                            <td>
+                                {{ task_closed_90.status__name }}
+                            </td>
+                            <td>
+                                {{ task_closed_90.status__count }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+			</div>
+		</div>
+	</div>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="well">
+                <p><strong>Tasks Duration All</strong></p>
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>Minimum</th>
+							<th>Average</th>
+							<th>Maximum</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-toggle="collapse" data-target="#mytasks{{task_closed_stats.pk}}" class="accordion-toggle">
+                            <td>
+								{{ tasks_closed_stats_min }}
+							</td>
+							<td>
+								{{ tasks_closed_stats_avg }}
+							</td>
+							<td>
+								{{ tasks_closed_stats_max }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+			</div>
+		</div>
+        <div class="col-md-4">
+            <div class="well">
+                <p><strong>Tasks Duration last 30 days</strong></p>
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>Minimum</th>
+							<th>Average</th>
+							<th>Maximum</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-toggle="collapse" data-target="#mytasks{{task_closed_stats30.pk}}" class="accordion-toggle">
+                            <td>
+								{{ tasks_closed_stats30_min }}
+							</td>
+							<td>
+								{{ tasks_closed_stats30_avg }}
+							</td>
+							<td>
+								{{ tasks_closed_stats30_max }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+			</div>
+		</div>
+        <div class="col-md-4">
+            <div class="well">
+                <p><strong>Tasks Duration last 90 days</strong></p>
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>Minimum</th>
+							<th>Average</th>
+							<th>Maximum</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-toggle="collapse" data-target="#mytasks{{task_closed_stats90.pk}}" class="accordion-toggle">
+                            <td>
+								{{ tasks_closed_stats90_min }}
+							</td>
+							<td>
+								{{ tasks_closed_stats90_avg }}
+							</td>
+							<td>
+								{{ tasks_closed_stats90_max }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+			</div>
+		</div>
+	</div>
+	<hr class="thick">
+<!--    <div class="row">-->
+<!--        <div class="col-md-4">-->
+<!--            <div class="well">-->
+<!--				111-->
+<!--			</div>-->
+<!--		</div>-->
+<!--        <div class="col-md-4">-->
+<!--            <div class="well">-->
+<!--				222-->
+<!--			</div>-->
+<!--		</div>-->
+<!--        <div class="col-md-4">-->
+<!--            <div class="well">-->
+<!--				333-->
+<!--			</div>-->
+<!--		</div>-->
+<!--	</div>-->
+
+</div>
+{% endblock reports_content %}
+</div>

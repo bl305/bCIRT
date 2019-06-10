@@ -91,12 +91,17 @@ Go to the bCIRT/settings.py and change the followings:
 BASE_URL = "http://127.0.0.1:8000"
 ALLOWED_HOSTS = ['127.0.0.1']
 INTERNAL_IPS = ['127.0.0.1']
-PROJECT_ROOT='/home/bali/PycharmProjects/bCIRT'
 
 ```
-Go to the bCIRT/custom_params.py and change:
+Go to the bCIRT/custom_variables.py and change:
 ```text
-ALLOWED_HOSTS = '127.0.0.1'
+ALLOWED_HOSTS = ['127.0.0.1']
+
+Optionally also modify:
+MYPATH
+MYMEDIA_ROOT
+MYDB
+
 ```
 
 ### 5. Init database

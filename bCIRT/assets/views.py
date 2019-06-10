@@ -10,7 +10,7 @@ from django.contrib.auth.mixins import (
 from django.views import generic
 import logging
 from django.utils.http import is_safe_url
-from bCIRT import custom_params
+from bCIRT.settings import ALLOWED_HOSTS
 # check remaining session time
 from django.contrib.sessions.models import Session
 from datetime import datetime, timezone
@@ -48,7 +48,7 @@ class HostCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Create
     def get_success_url(self):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
-            if not is_safe_url(url=redirect_to, allowed_hosts=custom_params.ALLOWED_HOSTS):
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
                 return reverse(self.success_url)
         else:
             return reverse(self.success_url)
@@ -125,7 +125,7 @@ class HostUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Update
     def get_success_url(self):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
-            if not is_safe_url(url=redirect_to, allowed_hosts=custom_params.ALLOWED_HOSTS):
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
                 return reverse(self.success_url)
         else:
             return reverse(self.success_url)
@@ -175,7 +175,7 @@ class HostRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generic.Delete
     def get_success_url(self):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
-            if not is_safe_url(url=redirect_to, allowed_hosts=custom_params.ALLOWED_HOSTS):
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
                 return reverse(self.success_url)
         else:
             return reverse(self.success_url)
@@ -230,7 +230,7 @@ class ProfileCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Cre
     def get_success_url(self):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
-            if not is_safe_url(url=redirect_to, allowed_hosts=custom_params.ALLOWED_HOSTS):
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
                 return reverse(self.success_url)
         else:
             return reverse(self.success_url)
@@ -313,7 +313,7 @@ class ProfileUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Upd
     def get_success_url(self):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
-            if not is_safe_url(url=redirect_to, allowed_hosts=custom_params.ALLOWED_HOSTS):
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
                 return reverse(self.success_url)
         else:
             return reverse(self.success_url)
@@ -364,7 +364,7 @@ class ProfileRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generic.Del
     def get_success_url(self):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
-            if not is_safe_url(url=redirect_to, allowed_hosts=custom_params.ALLOWED_HOSTS):
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
                 return reverse(self.success_url)
         else:
             return reverse(self.success_url)

@@ -13,7 +13,7 @@ from stat import S_IREAD, S_IRGRP, S_IROTH, S_IWUSR, S_IWGRP
 import ipaddress
 import re
 import pathlib
-from bCIRT import custom_params
+from bCIRT.settings import PROJECT_ROOT
 from django.utils.timezone import now as timezone_now
 import random
 import string
@@ -413,15 +413,18 @@ class Task(models.Model):
 
 def task_close(ptaskpk, ptaskmoduser):
     if Task.objects.filter(pk=ptaskpk).exists():
-        task_obj = Task.objects.filter(pk=ptaskpk)
+        task_obj = Task.objects.get(pk=ptaskpk)
         taskstatusclose = TaskStatus.objects.get(name="Completed")
         taskduration = None
         if task_obj.starttime is not None and task_obj.endtime is not None:
             task_obj.taskduration = timediff(task_obj.starttime, task_obj.endtime)
         else:
             task_obj.taskduration = None
-        task_obj.update(status=taskstatusclose, modified_by=ptaskmoduser, taskduration=taskduration)
-
+        # task_obj.update(status=taskstatusclose, modified_by=ptaskmoduser, taskduration=taskduration)
+        task_obj.status = taskstatusclose
+        task_obj.modified_by = ptaskmoduser
+        task_obj.taskduration = taskduration
+        task_obj.save()
 
 class EvidenceFormat(models.Model):
     objects = models.Manager()
@@ -461,8 +464,8 @@ class Evidence(models.Model):
     #    class Meta:
     #        ordering = ['-id']
 
-    # class Meta:
-#       ordering = ['-id']
+    class Meta:
+      ordering = ['id']
 
     def __str__(self):
         # return self.description
@@ -833,11 +836,11 @@ class Action(models.Model):
     def save(self, *args, **kwargs):
         self.description_html = misaka.html(self.description)
 
-        savepath = os.path.join(custom_params.PROJECT_PATH, 'tasks', 'actions', str(self.pk))
+        savepath = os.path.join(PROJECT_ROOT, 'tasks', 'actions', str(self.pk))
         pathlib.Path(savepath).mkdir(parents=True, exist_ok=True)
         filename = str(self.pk)+'_'+str(datetime.utcnow().strftime('%Y-%m-%d_%H-%M-%S'))
         self.code_file_name = filename
-        savefile = os.path.join(custom_params.PROJECT_PATH, 'tasks', 'actions', str(self.pk), filename)
+        savefile = os.path.join(PROJECT_ROOT, 'tasks', 'actions', str(self.pk), filename)
         self.code_file_path = savefile
 
         saved = save_code(savefile, self.code)
@@ -1222,7 +1225,10 @@ def run_action(pactuser, pactusername, pev_pk, ptask_pk, pact_pk, pinv_pk, pargd
         argument = argumentm
     argument_cleartext = ""
     # this is needed to be able to display it and save it clear-text
+    # 1. create temp folder
+    tempfile.tempdir = path.join(MEDIA_ROOT, "tmp")
     destoutdirname = None
+    mytempdir = None
     if argument != "None":
         if action_obj.script_category.pk == 1:
             '''
@@ -1259,8 +1265,6 @@ def run_action(pactuser, pactusername, pev_pk, ptask_pk, pact_pk, pinv_pk, pargd
             #  this represents file type so reads the file from the evidence
             #  need to have a file to work on, that's "2"
             # create a temporary file so the original remains intact
-            # 1. create temp folder
-            tempfile.tempdir = path.join(MEDIA_ROOT, "tmp")
             #generate a random folder with some prefix:
             myprefix = "EV-"+str(ev_pk)+"-"
             mytempdir = tempfile.TemporaryDirectory(prefix=myprefix)
@@ -1282,14 +1286,14 @@ def run_action(pactuser, pactusername, pev_pk, ptask_pk, pact_pk, pinv_pk, pargd
             argument = argument.replace('$FILE$', destfile)
             # argument replace the $OUTDIR$ with the standard dir where output files will be stored
             # destoutdir = os.path.join(destdir, "bcirtoutdir")
-            destoutdirname = tempfile.mkdtemp()
-            destoutdirname = str(destoutdirname) + "/"
+            destoutdir = tempfile.mkdtemp()
+            destoutdirname = str(destoutdir) + "/"
             argument = argument.replace('$OUTDIR$', destoutdirname)
+            print("1111"+str(os.listdir(destdir)))
 
         cmdin = [interpreter, cmd, argument]
     else:
         cmdin = [interpreter, cmd]
-
     scripttype = action_obj.script_type
     actionq_startid = None
     results = ""
@@ -1308,7 +1312,6 @@ def run_action(pactuser, pactusername, pev_pk, ptask_pk, pact_pk, pinv_pk, pargd
         # ExtractAttr(4, self.request.user, self.request.user.get_username(), 2, 2).extract_ip()
         pass
 
-
     rescommand = results.get('command')
     reserror = results.get('error')
     resstatus = results.get('status')
@@ -1321,8 +1324,10 @@ def run_action(pactuser, pactusername, pev_pk, ptask_pk, pact_pk, pinv_pk, pargd
 
     actionq_stopid=None
     evid = None
+    actq = None
     # if argumentoutput == "None":
     if action_outputtarget == 1:
+        # Description is target for output
         # create the actionQ items
         actionq_startid = new_actionq(actuser, action_obj, task_obj, inv_obj, oldev_obj, None, action_obj.title,
                                       scripttype, cmdin, argument_cleartext, argumentdynamic, None, None, None, None,
@@ -1341,7 +1346,10 @@ def run_action(pactuser, pactusername, pev_pk, ptask_pk, pact_pk, pinv_pk, pargd
 
         if oldev_obj:
             Evidence.objects.filter(pk=evid.pk).update(prevev=oldev_obj.pk)
+
+        actq = actionq_stopid.pk
     elif action_outputtarget == 2:
+        # Attribute is target for output
         # create the actionQ item
         actionq_startid = new_actionq(actuser, action_obj, task_obj, inv_obj, oldev_obj, None, action_obj.title,
                                       scripttype, cmdin, argument_cleartext, argumentdynamic, None, None, None, None,
@@ -1363,11 +1371,60 @@ def run_action(pactuser, pactusername, pev_pk, ptask_pk, pact_pk, pinv_pk, pargd
         # OUTPUT DELIMITER needs to be defined in the model - if empty, don't split...TBD
         for item1 in resoutput.splitlines():
             add_evattr(actuser, oldev_obj, item1, currevattrformat, actusername, actusername)
+
+        actq = actionq_stopid.pk
     elif action_outputtarget == 3:
-        #  Output to file
+        # File attachment is target for output
         # list of files to be saved
         outputfiles = os.listdir(destoutdirname)
-        for fname in outputfiles:
+        if outputfiles:
+            for fname in outputfiles:
+                actionq_startid = new_actionq(actuser, action_obj, task_obj, inv_obj, oldev_obj, None, action_obj.title,
+                                              scripttype, cmdin, argument_cleartext, argumentdynamic, None, None, None,
+                                              None,
+                                              ActionQStatus.objects.get(name="Started"), actuser)
+                # create the actionQ item
+                actionq_stopid = new_actionq(actuser, action_obj, task_obj, inv_obj, oldev_obj, actionq_startid,
+                                             action_obj.title, scripttype, rescommand, argument_cleartext, argumentdynamic,
+                                             reserror, resstatus, resoutput, respid,
+                                             ActionQStatus.objects.get(name="Finished"), actuser)
+                # update the actionQ with the parent value
+                ActionQ.objects.filter(pk=actionq_startid.pk).update(parent=actionq_stopid)
+
+                # copy files to the evidences folder
+                evfolder = 'uploads/evidences'
+                srcfilename1=os.path.join(destoutdirname,fname)
+                dstfilename1 = os.path.join(MEDIA_ROOT, evfolder, fname)
+                # if os.path.isfile(srcfilename1):
+                #     copy(srcfilename1, dstfilename1)
+                # copy(srcfilename1,dstfilename1)
+                from django.core.files import File
+                # dstfileref = os.path.join(evfolder,fname)
+                dstfileref = File(open(srcfilename1, 'rb'))
+                evfid = new_evidence(
+                    puser=actuser,
+                    ptask=task_obj,
+                    pinv=inv_obj,
+                    pcreated_by=actusername,
+                    pmodified_by=actusername,
+                    pdescription="Automatic file output from evidence: "+str(oldev_obj.pk),
+                    # pfilename=fname,
+                    # pfileref=dstfileref
+                )
+                evfid.fileRef.save(fname, dstfileref)
+                Evidence.objects.filter(pk=evfid.pk).update(fileName=fname)
+                if os.path.isfile(dstfilename1):
+                    #  This makes the files readonly
+                    os.chmod(dstfilename1, S_IREAD | S_IRGRP | S_IROTH)
+                # manage the actionQ
+                ActionQ.objects.filter(pk=actionq_stopid.pk).update(evid=evfid.pk)
+
+                if oldev_obj:
+                    Evidence.objects.filter(pk=evfid.pk).update(prevev=oldev_obj.pk)
+
+
+                actq = actionq_stopid.pk
+        else:
             actionq_startid = new_actionq(actuser, action_obj, task_obj, inv_obj, oldev_obj, None, action_obj.title,
                                           scripttype, cmdin, argument_cleartext, argumentdynamic, None, None, None,
                                           None,
@@ -1379,41 +1436,14 @@ def run_action(pactuser, pactusername, pev_pk, ptask_pk, pact_pk, pinv_pk, pargd
                                          ActionQStatus.objects.get(name="Finished"), actuser)
             # update the actionQ with the parent value
             ActionQ.objects.filter(pk=actionq_startid.pk).update(parent=actionq_stopid)
+            #  Output to the attribute in the same evidence
+            ActionQ.objects.filter(pk=actionq_stopid.pk).update(evid=oldev_obj.pk)
+            actq = actionq_stopid.pk
 
-            # copy files to the evidences folder
-            evfolder = 'uploads/evidences'
-            srcfilename1=os.path.join(destoutdirname,fname)
-            dstfilename1 = os.path.join(MEDIA_ROOT, evfolder, fname)
-            # if os.path.isfile(srcfilename1):
-            #     copy(srcfilename1, dstfilename1)
-            # copy(srcfilename1,dstfilename1)
-            from django.core.files import File
-            # dstfileref = os.path.join(evfolder,fname)
-            dstfileref = File(open(srcfilename1, 'rb'))
-            evfid = new_evidence(
-                puser=actuser,
-                ptask=task_obj,
-                pinv=inv_obj,
-                pcreated_by=actusername,
-                pmodified_by=actusername,
-                pdescription="Automatic file output from evidence: "+str(oldev_obj.pk),
-                # pfilename=fname,
-                # pfileref=dstfileref
-            )
-            evfid.fileRef.save(fname, dstfileref)
-            Evidence.objects.filter(pk=evfid.pk).update(fileName=fname)
-            if os.path.isfile(dstfilename1):
-                #  This makes the files readonly
-                os.chmod(dstfilename1, S_IREAD | S_IRGRP | S_IROTH)
-            # manage the actionQ
-            ActionQ.objects.filter(pk=actionq_stopid.pk).update(evid=evfid.pk)
-
-            if oldev_obj:
-                Evidence.objects.filter(pk=evfid.pk).update(prevev=oldev_obj.pk)
     else:
         # Output to be dropped
         pass
-    actq = actionq_stopid.pk
+    # actq = actionq_stopid.pk
     return actq
 
 
@@ -1476,7 +1506,7 @@ class ActionQ(models.Model):
     parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name="actionq_parent")
     title = models.CharField(max_length=50, default=None, blank=True, null=True)
     scripttype = models.CharField(max_length=60, blank=False, null=False)
-    command = models.CharField(max_length=255, blank=False, null=False)
+    command = models.CharField(max_length=2048, blank=False, null=False)
     argument = models.CharField(max_length=255, default=None, blank=True, null=True)
     argumentdynamic = models.CharField(max_length=255, default=None, blank=True, null=True)
     cmderror = models.TextField(default=None, blank=True, null=True)

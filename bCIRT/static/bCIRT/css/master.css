@@ -6,6 +6,32 @@ body {
   max-width:100%;
 }
 
+/* Solid border */
+hr.solid {
+  border-top: 3px solid black;
+}
+
+/* Dashed border */
+hr.dashed {
+  border-top: 3px dashed black;
+}
+
+/* Dotted border */
+hr.dotter {
+  border-top: 3px dotted black;
+}
+
+/* Thick border */
+hr.thick {
+  border: 3px solid black;
+}
+
+/* Large rounded border */
+hr.large {
+  border: 10px solid black;
+  border-radius: 5px;
+}
+
 .myheight{
   min-height:87vh;
 }

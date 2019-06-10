@@ -20,7 +20,8 @@ from django.http import FileResponse
 from django.views import generic
 # from django.forms.widgets import SplitDateTimeWidget  # , ClearableFileInput
 import logging
-from bCIRT import custom_params
+from bCIRT.custom_variables import MYMEDIA_ROOT
+from bCIRT.settings import ALLOWED_HOSTS
 # check remaining session time
 from django.contrib.sessions.models import Session
 from datetime import timezone
@@ -219,7 +220,7 @@ class GetFileRawView(LoginRequiredMixin, PermissionRequiredMixin, generic.Detail
         if Evidence.objects.filter(pk=ev_pk).exists():
             origfilename = str(Evidence.objects.get(pk=ev_pk).fileName)
             filepath = str(Evidence.objects.get(pk=ev_pk).fileRef)
-            fileroot = str(custom_params.MEDIA_PATH)
+            fileroot = str(MYMEDIA_ROOT)
             fullpath = os.path.join(fileroot, filepath)
 
             now = datetime.now()
@@ -251,7 +252,7 @@ class GetFileZippedView(LoginRequiredMixin, PermissionRequiredMixin, generic.Det
         # self.context['ev_pk'] = self.get_object()
         # self.context['user'] = self.request.user.get_username()
             filepath = str(Evidence.objects.get(pk=ev_pk).fileRef)
-            fileroot = str(custom_params.MEDIA_PATH)
+            fileroot = str(MYMEDIA_ROOT)
             fullpath = os.path.join(fileroot, filepath)
 
             now = datetime.now()
@@ -335,7 +336,7 @@ class ActionCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Crea
     def get_success_url(self):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
-            if not is_safe_url(url=redirect_to, allowed_hosts=custom_params.ALLOWED_HOSTS):
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
                 return reverse(self.success_url)
         else:
             return reverse(self.success_url)
@@ -419,7 +420,7 @@ class ActionUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Upda
     def get_success_url(self):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
-            if not is_safe_url(url=redirect_to, allowed_hosts=custom_params.ALLOWED_HOSTS):
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
                 return reverse(self.success_url)
         else:
             return reverse(self.success_url)
@@ -473,7 +474,7 @@ class ActionRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generic.Dele
     def get_success_url(self):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
-            if not is_safe_url(url=redirect_to, allowed_hosts=custom_params.ALLOWED_HOSTS):
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
                 return reverse(self.success_url)
         else:
             return reverse(self.success_url)
@@ -563,14 +564,15 @@ class ActionExecScriptRedirectView(LoginRequiredMixin, PermissionRequiredMixin, 
         return super(ActionExecScriptRedirectView, self).dispatch(request, *args, **kwargs)
 
     def get_redirect_url(self, *args, **kwargs):
-        # if 'next1' in self.request.GET:
-        #     redirect_to = self.request.GET['next1']
-        #     if not is_safe_url(url=redirect_to, allowed_hosts=custom_params.ALLOWED_HOSTS):
-        #         return reverse(self.success_url)
-        # else:
-        #     return reverse(self.success_url)
-        # return redirect_to
-        return reverse('tasks:actq_detail', kwargs={'pk': self.actq})
+        if 'next1' in self.request.GET:
+            redirect_to = self.request.GET['next1']
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
+                return reverse(self.success_url)
+        else:
+            return reverse(self.success_url)
+        return redirect_to
+        # return reverse('tasks:actq_detail', kwargs={'pk': self.actq})
+
         # return reverse('tasks:act_list')
         # return super().get_redirect_url(*args, **kwargs)
 # Investigation related views
@@ -604,7 +606,7 @@ class TaskCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Create
     def get_success_url(self):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
-            if not is_safe_url(url=redirect_to, allowed_hosts=custom_params.ALLOWED_HOSTS):
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
                 return reverse(self.success_url)
         else:
             return reverse(self.success_url)
@@ -695,7 +697,7 @@ class TaskUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Update
     def get_success_url(self):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
-            if not is_safe_url(url=redirect_to, allowed_hosts=custom_params.ALLOWED_HOSTS):
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
                 return reverse(self.success_url)
         else:
             return reverse(self.success_url)
@@ -747,7 +749,7 @@ class TaskRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generic.Delete
     def get_success_url(self):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
-            if not is_safe_url(url=redirect_to, allowed_hosts=custom_params.ALLOWED_HOSTS):
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
                 return reverse(self.success_url)
         else:
             return reverse(self.success_url)
@@ -801,7 +803,7 @@ class TaskTemplateCreateView(LoginRequiredMixin, PermissionRequiredMixin, generi
     def get_success_url(self):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
-            if not is_safe_url(url=redirect_to, allowed_hosts=custom_params.ALLOWED_HOSTS):
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
                 return reverse(self.success_url)
         else:
             return reverse(self.success_url)
@@ -884,7 +886,7 @@ class TaskTemplateUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generi
     def get_success_url(self):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
-            if not is_safe_url(url=redirect_to, allowed_hosts=custom_params.ALLOWED_HOSTS):
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
                 return reverse(self.success_url)
         else:
             return reverse(self.success_url)
@@ -936,7 +938,7 @@ class TaskTemplateRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generi
     def get_success_url(self):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
-            if not is_safe_url(url=redirect_to, allowed_hosts=custom_params.ALLOWED_HOSTS):
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
                 return reverse(self.success_url)
         else:
             return reverse(self.success_url)
@@ -1076,7 +1078,7 @@ class TaskTemplateAddView(LoginRequiredMixin, PermissionRequiredMixin, generic.R
     def get_redirect_url(self, *args, **kwargs):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
-            if not is_safe_url(url=redirect_to, allowed_hosts=custom_params.ALLOWED_HOSTS):
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
                 return reverse(self.success_url)
         else:
             return reverse(self.success_url)
@@ -1114,7 +1116,7 @@ class TaskVarCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Cre
     def get_success_url(self):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
-            if not is_safe_url(url=redirect_to, allowed_hosts=custom_params.ALLOWED_HOSTS):
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
                 return reverse(self.success_url)
         else:
             return reverse(self.success_url)
@@ -1207,7 +1209,7 @@ class TaskVarUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Upd
     def get_success_url(self):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
-            if not is_safe_url(url=redirect_to, allowed_hosts=custom_params.ALLOWED_HOSTS):
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
                 return reverse(self.success_url)
         else:
             return reverse(self.success_url)
@@ -1256,7 +1258,7 @@ class TaskVarRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generic.Del
     def get_success_url(self):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
-            if not is_safe_url(url=redirect_to, allowed_hosts=custom_params.ALLOWED_HOSTS):
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
                 return reverse(self.success_url)
         else:
             return reverse(self.success_url)
@@ -1304,7 +1306,7 @@ class PlaybookCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Re
     def get_redirect_url(self, *args, **kwargs):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
-            if not is_safe_url(url=redirect_to, allowed_hosts=custom_params.ALLOWED_HOSTS):
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
                 return reverse(self.success_url)
         else:
             return reverse(self.success_url)
@@ -1419,7 +1421,7 @@ class PlaybookUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Up
     def get_success_url(self):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
-            if not is_safe_url(url=redirect_to, allowed_hosts=custom_params.ALLOWED_HOSTS):
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
                 return reverse(self.success_url)
         else:
             return reverse(self.success_url)
@@ -1468,7 +1470,7 @@ class PlaybookRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generic.De
     def get_success_url(self):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
-            if not is_safe_url(url=redirect_to, allowed_hosts=custom_params.ALLOWED_HOSTS):
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
                 return reverse(self.success_url)
         else:
             return reverse(self.success_url)
@@ -1519,7 +1521,7 @@ class PlaybookTemplateCreateView(LoginRequiredMixin, PermissionRequiredMixin, ge
     def get_success_url(self):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
-            if not is_safe_url(url=redirect_to, allowed_hosts=custom_params.ALLOWED_HOSTS):
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
                 return reverse(self.success_url)
         else:
             return reverse(self.success_url)
@@ -1600,7 +1602,7 @@ class PlaybookTemplateUpdateView(LoginRequiredMixin, PermissionRequiredMixin, ge
     def get_success_url(self):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
-            if not is_safe_url(url=redirect_to, allowed_hosts=custom_params.ALLOWED_HOSTS):
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
                 return reverse(self.success_url)
         else:
             return reverse(self.success_url)
@@ -1652,7 +1654,7 @@ class PlaybookTemplateRemoveView(LoginRequiredMixin, PermissionRequiredMixin, ge
     def get_success_url(self):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
-            if not is_safe_url(url=redirect_to, allowed_hosts=custom_params.ALLOWED_HOSTS):
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
                 return reverse(self.success_url)
         else:
             return reverse(self.success_url)
@@ -1684,7 +1686,7 @@ class PlaybookTemplateRemoveView(LoginRequiredMixin, PermissionRequiredMixin, ge
 class PlaybookTemplateItemListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
     model = PlaybookTemplateItem
     form_class = PlaybookTemplateItemForm
-    permission_required = ('tasks.view_playbookTemplateitem',)
+    permission_required = ('tasks.view_playbooktemplateitem',)
 
     def get_context_data(self, **kwargs):
         # create_task()
@@ -1702,14 +1704,14 @@ class PlaybookTemplateItemListView(LoginRequiredMixin, PermissionRequiredMixin, 
 class PlaybookTemplateItemCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
     model = PlaybookTemplateItem
     form_class = PlaybookTemplateItemForm
-    permission_required = ('playbook.add_playbooktemplateitem',)
+    permission_required = ('tasks.add_playbooktemplateitem',)
 
     success_url = 'tasks:playittmp_list'
 
     def get_success_url(self):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
-            if not is_safe_url(url=redirect_to, allowed_hosts=custom_params.ALLOWED_HOSTS):
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
                 return reverse(self.success_url)
         else:
             return reverse(self.success_url)
@@ -1738,7 +1740,7 @@ class PlaybookTemplateItemCreateView(LoginRequiredMixin, PermissionRequiredMixin
         if not request.user.is_authenticated:
             # This will redirect to the login view
             return self.handle_no_permission()
-        elif not self.request.user.has_perm('playbook.add_playbooktemplateitem'):
+        elif not self.request.user.has_perm('tasks.add_playbooktemplateitem'):
             messages.error(self.request, "No permission to add a record !!!")
             return redirect('tasks:playittmp_list')
         # Checks pass, let http method handlers process the request
@@ -1764,7 +1766,7 @@ class PlaybookTemplateItemCreateView(LoginRequiredMixin, PermissionRequiredMixin
 
 class PlaybookTemplateItemDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailView):
     model = PlaybookTemplateItem
-    permission_required = ('playbook.view_playbooktemplateitem',)
+    permission_required = ('tasks.view_playbooktemplateitem',)
 
     def get_context_data(self, **kwargs):
         # check remaining session time
@@ -1780,7 +1782,7 @@ class PlaybookTemplateItemDetailView(LoginRequiredMixin, PermissionRequiredMixin
         if not request.user.is_authenticated:
             # This will redirect to the login view
             return self.handle_no_permission()
-        elif not self.request.user.has_perm('playbook.view_playbooktemplateitem'):
+        elif not self.request.user.has_perm('tasks.view_playbooktemplateitem'):
             messages.error(self.request, "No permission to view a record !!!")
             return redirect('tasks:playittmp_list')
         # Checks pass, let http method handlers process the request
@@ -1793,14 +1795,14 @@ class PlaybookTemplateItemUpdateView(LoginRequiredMixin, PermissionRequiredMixin
 
     form_class = PlaybookTemplateItemForm
     model = PlaybookTemplateItem
-    permission_required = ('playbook.change_playbooktemplateitem',)
+    permission_required = ('tasks.change_playbooktemplateitem',)
 
     success_url = 'tasks:playittmp_list'
 
     def get_success_url(self):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
-            if not is_safe_url(url=redirect_to, allowed_hosts=custom_params.ALLOWED_HOSTS):
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
                 return reverse(self.success_url)
         else:
             return reverse(self.success_url)
@@ -1820,7 +1822,7 @@ class PlaybookTemplateItemUpdateView(LoginRequiredMixin, PermissionRequiredMixin
         if not request.user.is_authenticated:
             # This will redirect to the login view
             return self.handle_no_permission()
-        elif not self.request.user.has_perm('playbook.change_playbooktemplateitem'):
+        elif not self.request.user.has_perm('tasks.change_playbooktemplateitem'):
             messages.error(self.request, "No permission to change a record !!!")
             return redirect('tasks:playittmp_detail', pk=self.kwargs.get('pk'))
         # Checks pass, let http method handlers process the request
@@ -1852,14 +1854,14 @@ class PlaybookTemplateItemUpdateView(LoginRequiredMixin, PermissionRequiredMixin
 class PlaybookTemplateItemRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView):
     model = PlaybookTemplateItem
     # success_url = reverse_lazy('tasks:tsk_list')
-    permission_required = ('playbook.delete_playbooktemplateitem',)
+    permission_required = ('tasks.delete_playbooktemplateitem',)
 
     success_url = 'tasks:playittmp_list'
 
     def get_success_url(self):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
-            if not is_safe_url(url=redirect_to, allowed_hosts=custom_params.ALLOWED_HOSTS):
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
                 return reverse(self.success_url)
         else:
             return reverse(self.success_url)
@@ -1879,7 +1881,7 @@ class PlaybookTemplateItemRemoveView(LoginRequiredMixin, PermissionRequiredMixin
         if not request.user.is_authenticated:
             # This will redirect to the login view
             return self.handle_no_permission()
-        elif not self.request.user.has_perm('playbook.delete_playbooktemplateitem'):
+        elif not self.request.user.has_perm('tasks.delete_playbooktemplateitem'):
             messages.error(self.request, "No permission to delete a record !!!")
             return redirect('tasks:playittmp_detail', pk=self.kwargs.get('pk'))
         # Checks pass, let http method handlers process the request
@@ -1904,15 +1906,20 @@ class TaskAssignView(LoginRequiredMixin, PermissionRequiredMixin, generic.Redire
             return redirect('tasks:tsk_list')
         task_pk = self.kwargs.get('pk')
         # Checks pass, let http method handlers process the request
-        Task.objects.filter(pk=task_pk).update(user=self.request.user)
-        Task.objects.filter(pk=task_pk).update(status=3)
+        # Task.objects.filter(pk=task_pk).update(user=self.request.user)
+        # Task.objects.filter(pk=task_pk).update(status=3)
+        task_obj = Task.objects.get(pk=task_pk)
+        task_obj.user = self.request.user
+        task_obj.status = TaskStatus.objects.get(pk=3)
+        task_obj.save()
+
         # return redirect(self.success_url)
         return super(TaskAssignView, self).dispatch(request, *args, **kwargs)
 
     def get_redirect_url(self, *args, **kwargs):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
-            if not is_safe_url(url=redirect_to, allowed_hosts=custom_params.ALLOWED_HOSTS):
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
                 return reverse(self.success_url)
         else:
             return reverse(self.success_url)
@@ -1938,14 +1945,17 @@ class TaskCloseView(LoginRequiredMixin, PermissionRequiredMixin, generic.Redirec
             return redirect('tasks:tsk_list')
         task_pk = self.kwargs.get('pk')
         # Checks pass, let http method handlers process the request
-        Task.objects.filter(pk=task_pk).update(status=2)
+        # Task.objects.filter(pk=task_pk).update(status=2)
+        task_obj = Task.objects.get(pk=task_pk)
+        task_obj.status = TaskStatus.objects.get(pk=2)
+        task_obj.save()
         # return redirect(self.success_url)
         return super(TaskCloseView, self).dispatch(request, *args, **kwargs)
 
     def get_redirect_url(self, *args, **kwargs):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
-            if not is_safe_url(url=redirect_to, allowed_hosts=custom_params.ALLOWED_HOSTS):
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
                 return reverse(self.success_url)
         else:
             return reverse(self.success_url)
@@ -1970,14 +1980,18 @@ class TaskOpenView(LoginRequiredMixin, PermissionRequiredMixin, generic.Redirect
             return redirect('tasks:tsk_list')
         task_pk = self.kwargs.get('pk')
         # Checks pass, let http method handlers process the request
-        Task.objects.filter(pk=task_pk).update(status=1)
+        # Task.objects.filter(pk=task_pk).update(status=1)
+        task_obj = Task.objects.get(pk=task_pk)
+        task_obj.status = TaskStatus.objects.get(pk=1)
+        task_obj.save()
+
         # return redirect(self.success_url)
         return super(TaskOpenView, self).dispatch(request, *args, **kwargs)
 
     def get_redirect_url(self, *args, **kwargs):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
-            if not is_safe_url(url=redirect_to, allowed_hosts=custom_params.ALLOWED_HOSTS):
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
                 return reverse(self.success_url)
         else:
             return reverse(self.success_url)
@@ -2020,7 +2034,7 @@ class EvidenceCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Cr
     def get_success_url(self):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
-            if not is_safe_url(url=redirect_to, allowed_hosts=custom_params.ALLOWED_HOSTS):
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
                 return reverse(self.success_url)
         else:
             return reverse(self.success_url)
@@ -2124,7 +2138,7 @@ class EvidenceUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Up
     def get_success_url(self):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
-            if not is_safe_url(url=redirect_to, allowed_hosts=custom_params.ALLOWED_HOSTS):
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
                 return reverse(self.success_url)
         else:
             return reverse(self.success_url)
@@ -2207,7 +2221,7 @@ class EvidenceRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generic.De
     def get_success_url(self):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
-            if not is_safe_url(url=redirect_to, allowed_hosts=custom_params.ALLOWED_HOSTS):
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
                 return reverse(self.success_url)
         else:
             return reverse(self.success_url)
@@ -2279,7 +2293,7 @@ class EvidenceAttrCreateView(LoginRequiredMixin, PermissionRequiredMixin, generi
     def get_success_url(self):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
-            if not is_safe_url(url=redirect_to, allowed_hosts=custom_params.ALLOWED_HOSTS):
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
                 return reverse(self.success_url)
         else:
             return reverse(self.success_url)
@@ -2367,7 +2381,7 @@ class EvidenceAttrUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generi
     def get_success_url(self):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
-            if not is_safe_url(url=redirect_to, allowed_hosts=custom_params.ALLOWED_HOSTS):
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
                 return reverse(self.success_url)
         else:
             return reverse(self.success_url)
@@ -2433,7 +2447,7 @@ class EvidenceAttrRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generi
     def get_success_url(self):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
-            if not is_safe_url(url=redirect_to, allowed_hosts=custom_params.ALLOWED_HOSTS):
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
                 return reverse(self.success_url)
                 # return reverse("tasks:ev_detail", kwargs={'pk': self.object.ev.pk})
         else:

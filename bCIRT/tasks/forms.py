@@ -220,6 +220,8 @@ class TaskForm(forms.ModelForm):
         # else:
         #     current_pk = 0
         self.fields['user'].initial = user
+        self.fields['status'].initial = 3
+        self.fields['priority'].initial = 1
 
     status = forms.ModelChoiceField(
         label='Status*',
@@ -469,10 +471,15 @@ class TaskTemplateForm(forms.ModelForm):
         if kwargs.get('instance'):
             current_pk = kwargs.get('instance').pk
             self.fields['actiontarget'].queryset = TaskTemplate.objects.all().exclude(pk=current_pk)
+        # define some defaults
+        self.fields['status'].initial = 1
+        self.fields['user'].initial = None
+        self.fields['priority'].initial = 1
+        self.fields['category'].initial = 1
 
     status = forms.ModelChoiceField(
         label='Status*',
-        queryset=TaskStatus.objects.filter(enabled=True),
+        queryset=TaskStatus.objects.filter(enabled=True).order_by('name'),
         empty_label="--Select--",
         widget=forms.Select(
             attrs={
@@ -866,6 +873,7 @@ class PlaybookTemplateItemForm(forms.ModelForm):
         logger.info("PlaybookTemplateItemForm - "+str(user))
         self.fields['playbooktemplateid'].initial = self.play_pk
         self.fields['user'].initial = user
+        self.fields['itemorder'].initial = 100
 
         if kwargs.get('instance'):
             currentitem_pk = kwargs.get('instance').pk

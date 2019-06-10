@@ -11,9 +11,29 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+# Custom parameters should dbe set in the following files instead of modifying this file:
+# custom_variables.py
+try:
+    from bCIRT.custom_variables import MYDB
+except:
+    MYDB = None
+try:
+    from bCIRT.custom_variables import MYPATH
+except:
+    MYPATH = None
+try:
+    from bCIRT.custom_variables import MYALLOWED_HOSTS
+except:
+    MYALLOWED_HOSTS = None
 
 # custom backup constants start
-PROJECT_ROOT = '/home/bali/PycharmProjects/bCIRT'
+# PROJECT_ROOT = '/home/bali/PycharmProjects/bCIRT'
+PROJECT_ROOT = None
+if MYPATH is None:
+    PROJECT_ROOT = '/var/www/html/bCIRT'
+else:
+    PROJECT_ROOT = MYPATH
+
 MAXBYTES = 104857600  # 1024*1024*100, # 100MB
 LFILENAME = 'logs.txt'
 LOG_PATH = os.path.join(PROJECT_ROOT, 'log', LFILENAME)
@@ -42,7 +62,9 @@ SECRET_KEY = 'moyg9_u$c$gg=0y_ou557!w8kkq7z4ze4_ua*0(l*i(39%*c*p'
 DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1']
-
+if MYALLOWED_HOSTS is not None:
+    for myhosts in MYALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(myhosts)
 
 # Application definition
 
@@ -61,6 +83,7 @@ INSTALLED_APPS = [
     'invs',
     'tasks',
     'assets',
+    'reports',
     'import_export'
 ]
 IMPORT_EXPORT_USE_TRANSACTIONS = True
@@ -103,14 +126,16 @@ WSGI_APPLICATION = 'bCIRT.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+DATABASES = None
+if not MYDB:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
     }
-}
-
+else:
+    DATABASES = MYDB
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
