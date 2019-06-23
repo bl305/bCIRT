@@ -30,6 +30,7 @@ class Command(BaseCommand):
         if p_all:
             self.populate_evidenceformat()
             self.populate_evidenceattrformat()
+            self.populate_evreputation()
 
             self.populate_invseverity()
             self.populate_invstatus()
@@ -65,6 +66,7 @@ class Command(BaseCommand):
             elif p_table == "evidences":
                 self.populate_evidenceformat()
                 self.populate_evidenceattrformat()
+                self.populate_evreputation()
             elif p_table == "tasks":
                 self.populate_taskstatus()
                 self.populate_taskcategory()
@@ -190,6 +192,40 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
                 )
         except:
             raise CommandError("EvidenceAttrFormat table could not be updated!")
+
+    def populate_evreputation(self):
+        evreputation = [
+            {
+                "name": "Unknown",
+                "enabled": "1",
+                "description": "Item has been checked, but reputation databases have no good or bad reputation value for this item."
+            },
+            {
+                "name": "Clean",
+                "enabled": "1",
+                "description": "Reputation database contains the item and it is clean."
+            },
+            {
+                "name": "Suspicious",
+                "enabled": "1",
+                "description": "Reputation database contains some information but cannot tell for sure."
+            },
+            {
+                "name": "Malicious",
+                "enabled": "1",
+                "description": "The item is malicious."
+            }
+        ]
+        try:
+            self.stdout.write("Initiating Evreputation")
+            for evreputationitem in evreputation:
+                InvStatus.objects.create(
+                    name=evreputationitem['name'],
+                    enabled=evreputationitem['enabled'],
+                    description=evreputationitem['description']
+                )
+        except:
+            raise CommandError("Evidence Reputation table could not be updated!")
 
     def populate_invstatus(self):
         invstatus = [

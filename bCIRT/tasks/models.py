@@ -19,6 +19,7 @@ import random
 import string
 import os
 from os import path
+import hashlib
 from shutil import copy
 from base64 import b64encode
 from bCIRT.settings import MEDIA_ROOT
@@ -90,8 +91,8 @@ def timediff(pdate1, pdate2):
 # housekeeping, to be deleted when new initdb happens
 
 
-def upload_to(instance, filename):
-    pass
+# def upload_to(instance, filename):
+#     pass
 
 
 class TaskStatus(models.Model):
@@ -354,6 +355,11 @@ class Task(models.Model):
         else:
             self.taskduration = None
         self.description_html = misaka.html(self.description)
+
+        # updating inv time
+        if self.inv:
+            Inv.objects.filter(pk=self.inv.pk).update(modified_at=timezone_now(), modified_by=self.modified_by)
+
         super(Task, self).save(force_insert, force_update, *args, **kwargs)
         self.__original_status = self.status
 
@@ -495,6 +501,10 @@ class Evidence(models.Model):
                 super(Evidence, self).save(*args, **kwargs)
                 self.fileRef = file_to_save
             # kwargs.pop('force_insert')
+        if self.inv:
+            Inv.objects.filter(pk=self.inv.pk).update(modified_at=timezone_now(), modified_by=self.modified_by)
+        if self.task:
+            Task.objects.filter(pk=self.task.pk).update(modified_at=timezone_now(), modified_by=self.modified_by)
 
         super(Evidence, self).save(*args, **kwargs)
 
@@ -527,6 +537,20 @@ class EvidenceAttrFormat(models.Model):
         self.description_html = misaka.html(self.description)
         super(EvidenceAttrFormat, self).save(*args, **kwargs)
 
+class EvReputation(models.Model):
+    objects = models.Manager()
+    enabled = models.BooleanField(default=True)
+    name = models.CharField(max_length=20)
+    description = models.TextField(max_length=500, default="")
+    description_html = models.TextField(editable=True, default='', blank=True)
+
+    def __str__(self):
+        return str(self.name)
+
+    def save(self, *args, **kwargs):
+        self.description_html = misaka.html(self.description)
+        super(EvReputation, self).save(*args, **kwargs)
+
 
 class EvidenceAttr(models.Model):
     objects = models.Manager()
@@ -540,6 +564,8 @@ class EvidenceAttr(models.Model):
     modified_by = models.CharField(max_length=20, default="unknown")
     evattrformat = models.ForeignKey(EvidenceAttrFormat, on_delete=models.SET_DEFAULT, default=1, null=False,
                                      blank=False, related_name="evattr_evidenceattrformat")
+    attr_automatic = models.BooleanField(default=None, null=True, blank=True)
+    attr_reputation = models.ForeignKey(EvReputation, on_delete=models.SET_NULL, null=True, blank=True, related_name="evattr_evreputation")
 
     def __str__(self):
         return str(self.pk)
@@ -555,6 +581,14 @@ class EvidenceAttr(models.Model):
             })
 
     def save(self, *args, **kwargs):
+        if self.ev:
+            Evidence.objects.filter(pk=self.ev.pk).update(modified_at=timezone_now(), modified_by=self.modified_by)
+            if Evidence.objects.get(pk=self.ev.pk).task:
+                task_pk = Evidence.objects.get(pk=self.ev.pk).task.pk
+                Task.objects.filter(pk=task_pk).update(modified_at=timezone_now(), modified_by=self.modified_by)
+            if Evidence.objects.get(pk=self.ev.pk).inv:
+                inv_pk = Evidence.objects.get(pk=self.ev.pk).inv.pk
+                Inv.objects.filter(pk=inv_pk).update(modified_at=timezone_now(), modified_by=self.modified_by)
         super(EvidenceAttr, self).save(*args, **kwargs)
 
     def clean(self):
@@ -803,6 +837,8 @@ class Action(models.Model):
                                          related_name="action_scriptoutputtype")
     outputtarget = models.ForeignKey(OutputTarget, on_delete=models.SET_DEFAULT, default=1, blank=True, null=True,
                                      related_name="action_outputtarget")
+    outputdescformat = models.ForeignKey(EvidenceFormat, on_delete=models.SET_DEFAULT, default=1, blank=True, null=True,
+                                     related_name="action_outputdescformat")
     argument = models.CharField(max_length=255, default=None, blank=True, null=True)
     timeout = models.PositiveIntegerField(default=300, null=False, blank=False)
     #  300 seconds
@@ -1065,29 +1101,52 @@ def add_task_from_template(atitle, astatus, aplaybook, auser, ainv, aaction, aac
     return obj
 
 
-def new_evidence(puser, ptask, pinv, pcreated_by, pmodified_by, pdescription, pfilename=None, pfileref=None):
-    newev = Evidence.objects.create(
+def new_evidence(puser, ptask, pinv, pcreated_by, pmodified_by, pdescription, pfilename=None, pfileref=None, pevformat=None):
+    if pevformat is None:
+        pevformat = EvidenceFormat.objects.get(pk=1)
+    newev = Evidence.objects.update_or_create(
         user=puser,
         task=ptask,
         inv=pinv,
         created_by=pcreated_by,
         modified_by=pmodified_by,
         description=pdescription,
+        evidenceformat=pevformat,
         # fileName=pfilename,
         # fileRef=pfileref
     )
+    # update the corresponding Evidence last update time
+    # if newev:
+        # update the investigation last update time
+        # if pinv:
+        #     print(pinv)
+        #     pinv.update(modified_at=timezone_now(),modified_by=pmodified_by)
+        # update the task last update time
+        # if ptask:
+        #     ptask.update(modified_at=timezone_now(), modified_by=pmodified_by)
+
     return newev
 
 
-def add_evattr(auser, aev, aevattrvalue, aevattrformat, amodified_by, acreated_by):
-    obj = EvidenceAttr.objects.create(
+def add_evattr(auser, aev, aevattrvalue, aevattrformat, amodified_by, acreated_by, aattr_automatic=None):
+    obj = EvidenceAttr.objects.update_or_create(
         user=auser,
         ev=aev,
         evattrvalue=aevattrvalue,
         evattrformat=aevattrformat,
         modified_by=amodified_by,
         created_by=acreated_by,
+        attr_automatic=aattr_automatic,
     )
+    # update the corresponding Evidence last update time
+    # if obj:
+    #     Evidence.objects.filter(pk=aev.pk).update(modified_at=timezone_now(),modified_by=amodified_by)
+        # update the investigation last update time
+        # if aev.inv:
+        #     Inv.objects.filter(pk=aev.inv.pk).update(modified_at=timezone_now(),modified_by=amodified_by)
+        # update the task last update time
+        # if aev.task:
+        #     Task.objects.filter(pk=aev.task.pk).update(modified_at=timezone_now(),modified_by=amodified_by)
     return obj
 
 # Replace/delete files
@@ -1116,6 +1175,20 @@ def auto_make_readonly(sender, instance, **kwargs):
         if os.path.isfile(instance.fileRef.path):
             #  This makes the files readonly
             os.chmod(instance.fileRef.path, S_IREAD | S_IRGRP | S_IROTH)
+
+            # this one calculates the hash for the file
+            res_md5 = FileHashCalc().md5sum(instance.fileRef.path)
+            add_evattr(instance.user, Evidence.objects.get(pk=instance.pk), res_md5, EvidenceAttrFormat.objects.get(pk=9),
+                       instance.user.username, instance.user.username, True)
+            res_sha1 = FileHashCalc().sha1sum(instance.fileRef.path)
+            add_evattr(instance.user, Evidence.objects.get(pk=instance.pk), res_sha1, EvidenceAttrFormat.objects.get(pk=10),
+                       instance.user.username, instance.user.username, True)
+            res_sha256 = FileHashCalc().sha256sum(instance.fileRef.path)
+            add_evattr(instance.user, Evidence.objects.get(pk=instance.pk), res_sha256, EvidenceAttrFormat.objects.get(pk=11),
+                       instance.user.username, instance.user.username, True)
+            res_sha512 = FileHashCalc().sha512sum(instance.fileRef.path)
+            add_evattr(instance.user, Evidence.objects.get(pk=instance.pk), res_sha512, EvidenceAttrFormat.objects.get(pk=12),
+                       instance.user.username, instance.user.username, True)
 
 
 @receiver(models.signals.pre_save, sender=Evidence)
@@ -1147,8 +1220,8 @@ class OutputProcessor():
     def __init__(self):
         pass
 
-    def split_delimiter(self, pstrin, pdelimiter):
-        retval = str(pstrin).split(pdelimiter)
+    def split_delimiter(self, pstring, pdelimiter):
+        retval = str(pstring).split(pdelimiter)
         return retval
 
 
@@ -1173,6 +1246,7 @@ def run_action(pactuser, pactusername, pev_pk, ptask_pk, pact_pk, pinv_pk, pargd
     actusername = pactusername  # self.request.user.get_username()
     oldev_file = None
     oldev_file_name = None
+    task_obj = None
     ev_pk = pev_pk
     if ev_pk == '0' or ev_pk == None:
         oldev_id = None
@@ -1289,7 +1363,6 @@ def run_action(pactuser, pactusername, pev_pk, ptask_pk, pact_pk, pinv_pk, pargd
             destoutdir = tempfile.mkdtemp()
             destoutdirname = str(destoutdir) + "/"
             argument = argument.replace('$OUTDIR$', destoutdirname)
-            print("1111"+str(os.listdir(destdir)))
 
         cmdin = [interpreter, cmd, argument]
     else:
@@ -1317,7 +1390,11 @@ def run_action(pactuser, pactusername, pev_pk, ptask_pk, pact_pk, pinv_pk, pargd
     resstatus = results.get('status')
     resoutput = results.get('output')
     respid = results.get('pid')
+    resoutputl = None
     if action_obj.scriptoutput:
+        if action_obj.scriptoutput.name == "List":
+            from ast import literal_eval
+            resoutput = literal_eval(resoutput)
         if action_obj.scriptoutput.delimiter:
             resoutput = OutputProcessor().split_delimiter(resoutput, action_obj.scriptoutput.delimiter)
     # save action to the actionQ
@@ -1369,8 +1446,13 @@ def run_action(pactuser, pactusername, pev_pk, ptask_pk, pact_pk, pinv_pk, pargd
         #     currevattrformat = EvidenceAttrFormat.objects.get(name=argumentoutput)
         # resoutput.split()
         # OUTPUT DELIMITER needs to be defined in the model - if empty, don't split...TBD
-        for item1 in resoutput.splitlines():
-            add_evattr(actuser, oldev_obj, item1, currevattrformat, actusername, actusername)
+        if isinstance(resoutput,list) or isinstance(resoutput,tuple):
+            # list type output
+            for item1 in resoutput:
+                add_evattr(actuser, oldev_obj, item1, currevattrformat, actusername, actusername)
+        elif (isinstance(resoutput,str)):
+            for item1 in resoutput.splitlines():
+                add_evattr(actuser, oldev_obj, item1, currevattrformat, actusername, actusername)
 
         actq = actionq_stopid.pk
     elif action_outputtarget == 3:
@@ -1520,3 +1602,46 @@ class ActionQ(models.Model):
 
     def __str__(self):
         return str(self.pk)
+
+class FileHashCalc():
+    def __init__(self):
+        # self.myfile=pfile
+        pass
+
+    def md5sum(self, filename):
+        h  = hashlib.md5()
+        b  = bytearray(128*1024)
+        mv = memoryview(b)
+        with open(filename, 'rb', buffering=0) as f:
+            for n in iter(lambda : f.readinto(mv), 0):
+                h.update(mv[:n])
+        return h.hexdigest()
+
+    def sha1sum(self, filename):
+        h  = hashlib.sha1()
+        b  = bytearray(128*1024)
+        mv = memoryview(b)
+        with open(filename, 'rb', buffering=0) as f:
+            for n in iter(lambda : f.readinto(mv), 0):
+                h.update(mv[:n])
+        return h.hexdigest()
+
+    def sha256sum(self, filename):
+        h  = hashlib.sha256()
+        b  = bytearray(128*1024)
+        mv = memoryview(b)
+        with open(filename, 'rb', buffering=0) as f:
+            for n in iter(lambda : f.readinto(mv), 0):
+                h.update(mv[:n])
+        return h.hexdigest()
+
+    def sha512sum(self, filename):
+        h  = hashlib.sha512()
+        b  = bytearray(128*1024)
+        mv = memoryview(b)
+        with open(filename, 'rb', buffering=0) as f:
+            for n in iter(lambda : f.readinto(mv), 0):
+                h.update(mv[:n])
+        return h.hexdigest()
+
+    #res_md5 = FileHashCals().md5sum('FilePath')

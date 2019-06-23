@@ -99,6 +99,13 @@ hr.large {
 }
 
 
+.attributefield {
+  margin:1px;
+  word-wrap:break-word;
+  overflow-wrap:break-word;
+  max-width: 70%;
+}
+
 //EVIDENCES
 .ev-detail{
 

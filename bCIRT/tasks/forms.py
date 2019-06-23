@@ -95,6 +95,21 @@ class ActionForm(forms.ModelForm):
         )
     )
 
+    outputdescformat = forms.ModelChoiceField(
+        label="Output Evidence Format*",
+        queryset=EvidenceFormat.objects.filter(enabled=True),
+        empty_label="--None--",
+        widget=forms.Select(
+            attrs={
+                'class': 'selectpicker show-tick form-control',  # form-control
+                'data-live-search': 'true',
+                'data-width': 'auto',
+                'data-style': 'btn-default btn-sm',
+                'style': 'width:50%',
+            }
+        )
+    )
+
     scriptoutputtype = forms.ModelChoiceField(
         label="Output Data Type*",
         queryset=EvidenceAttrFormat.objects.filter(enabled=True),
@@ -145,7 +160,7 @@ class ActionForm(forms.ModelForm):
     #   fileRef = forms.FileField(widget=CustomClearableFileInput)
     class Meta:
         fields = ("user", "title", "version", "type", "script_type", "script_category", "scriptoutput",
-                  "scriptoutputtype", "outputtarget", "argument", "timeout", "code", "fileRef", "description")
+                  "scriptoutputtype", "outputtarget", "outputdescformat", "argument", "timeout", "code", "fileRef", "description")
         model = Action
         labels = {
             "description": "Description*",

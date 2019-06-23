@@ -1,0 +1,75 @@
+#!/usr/bin/env python3
+import hashlib
+import argparse
+
+class file_hasher():
+    def __init__(self):
+        # self.myfile=pfile
+        pass
+
+    def md5sum(self, filename):
+        h  = hashlib.md5()
+        b  = bytearray(128*1024)
+        mv = memoryview(b)
+        with open(filename, 'rb', buffering=0) as f:
+            for n in iter(lambda : f.readinto(mv), 0):
+                h.update(mv[:n])
+        return h.hexdigest()
+
+    def sha1sum(self, filename):
+        h  = hashlib.sha1()
+        b  = bytearray(128*1024)
+        mv = memoryview(b)
+        with open(filename, 'rb', buffering=0) as f:
+            for n in iter(lambda : f.readinto(mv), 0):
+                h.update(mv[:n])
+        return h.hexdigest()
+
+    def sha256sum(self, filename):
+        h  = hashlib.sha256()
+        b  = bytearray(128*1024)
+        mv = memoryview(b)
+        with open(filename, 'rb', buffering=0) as f:
+            for n in iter(lambda : f.readinto(mv), 0):
+                h.update(mv[:n])
+        return h.hexdigest()
+
+    def sha512sum(self, filename):
+        h  = hashlib.sha512()
+        b  = bytearray(128*1024)
+        mv = memoryview(b)
+        with open(filename, 'rb', buffering=0) as f:
+            for n in iter(lambda : f.readinto(mv), 0):
+                h.update(mv[:n])
+        return h.hexdigest()
+
+
+def build_parser():
+    parser = argparse.ArgumentParser(description='Hash file.', usage='file_hasher [options]')
+    parser.add_argument("FilePath", help="Directory path to the file")
+
+    parser.add_argument('-m', '--md5', action='store_true', help='Print the MD5 hash')
+    parser.add_argument('-a', '--sha1', action='store_true', help='Print the SHA1 hash')
+    parser.add_argument('-b', '--sha256', action='store_true', help='Print the SHA256 hash')
+    parser.add_argument('-s', '--sha512', action='store_true', help='Print the SHA512 hash')
+
+    args = vars(parser.parse_args())
+    # args = self.parser.parse_args()
+    return args
+
+if __name__ == "__main__":
+    args = build_parser()
+    # print(args)
+
+    if args['md5']:
+        res_md5 = file_hasher().md5sum(args['FilePath'])
+        print(res_md5)
+    if args['sha1']:
+        res_sha1 = file_hasher().sha1sum(args['FilePath'])
+        print(res_sha1)
+    if args['sha256']:
+        res_sha256 = file_hasher().sha256sum(args['FilePath'])
+        print(res_sha256)
+    if args['sha512']:
+        res_sha512 = file_hasher().sha512sum(args['FilePath'])
+        print(res_sha512)

@@ -170,6 +170,32 @@
                                 {% for attr in evidence.evattr_evidence.all %}
                                     <tr id="item-attr-{{attr.pk}}">
                                         <td>
+                                            <li class="btn btn-md">
+                                                {% if attr.attr_automatic %}
+                                                    {% if attr.attr_reputation.pk == 1 %}
+                                                        <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-placement="top" title="Unknown">
+                                                    {% else %}
+                                                        {% if attr.attr_reputation.pk == 2 %}
+                                                            <span style="color:green;" class="glyphicon glyphicon-ok-sign" data-toggle="tooltip" data-placement="top" title="Clean">
+                                                        {% else %}
+                                                            {% if attr.attr_reputation.pk == 3 %}
+                                                                <strong>
+                                                                <span style="color:orange;" class="glyphicon glyphicon-alert" data-toggle="tooltip" data-placement="top" title="Suspicious">
+                                                                    </strong>
+                                                            {% else %}
+                                                                {% if attr.attr_reputation.pk == 4 %}
+                                                                    <span style="color:red;" class="glyphicon glyphicon-remove-sign" data-toggle="tooltip" data-placement="top" title="Malicious">
+                                                                {% else %}
+                                                                    <span data-toggle="tooltip" data-placement="top" title="-">-
+                                                                {% endif %}
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    {% endif %}
+                                                {% else %}
+                                                    <span data-toggle="tooltip" data-placement="top" title="-">-
+                                                {% endif %}
+                                            </li>
+
                                             <!--Attribute dropdown-->
                                             <li class="dropdown" onclick="incrow({{attr.pk}},'item-attr-','200px')">
                                                 <button class="btn btn-default btn-xs dropdown-toggle" onclick="filterFunctionEvAttr()" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
