@@ -358,7 +358,11 @@ class Task(models.Model):
 
         # updating inv time
         if self.inv:
-            Inv.objects.filter(pk=self.inv.pk).update(modified_at=timezone_now(), modified_by=self.modified_by)
+            if self.modified_by is None:
+                pmodified_by='admin'
+            else:
+                pmodified_by=str(self.modified_by)
+            Inv.objects.filter(pk=self.inv.pk).update(modified_at=timezone_now(), modified_by=pmodified_by)
 
         super(Task, self).save(force_insert, force_update, *args, **kwargs)
         self.__original_status = self.status
@@ -1115,6 +1119,7 @@ def new_evidence(puser, ptask, pinv, pcreated_by, pmodified_by, pdescription, pf
         # fileName=pfilename,
         # fileRef=pfileref
     )
+    newev = newev[0]
     # update the corresponding Evidence last update time
     # if newev:
         # update the investigation last update time
@@ -1129,7 +1134,7 @@ def new_evidence(puser, ptask, pinv, pcreated_by, pmodified_by, pdescription, pf
 
 
 def add_evattr(auser, aev, aevattrvalue, aevattrformat, amodified_by, acreated_by, aattr_automatic=None):
-    obj = EvidenceAttr.objects.update_or_create(
+    new_evattr = EvidenceAttr.objects.update_or_create(
         user=auser,
         ev=aev,
         evattrvalue=aevattrvalue,
@@ -1138,6 +1143,7 @@ def add_evattr(auser, aev, aevattrvalue, aevattrformat, amodified_by, acreated_b
         created_by=acreated_by,
         attr_automatic=aattr_automatic,
     )
+    new_evattr = new_evattr[0]
     # update the corresponding Evidence last update time
     # if obj:
     #     Evidence.objects.filter(pk=aev.pk).update(modified_at=timezone_now(),modified_by=amodified_by)
@@ -1147,7 +1153,7 @@ def add_evattr(auser, aev, aevattrvalue, aevattrformat, amodified_by, acreated_b
         # update the task last update time
         # if aev.task:
         #     Task.objects.filter(pk=aev.task.pk).update(modified_at=timezone_now(),modified_by=amodified_by)
-    return obj
+    return new_evattr
 
 # Replace/delete files
 
@@ -1305,11 +1311,10 @@ def run_action(pactuser, pactusername, pev_pk, ptask_pk, pact_pk, pinv_pk, pargd
     mytempdir = None
     if argument != "None":
         if action_obj.script_category.pk == 1:
-            '''
-            this represents generic type so reads the 
-            description field by default, 
-            or the attribute value if the "attr" is sent in GET with a value 
-            '''
+
+            # this represents generic type so reads the
+            # description field by default,
+            # or the attribute value if the "attr" is sent in GET with a value
 
             desc = ""
             if argumentattr != "None":

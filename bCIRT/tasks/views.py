@@ -1371,8 +1371,8 @@ class PlaybookCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Re
                 atype=tmp_to_copy.type,
                 asummary=tmp_to_copy.summary,
                 adescription=tmp_to_copy.description,
-                amodified_by=self.request.user,
-                acreated_by=self.request.user
+                amodified_by=str(self.request.user),
+                acreated_by=str(self.request.user)
             )
             # print(str(new_task)+"->->"+str(tmp_item_prevtask))
             #  here I need to map the tampate pks to the new pks so I can assign the proper actions

@@ -1,7 +1,7 @@
 from django import forms
 from tinymce import TinyMCE
 from .models import Task, TaskCategory, TaskPriority, TaskStatus, TaskTemplate, TaskType, TaskVar, TaskVarCategory, \
-    TaskVarType, Type, EvidenceFormat, EvidenceAttrFormat, EvidenceAttr, Evidence,\
+    TaskVarType, Type, EvidenceFormat, EvidenceAttrFormat, EvidenceAttr, Evidence, EvReputation, \
     Action, Playbook, PlaybookTemplate, PlaybookTemplateItem, \
     ScriptType, ScriptOutput, ScriptCategory, OutputTarget,\
     Inv
@@ -888,7 +888,13 @@ class PlaybookTemplateItemForm(forms.ModelForm):
         logger.info("PlaybookTemplateItemForm - "+str(user))
         self.fields['playbooktemplateid'].initial = self.play_pk
         self.fields['user'].initial = user
-        self.fields['itemorder'].initial = 100
+        # self.fields['itemorder'].initial = 100
+        from django.db.models import Max
+        if PlaybookTemplateItem.objects.filter(playbooktemplateid=self.play_pk):
+            self.fields['itemorder'].initial = int(PlaybookTemplateItem.objects.filter(playbooktemplateid=self.play_pk).aggregate(Max('itemorder'))['itemorder__max'])+1
+        else:
+            self.fields['itemorder'].initial = 100
+
 
         if kwargs.get('instance'):
             currentitem_pk = kwargs.get('instance').pk
@@ -1414,8 +1420,25 @@ class EvidenceAttrForm(forms.ModelForm):
         )
     )
 
+    attr_reputation = forms.ModelChoiceField(
+        label="Reputation",
+        queryset=EvReputation.objects.filter(enabled=True),  # .values_list('name',flat=True),
+        empty_label="--None--",
+        # initial=EvidenceAttrFormat.objects.get(pk=2),
+        widget=forms.Select(
+            attrs={
+                'class': 'selectpicker show-tick form-control',  # form-control
+                'data-live-search': 'true',
+                'data-width': 'auto',
+                'data-style': 'btn-default btn-sm',
+                'style': 'width:50%',
+            }
+        )
+    )
+
+
     class Meta:
-        fields = ("user", "ev", "evattrformat", "evattrvalue")
+        fields = ("user", "ev", "evattrformat", "evattrvalue", "attr_reputation")
         model = EvidenceAttr
         labels = {
             "evattrvalue": "Value*",

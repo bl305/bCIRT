@@ -2,7 +2,7 @@ from django.core.management.base import BaseCommand, CommandError
 from invs.models import InvStatus, InvPriority, InvCategory, InvPhase, InvSeverity
 from tasks.models import TaskVarType, TaskVarCategory, TaskType, TaskCategory, TaskStatus, TaskPriority
 from tasks.models import ScriptOs, ScriptType, ScriptCategory, Action, Type, ActionQStatus, OutputTarget, ScriptOutput
-from tasks.models import EvidenceFormat, EvidenceAttrFormat
+from tasks.models import EvidenceFormat, EvidenceAttrFormat, EvReputation
 from bCIRT.settings import PROJECT_ROOT
 from os import path
 from django.contrib.auth import get_user_model
@@ -219,7 +219,7 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
         try:
             self.stdout.write("Initiating Evreputation")
             for evreputationitem in evreputation:
-                InvStatus.objects.create(
+                EvReputation.objects.create(
                     name=evreputationitem['name'],
                     enabled=evreputationitem['enabled'],
                     description=evreputationitem['description']
@@ -552,17 +552,26 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
             {
                 "name": "Default",
                 "enabled": "1",
+                "delimiter": '',
                 "description": "Use output as it is",
             },
             {
                 "name": "CSV",
                 "enabled": "1",
+                "delimiter": ',',
                 "description": "Comma separated values",
             },
             {
                 "name": "Line-by-Line",
                 "enabled": "1",
+                "delimiter": '',
                 "description": "Newline separated values",
+            },
+            {
+                "name": "List",
+                "enabled": "1",
+                "delimiter": '',
+                "description": "List type of values",
             },
         ]
         try:
