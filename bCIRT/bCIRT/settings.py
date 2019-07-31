@@ -1,3 +1,15 @@
+# -*- coding: utf-8 -*-
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : bCIRT/settings.py
+# Author            : Balazs Lendvay
+# Date created      : 2019.07.27
+# Purpose           : Settings file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.07.29  Lendvay     1      Initial file
+# **********************************************************************;
 """
 Django settings for bCIRT project.
 
@@ -25,6 +37,10 @@ try:
     from bCIRT.custom_variables import MYALLOWED_HOSTS
 except:
     MYALLOWED_HOSTS = None
+try:
+    from bCIRT.custom_variables import LOGLEVEL
+except:
+    LOGLEVEL = 0
 
 # custom backup constants start
 # PROJECT_ROOT = '/home/bali/PycharmProjects/bCIRT'

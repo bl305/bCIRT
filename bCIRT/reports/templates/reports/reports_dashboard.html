@@ -1,4 +1,17 @@
 {% extends "reports/reports_base.html" %}
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : reports/reports_dashboard.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.07.27
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.07.29  Lendvay     1      Initial file
+# **********************************************************************;
+-->
 
 {% block prereports %}
 <div class="container">
@@ -254,7 +267,6 @@
 			</div>
 		</div>
 	</div>
-
 	<hr class="thick">
     <div class="row">
         <div class="col-md-4">
@@ -417,6 +429,85 @@
 		</div>
 	</div>
 	<hr class="thick">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="well">
+                <p><strong>Attack Vectors All</strong></p>
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for inv_closed_attackvector in invs_closed_attackvector %}
+                        <tr data-toggle="collapse" data-target="#myinvs{{inv_closed_attackvector.pk}}" class="accordion-toggle">
+                            <td>
+                                {{ inv_closed_attackvector.attackvector__name }}
+                            </td>
+                            <td>
+                                {{ inv_closed_attackvector.attackvector__count }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+			</div>
+		</div>
+        <div class="col-md-4">
+            <div class="well">
+                <p><strong>Attack Vector last 30 days</strong></p>
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for inv_closed_attackvector_30 in invs_closed_attackvector_30 %}
+                        <tr data-toggle="collapse" data-target="#myinvs{{inv_closed_attackvector_30.pk}}" class="accordion-toggle">
+                            <td>
+                                {{ inv_closed_attackvector_30.attackvector__name }}
+                            </td>
+                            <td>
+                                {{ inv_closed_attackvector_30.attackvector__count }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+			</div>
+		</div>
+        <div class="col-md-4">
+            <div class="well">
+                <p><strong>Attack Vectors last 90 days</strong></p>
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for inv_closed_attackvector_90 in invs_closed_attackvector_90 %}
+                        <tr data-toggle="collapse" data-target="#myinvs{{inv_closed_attackvector_90.pk}}" class="accordion-toggle">
+                            <td>
+                                {{ inv_closed_attackvector_90.attackvector__name }}
+                            </td>
+                            <td>
+                                {{ inv_closed_attackvector_90.attackvector__count }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+			</div>
+		</div>
+	</div>
+
+    <hr class="thick">
 <!--    <div class="row">-->
 <!--        <div class="col-md-4">-->
 <!--            <div class="well">-->

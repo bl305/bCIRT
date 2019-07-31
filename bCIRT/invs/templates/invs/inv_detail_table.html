@@ -1,3 +1,16 @@
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : inv/inv_detail_table.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.07.27
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.07.29  Lendvay     1      Initial file
+# **********************************************************************;
+-->
 {% if inv.invid %}
     <tr>
         <td><strong>Investigation ID</strong><br> {{ inv.id }}-{{ inv.invid }} </td>
@@ -18,7 +31,7 @@
     <tr>
         <td colspan="2"><strong>Phase</strong><br> {{ inv.phase }} </td>
         <td colspan="2"><strong>Category</strong><br> {{ inv.category }} </td>
-        <td colspan="1"></td>
+        <td colspan="1"><strong>Monetary Loss</strong><br> {{ inv.monetaryloss }} {{ inv.losscurrency }} </td>
         <td><strong>Investigation start</strong><br> {{ inv.starttime|date:"Y/m/d H:i:s" }} </td>
         <td><strong>Investigation end</strong><br>
             {% if inv.endtime %}
@@ -29,9 +42,9 @@
         </td>
     </tr>
     <tr>
+        <td><strong>Reference</strong><br> {{ inv.refid }} </td>
+        <td colspan="1"></td>
         <td><strong>Attack Vector</strong><br> {{ inv.attackvector }} </td>
-        <td colspan="1"></td>
-        <td colspan="1"></td>
         <td colspan="1"></td>
         <td colspan="1"></td>
         <td><strong>Modified on</strong><br> {{ inv.modified_at|date:"Y/m/d H:i:s" }} </td>

@@ -1,5 +1,17 @@
+# -*- coding: utf-8 -*-
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : invs/forms.py
+# Author            : Balazs Lendvay
+# Date created      : 2019.07.27
+# Purpose           : Forms file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.07.29  Lendvay     1      Initial file
+# **********************************************************************;
 from django import forms
-from .models import Inv, InvStatus, InvSeverity, InvPhase, InvCategory, InvAttackvector, InvPriority
+from .models import Inv, InvStatus, InvSeverity, InvPhase, InvCategory, InvAttackvector, InvPriority, CurrencyType
 import logging
 from django.forms.widgets import SplitDateTimeWidget  # , ClearableFileInput
 from tinymce import TinyMCE
@@ -28,6 +40,7 @@ class InvForm(forms.ModelForm):
         self.fields['phase'].initial = 1
         self.fields['severity'].initial = 2
         self.fields['priority'].initial = 1
+        self.fields['losscurrency'].initial = 1
 
 
     status = forms.ModelChoiceField(
@@ -138,10 +151,10 @@ class InvForm(forms.ModelForm):
     )
 
     attackvector = forms.ModelChoiceField(
-        label='Attack vector',
+        label='Attack vector*',
         queryset=InvAttackvector.objects.filter(enabled=True),
         empty_label="--Select--",
-        required=False,
+        required=True,
         widget=forms.Select(
             attrs={
                 'class': 'selectpicker show-tick form-control',  # form-control
@@ -149,6 +162,22 @@ class InvForm(forms.ModelForm):
                 'data-width': 'auto',
                 'data-style': 'btn-default btn-sm',
                 'style': 'width:50%',
+            }
+        )
+    )
+
+    losscurrency = forms.ModelChoiceField(
+        label='Currency',
+        queryset=CurrencyType.objects.filter(enabled=True),
+        empty_label="--Select--",
+        required=True,
+        widget=forms.Select(
+            attrs={
+                'class': 'selectpicker show-tick form-control',  # form-control
+                'data-live-search': 'true',
+                'data-width': 'auto',
+                'data-style': 'btn-default btn-sm',
+                'style': 'width:30%',
             }
         )
     )
@@ -186,6 +215,7 @@ class InvForm(forms.ModelForm):
     class Meta:
         model = Inv
         fields = ('invid',
+                  'refid',
                   'status',
                   'description',
                   'summary',
@@ -194,20 +224,29 @@ class InvForm(forms.ModelForm):
                   'phase',
                   'severity',
                   'category',
-                  'priority',
                   'attackvector',
+                  'priority',
                   'comment',
+                  'monetaryloss',
+                  'losscurrency',
                   'starttime',
                   'endtime')
         labels = {
             'invid': "Investigation ID*",
+            'refid': "Reference",
             'user': "Assigned to",
             'description': 'Incident Description*',
             'summary': "Executive Summary",
             'comment': "Attack Comment",
+            'losscurrency': "Monetary Loss",
         }
         widgets = {
             'invid': forms.TextInput(attrs={
+                'size': 20,
+                'style': 'width:50%;',
+                'class': 'form-control'}
+            ),
+            'refid': forms.TextInput(attrs={
                 'size': 20,
                 'style': 'width:50%;',
                 'class': 'form-control'}
@@ -227,6 +266,11 @@ class InvForm(forms.ModelForm):
             'comment': forms.TextInput(attrs={
                 'size': 50,
                 'style': 'width:50%',
+                'class': 'form-control'}
+            ),
+            'losscurrency': forms.TextInput(attrs={
+                'size': 20,
+                'style': 'width:50%;',
                 'class': 'form-control'}
             ),
         }

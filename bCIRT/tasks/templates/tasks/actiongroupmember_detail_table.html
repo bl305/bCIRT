@@ -1,0 +1,23 @@
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : tasks/actiongroupmember_detail_table.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.07.27
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.07.29  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+{% if actiongroupmember.pk %}
+    <tr>
+        <td><strong>ActionGroupMember ID</strong><br> {{ actiongroupmember.pk }} </td>
+        <td><strong>Action</strong><br> {{ actiongroupmember.actionid.pk }}-{{ actiongroupmember.actionid.title }} </td>
+        <td><strong>ActionGroup</strong><br> {{ actiongroupmember.actiongroupid.id }}-{{ actiongroupmember.actiongroupid.name }} </td>
+
+    </tr>
+{% else %}
+    <tr><td colspan="3">No Data available!</td></tr>
+{% endif %}

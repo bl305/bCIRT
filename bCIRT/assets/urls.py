@@ -1,3 +1,16 @@
+# -*- coding: utf-8 -*-
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : assets/urls.py
+# Author            : Balazs Lendvay
+# Date created      : 2019.07.27
+# Purpose           : URL file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.07.29  Lendvay     1      Initial file
+# **********************************************************************;
+# from django.shortcuts import render
 from django.conf.urls import url
 from . import views
 # from django.contrib.auth import views as auth_views
@@ -11,6 +24,8 @@ urlpatterns = [
     url(r'^profile/(?P<pk>\d+)/edit/$', views.ProfileUpdateView.as_view(), name='prof_edit'),
     url(r'^profile/(?P<pk>\d+)/remove/$', views.ProfileRemoveView.as_view(), name='prof_remove'),
 
+    url(r"^profile/autoadd/(?P<inv_pk>\d+)/(?P<evattr_pk>\d+)/$",
+        views.ProfileCreateRedirectView.as_view(), name="profile_autoadd"),
 
     url(r"^host$", views.HostListView.as_view(), name="host_list"),
     url(r"^host/new/$", views.HostCreateView.as_view(), name="host_create"),

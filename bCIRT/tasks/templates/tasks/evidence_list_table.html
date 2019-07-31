@@ -1,3 +1,16 @@
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : tasks/evidence_list_table.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.07.27
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.07.29  Lendvay     1      Initial file
+# **********************************************************************;
+-->
 {% if object_list %}
 {% for evidence in object_list %}
                 <tr id="ev_{{evidence.pk}}">
@@ -35,22 +48,22 @@
                                         <ul class="dropdown-menu dropdown-content" id="myDropdown">
                                             <input type="text" placeholder="Search.." id="myInput" onkeyup="filterFunction()">
                                             {% for actid in actions %}
-                                                {% if actid.script_category.pk != 2 %}
+                                                {% if actid.scriptinput.pk != 2 %}
                                                     <li>
                                                         {% if evidence.task %}
                                                             {% if evidence.inv %}
-                                                                <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=evidence.inv.pk task_pk=evidence.task.pk ev_pk=evidence.pk %}?next1={{ request.get_full_path|urlencode }}">
+                                                                <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=evidence.inv.pk task_pk=evidence.task.pk ev_pk=evidence.pk evattr_pk=0%}?next1={{ request.get_full_path|urlencode }}">
                                                             {% else %}
-                                                                <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=0 task_pk=evidence.task.pk ev_pk=evidence.pk %}?next1={{ request.get_full_path|urlencode }}">
+                                                                <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=0 task_pk=evidence.task.pk ev_pk=evidence.pk evattr_pk=0 %}?next1={{ request.get_full_path|urlencode }}">
                                                             {% endif %}
                                                                 <span></span>
                                                                 {{ actid.pk }} - {{ actid.title }} ({{ actid.outputtarget.shortname }})
                                                                 </a>
                                                         {% else %}
                                                             {% if evidence.inv %}
-                                                                <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=evidence.inv.pk task_pk=0 ev_pk=evidence.pk %}?next1={{ request.get_full_path|urlencode }}">
+                                                                <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=evidence.inv.pk task_pk=0 ev_pk=evidence.pk evattr_pk=0 %}?next1={{ request.get_full_path|urlencode }}">
                                                             {% else %}
-                                                                <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=0 task_pk=0 ev_pk=evidence.pk %}?next1={{ request.get_full_path|urlencode }}">
+                                                                <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=0 task_pk=0 ev_pk=evidence.pk evattr_pk=0 %}?next1={{ request.get_full_path|urlencode }}">
                                                             {% endif %}
                                                                 <span></span>
                                                                 {{ actid.pk }} - {{ actid.title }} ({{ actid.outputtarget.shortname }})
@@ -61,22 +74,22 @@
                                                 {% endif %}
 
                                                 {% if evidence.fileRef %}
-                                                        {% if actid.script_category.pk == 2 %}
+                                                        {% if actid.scriptinput.pk == 2 %}
                                                           <li>
                                                               {% if evidence.task %}
                                                                 {% if evidence.inv %}
-                                                                  <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=evidence.inv.pk task_pk=evidence.task.pk ev_pk=evidence.pk %}?next1={{ request.get_full_path|urlencode }}">
+                                                                  <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=evidence.inv.pk task_pk=evidence.task.pk ev_pk=evidence.pk evattr_pk=0 %}?next1={{ request.get_full_path|urlencode }}">
                                                                 {% else %}
-                                                                  <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=0 task_pk=evidence.task.pk ev_pk=evidence.pk %}?next1={{ request.get_full_path|urlencode }}">
+                                                                  <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=0 task_pk=evidence.task.pk ev_pk=evidence.pk evattr_pk=0 %}?next1={{ request.get_full_path|urlencode }}">
                                                                 {% endif %}
                                                                       <span></span>
                                                                       {{ actid.pk }} - {{ actid.title }} ({{ actid.outputtarget.shortname }})
                                                                   </a>
                                                               {% else %}
                                                                 {% if evidence.inv %}
-                                                                  <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=evidence.inv.pk task_pk=0 ev_pk=evidence.pk %}?next1={{ request.get_full_path|urlencode }}">
+                                                                  <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=evidence.inv.pk task_pk=0 ev_pk=evidence.pk evattr_pk=0 %}?next1={{ request.get_full_path|urlencode }}">
                                                                 {% else %}
-                                                                  <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=0 task_pk=0 ev_pk=evidence.pk %}?next1={{ request.get_full_path|urlencode }}">
+                                                                  <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=0 task_pk=0 ev_pk=evidence.pk evattr_pk=0 %}?next1={{ request.get_full_path|urlencode }}">
                                                                 {% endif %}
                                                                       <span></span>
                                                                       {{ actid.pk }} - {{ actid.title }} ({{ actid.outputtarget.shortname }})

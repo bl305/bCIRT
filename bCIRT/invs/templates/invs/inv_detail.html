@@ -1,5 +1,17 @@
 {% extends "invs/inv_base.html" %}
-
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : inv/inv_detail.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.07.27
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.07.29  Lendvay     1      Initial file
+# **********************************************************************;
+-->
 {% block invslist_active %}active{% endblock invslist_active%}
 
 {% block preinvs %}
@@ -20,9 +32,7 @@
 
      <div class="container-fluid">
             <div class="row">
-
                     <div id="tabs">
-
                         <ul class="nav navbar-nav" >
                             <li class="nav-item">
                                 <a class="nav-link text-danger" href="#tabs-1">
@@ -49,7 +59,7 @@
                                     <span><strong>Evidences({{ inv.evidence_inv.count }})</strong></span>
                                 </a>
                             </li>
-                            <span class="navbar-text" style="color: white;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <span class="navbar-text" style="color: black;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                 <strong>Investigation: {{ inv.id }}-{{ inv.invid }}</strong>
                             </span>
                         </ul>

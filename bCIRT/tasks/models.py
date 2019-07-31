@@ -1,3 +1,15 @@
+# -*- coding: utf-8 -*-
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : tasks/models.py
+# Author            : Balazs Lendvay
+# Date created      : 2019.07.27
+# Purpose           : Models file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.07.29  Lendvay     1      Initial file
+# **********************************************************************;
 from django.db import models
 from django.urls import reverse
 import tempfile
@@ -17,6 +29,7 @@ from bCIRT.settings import PROJECT_ROOT
 from django.utils.timezone import now as timezone_now
 import random
 import string
+import magic
 import os
 from os import path
 import hashlib
@@ -24,6 +37,9 @@ from shutil import copy
 from base64 import b64encode
 from bCIRT.settings import MEDIA_ROOT
 from .scriptmanager.run_script import run_script_class
+import logging
+logger = logging.getLogger('log_file_verbose')
+
 # Get the user so we can use this
 from django.contrib.auth import get_user_model
 User = get_user_model()
@@ -88,11 +104,48 @@ def timediff(pdate1, pdate2):
         retval = None
     return retval
 
-# housekeeping, to be deleted when new initdb happens
+
+def check_file_type(pfile):
+    f = magic.Magic()
+    ftype = f.from_file(pfile)
+    if ftype.startswith("PNG") or ftype.startswith('JPG') or ftype.startswith('BMP'):
+        return "image"
+    elif ftype.startswith("ASCII"):
+        return "text"
+    else:
+        return "na"
+
+class MitreAttck_Tactics(models.Model):
+    objects = models.Manager()
+    matacid = models.CharField(max_length=6, blank=False, null=False)
+    name = models.CharField(max_length=25, blank=False, null=False)
+    enabled = models.BooleanField(default=True)
+    description = models.TextField(max_length=500, default="")
+    description_html = models.TextField(editable=True, default='', blank=True)
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        self.description_html = misaka.html(self.description)
+        super(MitreAttck_Tactics, self).save(*args, **kwargs)
 
 
-# def upload_to(instance, filename):
-#     pass
+class MitreAttck_Techniques(models.Model):
+    objects = models.Manager()
+    matacref = models.ForeignKey(MitreAttck_Tactics, on_delete=models.SET_DEFAULT, default=None, related_name="matec_matac")
+    matecid = models.CharField(max_length=6, blank=False, null=False)
+    name = models.CharField(max_length=25, blank=False, null=False)
+    enabled = models.BooleanField(default=True)
+    description = models.TextField(max_length=500, default="")
+    description_html = models.TextField(editable=True, default='', blank=True)
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        self.description_html = misaka.html(self.description)
+        super(MitreAttck_Techniques, self).save(*args, **kwargs)
 
 
 class TaskStatus(models.Model):
@@ -291,9 +344,9 @@ class Task(models.Model):
                     for targettask in targettasks:
                         targettaskactionpk = int()
                         if targettask.type.pk == 1:
-                        #  this means there is a task which relies on this and is automated task
-                        #  we need to run the task
-                        # will have to run all so using filter instead of get
+                            #  this means there is a task which relies on this and is automated task
+                            #  we need to run the task referred
+                            #  will have to run on all related tasks, so using filter instead of get
                             targettaskpk = targettask.pk
                             targettaskactionpk = targettask.action.pk
                             targettaskinvpk = targettask.inv.pk
@@ -301,6 +354,7 @@ class Task(models.Model):
                             #  here we need to find the proper evidence...
                             sourcetask = Task.objects.get(pk=self.pk)
                             evid = sourcetask.evidence_task.all()
+                            evattrs = None
                             # # here we will need a nested for loop
                             if TaskVar.objects.filter(task=sourcetask, name='ActionTarget', category=2).exists():
                                 taskvar_obj = TaskVar.objects.get(task=sourcetask, name='ActionTarget', category=2)
@@ -317,18 +371,46 @@ class Task(models.Model):
                             else:
                                 evidpk = evid.first().pk  #Task.objects.get(pk=evid.first().pk)
 
-                        # print("AUTOMATED: "+str(targettaskactionpk)+":"+str(targettaskinvpk)+":"+str(targettaskpk)+":"+str(evidpk))
-                        #  Call the function that has to be executed upon close
-                        run_action(
-                            pactuser=self.user,
-                            pactusername="action",
-                            pev_pk=evidpk,
-                            ptask_pk=targettaskpk,
-                            pact_pk=targettaskactionpk,
-                            pinv_pk=targettaskinvpk,
-                            pargdyn='',
-                            pattr=''
-                        )
+                            # checking for a list of all attributes which match the attribute filter in the action
+                            evidobj = Evidence.objects.get(pk=evidpk)
+                            curraction = Action.objects.get(pk=targettaskactionpk)
+                            filterforpk = None
+                            evidattrs = None
+                            if curraction.scriptinputattrtypeall and curraction.scriptinput.name == 'Attribute':
+                                evidattrs = evidobj.evattr_evidence.all()
+                            elif not curraction.scriptinputattrtypeall and curraction.scriptinput.name == 'Attribute':
+                                filterforpk = curraction.scriptinputattrtype
+                                evidattrs = evidobj.evattr_evidence.filter(evattrformat=filterforpk)
+                            if evidattrs:
+                                for evidattr1 in evidattrs:
+                                    # print("AUTOMATED: "+str(targettaskactionpk)+":"+str(targettaskinvpk)+":"+str(targettaskpk)+":"+str(evidpk))
+                                    #  Call the function that has to be executed upon close
+                                    run_action(
+                                        pactuser=self.user,
+                                        pactusername="action",
+                                        pev_pk=evidpk,
+                                        pevattr_pk=evidattr1.pk,
+                                        ptask_pk=targettaskpk,
+                                        pact_pk=targettaskactionpk,
+                                        pinv_pk=targettaskinvpk,
+                                        pargdyn='',
+                                        pattr=''
+                                    )
+                            else:
+                                # print("AUTOMATED: "+str(targettaskactionpk)+":"+str(targettaskinvpk)+":"+str(targettaskpk)+":"+str(evidpk))
+                                #  Call the function that has to be executed upon close
+                                run_action(
+                                    pactuser=self.user,
+                                    pactusername="action",
+                                    pev_pk=evidpk,
+                                    pevattr_pk=None,
+                                    ptask_pk=targettaskpk,
+                                    pact_pk=targettaskactionpk,
+                                    pinv_pk=targettaskinvpk,
+                                    pargdyn='',
+                                    pattr=''
+                                )
+
                         task_close(
                             ptaskpk=targettaskpk,
                             ptaskmoduser='action'
@@ -436,6 +518,7 @@ def task_close(ptaskpk, ptaskmoduser):
         task_obj.taskduration = taskduration
         task_obj.save()
 
+
 class EvidenceFormat(models.Model):
     objects = models.Manager()
     enabled = models.BooleanField(default=True)
@@ -457,6 +540,9 @@ class Evidence(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="evidence_users")
     task = models.ForeignKey(Task, on_delete=models.CASCADE, null=True, blank=True, related_name="evidence_task")
     inv = models.ForeignKey(Inv, on_delete=models.CASCADE, null=True, blank=True, related_name="evidence_inv")
+    parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name="evidence_parent")
+    parentattr = models.ForeignKey('EvidenceAttr', on_delete=models.SET_NULL, null=True, blank=True,
+                                   related_name="evidence_parentattr")
     prevev = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name="evidence_prevev")
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -465,6 +551,8 @@ class Evidence(models.Model):
     modified_by = models.CharField(max_length=20, default="unknown")
     evidenceformat = models.ForeignKey(EvidenceFormat, on_delete=models.SET_DEFAULT, default=1, null=False, blank=False,
                                        related_name="evidence_evidenceformat")
+    mitretactic = models.ForeignKey(MitreAttck_Tactics, on_delete=models.SET_DEFAULT, default=1, null=False, blank=False,
+                                       related_name="evidence_mitretactic")
 
     description = HTMLField()
     fileName = models.CharField(max_length=255, default="", null=True, blank=True)
@@ -541,6 +629,7 @@ class EvidenceAttrFormat(models.Model):
         self.description_html = misaka.html(self.description)
         super(EvidenceAttrFormat, self).save(*args, **kwargs)
 
+
 class EvReputation(models.Model):
     objects = models.Manager()
     enabled = models.BooleanField(default=True)
@@ -607,12 +696,12 @@ class ExtractAttr():
     pselector selects which data source to use
     '''
 
-    def __init__(self, pevidence, puser, pusername, pattr=None, pselector=1):
+    def __init__(self, pevidence, puser, pusername, pevattr=None, pselector=1):
         self.currev = Evidence.objects.get(pk=pevidence)
         self.curruser = puser
         self.currusername = pusername
-        if pattr:
-            self.currattr = EvidenceAttr.objects.get(pk=pattr)
+        if pevattr:
+            self.currattr = EvidenceAttr.objects.get(pk=pevattr)
         self.pfile = None
         self.pselector = pselector
 
@@ -776,6 +865,22 @@ class ScriptOutput(models.Model):
         super(ScriptOutput, self).save(*args, **kwargs)
 
 
+class ScriptInput(models.Model):
+    objects = models.Manager()
+    enabled = models.BooleanField(default=True)
+    name = models.CharField(max_length=20)
+    shortname = models.CharField(max_length=4, default="")
+    description = models.TextField(max_length=500, default="")
+    description_html = models.TextField(editable=True, default='', blank=True)
+
+    def __str__(self):
+        return str(self.name)
+
+    def save(self, *args, **kwargs):
+        self.description_html = misaka.html(self.description)
+        super(ScriptInput, self).save(*args, **kwargs)
+
+
 class Type(models.Model):
     objects = models.Manager()
     enabled = models.BooleanField(default=True)
@@ -835,15 +940,20 @@ class Action(models.Model):
                                     related_name="action_scripttype")
     script_category = models.ForeignKey(ScriptCategory, on_delete=models.SET_DEFAULT, default='1', blank=False,
                                         null=False, related_name="action_scriptcategory")
-    scriptoutput = models.ForeignKey(ScriptOutput, on_delete=models.SET_NULL, default=None, blank=False, null=True,
+    scriptoutput = models.ForeignKey(ScriptOutput, on_delete=models.SET_NULL, default='1', blank=False, null=True,
                                      related_name="action_scriptoutput")
-    scriptoutputtype = models.ForeignKey(EvidenceAttrFormat, on_delete=models.SET_NULL, blank=True, null=True,
+    scriptoutputtype = models.ForeignKey(EvidenceAttrFormat, on_delete=models.SET_NULL, default='1', blank=True, null=True,
                                          related_name="action_scriptoutputtype")
+    scriptinput = models.ForeignKey(ScriptInput, on_delete=models.SET_NULL, default='1', blank=False, null=True,
+                                     related_name="action_scriptinput")
+    scriptinputattrtype = models.ForeignKey(EvidenceAttrFormat, on_delete=models.SET_NULL, default=None, blank=True,
+                                       null=True, related_name="action_scriptinputattrtype")
+    scriptinputattrtypeall = models.BooleanField(default=False)
     outputtarget = models.ForeignKey(OutputTarget, on_delete=models.SET_DEFAULT, default=1, blank=True, null=True,
                                      related_name="action_outputtarget")
     outputdescformat = models.ForeignKey(EvidenceFormat, on_delete=models.SET_DEFAULT, default=1, blank=True, null=True,
                                      related_name="action_outputdescformat")
-    argument = models.CharField(max_length=255, default=None, blank=True, null=True)
+    argument = models.CharField(max_length=2048, default=None, blank=True, null=True)
     timeout = models.PositiveIntegerField(default=300, null=False, blank=False)
     #  300 seconds
     code = models.TextField(editable=True, default='', blank=True)
@@ -859,9 +969,7 @@ class Action(models.Model):
     modified_by = models.CharField(max_length=20, default="unknown")
     description = HTMLField()
     description_html = models.TextField(editable=True, default='', blank=True)
-    # fileName = models.CharField(max_length=20, default="", null=True, blank=True)
-    # fileRef = models.FileField(upload_to=upload_to, null=True, blank=True)
-    # filecreated_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+
 
     #    class Meta:
     #        ordering = ['-id']
@@ -871,7 +979,7 @@ class Action(models.Model):
     #  to satisfy pyCharm
 
     def __str__(self):
-        return str(self.title)+" ("+str(self.outputtarget.shortname)+")"
+        return str(self.title)+" ("+str(self.scriptinput.shortname)+"->"+str(self.outputtarget.shortname)+")"
 
     def save(self, *args, **kwargs):
         self.description_html = misaka.html(self.description)
@@ -907,6 +1015,31 @@ class Action(models.Model):
             # raise ValidationError(_('You must define Code or upload a script.'))
             raise ValidationError(_("You must either define Code or upload a script file!"))
         pass
+
+
+class ActionGroup(models.Model):
+    objects = models.Manager()
+    enabled = models.BooleanField(default=True)
+    name = models.CharField(max_length=20)
+    description = models.TextField(max_length=500, default="")
+    description_html = models.TextField(editable=True, default='', blank=True)
+
+    def __str__(self):
+        return str(self.name)
+
+    def save(self, *args, **kwargs):
+        self.description_html = misaka.html(self.description)
+        super(ActionGroup, self).save(*args, **kwargs)
+
+
+class ActionGroupMember(models.Model):
+    objects = models.Manager()
+    actionid = models.ForeignKey(Action, on_delete=models.CASCADE, blank=False, null=False,
+                                    related_name="actiongroupmember_action")
+    actiongroupid = models.ForeignKey(ActionGroup, on_delete=models.CASCADE, default=None, blank=True, null=True,
+                                    related_name="actiongroupmember_actiongroup")
+    def __str__(self):
+        return str(self.actionid)
 
 
 class TaskTemplate(models.Model):
@@ -1058,7 +1191,7 @@ class PlaybookTemplateItem(models.Model):
     description_html = models.TextField(editable=True, default='', blank=True)
 
     def __str__(self):
-        return str(self.pk)
+        return str(self.pk)+" - "+str(self.acttask.title)
 
     def get_absolute_url(self):
         return reverse(
@@ -1105,59 +1238,71 @@ def add_task_from_template(atitle, astatus, aplaybook, auser, ainv, aaction, aac
     return obj
 
 
-def new_evidence(puser, ptask, pinv, pcreated_by, pmodified_by, pdescription, pfilename=None, pfileref=None, pevformat=None):
+def new_evidence(puser, ptask, pinv, pcreated_by, pmodified_by, pdescription, pfilename=None, pfileref=None, pevformat=None, pforce=False, pparent=False, pparentattr=None):
+    newev = None
     if pevformat is None:
         pevformat = EvidenceFormat.objects.get(pk=1)
-    newev = Evidence.objects.update_or_create(
-        user=puser,
-        task=ptask,
-        inv=pinv,
-        created_by=pcreated_by,
-        modified_by=pmodified_by,
-        description=pdescription,
-        evidenceformat=pevformat,
-        # fileName=pfilename,
-        # fileRef=pfileref
-    )
-    newev = newev[0]
-    # update the corresponding Evidence last update time
-    # if newev:
-        # update the investigation last update time
-        # if pinv:
-        #     print(pinv)
-        #     pinv.update(modified_at=timezone_now(),modified_by=pmodified_by)
-        # update the task last update time
-        # if ptask:
-        #     ptask.update(modified_at=timezone_now(), modified_by=pmodified_by)
-
+    if pforce is False:
+        newev = Evidence.objects.update_or_create(
+            user=puser,
+            task=ptask,
+            inv=pinv,
+            created_by=pcreated_by,
+            modified_by=pmodified_by,
+            description=pdescription,
+            evidenceformat=pevformat,
+            parent=pparent,
+            parentattr=pparentattr,
+            # fileName=pfilename,
+            # fileRef=pfileref
+        )
+        newev = newev[0]
+    else:
+        newev = Evidence.objects.create(
+            user=puser,
+            task=ptask,
+            inv=pinv,
+            created_by=pcreated_by,
+            modified_by=pmodified_by,
+            description=pdescription,
+            evidenceformat=pevformat,
+            parent=pparent,
+            parentattr=pparentattr,
+            # fileName=pfilename,
+            # fileRef=pfileref
+        )
     return newev
 
 
-def add_evattr(auser, aev, aevattrvalue, aevattrformat, amodified_by, acreated_by, aattr_automatic=None):
-    new_evattr = EvidenceAttr.objects.update_or_create(
-        user=auser,
-        ev=aev,
-        evattrvalue=aevattrvalue,
-        evattrformat=aevattrformat,
-        modified_by=amodified_by,
-        created_by=acreated_by,
-        attr_automatic=aattr_automatic,
-    )
-    new_evattr = new_evattr[0]
-    # update the corresponding Evidence last update time
-    # if obj:
-    #     Evidence.objects.filter(pk=aev.pk).update(modified_at=timezone_now(),modified_by=amodified_by)
-        # update the investigation last update time
-        # if aev.inv:
-        #     Inv.objects.filter(pk=aev.inv.pk).update(modified_at=timezone_now(),modified_by=amodified_by)
-        # update the task last update time
-        # if aev.task:
-        #     Task.objects.filter(pk=aev.task.pk).update(modified_at=timezone_now(),modified_by=amodified_by)
+def add_evattr(auser, aev, aevattrvalue, aevattrformat, amodified_by, acreated_by, aattr_reputation=None,
+               aattr_automatic=None, aforce=False):
+    newevattr = None
+    if aforce is False:
+        new_evattr = EvidenceAttr.objects.update_or_create(
+            user=auser,
+            ev=aev,
+            evattrvalue=aevattrvalue,
+            evattrformat=aevattrformat,
+            modified_by=amodified_by,
+            created_by=acreated_by,
+            attr_reputation=aattr_reputation,
+            attr_automatic=aattr_automatic,
+        )
+        new_evattr = new_evattr[0]
+    else:
+        new_evattr = EvidenceAttr.objects.create(
+            user=auser,
+            ev=aev,
+            evattrvalue=aevattrvalue,
+            evattrformat=aevattrformat,
+            modified_by=amodified_by,
+            created_by=acreated_by,
+            attr_reputation=aattr_reputation,
+            attr_automatic=aattr_automatic,
+        )
     return new_evattr
 
 # Replace/delete files
-
-
 @receiver(models.signals.post_delete, sender=Evidence)
 def auto_delete_file_on_delete(sender, instance, **kwargs):
     """
@@ -1184,18 +1329,49 @@ def auto_make_readonly(sender, instance, **kwargs):
 
             # this one calculates the hash for the file
             res_md5 = FileHashCalc().md5sum(instance.fileRef.path)
-            add_evattr(instance.user, Evidence.objects.get(pk=instance.pk), res_md5, EvidenceAttrFormat.objects.get(pk=9),
-                       instance.user.username, instance.user.username, True)
+            add_evattr(
+                auser=instance.user,
+                aev=Evidence.objects.get(pk=instance.pk),
+                aevattrvalue=res_md5,
+                aevattrformat=EvidenceAttrFormat.objects.get(pk=9),
+                amodified_by=instance.user.username,
+                acreated_by=instance.user.username,
+                aattr_reputation=None,
+                aforce=True
+            )
             res_sha1 = FileHashCalc().sha1sum(instance.fileRef.path)
-            add_evattr(instance.user, Evidence.objects.get(pk=instance.pk), res_sha1, EvidenceAttrFormat.objects.get(pk=10),
-                       instance.user.username, instance.user.username, True)
+            add_evattr(
+                auser=instance.user,
+                aev=Evidence.objects.get(pk=instance.pk),
+                aevattrvalue=res_sha1,
+                aevattrformat=EvidenceAttrFormat.objects.get(pk=10),
+                amodified_by=instance.user.username,
+                acreated_by=instance.user.username,
+                aattr_reputation=None,
+                aforce=True
+            )
             res_sha256 = FileHashCalc().sha256sum(instance.fileRef.path)
-            add_evattr(instance.user, Evidence.objects.get(pk=instance.pk), res_sha256, EvidenceAttrFormat.objects.get(pk=11),
-                       instance.user.username, instance.user.username, True)
+            add_evattr(
+                auser=instance.user,
+                aev=Evidence.objects.get(pk=instance.pk),
+                aevattrvalue=res_sha256,
+                aevattrformat=EvidenceAttrFormat.objects.get(pk=11),
+                amodified_by=instance.user.username,
+                acreated_by=instance.user.username,
+                aattr_reputation=None,
+                aforce=True
+            )
             res_sha512 = FileHashCalc().sha512sum(instance.fileRef.path)
-            add_evattr(instance.user, Evidence.objects.get(pk=instance.pk), res_sha512, EvidenceAttrFormat.objects.get(pk=12),
-                       instance.user.username, instance.user.username, True)
-
+            add_evattr(
+                auser=instance.user,
+                aev=Evidence.objects.get(pk=instance.pk),
+                aevattrvalue=res_sha512,
+                aevattrformat=EvidenceAttrFormat.objects.get(pk=12),
+                amodified_by=instance.user.username,
+                acreated_by=instance.user.username,
+                aattr_reputation=None,
+                aforce=True
+            )
 
 @receiver(models.signals.pre_save, sender=Evidence)
 def auto_delete_file_on_change(sender, instance, **kwargs):
@@ -1247,13 +1423,23 @@ def remove_html_markup(s):
     return out
 
 
-def run_action(pactuser, pactusername, pev_pk, ptask_pk, pact_pk, pinv_pk, pargdyn, pattr):
+def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pinv_pk, pargdyn, pattr):
     actuser = pactuser  #  self.request.user
     actusername = pactusername  # self.request.user.get_username()
     oldev_file = None
     oldev_file_name = None
     task_obj = None
     ev_pk = pev_pk
+    oldev_obj = None
+    oldev_id = None
+    evattr_pk = None
+    if pevattr_pk:
+        evattr_pk = int(pevattr_pk)
+    evattr_obj = None
+    ismalicious = None
+    if evattr_pk != 0 and evattr_pk is not None:
+        evattr_obj = EvidenceAttr.objects.get(pk=evattr_pk)
+
     if ev_pk == '0' or ev_pk == None:
         oldev_id = None
         oldev_obj = None
@@ -1295,9 +1481,10 @@ def run_action(pactuser, pactusername, pev_pk, ptask_pk, pact_pk, pinv_pk, pargd
     argumentm = str(Action.objects.get(pk=act_id).argument)
     argumentdynamic = str(pargdyn)
     # dynamic argument parameters can be submitted via POST/GET
-    argumentattr = str(pattr)
+    # argumentattr = str(pattr)
+    argumentattr = evattr_pk
     #  attribute defines if the output should go to an attribute or to an evidence field
-    # argumentoutput = str(self.request.GET.get('attrout'))
+    #  argumentoutput = str(self.request.GET.get('attrout'))
     argument = ""
     if argumentdynamic != "None":
         argument = argumentm + " " + argumentdynamic
@@ -1309,16 +1496,15 @@ def run_action(pactuser, pactusername, pev_pk, ptask_pk, pact_pk, pinv_pk, pargd
     tempfile.tempdir = path.join(MEDIA_ROOT, "tmp")
     destoutdirname = None
     mytempdir = None
+
     if argument != "None":
-        if action_obj.script_category.pk == 1:
-
-            # this represents generic type so reads the
-            # description field by default,
-            # or the attribute value if the "attr" is sent in GET with a value
-
+        if action_obj.scriptinput.pk == 1 or action_obj.scriptinput.pk == 3:
+            # 1 represents description field as the input
+            # 3 represents attribute field as the input
             desc = ""
-            if argumentattr != "None":
-                desc = EvidenceAttr.objects.get(pk=argumentattr).evattrvalue
+            if action_obj.scriptinput.pk == 3 and evattr_obj and evattr_obj.evattrvalue:
+                # desc = EvidenceAttr.objects.get(pk=argumentattr).evattrvalue
+                desc = evattr_obj.evattrvalue
             else:
                 if oldev_obj:
                     if oldev_obj.evidenceformat.pk == 1:
@@ -1335,16 +1521,27 @@ def run_action(pactuser, pactusername, pev_pk, ptask_pk, pact_pk, pinv_pk, pargd
                 #  b64 encrypted values
                 argument_cleartext = argument.replace('$EVIDENCE$', desc)
                 argument = argument.replace('$EVIDENCE$', b64encode(desc.encode()).decode())
-
             else:
                 argument = argument.replace('$EVIDENCE$', desc)
                 argument_cleartext = argument
-
-        elif action_obj.script_category.pk == 2 and oldev_file:
+            if action_obj.outputtarget.name == 'File':
+                # this means the output is a file
+                #  generate a random folder with some prefix:
+                myprefix = "EV-" + str(ev_pk) + "-"
+                mytempdir = tempfile.TemporaryDirectory(prefix=myprefix)
+                #  make the tempdir the temp root
+                tempfile.tempdir = mytempdir.name
+                # with tempfile.TemporaryDirectory() as directory:
+                destdir = mytempdir.name
+                # argument replace the $OUTDIR$ with the standard dir where output files will be stored
+                destoutdir = tempfile.mkdtemp()
+                destoutdirname = str(destoutdir) + "/"
+                argument = argument.replace('$OUTDIR$', destoutdirname)
+        elif action_obj.scriptinput.pk == 2 and oldev_file:
             #  this represents file type so reads the file from the evidence
             #  need to have a file to work on, that's "2"
-            # create a temporary file so the original remains intact
-            #generate a random folder with some prefix:
+            #  create a temporary file so the original remains intact
+            #  generate a random folder with some prefix:
             myprefix = "EV-"+str(ev_pk)+"-"
             mytempdir = tempfile.TemporaryDirectory(prefix=myprefix)
             #  make the tempdir the temp root
@@ -1387,6 +1584,37 @@ def run_action(pactuser, pactusername, pev_pk, ptask_pk, pact_pk, pinv_pk, pargd
         results = run_script_class(interpreter, cmd, argument, timeout).runscript()
     elif action_obj.type.pk == 4:  # Script with b64 encrypted values to pass over
         results = run_script_class(interpreter, cmd, argument, timeout).runscript()
+    elif action_obj.type.pk == 5:  # Internal command
+        from tasks.scripts import String_Parser
+        sp1 = String_Parser.StringParser
+        afuncoutput = getattr(sp1, action_obj.code)('',argument)
+        if action_obj.code == "check_malicious":
+            ismalicious = afuncoutput
+            if action_obj.scriptinput.pk == 1:
+                # description input
+                # add_evattr(
+                #     auser=actuser,
+                #     aev=oldev_obj,
+                #     aevattrvalue=afuncoutput,
+                #     aevattrformat=EvidenceAttrFormat.objects.get(name='Reputation'),
+                #     amodified_by=actusername,
+                #     acreated_by=actusername,
+                #     aattr_automatic=None
+                # )
+                pass
+            elif action_obj.scriptinput.pk == 2:
+                # file input
+                pass
+            elif action_obj.scriptinput.pk == 3:
+                # attribute input
+                # EvidenceAttr.objects.filter(pk=evattr_pk).update(attr_reputation = EvReputation.objects.get(pk=1))
+                pass
+        results = {"command": str(cmd), "status": "1", "error": "0", "output": afuncoutput, "pid": 1}
+        # if True: # SUCCESS
+        #     results = {"command": str(cmd), "status": "1", "error": "0", "output": afuncoutput, "pid": 1}
+        # else: # FAIL
+        #     results = {"command": str(cmd), "status": "0", "error": "1", "output": afuncoutput, "pid": 1}
+
         # ExtractAttr(4, self.request.user, self.request.user.get_username(), 2, 2).extract_ip()
         pass
 
@@ -1423,7 +1651,39 @@ def run_action(pactuser, pactusername, pev_pk, ptask_pk, pact_pk, pinv_pk, pargd
         ActionQ.objects.filter(pk=actionq_startid.pk).update(parent=actionq_stopid)
 
         #  Output to Description field in new evidence
-        evid = new_evidence(actuser, task_obj, inv_obj, actusername, actusername, resoutput)
+        evid = new_evidence(
+            puser=actuser,
+            ptask=task_obj,
+            pinv=inv_obj,
+            pcreated_by=actusername,
+            pmodified_by=actusername,
+            pdescription=resoutput,
+            pparent=oldev_obj,
+            pparentattr=evattr_obj
+        )
+        # Add an attribute with reputation
+        if ismalicious:
+            if EvReputation.objects.get(name=ismalicious):
+                attr_rep = EvReputation.objects.get(name=ismalicious)
+            else:
+                attr_rep = None
+            evidattr = add_evattr(
+                auser=actuser,
+                aev=evid,
+                aevattrvalue=ismalicious,
+                aevattrformat=EvidenceAttrFormat.objects.get(name='Reputation'),
+                amodified_by=actusername,
+                acreated_by=actusername,
+                aattr_reputation=attr_rep,
+                aforce=False
+            )
+            # Creating a clone for the attribute item inspected
+            if oldev_obj.parentattr:
+                cloneevidattr = oldev_obj.parentattr
+                cloneevidattr.pk = None
+                cloneevidattr.attr_reputation = attr_rep
+                newclone = cloneevidattr.save()
+
         ActionQ.objects.filter(pk=actionq_stopid.pk).update(evid=evid.pk)
 
         if oldev_obj:
@@ -1444,9 +1704,13 @@ def run_action(pactuser, pactusername, pev_pk, ptask_pk, pact_pk, pinv_pk, pargd
         ActionQ.objects.filter(pk=actionq_startid.pk).update(parent=actionq_stopid)
         #  Output to the attribute in the same evidence
         ActionQ.objects.filter(pk=actionq_stopid.pk).update(evid=oldev_obj.pk)
-        currevattrformat = EvidenceAttrFormat.objects.get(name='Unknown')
-        if action_obj.scriptoutputtype:
-            currevattrformat = EvidenceAttrFormat.objects.get(pk=action_obj.scriptoutputtype.pk)
+        if action_obj.code == 'check_malicious':
+            currevattrformat = EvidenceAttrFormat.objects.get(name='Reputation')
+        else:
+            currevattrformat = EvidenceAttrFormat.objects.get(name='Unknown')
+            if action_obj.scriptoutputtype:
+                currevattrformat = EvidenceAttrFormat.objects.get(pk=action_obj.scriptoutputtype.pk)
+
         # if EvidenceAttrFormat.objects.get(name=argumentoutput):
         #     currevattrformat = EvidenceAttrFormat.objects.get(name=argumentoutput)
         # resoutput.split()
@@ -1454,10 +1718,56 @@ def run_action(pactuser, pactusername, pev_pk, ptask_pk, pact_pk, pinv_pk, pargd
         if isinstance(resoutput,list) or isinstance(resoutput,tuple):
             # list type output
             for item1 in resoutput:
-                add_evattr(actuser, oldev_obj, item1, currevattrformat, actusername, actusername)
+                attr_rep = None
+                if ismalicious:
+                    if EvReputation.objects.get(name=ismalicious):
+                        attr_rep = EvReputation.objects.get(name=ismalicious)
+                    else:
+                        attr_rep = None
+                add_evattr(
+                    auser=actuser,
+                    aev=oldev_obj,
+                    aevattrvalue=item1,
+                    aevattrformat=currevattrformat,
+                    amodified_by=actusername,
+                    acreated_by=actusername,
+                    aattr_reputation=attr_rep,
+                    aforce=False
+                )
+                # Creating a clone for the attribute item inspected
+                if oldev_obj.parentattr:
+                    cloneevidattr = oldev_obj.parentattr
+                    cloneevidattr.pk = None
+                    cloneevidattr.attr_reputation = attr_rep
+                    newclone = cloneevidattr.save()
+
+
         elif (isinstance(resoutput,str)):
             for item1 in resoutput.splitlines():
-                add_evattr(actuser, oldev_obj, item1, currevattrformat, actusername, actusername)
+                # add_evattr(actuser, oldev_obj, item1, currevattrformat, actusername, actusername)
+                attr_rep = None
+                if ismalicious:
+                    if EvReputation.objects.get(name=ismalicious):
+                        attr_rep = EvReputation.objects.get(name=ismalicious)
+                    else:
+                        attr_rep = None
+                add_evattr(
+                    auser=actuser,
+                    aev=oldev_obj,
+                    aevattrvalue=item1,
+                    aevattrformat=currevattrformat,
+                    amodified_by=actusername,
+                    acreated_by=actusername,
+                    aattr_reputation=attr_rep,
+                    aforce=False
+                )
+
+                # Creating a clone for the attribute item inspected
+                if oldev_obj.parentattr:
+                    cloneevidattr = oldev_obj.parentattr
+                    cloneevidattr.pk = None
+                    cloneevidattr.attr_reputation = attr_rep
+                    newclone = cloneevidattr.save()
 
         actq = actionq_stopid.pk
     elif action_outputtarget == 3:
@@ -1480,7 +1790,7 @@ def run_action(pactuser, pactusername, pev_pk, ptask_pk, pact_pk, pinv_pk, pargd
 
                 # copy files to the evidences folder
                 evfolder = 'uploads/evidences'
-                srcfilename1=os.path.join(destoutdirname,fname)
+                srcfilename1 = os.path.join(destoutdirname,fname)
                 dstfilename1 = os.path.join(MEDIA_ROOT, evfolder, fname)
                 # if os.path.isfile(srcfilename1):
                 #     copy(srcfilename1, dstfilename1)
@@ -1488,18 +1798,54 @@ def run_action(pactuser, pactusername, pev_pk, ptask_pk, pact_pk, pinv_pk, pargd
                 from django.core.files import File
                 # dstfileref = os.path.join(evfolder,fname)
                 dstfileref = File(open(srcfilename1, 'rb'))
+                olddesc = "Automatic file output from evidence: "+str(oldev_obj.pk)
                 evfid = new_evidence(
                     puser=actuser,
                     ptask=task_obj,
                     pinv=inv_obj,
                     pcreated_by=actusername,
                     pmodified_by=actusername,
-                    pdescription="Automatic file output from evidence: "+str(oldev_obj.pk),
+                    pdescription=olddesc,
+                    pforce=True,
+                    pparent=oldev_obj,
+                    pevformat=EvidenceFormat.objects.get(pk=2),
+                    pparentattr=evattr_obj
                     # pfilename=fname,
                     # pfileref=dstfileref
                 )
+                if ismalicious:
+                    if EvReputation.objects.get(name=ismalicious):
+                        attr_rep = EvReputation.objects.get(name=ismalicious)
+                    else:
+                        attr_rep = None
+                    evfidattr = add_evattr(
+                        auser=actuser,
+                        aev=evfid,
+                        aevattrvalue=ismalicious,
+                        aevattrformat=EvidenceAttrFormat.objects.get(name='Reputation'),
+                        amodified_by=actusername,
+                        acreated_by=actusername,
+                        aattr_reputation=attr_rep,
+                        aforce=False
+                    )
+                    # Creating a clone for the attribute item inspected
+                    if oldev_obj.parentattr:
+                        cloneevidattr = oldev_obj.parentattr
+                        cloneevidattr.pk = None
+                        cloneevidattr.attr_reputation = attr_rep
+                        newclone = cloneevidattr.save()
+
+                # EvidenceAttr.objects.filter(pk=evfidattr).update(attr_reputation=EvidenceAttrFormat.objects.get(name=ismalicious))
                 evfid.fileRef.save(fname, dstfileref)
                 Evidence.objects.filter(pk=evfid.pk).update(fileName=fname)
+
+                imgurl1 = str(Evidence.objects.get(pk=evfid.pk).fileRef)
+                imgpath = str(os.path.join("../../../../media/", imgurl1))
+                # Check if the uploaded file is an image and put it in the description
+                if check_file_type(os.path.join(MEDIA_ROOT,imgurl1)) == 'image':
+                    imgtag = '<p><img src="'+imgpath+'" alt="'+fname+'" width="1024" height="768" border="2" /></p>'
+                    newdesc = olddesc + "<br>" + imgtag
+                    Evidence.objects.filter(pk=evfid.pk).update(description=newdesc)
                 if os.path.isfile(dstfilename1):
                     #  This makes the files readonly
                     os.chmod(dstfilename1, S_IREAD | S_IRGRP | S_IROTH)
@@ -1508,7 +1854,6 @@ def run_action(pactuser, pactusername, pev_pk, ptask_pk, pact_pk, pinv_pk, pargd
 
                 if oldev_obj:
                     Evidence.objects.filter(pk=evfid.pk).update(prevev=oldev_obj.pk)
-
 
                 actq = actionq_stopid.pk
         else:
@@ -1594,7 +1939,7 @@ class ActionQ(models.Model):
     title = models.CharField(max_length=50, default=None, blank=True, null=True)
     scripttype = models.CharField(max_length=60, blank=False, null=False)
     command = models.CharField(max_length=2048, blank=False, null=False)
-    argument = models.CharField(max_length=255, default=None, blank=True, null=True)
+    argument = models.CharField(max_length=2048, default=None, blank=True, null=True)
     argumentdynamic = models.CharField(max_length=255, default=None, blank=True, null=True)
     cmderror = models.TextField(default=None, blank=True, null=True)
     cmdstatus = models.TextField(default=None, blank=True, null=True)
@@ -1607,6 +1952,7 @@ class ActionQ(models.Model):
 
     def __str__(self):
         return str(self.pk)
+
 
 class FileHashCalc():
     def __init__(self):
@@ -1650,3 +1996,6 @@ class FileHashCalc():
         return h.hexdigest()
 
     #res_md5 = FileHashCals().md5sum('FilePath')
+
+def add_to_profile(pevattr):
+    print(pevattr)

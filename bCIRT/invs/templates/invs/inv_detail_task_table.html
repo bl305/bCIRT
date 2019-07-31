@@ -1,3 +1,16 @@
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : inv/inv_detail_task_table.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.07.27
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.07.29  Lendvay     1      Initial file
+# **********************************************************************;
+-->
 {% if inv.task_inv.count > 0 %}
 {% for task in inv.task_inv.all %}
                     <tr data-toggle="collapse" data-target="#mytasks{{task.pk}}" class="accordion-toggle" id="item-task-{{ task.pk }}">
@@ -43,15 +56,15 @@
                                         <li>
                                             {% if task.action.code_file and task.status.pk != 2 %}
                                                 {% if task.actev %}
-                                                    {% if task.action.script_category.pk == 2 and task.actiontarget.evidence_task.all.first.fileName or task.action.script_category.pk == 1 %}
+                                                    {% if task.action.scriptinput.pk == 2 and task.actiontarget.evidence_task.all.first.fileName or task.action.scriptinput.pk == 1 %}
                                                         {% if task.inv %}
-                                                            <a href="{% url 'tasks:act_exec_script' pk=task.action.pk inv_pk=task.inv.pk task_pk=task.pk ev_pk=task.actev %}"
+                                                            <a href="{% url 'tasks:act_exec_script' pk=task.action.pk inv_pk=task.inv.pk task_pk=task.pk ev_pk=task.actev evattr_pk=0 %}"
                                                                class="btn btn-success btn-xs">
                                                                 Run
                                                                 <span class="glyphicon glyphicon-play"></span>
                                                             </a>
                                                         {% else %}
-                                                            <a href="{% url 'tasks:act_exec_script' pk=task.action.pk inv_pk=0 task_pk=task.pk ev_pk=task.actev %}"
+                                                            <a href="{% url 'tasks:act_exec_script' pk=task.action.pk inv_pk=0 task_pk=task.pk ev_pk=task.actev evattr_pk=0 %}"
                                                                class="btn btn-success btn-xs">
                                                                 Run
                                                                 <span class="glyphicon glyphicon-play"></span>
@@ -135,6 +148,9 @@
                             {% else %}
                                 -
                             {% endif %}
+                        </td>
+                        <td>
+                            {{ task.type }}
                         </td>
                         <td>
                             {{ task.created_at|date:"Y/m/d H:i:s" }}
@@ -235,9 +251,9 @@
                                                                             {% for actid in actions %}
                                                                                 <li>
                                                                                     {% if taskev.inv %}
-                                                                                        <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=taskev.inv.pk task_pk=task.pk ev_pk=taskev.pk %}?attr={{attr.pk}}&next1={{ request.get_full_path|urlencode }}">
+                                                                                        <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=taskev.inv.pk task_pk=task.pk ev_pk=taskev.pk evattr_pk=attr.pk %}?attr={{attr.pk}}&next1={{ request.get_full_path|urlencode }}">
                                                                                     {% else %}
-                                                                                        <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=0 task_pk=task.pk ev_pk=taskev.pk %}?attr={{attr.pk}}&next1={{ request.get_full_path|urlencode }}">
+                                                                                        <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=0 task_pk=task.pk ev_pk=taskev.pk evattr_pk=attr.pk %}?attr={{attr.pk}}&next1={{ request.get_full_path|urlencode }}">
                                                                                     {% endif %}
                                                                                         <span></span>
                                                                                         {{ actid.pk }} - {{ actid.title }}

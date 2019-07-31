@@ -1,10 +1,22 @@
+# -*- coding: utf-8 -*-
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : tasks/forms.py
+# Author            : Balazs Lendvay
+# Date created      : 2019.07.27
+# Purpose           : Forms file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.07.29  Lendvay     1      Initial file
+# **********************************************************************;
 from django import forms
 from tinymce import TinyMCE
 from .models import Task, TaskCategory, TaskPriority, TaskStatus, TaskTemplate, TaskType, TaskVar, TaskVarCategory, \
     TaskVarType, Type, EvidenceFormat, EvidenceAttrFormat, EvidenceAttr, Evidence, EvReputation, \
-    Action, Playbook, PlaybookTemplate, PlaybookTemplateItem, \
-    ScriptType, ScriptOutput, ScriptCategory, OutputTarget,\
-    Inv
+    Action, ActionGroup, ActionGroupMember, Playbook, PlaybookTemplate, PlaybookTemplateItem, \
+    ScriptType, ScriptOutput, ScriptCategory, ScriptInput, OutputTarget,\
+    Inv, MitreAttck_Tactics
 from assets.models import Host, Hostname, Ipaddress, Profile
 # from django.core.exceptions import ValidationError
 from django.forms.widgets import SplitDateTimeWidget  # , ClearableFileInput
@@ -69,6 +81,37 @@ class ActionForm(forms.ModelForm):
         label="Output Format*",
         queryset=ScriptOutput.objects.filter(enabled=True),
         empty_label="--None--",
+        widget=forms.Select(
+            attrs={
+                'class': 'selectpicker show-tick form-control',  # form-control
+                'data-live-search': 'true',
+                'data-width': 'auto',
+                'data-style': 'btn-default btn-sm',
+                'style': 'width:50%',
+            }
+        )
+    )
+
+    scriptinput = forms.ModelChoiceField(
+        label="Input Format*",
+        queryset=ScriptInput.objects.filter(enabled=True),
+        empty_label="--None--",
+        widget=forms.Select(
+            attrs={
+                'class': 'selectpicker show-tick form-control',  # form-control
+                'data-live-search': 'true',
+                'data-width': 'auto',
+                'data-style': 'btn-default btn-sm',
+                'style': 'width:50%',
+            }
+        )
+    )
+
+    scriptinputattrtype = forms.ModelChoiceField(
+        label="Input Attribute Filter",
+        queryset=EvidenceAttrFormat.objects.filter(enabled=True),
+        empty_label="--None--",
+        required=False,
         widget=forms.Select(
             attrs={
                 'class': 'selectpicker show-tick form-control',  # form-control
@@ -159,19 +202,21 @@ class ActionForm(forms.ModelForm):
 
     #   fileRef = forms.FileField(widget=CustomClearableFileInput)
     class Meta:
-        fields = ("user", "title", "version", "type", "script_type", "script_category", "scriptoutput",
-                  "scriptoutputtype", "outputtarget", "outputdescformat", "argument", "timeout", "code", "fileRef", "description")
+        fields = ("user", "title", "version", "type", "script_type", "script_category", "scriptinput",
+                  "scriptinputattrtype", "scriptinputattrtypeall", "scriptoutput",  "scriptoutputtype", "outputtarget", "outputdescformat",
+                  "argument", "timeout", "code", "fileRef", "description")
         model = Action
         labels = {
             "description": "Description*",
             "fileRef": "Attachment",
             'argument': 'Argument (override: $FILE$ can be used to refer to the evidence file, $EVIDENCE$ for '
-                        'the description/attribute)',
+                        'the description/attribute, $OUTDIR$ for any output files)',
             "timeout": "Timeout (sec)",
             'title': 'Title*',
             'version': 'Version*',
             'scriptoutput': 'Script output format',
-            'outputtarget': 'Output Target*'
+            'outputtarget': 'Output Target*',
+            'scriptinputattrtypeall': 'Run on all filtered attributes',
         }
         widgets = {
             'title': forms.TextInput(attrs={
@@ -215,6 +260,89 @@ class ActionForm(forms.ModelForm):
                     'style': 'padding-right: 100px',
                 }
             ),
+        }
+
+
+class ActionGroupForm(forms.ModelForm):
+    #  inv_pk and task_pk defaults to zero as they are not needed for updates
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop("user", None)
+        super(ActionGroupForm, self).__init__(*args, **kwargs)
+        logger.info("ActionGroupForm - "+str(user))
+        # self.fields['user'].initial = user
+
+    #   fileRef = forms.FileField(widget=CustomClearableFileInput)
+    class Meta:
+        fields = ("name", "enabled", "description")
+        model = ActionGroup
+        labels = {
+            "description": "Description*",
+        }
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'size': 50,
+                'style': 'width:50%',
+                'class': 'form-control'}
+            ),
+            'description': TinyMCEWidget(
+                mce_attrs={
+                    'width': '90%',
+                },
+                attrs={
+                    'style': 'padding-right: 100px',
+                }
+            ),
+        }
+
+
+class ActionGroupMemberForm(forms.ModelForm):
+    #  inv_pk and task_pk defaults to zero as they are not needed for updates
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop("user", None)
+        super(ActionGroupMemberForm, self).__init__(*args, **kwargs)
+        logger.info("ActionGroupMemberForm - "+str(user))
+        # self.fields['user'].initial = user
+
+    actionid = forms.ModelChoiceField(
+        label='Status*',
+        queryset=Action.objects.filter(enabled=True),
+        empty_label="--Select--",
+        widget=forms.Select(
+            attrs={
+                'class': 'selectpicker show-tick form-control',  # form-control
+                'data-live-search': 'true',
+                'data-width': 'auto',
+                'data-style': 'btn-default btn-sm',
+                'style': 'width:50%',
+            }
+        )
+    )
+
+    actiongroupid = forms.ModelChoiceField(
+        label='Status*',
+        queryset=ActionGroup.objects.filter(enabled=True),
+        empty_label="--Select--",
+        widget=forms.Select(
+            attrs={
+                'class': 'selectpicker show-tick form-control',  # form-control
+                'data-live-search': 'true',
+                'data-width': 'auto',
+                'data-style': 'btn-default btn-sm',
+                'style': 'width:50%',
+            }
+        )
+    )
+
+
+
+    #   fileRef = forms.FileField(widget=CustomClearableFileInput)
+    class Meta:
+        fields = ("actionid", "actiongroupid")
+        model = ActionGroupMember
+        # labels = {
+        #     "description": "Description*",
+        # }
+        widgets = {
         }
 
 
@@ -662,6 +790,21 @@ class TaskVarForm(forms.ModelForm):
         self.fields['task'].initial = task_pk
         self.fields['tasktemplate'].initial = tasktmp_pk
         self.fields['user'].initial = user
+
+    user = forms.ModelChoiceField(
+        label='Owner:',
+        queryset=User.objects.all(),
+        empty_label="--Select--",
+        widget=forms.Select(
+            attrs={
+                'class': 'selectpicker show-tick form-control',  # form-control
+                'data-live-search': 'true',
+                'data-width': 'auto',
+                'data-style': 'btn-default btn-sm',
+                'style': 'width:50%',
+            }
+        )
+    )
 
     task = forms.ModelChoiceField(
         label='Task',
@@ -1319,6 +1462,23 @@ class EvidenceForm(forms.ModelForm):
         )
     )
 
+    parent = forms.ModelChoiceField(
+        label='Parent',
+        queryset=Evidence.objects.all(),
+        empty_label="--Select--",
+        required=False,
+        widget=forms.Select(
+            attrs={
+                'class': 'selectpicker show-tick form-control',  # form-control
+                'data-live-search': 'true',
+                'data-width': 'auto',
+                'data-style': 'btn-default btn-sm',
+                'style': 'width:50%',
+            }
+        )
+    )
+
+
     evidenceformat = forms.ModelChoiceField(
         label="Evidence format*",
         queryset=EvidenceFormat.objects.filter(enabled=True),  # .values_list('name',flat=True),
@@ -1340,14 +1500,33 @@ class EvidenceForm(forms.ModelForm):
         )
     )
 
+    mitretactic = forms.ModelChoiceField(
+        label="MITRE ATTCK Tactics*",
+        # queryset=Task.objects.exclude(status='2'),  #  exclude closed task
+        queryset=MitreAttck_Tactics.objects.exclude(enabled=False),
+        empty_label="--None--",
+        required=True,
+        widget=forms.Select(
+            attrs={
+                'class': 'selectpicker show-tick form-control',  # form-control
+                'data-live-search': 'true',
+                'data-width': 'auto',
+                'data-style': 'btn-default btn-sm',
+                'style': 'width:50%',
+            }
+        )
+    )
+
+
     # fileRef = forms.FileField(widget=CustomClearableFileInput)
     class Meta:
-        fields = ("user", "inv", "task", "evidenceformat", "description", "fileRef")
+        fields = ("user", "inv", "task", "parent", "evidenceformat", "mitretactic", "description", "fileRef")
         # fields = ( "user", "inv", "description")
         model = Evidence
         labels = {
             "description": "Description*",
             "fileRef": "Attachment",
+            "parent": "Parent",
         }
         widgets = {
             # 'fileRef': CustomClearableFileInput,
@@ -1405,7 +1584,7 @@ class EvidenceAttrForm(forms.ModelForm):
 
     evattrformat = forms.ModelChoiceField(
         label="Attribute format*",
-        queryset=EvidenceAttrFormat.objects.filter(enabled=True),  # .values_list('name',flat=True),
+        queryset=EvidenceAttrFormat.objects.filter(enabled=True).order_by('name'),  # .values_list('name',flat=True),
         empty_label="--None--",
         required=True,
         # initial=EvidenceAttrFormat.objects.get(pk=2),

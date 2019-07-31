@@ -1,3 +1,16 @@
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : tasks/tasktemplate_detail_table.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.07.27
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.07.29  Lendvay     1      Initial file
+# **********************************************************************;
+-->
 {% if tasktemplate.pk %}
     <tr>
         <td><strong>Task ID</strong><br> {{ tasktemplate.pk }} </td>
@@ -57,12 +70,12 @@
             {% if tasktemplate.action.code_file %}
                 {% if tasktemplate.actev %}
                     {% if tasktemplate.inv %}
-                        <a href="{% url 'tasks:act_exec_script' pk=tasktemplate.action.pk inv_pk=tasktemplate.inv.pk task_pk=task.pk ev_pk=task.actev %}"
+                        <a href="{% url 'tasks:act_exec_script' pk=tasktemplate.action.pk inv_pk=tasktemplate.inv.pk task_pk=task.pk ev_pk=task.actev evattr_pk=0 %}"
                            class="btn btn-success btn-xs">
                             <span class="glyphicon glyphicon-play"></span>
                         </a>
                     {% else %}
-                        <a href="{% url 'tasks:act_exec_script' pk=tasktemplate.action.pk inv_pk=0 task_pk=tasktemplate.pk ev_pk=task.actev %}"
+                        <a href="{% url 'tasks:act_exec_script' pk=tasktemplate.action.pk inv_pk=0 task_pk=tasktemplate.pk ev_pk=task.actev evattr_pk=0 %}"
                            class="btn btn-success btn-xs">
                             <span class="glyphicon glyphicon-play"></span>
                         </a>

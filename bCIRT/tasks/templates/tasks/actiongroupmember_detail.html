@@ -1,0 +1,62 @@
+{% extends "tasks/action_base.html" %}
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : tasks/actiongroupmember_detail.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.07.27
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.07.29  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+
+{% block actionslist_active %}active{% endblock actionslist_active%}
+
+{% block preactions %}
+
+{% endblock %}
+
+
+{% block actions_content %}
+    <div class="row">
+        <!-- Left Investigation Info -->
+        <div class="col-sm-12 col-md-12">
+            <div class="panel panel-primary">
+                <header class = "panel-heading">
+                    <div class="panel-title text-center">
+                        <div class="btn-group inline pull-left">
+                            <a href="{% url 'tasks:actgrp_create' %}?next1={{ request.get_full_path|urlencode }}"
+                               class="btn btn-default btn-xs">
+                            <span class="glyphicon glyphicon-plus"></span>
+                            New ActionGroupMember
+                            </a>
+                        </div>
+                        <strong>&nbsp;ActionGroupMember Details | {{ actiongroupmember.pk }}</strong>
+                        <div class="btn-group inline ">
+                            <div class="btn btn-warning btn-xs">
+                            <a style="color:white" href="{% url 'tasks:actgrp_edit' pk=actiongroupmember.pk %}?next1={{ request.get_full_path|urlencode }}">
+                            <span class="glyphicon glyphicon-pencil"></span>
+                            Edit
+                            </a>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+                <div class="panel-body inv-panel-body">
+                    <table class="table" id="actions-detail">
+                        <tbody >
+                            {% include 'tasks/actiongroupmember_detail_table.html' %}
+                        </tbody>
+                    </table>
+                    <a href="{% url 'tasks:actgrp_list' %}" class="btn btn-primary pull-right">
+                        <span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>
+                        <span>ActionGroupMember list</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

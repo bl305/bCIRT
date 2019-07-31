@@ -1,4 +1,16 @@
-    <div class="row">
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : inv/inv_detail_tab_evidences.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.07.27
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.07.29  Lendvay     1      Initial file
+# **********************************************************************;
+-->    <div class="row">
         <div class="col-sm-12">
 
                 <div class="panel panel-primary">
@@ -22,21 +34,30 @@
                     </div>
                     <div class="panel-body inv-panel-body">
 
+<!--                        data-pagination="false"-->
+<!--                        data-show-pagination-switch="true"-->
+<!--                        data-side-pagination="client"-->
+<!--                        data-pagination-h-align="left"-->
+<!--                        data-pagination-detail-h-align="right"-->
+<!--                        https://bootstrap-table.com/docs/api/table-options/#pagination-->
+
                         <table class="table table-hover table-striped table-condensed" id="investigations-inve"
                                style="min-height:45vh;"
                         data-toggle="table"
+
                         data-classes="table table-no-bordered"
-                        data-pagination="true"
                         data-search="true"
+                        data-search-align="left"
                         data-show-refresh="true"
                         data-show-toggle="true"
                         data-show-columns="true"
                         data-minimum-count-columns="2"
-                        data-show-pagination-switch="true"
                         data-id-field="id"
                         data-page-list="[10, 25, 50, 100, ALL]"
                         data-show-footer="false"
-                        data-side-pagination="client"
+                        data-buttons-align="left"
+                        data-buttons-class="primary"
+
                         >
                             <thead>
                                 <tr class="mylist-header">
@@ -55,7 +76,6 @@
                             <!--<tr><td colspan="8" style="min-height:400px">&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;</td></tr>-->
                             </tbody>
                         </table>
-
                         <div class="modal fade" id="modal-investigations-inve">
                             <!--<div class="modal-dialog" style="max-height:90%; max-width: 90%;">-->
                             <div class="modal-dialog">

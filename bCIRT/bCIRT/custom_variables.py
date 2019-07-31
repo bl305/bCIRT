@@ -1,3 +1,15 @@
+# -*- coding: utf-8 -*-
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : bCIRT/custom_variables.py
+# Author            : Balazs Lendvay
+# Date created      : 2019.07.27
+# Purpose           : Custom Settings file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.07.29  Lendvay     1      Initial file
+# **********************************************************************;
 from os.path import join as path_join
 
 MYALLOWED_HOSTS = ['192.168.56.101']
@@ -18,3 +30,8 @@ BASE_THEME = 'dark'  # not in use yet
 PROJECTNAME = 'bCIRT'
 PROJECT_TITLE = 'bCIRT'
 TIMEFORMAT = "Y/m/d H:i:s"
+LOGLEVEL = 0 #off
+#LOGLEVEL = 1 #minimum
+#LOGLEVEL = 2 #standard
+# LOGLEVEL = 3 #verbose
+LOGSEPARATOR = ";"

@@ -1,5 +1,17 @@
+# -*- coding: utf-8 -*-
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : invs/view.py
+# Author            : Balazs Lendvay
+# Date created      : 2019.07.27
+# Purpose           : View file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.07.29  Lendvay     1      Initial file
+# **********************************************************************;
 from .models import Inv, InvStatus
-from tasks.models import TaskTemplate, PlaybookTemplate, Action
+from tasks.models import TaskTemplate, PlaybookTemplate, Action, ActionGroup, ActionGroupMember
 from .forms import InvForm
 from django.shortcuts import redirect, reverse    # ,render, get_object_or_404
 from django.contrib import messages
@@ -9,15 +21,14 @@ from django.contrib.auth.mixins import (
 )
 from django.views import generic
 import logging
+from bCIRT.custom_variables import LOGLEVEL, LOGSEPARATOR
 from django.utils.http import is_safe_url
-from bCIRT.settings import ALLOWED_HOSTS, PROJECT_ROOT
+from bCIRT.settings import ALLOWED_HOSTS
 # check remaining session time
 from django.contrib.sessions.models import Session
 from datetime import datetime, timezone
 # check remaining session time
 from django.template.loader import get_template
-from django.http import HttpResponse
-from weasyprint import HTML, CSS
 from wkhtmltopdf.views import PDFTemplateResponse
 from django.contrib.auth import get_user_model
 User = get_user_model()
@@ -30,6 +41,16 @@ class MyPDFView(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailView)
     model = Inv
     permission_required = ('invs.view_inv', 'tasks.view_evidence', 'tasks:view_task', 'tasks:view_playbook')
     context = {"title": "Investigation evidences"}
+
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logger.info(logmsg)
+        super(MyPDFView, self).__init__(*args, **kwargs)
 
     def get(self, request, *args, **kwargs):
         self.context['inv'] = self.get_object()
@@ -61,35 +82,20 @@ class MyPDFView(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailView)
         return response
 
 
-class MyPDFView_weasyprint(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailView):
-
-    # context = {"title": "Task evidences"}  # data that has to be rendered to pdf templete
-    model = Inv
-    permission_required = ('invs.view_inv', 'tasks.view_evidence', 'tasks:view_task', 'tasks:view_playbook')
-    context = {"title": "Investigation evidences"}
-
-    def get(self, request, *args, **kwargs):
-        self.context['inv'] = self.get_object()
-        self.context['user'] = self.request.user.get_username()
-
-        html_template = get_template('invs/inv_detail_REPORT.html')
-
-        rendered_html = html_template.render(self.context)
-
-        css_path = PROJECT_ROOT + '/static/bCIRT/bootstrap-3.3.7/css/bootstrap.min.css'
-        pdf_file = HTML(string=rendered_html).write_pdf(stylesheets=[CSS(css_path)])
-        # pdf_file = HTML(string=rendered_html).write_pdf()
-
-        http_response = HttpResponse(pdf_file, content_type='application/pdf')
-        http_response['Content-Disposition'] = 'filename="report_investigation.pdf"'
-
-        return http_response
-
-
 class InvDetailPrintView(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailView):
     model = Inv
     template_name = 'invs/inv_detail_REPORT_v1.html'
     permission_required = ('invs.view_inv',)
+
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logger.info(logmsg)
+        super(InvDetailPrintView, self).__init__(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
         # check remaining session time
@@ -121,6 +127,16 @@ class InvListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView)
     form_class = InvForm
     permission_required = ('invs.view_inv',)
 
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logger.info(logmsg)
+        super(InvListView, self).__init__(*args, **kwargs)
+
     def get_context_data(self, **kwargs):
         # check remaining session time
         session_key = self.request.COOKIES["sessionid"]
@@ -136,6 +152,16 @@ class InvCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateV
     form_class = InvForm
     permission_required = ('invs.add_inv',)
     success_url = 'invs:inv_list'
+
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logger.info(logmsg)
+        super(InvCreateView, self).__init__(*args, **kwargs)
 
     def get_success_url(self):
         if 'next1' in self.request.GET:
@@ -158,7 +184,7 @@ class InvCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateV
     def form_valid(self, form):
         self.object = form.save(commit=False)
         # self.object.user = self.request.user
-        self.object.user = None
+        self.object.user = self.request.user
         self.object.modified_by = self.request.user.get_username()
         self.object.created_by = self.request.user.get_username()
         self.object.save()
@@ -190,6 +216,16 @@ class InvDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailV
     model = Inv
     permission_required = ('invs.view_inv',)
 
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logger.info(logmsg)
+        super(InvDetailView, self).__init__(*args, **kwargs)
+
     def get_context_data(self, **kwargs):
         # check remaining session time
         session_key = self.request.COOKIES["sessionid"]
@@ -200,6 +236,39 @@ class InvDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailV
         kwargs['templatecategories'] = TaskTemplate.objects.filter(enabled=True)
         kwargs['playbooks'] = PlaybookTemplate.objects.filter(enabled=True)
         kwargs['actions'] = Action.objects.filter(enabled=True)
+        # actiongrmember_file = set()
+        # actiongrmember_desc = set()
+        # actiongrmember_attr = set()
+        actiongroups_file = set()
+        actiongroups_desc = set()
+        actiongroups_attr = set()
+        if ActionGroupMember.objects.all():
+            for actgrpmember in ActionGroupMember.objects.all():
+                # input is description scriptinput=1:
+                if actgrpmember.actionid.enabled == True and actgrpmember.actionid.scriptinput.pk == 1:
+                    # actiongrmember_desc.add(actgrpmember.actionid)
+                    actiongroups_desc.add(actgrpmember.actiongroupid)
+                # input is file scriptinput=2:
+                elif actgrpmember.actionid.enabled == True and actgrpmember.actionid.scriptinput.pk == 2:
+                    # actiongrmember_file.add(actgrpmember.actionid)
+                    actiongroups_file.add(actgrpmember.actiongroupid)
+                # input is attribute scriptinput=1:
+                elif actgrpmember.actionid.enabled == True and actgrpmember.actionid.scriptinput.pk == 3:
+                    # actiongrmember_attr.add(actgrpmember.actionid)
+                    actiongroups_attr.add(actgrpmember.actiongroupid)
+                # input is none of the above:
+                else:
+                    # print(actgrpmember.actionid.scriptinput.pk)
+                    pass
+        # print(actiongr_desc)
+        # print(actiongr_file)
+        # print(actiongr_attr)
+        # kwargs['actiongroupmembers_desc'] = actiongrmember_desc
+        # kwargs['actiongroupmembers_file'] = actiongrmember_file
+        # kwargs['actiongroupmembers_attr'] = actiongrmember_attr
+        kwargs['actiongroups_desc'] = actiongroups_desc
+        kwargs['actiongroups_file'] = actiongroups_file
+        kwargs['actiongroups_attr'] = actiongroups_attr
         return super(InvDetailView, self).get_context_data(**kwargs)
 
     def dispatch(self, request, *args, **kwargs):
@@ -220,6 +289,16 @@ class InvUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateV
     model = Inv
     permission_required = ('invs.change_inv',)
     success_url = 'invs:inv_list'
+
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logger.info(logmsg)
+        super(InvUpdateView, self).__init__(*args, **kwargs)
 
     def get_success_url(self):
         if 'next1' in self.request.GET:
@@ -261,6 +340,16 @@ class InvRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteV
     permission_required = ('invs.delete_inv',)
     success_url = 'invs:inv_list'
 
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logger.info(logmsg)
+        super(InvRemoveView, self).__init__(*args, **kwargs)
+
     def get_success_url(self):
         return reverse(self.success_url)
 
@@ -287,6 +376,16 @@ class InvRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteV
 class InvAssignView(LoginRequiredMixin, PermissionRequiredMixin, generic.RedirectView):
     permission_required = ('invs.view_inv', 'invs.change_inv')
     success_url = 'invs:inv_list'
+
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logger.info(logmsg)
+        super(InvAssignView, self).__init__(*args, **kwargs)
 
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:

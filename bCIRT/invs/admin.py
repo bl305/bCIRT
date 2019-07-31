@@ -1,3 +1,16 @@
+# -*- coding: utf-8 -*-
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : invs/admin.py
+# Author            : Balazs Lendvay
+# Date created      : 2019.07.27
+# Purpose           : Admin file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.07.29  Lendvay     1      Initial file
+# **********************************************************************;
+
 from django.contrib import admin
 # Register your models here.
 from . import models
@@ -13,7 +26,7 @@ class GroupMemberInline(admin.TabularInline):
     model = models.InvSeverity
     model = models.InvStatus
     model = models.Inv
-
+    model = models.CurrencyType
 
 # admin.site.register(models.Inv)
 # admin.site.register(models.InvAttackvector)
@@ -23,6 +36,9 @@ class GroupMemberInline(admin.TabularInline):
 # admin.site.register(models.InvSeverity)
 # admin.site.register(models.InvStatus)
 
+@admin.register(models.CurrencyType)
+class CurrencyTypeAdmin(ImportExportModelAdmin):
+    pass
 
 @admin.register(models.InvAttackvector)
 class InvAttackvectorAdmin(ImportExportModelAdmin):

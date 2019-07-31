@@ -1,3 +1,15 @@
+# -*- coding: utf-8 -*-
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : configuration/views.py
+# Author            : Balazs Lendvay
+# Date created      : 2019.07.27
+# Purpose           : View file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.07.29  Lendvay     1      Initial file
+# **********************************************************************;
 from django.views.generic import TemplateView, CreateView, ListView, DetailView, UpdateView, DeleteView
 from django.contrib.auth.mixins import (
     LoginRequiredMixin,
@@ -14,6 +26,7 @@ from django.contrib import messages
 from .forms import UpdatePackageForm
 # Create your views here.
 from os import path
+from bCIRT.custom_variables import LOGLEVEL, LOGSEPARATOR
 import logging
 logger = logging.getLogger('log_file_verbose')
 
@@ -21,15 +34,46 @@ logger = logging.getLogger('log_file_verbose')
 class ConfigurationPage(LoginRequiredMixin, TemplateView):
     template_name = 'configuration/configuration_base.html'
 
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logger.info(logmsg)
+        super(ConfigurationPage, self).__init__(*args, **kwargs)
+
+
 
 class ConfigurationLoggingPage(LoginRequiredMixin, TemplateView):
     template_name = 'configuration/configuration_logging.html'
+
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logger.info(logmsg)
+        super(ConfigurationLoggingPage, self).__init__(*args, **kwargs)
 
 
 class UpdatePackageListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     model = UpdatePackage
     form_class = UpdatePackageForm
     permission_required = ('configuration.view_updatepackage',)
+
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logger.info(logmsg)
+        super(UpdatePackageListView, self).__init__(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
         # check remaining session time
@@ -45,6 +89,16 @@ class UpdatePackageCreateView(LoginRequiredMixin, PermissionRequiredMixin, Creat
     form_class = UpdatePackageForm
     permission_required = ('configuration.add_updatepackage',)
     success_url = 'configuration:conf_updatelist'
+
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logger.info(logmsg)
+        super(UpdatePackageCreateView, self).__init__(*args, **kwargs)
 
     def get_success_url(self):
         if 'next1' in self.request.GET:
@@ -98,6 +152,16 @@ class UpdatePackageDetailView(LoginRequiredMixin, PermissionRequiredMixin, Detai
     model = UpdatePackage
     permission_required = ('configuration.view_updatepackage',)
 
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logger.info(logmsg)
+        super(UpdatePackageDetailView, self).__init__(*args, **kwargs)
+
     def get_context_data(self, **kwargs):
         # check remaining session time
         session_key = self.request.COOKIES["sessionid"]
@@ -124,6 +188,16 @@ class UpdatePackageUpdateView(LoginRequiredMixin, PermissionRequiredMixin, Updat
     model = UpdatePackage
     permission_required = ('configuration.view_updatepackage', 'configuration.change_updatepackage',)
     success_url = 'configuration:conf_updatelist'
+
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logger.info(logmsg)
+        super(UpdatePackageUpdateView, self).__init__(*args, **kwargs)
 
     def get_success_url(self):
         if 'next1' in self.request.GET:
@@ -177,6 +251,16 @@ class UpdatePackageRemoveView(LoginRequiredMixin, PermissionRequiredMixin, Delet
     permission_required = ('configuration.delete_updatepackage', 'configuration.view_updatepackage',)
     success_url = 'configuration:conf_updatelist'
 
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logger.info(logmsg)
+        super(UpdatePackageRemoveView, self).__init__(*args, **kwargs)
+
     def get_success_url(self):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
@@ -212,6 +296,16 @@ class InstallPackageRedirectView(LoginRequiredMixin, PermissionRequiredMixin, ge
     """
     permission_required = ('configuration.view_updatepackage', 'configuration.change_updatepackage')
     success_url = 'configuration:conf_updatelist'
+
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logger.info(logmsg)
+        super(InstallPackageRedirectView, self).__init__(*args, **kwargs)
 
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:

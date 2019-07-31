@@ -1,12 +1,18 @@
+# -*- coding: utf-8 -*-
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : invs/management/comands/dbimport.py
+# Author            : Balazs Lendvay
+# Date created      : 2019.07.27
+# Purpose           : dbimport file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.07.29  Lendvay     1      Initial file
+# **********************************************************************;
 from django.core.management.base import BaseCommand, CommandError
-# from invs.models import InvStatus, InvPriority, InvAttackvector, InvCategory, InvPhase, InvSeverity
-# from tasks.models import TaskVarType, TaskVarCategory, TaskType, TaskCategory, TaskStatus, TaskPriority
-# from tasks.models import ScriptOs, ScriptType, ScriptCategory, Action, Type, ActionQStatus, OutputTarget, ScriptOutput
-# from tasks.models import EvidenceFormat, EvidenceAttr, EvidenceAttrFormat
-# from os import path
 import tablib
 import os
-# from import_export import resources
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
@@ -72,6 +78,9 @@ class Command(BaseCommand):
             self.import_actionqstatus(self.p_format)
             self.import_actionq(self.p_format)
             self.import_action(self.p_format)
+
+            self.import_updatepackage(self.p_format)
+
             print("Database import from " + self.p_dir + " finished.")
         else:
             print(r"""
@@ -755,6 +764,26 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
             try:
                 from tasks.resources import ActionQResource
                 aresource = ActionQResource()
+                dataset = tablib.Dataset().load(open(fname).read())
+                result = aresource.import_data(dataset, dry_run=True)
+                if not result.has_errors():
+                    aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
+                    print(tablename+" imported successfully")
+            except:
+                raise CommandError(tablename+" table could not be imported!")
+        else:
+            print(fname+" is not readable!")
+
+
+    def import_updatepackage(self, p_format):
+        tablename = "UpdatePackage"
+        print("Importing "+tablename)
+        fname = os.path.join(self.p_dir, tablename+'.'+p_format)
+        fname_readable = os.access(fname, os.R_OK)
+        if fname_readable:
+            try:
+                from tasks.resources import UpdatePackageResource
+                aresource = UpdatePackageResource()
                 dataset = tablib.Dataset().load(open(fname).read())
                 result = aresource.import_data(dataset, dry_run=True)
                 if not result.has_errors():

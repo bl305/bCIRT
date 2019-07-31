@@ -1,3 +1,16 @@
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : inv/inv_detail_task_table_REPORT_v1_.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.07.27
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.07.29  Lendvay     1      Initial file
+# **********************************************************************;
+-->
 {% if inv.task_inv.count > 0 %}
 {% for task in inv.task_inv.all %}
                     <tr class="mylist-meta" style="background-color:#e6e6e6" id="item-task-{{ task.pk }}">
@@ -10,7 +23,7 @@
                             <a class="badge" href="{% url 'tasks:tsk_detail' pk=task.pk %}?next1={{ request.get_full_path|urlencode }}">
                             {{ task.title }}
                             </a>
-                        </td>
+                            </td>
                         <td>
                             {{ task.status }}
                         </td>
@@ -22,6 +35,9 @@
                             {% else %}
                                 -
                             {% endif %}
+                        </td>
+                        <td>
+                            {{ task.type }}
                         </td>
                         <td>
                             {{ task.created_at|date:"Y/m/d H:i:s" }}
@@ -37,48 +53,10 @@
                         </td>
                     </tr>
                     <tr >
-                        <td colspan="8">
+                        <td colspan="9">
                             <div class="accordian-body collapse" id="mytasks{{task.pk}}">
                                 <!--<table class="invdescription2" style="max-width:100vw">-->
                                 <table class="bcirttable" style="max-width:100vw">
-                                    {% for taskev in task.evidence_task.all %}
-                                        <tr style="border-top: 2px dashed gray;">
-                                            <td>
-                                                <a class="badge" href="{% url 'tasks:ev_detail' pk=taskev.pk %}?next1={{ request.get_full_path|urlencode }}">
-                                                    {{ taskev.pk }}
-                                                </a>
-                                            </td>
-                                            <td>
-                                                {% if taskev.evidenceformat.pk == 2 %}
-                                                    {{ taskev.description|safe }}
-                                                {% else %}
-                                                    {% if taskev.evidenceformat.pk == 1 %}
-                                                        {{ taskev.description|linebreaks }}
-                                                    {% else %}
-                                                        Uknown evidence format!!!
-                                                    {% endif %}
-                                                {% endif %}
-                                            </td>
-                                            <td>
-                                                <table class="bcirttable">
-                                                    <tbody>
-                                                    {% for attr in taskev.evattr_evidence.all %}
-                                                        <tr id="item-attr-{{attr.pk}}">
-                                                            <td>
-
-                                                            </td>
-                                                            <td>
-                                                                <a class="badge" href="{% url 'tasks:evattr_detail' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}">
-                                                                    {{ attr.evattrvalue }}
-                                                                </a>
-                                                            </td>
-                                                        </tr>
-                                                    {% endfor %}
-                                                    </tbody>
-                                                </table>
-                                            </td>
-                                        </tr>
-                                    {% endfor %}
 
                                     {{ task.description|safe }}
                                 </table>

@@ -1,3 +1,16 @@
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : tasks/action_detail_table.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.07.27
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.07.29  Lendvay     1      Initial file
+# **********************************************************************;
+-->
 {% if action.pk %}
     <tr>
         <td><strong>Action ID</strong><br> {{ action.pk }} </td>
@@ -5,7 +18,7 @@
         <td><strong>Title</strong><br> {{ action.title }} </td>
         <td><strong>Version</strong><br> {{ action.version }} </td>
         <td><strong>Script Type</strong><br> {{ action.script_type }} </td>
-        <td><strong>Script Category</strong><br> {{ action.script_category }} </td>
+        <td><strong>Script Category</strong><br> {{ action.scriptinput }} </td>
     </tr>
     <tr>
         <td><strong>Exec Ready</strong><br> {{ action.code_file }} </td>

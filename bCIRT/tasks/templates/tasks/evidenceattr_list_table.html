@@ -1,3 +1,16 @@
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : tasks/evidenceattr_list_table.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.07.27
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.07.29  Lendvay     1      Initial file
+# **********************************************************************;
+-->
 {% if object_list %}
 {% for evidenceattr in object_list %}
                 <tr id="evattr_{{evidenceattr.pk}}">
@@ -35,7 +48,7 @@
                                         <ul class="dropdown-menu dropdown-content" id="myDropdown">
                                             <input type="text" placeholder="Search.." id="myInput" onkeyup="filterFunction()">
                                             {% for actid in actions %}
-                                             {% if actid.script_category.pk != 2 %}
+                                             {% if actid.scriptinput.pk != 2 %}
                                               <li>
                                                   <a href="#?next1={{ request.get_full_path|urlencode }}">
                                                   <span></span>

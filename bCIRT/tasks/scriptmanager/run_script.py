@@ -1,3 +1,15 @@
+# -*- coding: utf-8 -*-
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : tasks/scriptmanager/run_script.py
+# Author            : Balazs Lendvay
+# Date created      : 2019.07.27
+# Purpose           : Script manager script to run commands/scripts file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.07.29  Lendvay     1      Initial file
+# **********************************************************************;
 # https://www.daniweb.com/programming/software-development/code/257449/a-command-class-to-run-shell-commands
 # https://pymotw.com/2/argparse/
 from subprocess import Popen, PIPE, STDOUT

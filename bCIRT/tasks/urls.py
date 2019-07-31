@@ -1,3 +1,15 @@
+# -*- coding: utf-8 -*-
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : tasks/urls.py
+# Author            : Balazs Lendvay
+# Date created      : 2019.07.27
+# Purpose           : URL file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.07.29  Lendvay     1      Initial file
+# **********************************************************************;
 from django.conf.urls import url
 from . import views
 # from django.contrib.auth import views as auth_views
@@ -15,8 +27,24 @@ urlpatterns = [
     url(r'^actions/remove/(?P<pk>\d+)/$', views.ActionRemoveView.as_view(), name='act_remove'),
 
     url(r"^actions/qdetail/(?P<pk>\d+)/$", views.ActionQDetailView.as_view(), name="actq_detail"),
-    url(r"^actions/exec/(?P<pk>\d+)/(?P<inv_pk>\d+)/(?P<task_pk>\d+)/(?P<ev_pk>\d+)/$",
+    url(r"^actions/exec/(?P<pk>\d+)/(?P<inv_pk>\d+)/(?P<task_pk>\d+)/(?P<ev_pk>\d+)/(?P<evattr_pk>\d+)/$",
         views.ActionExecScriptRedirectView.as_view(), name="act_exec_script"),
+    url(r"^actions/execgrp/(?P<pk>\d+)/(?P<inv_pk>\d+)/(?P<task_pk>\d+)/(?P<ev_pk>\d+)/(?P<evattr_pk>\d+)/$",
+        views.ActionExecScriptGroupRedirectView.as_view(), name="act_exec_scriptgroup"),
+    url(r"^evidences/addtoprofile/(?P<pk>\d+)/(?P<evattr_pk>\d+)/$",
+        views.AddToProfileRedirectView.as_view(), name="ev_addtoprofile"),
+
+    url(r"^actiongroups/$", views.ActionGroupListView.as_view(), name="actgrp_list"),
+    url(r"^actiongroups/new/$", views.ActionGroupCreateView.as_view(), name="actgrp_create"),
+    url(r"^actiongroups/detail/(?P<pk>\d+)/$", views.ActionGroupDetailView.as_view(), name="actgrp_detail"),
+    url(r'^actiongroups/edit/(?P<pk>\d+)/$', views.ActionGroupUpdateView.as_view(), name='actgrp_edit'),
+    url(r'^actiongroups/remove/(?P<pk>\d+)/$', views.ActionGroupRemoveView.as_view(), name='actgrp_remove'),
+
+    url(r"^actiongroupmembers/$", views.ActionGroupMemberListView.as_view(), name="actgrpmem_list"),
+    url(r"^actiongroupmembers/new/$", views.ActionGroupMemberCreateView.as_view(), name="actgrpmem_create"),
+    url(r"^actiongroupmembers/detail/(?P<pk>\d+)/$", views.ActionGroupMemberDetailView.as_view(), name="actgrpmem_detail"),
+    url(r'^actiongroupmembers/edit/(?P<pk>\d+)/$', views.ActionGroupMemberUpdateView.as_view(), name='actgrpmem_edit'),
+    url(r'^actiongroupmembers/remove/(?P<pk>\d+)/$', views.ActionGroupMemberRemoveView.as_view(), name='actgrpmem_remove'),
 
     url(r"^evidences/$", views.EvidenceListView.as_view(), name="ev_list"),
     url(r"^evidences/new/(?P<inv_pk>\d+)/(?P<task_pk>\d+)/$", views.EvidenceCreateView.as_view(), name="ev_create"),

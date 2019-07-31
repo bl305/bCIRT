@@ -1,3 +1,16 @@
+# -*- coding: utf-8 -*-
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : invs/management/commands/dbexport.py
+# Author            : Balazs Lendvay
+# Date created      : 2019.07.27
+# Purpose           : dbexport file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.07.29  Lendvay     1      Initial file
+# **********************************************************************;
+
 from django.core.management.base import BaseCommand, CommandError
 # from invs.models import InvStatus, InvPriority, InvAttackvector, InvCategory, InvPhase, InvSeverity
 # from tasks.models import TaskVarType, TaskVarCategory, TaskType, TaskCategory, TaskStatus, TaskPriority
@@ -35,6 +48,8 @@ class Command(BaseCommand):
             self.export_evidenceattrformat(p_format)
             self.export_evidence(p_format)
             self.export_evidenceattr(p_format)
+
+            self.export_updatepackage(p_format)
 
             self.export_host(p_format)
             self.export_hostname(p_format)
@@ -122,8 +137,11 @@ class Command(BaseCommand):
                 self.export_actionq(p_format)
                 self.export_action(p_format)
                 print("Database export to " + p_dir + " finished.")
+            elif p_table == "configuration":
+                self.export_updatepackage(p_format)
+                print("Database export to " + p_dir + " finished.")
             else:
-                print("Wrong parameter! Options:\ninvestigations / tasks / taskvars / actions / evidences\n")
+                print("Wrong parameter! Options:\ninvestigations / tasks / taskvars / actions / evidences / configuration\n")
         else:
             print(r"""
 usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--version]
@@ -737,3 +755,20 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
                                   a_content=dataset.csv)
         except:
             raise CommandError("ActionQ table could not be exported!")
+
+    def export_updatepackage(self, p_format):
+        try:
+            print("Exporting UpdatePackage")
+            from configuration.resources import UpdatePackageResource
+            aresource = UpdatePackageResource()
+            dataset = aresource.export()
+            tablename = 'UpdatePackage'
+            if p_format == "json":
+                self.save_to_file(a_filename=tablename+'.json',
+                                  a_content=dataset.json)
+            elif p_format == "csv":
+                self.save_to_file(a_filename=tablename+'.csv',
+                                  a_content=dataset.csv)
+        except:
+            raise CommandError("UpdatePackage table could not be exported!")
+

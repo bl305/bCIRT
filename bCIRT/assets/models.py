@@ -1,3 +1,16 @@
+# -*- coding: utf-8 -*-
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : assets/models.py
+# Author            : Balazs Lendvay
+# Date created      : 2019.07.27
+# Purpose           : Models file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.07.29  Lendvay     1      Initial file
+# **********************************************************************;
+# from django.shortcuts import render
 from django.db import models
 from django.urls import reverse
 from django.core.exceptions import ValidationError
@@ -134,3 +147,21 @@ class Profile(models.Model):
 
     class Meta:
         ordering = ["id"]
+
+def new_profile(pinv, pusername=None, puserid=None, pemail=None, phost=None, pip=None, plocation=None,
+                pdepartment=None, plocation_contact=None, pcreated_by=None, pmodified_by=None, pdescription=None):
+    newprofile = Profile.objects.update_or_create(
+        inv=pinv,
+        username=pusername,
+        userid=puserid,
+        email=pemail,
+        host=phost,
+        ip=pip,
+        location=plocation,
+        department=pdepartment,
+        location_contact=plocation_contact,
+        created_by=pcreated_by,
+        modified_by=pmodified_by,
+        description=pdescription,
+    )
+    return newprofile

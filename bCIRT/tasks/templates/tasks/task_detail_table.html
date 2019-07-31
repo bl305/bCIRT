@@ -1,3 +1,16 @@
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : tasks/task_detail_table.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.07.27
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.07.29  Lendvay     1      Initial file
+# **********************************************************************;
+-->
 {% if task.pk %}
     <tr>
         <td><strong>Task ID</strong><br> {{ task.pk }} </td>
@@ -84,18 +97,21 @@
             {% endif %}
             {% if task.action.code_file %}
                 {% if task.actev %}
-                    {% if task.action.script_category.pk == 2 and task.actiontarget.evidence_task.all.first.fileName or task.action.script_category.pk == 1 %}
+                    {% if task.action.scriptinput.pk == 2 and task.actiontarget.evidence_task.all.first.fileName or task.action.scriptinput.pk == 1 %}
                         {% if task.inv %}
-                            <a href="{% url 'tasks:act_exec_script' pk=task.action.pk inv_pk=task.inv.pk task_pk=task.pk ev_pk=task.actev %}"
+                            <a href="{% url 'tasks:act_exec_script' pk=task.action.pk inv_pk=task.inv.pk task_pk=task.pk ev_pk=task.actev evattr_pk=0 %}"
                                class="btn btn-success btn-xs">
                                 <span class="glyphicon glyphicon-play"></span>
                             </a>
                         {% else %}
-                            <a href="{% url 'tasks:act_exec_script' pk=task.action.pk inv_pk=0 task_pk=task.pk ev_pk=task.actev %}"
+                            <a href="{% url 'tasks:act_exec_script' pk=task.action.pk inv_pk=0 task_pk=task.pk ev_pk=task.actev evattr_pk=0 %}"
                                class="btn btn-success btn-xs">
                                 <span class="glyphicon glyphicon-play"></span>
                             </a>
                         {% endif %}
+                    {% elif task.action.scriptinput.pk == 3 %}
+                        {{ task.actev  }}
+                        <!-- this is an attribute -->
                     {% else %}
                         (No file)
                     {% endif %}

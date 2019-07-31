@@ -1,8 +1,21 @@
+# -*- coding: utf-8 -*-
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : invs/management/commands/initdb.py
+# Author            : Balazs Lendvay
+# Date created      : 2019.07.27
+# Purpose           : Initdb file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.07.29  Lendvay     1      Initial file
+# **********************************************************************;
 from django.core.management.base import BaseCommand, CommandError
-from invs.models import InvStatus, InvPriority, InvCategory, InvPhase, InvSeverity
+from invs.models import InvStatus, InvPriority, InvCategory, InvPhase, InvSeverity, InvAttackvector
+from tasks.models import MitreAttck_Tactics, MitreAttck_Techniques
 from tasks.models import TaskVarType, TaskVarCategory, TaskType, TaskCategory, TaskStatus, TaskPriority
 from tasks.models import ScriptOs, ScriptType, ScriptCategory, Action, Type, ActionQStatus, OutputTarget, ScriptOutput
-from tasks.models import EvidenceFormat, EvidenceAttrFormat, EvReputation
+from tasks.models import EvidenceFormat, EvidenceAttrFormat, EvReputation, ScriptInput
 from bCIRT.settings import PROJECT_ROOT
 from os import path
 from django.contrib.auth import get_user_model
@@ -32,11 +45,13 @@ class Command(BaseCommand):
             self.populate_evidenceattrformat()
             self.populate_evreputation()
 
+            self.populate_currencytype()
             self.populate_invseverity()
             self.populate_invstatus()
             self.populate_invcategory()
             self.populate_invphase()
             self.populate_invpriority()
+            self.populate_invattackvector()
 
             self.populate_taskstatus()
             self.populate_taskcategory()
@@ -50,19 +65,25 @@ class Command(BaseCommand):
             self.populate_actscriptcategory()
             self.populate_actscripttype()
             self.populate_actscriptoutput()
+            self.populate_actscriptinput()
             self.populate_actoutputtarget()
             self.populate_acttype()
             self.populate_actionqstatus()
             self.populate_action()
+
+            self.populate_mitreattck_tactics()
+            # self.populate_mitreattck_techniques()
         elif p_clear:
             print("clear")
         elif p_table:
             if p_table == "investigations":
+                self.populate_currencytype()
                 self.populate_invseverity()
                 self.populate_invstatus()
                 self.populate_invcategory()
                 self.populate_invphase()
                 self.populate_invpriority()
+                self.populate_invattackvector()
             elif p_table == "evidences":
                 self.populate_evidenceformat()
                 self.populate_evidenceattrformat()
@@ -80,12 +101,16 @@ class Command(BaseCommand):
                 self.populate_actscriptcategory()
                 self.populate_actscripttype()
                 self.populate_actscriptoutput()
+                self.populate_actscriptinput()
                 self.populate_actoutputtarget()
                 self.populate_acttype()
                 self.populate_actionqstatus()
                 self.populate_action()
+            elif p_table == "mitre":
+                self.populate_mitreattck_tactics()
+                # self.populate_mitreattck_techniques()
             else:
-                print("Wrong parameter! Options:\ninvestigations / tasks / taskvars / actions / evidences\n")
+                print("Wrong parameter! Options:\ninvestigations / tasks / taskvars / actions / evidences / mitre\n")
         else:
             print(r"""
 usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
@@ -181,6 +206,16 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
                 "enabled": "1",
                 "description": "SHA512 hash of something"
             },
+            {
+                "name": "Reputation",
+                "enabled": "1",
+                "description": "Reputation of something"
+            },
+            {
+                "name": "UserID",
+                "enabled": "1",
+                "description": "UserID of a user"
+            },
         ]
         try:
             self.stdout.write("Initiating EvidenceAttrFormat")
@@ -226,6 +261,30 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
                 )
         except:
             raise CommandError("Evidence Reputation table could not be updated!")
+
+    def populate_currencytype(self):
+        currencytype = [
+            {
+                "name": "Euro",
+                "shortname": "EUR",
+                "enabled": "1",
+            },
+            {
+                "name": "USA Dollar",
+                "shortname": "USD",
+                "enabled": "1",
+            },
+        ]
+        try:
+            self.stdout.write("Initiating CurrencyType")
+            for currencytypeitem in currencytype:
+                InvPhase.objects.create(
+                    name=currencytypeitem['name'],
+                    enabled=currencytypeitem['enabled'],
+                    shortname=currencytypeitem['shortname']
+                )
+        except:
+            raise CommandError("CurrencyType table could not be updated!")
 
     def populate_invstatus(self):
         invstatus = [
@@ -428,6 +487,65 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
         except:
             raise CommandError("InvCategory table could not be updated!")
 
+    def populate_invattackvector(self):
+        invattackvector = [
+            {
+                "name": "Unknown",
+                "enabled": "1",
+                "description": "Unknown attack vector"
+            },
+            {
+                "name": "Account compromise",
+                "enabled": "1",
+                "description": "Account compromise or misuse"
+            },
+            {
+                "name": "Data Breach / Data Leak",
+                "enabled": "1",
+                "description": "Data breach or data leak"
+            },
+            {
+                "name": "Denial of Service",
+                "enabled": "1",
+                "description": "Malware, Virus, Ransomware, malicious code"
+            },
+            {
+                "name": "Fraud",
+                "enabled": "1",
+                "description": "Financial fraud"
+            },
+            {
+                "name": "Lost/Stolen device",
+                "enabled": "1",
+                "description": "Lost or stolen device, laptop, smartphone, external drive etc."
+            },
+            {
+                "name": "Malware",
+                "enabled": "1",
+                "description": "Malware, Virus, Ransomware, malicious code"
+            },
+            {
+                "name": "Phishing",
+                "enabled": "1",
+                "description": "Phishing incident"
+            },
+            {
+                "name": "Social Engineering",
+                "enabled": "1",
+                "description": "Social Engineering other than phishing"
+            },
+        ]
+        try:
+            self.stdout.write("Initiating InvAttackVecotr")
+            for invattackvectoritem in invattackvector:
+                InvStatus.objects.create(
+                    name=invattackvectoritem['name'],
+                    enabled=invattackvectoritem['enabled'],
+                    description=invattackvectoritem['description']
+                )
+        except:
+            raise CommandError("InvAttackVector table could not be updated!")
+
     def populate_actscriptos(self):
         actscriptos = [
             {
@@ -461,11 +579,6 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
                 "name": "Generic",
                 "enabled": "1",
                 "description": "Generic script",
-            },
-            {
-                "name": "FileBased",
-                "enabled": "1",
-                "description": "Performs actions based on the files in the evidence",
             },
         ]
 
@@ -517,21 +630,25 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
         actoutputtarget = [
             {
                 "name": "Description",
+                "shortname": "D",
                 "enabled": "1",
                 "description": "Output goes to the description field.",
             },
             {
                 "name": "Attribute",
+                "shortname": "A",
                 "enabled": "1",
                 "description": "Output goes to the attribute field.",
             },
             {
                 "name": "File",
+                "shortname": "F",
                 "enabled": "1",
                 "description": "Output goes to the file attachment.",
             },
             {
                 "name": "DropIt",
+                "shortname": "X",
                 "enabled": "1",
                 "description": "Output goes to the bin, not captured.",
             },
@@ -580,10 +697,44 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
                 ScriptOutput.objects.create(
                     name=actscriptoutputitem['name'],
                     enabled=actscriptoutputitem['enabled'],
+                    delimiter=actscriptoutputitem['delimiter'],
                     description=actscriptoutputitem['description'],
                 )
         except:
             raise CommandError("ActionScriptOutput table could not be updated!")
+
+    def populate_actscriptinput(self):
+        actscriptinput = [
+            {
+                "name": "Description",
+                "shortname": "D",
+                "enabled": "1",
+                "description": "Evidence description field",
+            },
+            {
+                "name": "File",
+                "shortname": "F",
+                "enabled": "1",
+                "description": "File based",
+            },
+            {
+                "name": "Attribute",
+                "shortname": "A",
+                "enabled": "1",
+                "description": "Evidence Attribute field",
+            },
+        ]
+        try:
+            self.stdout.write("Initiating ActScriptInput")
+            for actscriptinputitem in actscriptinput:
+                ScriptInput.objects.create(
+                    name=actscriptinputitem['name'],
+                    enabled=actscriptinputitem['enabled'],
+                    description=actscriptinputitem['description'],
+                )
+        except:
+            raise CommandError("ActionScriptInput table could not be updated!")
+
 
     def populate_acttype(self):
         acttype = [
@@ -606,6 +757,11 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
                 "name": "Script_b64",
                 "enabled": "1",
                 "description": "Script accepting b64 encrypted arguments",
+            },
+            {
+                "name": "Internal",
+                "enabled": "1",
+                "description": "Internal command/script",
             },
         ]
         try:
@@ -916,3 +1072,181 @@ sleep 2 &
                 )
         except:
             raise CommandError("InvStatus table could not be updated!")
+
+
+    def populate_mitreattck_tactics(self):
+        mitretactics = [
+            {
+                "matacid": "NA",
+                "name": "NA",
+                "enabled": "1",
+                "description": "NA"
+            },
+            {
+                "matacid": "TA0001",
+                "name": "Initial Access",
+                "enabled": "1",
+                "description": "The initial access tactic represents the vectors adversaries use to gain an initial "
+                               "foothold within a network."
+            },
+            {
+                "matacid": "TA0002",
+                "name": "Execution",
+                "enabled": "1",
+                "description": "The execution tactic represents techniques that result in execution of "
+                               "adversary-controlled code on a local or remote system. This tactic is often used in "
+                               "conjunction with initial access as the means of executing code once access is obtained"
+                               ", and lateral movement to expand access to remote systems on a network."
+            },
+            {
+                "matacid": "TA0003",
+                "name": "Persistence",
+                "enabled": "1",
+                "description": "Persistence is any access, action, or configuration change to a system that gives an"
+                               " adversary a persistent presence on that system. Adversaries will often need to "
+                               "maintain access to systems through interruptions such as system restarts, loss of "
+                               "credentials, or other failures that would require a remote access tool to restart or "
+                               "alternate backdoor for them to regain access."
+            },
+            {
+                "matacid": "TA0004",
+                "name": "Privilege Escalation",
+                "enabled": "1",
+                "description": "Privilege escalation is the result of actions that allows an adversary to obtain a "
+                               "higher level of permissions on a system or network. Certain tools or actions require "
+                               "a higher level of privilege to work and are likely necessary at many points throughout"
+                               " an operation. Adversaries can enter a system with unprivileged access and must take"
+                               " advantage of a system weakness to obtain local administrator or SYSTEM/root level "
+                               "privileges. A user account with administrator-like access can also be used. User "
+                               "accounts with permissions to access specific systems or perform specific functions "
+                               "necessary for adversaries to achieve their objective may also be considered an "
+                               "escalation of privilege."
+            },
+            {
+                "matacid": "TA0005",
+                "name": "Defense Evasion",
+                "enabled": "1",
+                "description": "Defense evasion consists of techniques an adversary may use to evade detection or "
+                               "avoid other defenses. Sometimes these actions are the same as or variations of "
+                               "techniques in other categories that have the added benefit of subverting a particular "
+                               "defense or mitigation. Defense evasion may be considered a set of attributes the "
+                               "adversary applies to all other phases of the operation."
+            },
+            {
+                "matacid": "TA0006",
+                "name": "Credential Access",
+                "enabled": "1",
+                "description": "Credential access represents techniques resulting in access to or control over "
+                               "system, domain, or service credentials that are used within an enterprise environment."
+                               " Adversaries will likely attempt to obtain legitimate credentials from users or "
+                               "administrator accounts (local system administrator or domain users with administrator"
+                               " access) to use within the network. This allows the adversary to assume the identity"
+                               " of the account, with all of that account's permissions on the system and network, "
+                               "and makes it harder for defenders to detect the adversary. With sufficient access "
+                               "within a network, an adversary can create accounts for later use within the "
+                               "environment."
+            },
+            {
+                "matacid": "TA0007",
+                "name": "Discovery",
+                "enabled": "1",
+                "description": "Discovery consists of techniques that allow the adversary to gain knowledge about"
+                               " the system and internal network. When adversaries gain access to a new system, "
+                               "they must orient themselves to what they now have control of and what benefits "
+                               "operating from that system give to their current objective or overall goals during "
+                               "the intrusion. The operating system provides many native tools that aid in this "
+                               "post-compromise information-gathering phase."
+            },
+            {
+                "matacid": "TA0008",
+                "name": "Lateral Movement",
+                "enabled": "1",
+                "description": "Lateral movement consists of techniques that enable an adversary to access and "
+                               "control remote systems on a network and could, but does not necessarily, include "
+                               "execution of tools on remote systems. The lateral movement techniques could allow "
+                               "an adversary to gather information from a system without needing additional tools,"
+                               " such as a remote access tool."
+            },
+            {
+                "matacid": "TA0009",
+                "name": "Collection",
+                "enabled": "1",
+                "description": "Collection consists of techniques used to identify and gather information, such as"
+                               " sensitive files, from a target network prior to exfiltration. This category also "
+                               "covers locations on a system or network where the adversary may look for information"
+                               " to exfiltrate."
+            },
+            {
+                "matacid": "TA0010",
+                "name": "Exfiltration",
+                "enabled": "1",
+                "description": "Exfiltration refers to techniques and attributes that result or aid in the adversary"
+                               " removing files and information from a target network. This category also covers "
+                               "locations on a system or network where the adversary may look for information to "
+                               "exfiltrate."
+            },
+            {
+                "matacid": "TA0011",
+                "name": "Command and Control",
+                "enabled": "1",
+                "description": "The command and control tactic represents how adversaries communicate with systems "
+                               "under their control within a target network. There are many ways an adversary can "
+                               "establish command and control with various levels of covertness, depending on system"
+                               " configuration and network topology. Due to the wide degree of variation available "
+                               "to the adversary at the network level, only the most common factors were used to "
+                               "describe the differences in command and control. There are still a great many specific"
+                               " techniques within the documented methods, largely due to how easy it is to define"
+                               " new protocols and use existing, legitimate protocols and network services for"
+                               " communication. The resulting breakdown should help convey the concept that detecting"
+                               " intrusion through command and control protocols without prior knowledge is a "
+                               "difficult proposition over the long term. Adversaries' main constraints in "
+                               "network-level defense avoidance are testing and deployment of tools to rapidly "
+                               "change their protocols, awareness of existing defensive technologies, and access "
+                               "to legitimate Web services that, when used appropriately, make their tools difficult "
+                               "to distinguish from benign traffic."
+            },
+            {
+                "matacid": "TA0040",
+                "name": "Impact",
+                "enabled": "1",
+                "description": "The Impact tactic represents techniques whose primary objective directly reduces the "
+                               "availability or integrity of a system, service, or network; including manipulation of"
+                               " data to impact a business or operational process. These techniques may represent an "
+                               "adversary's end goal, or provide cover for a breach of confidentiality."
+            },
+        ]
+        try:
+            self.stdout.write("Initiating MitreAttck_Tactics")
+            for mitretacticsitem in mitretactics:
+                MitreAttck_Tactics.objects.create(
+                    matacid=mitretacticsitem['matacid'],
+                    name=mitretacticsitem['name'],
+                    enabled=mitretacticsitem['enabled'],
+                    description=mitretacticsitem['description']
+                )
+        except:
+            raise CommandError("MitreAttck_Tactics table could not be updated!")
+
+
+    def populate_mitreattck_techniques(self):
+        mitretechniques = [
+            {
+                "matacref":"",
+                "matecid": "",
+                "name": "",
+                "enabled": "1",
+                "description": ""
+            },
+        ]
+        try:
+            self.stdout.write("Initiating MitreAttck_Techniques")
+            for mitretechniquesitem in mitretechniques:
+                MitreAttck_Techniques.objects.create(
+                    matacref=mitretechniquesitem['matacref'],
+                    matecid=mitretechniquesitem['matecid'],
+                    name=mitretechniquesitem['name'],
+                    enabled=mitretechniquesitem['enabled'],
+                    description=mitretechniquesitem['description']
+                )
+        except:
+            raise CommandError("MitreAttck_Techniques table could not be updated!")

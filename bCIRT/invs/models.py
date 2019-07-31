@@ -1,3 +1,15 @@
+# -*- coding: utf-8 -*-
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : invs/models.py
+# Author            : Balazs Lendvay
+# Date created      : 2019.07.27
+# Purpose           : Models file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.07.29  Lendvay     1      Initial file
+# **********************************************************************;
 from django.db import models
 from django.urls import reverse
 from django.core.exceptions import ValidationError
@@ -12,6 +24,15 @@ User = get_user_model()
 # https://docs.djangoproject.com/en/1.11/howto/custom-template-tags/#inclusion-tags
 # This is for the in_group_members check template tag
 register = template.Library()
+
+class CurrencyType(models.Model):
+    objects = models.Manager()
+    currencyname = models.CharField(max_length=20, default="", null=True, blank=True)
+    currencyshortname = models.CharField(max_length=3, default="", null=True, blank=True)
+    enabled = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.currencyshortname
 
 
 class InvStatus(models.Model):
@@ -123,14 +144,15 @@ class Inv(models.Model):
     objects = models.Manager()
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="inv_users")
     parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name="inv_parent")
-    invid = models.CharField(max_length=20)
+    invid = models.CharField(max_length=20, default="", null=False, blank=False)
+    refid = models.CharField(max_length=20, default="", null=True, blank=True)
     status = models.ForeignKey(InvStatus, on_delete=models.SET_DEFAULT, default="1", related_name="inv_status")
     phase = models.ForeignKey(InvPhase, on_delete=models.SET_DEFAULT, default="1", related_name="inv_phase")
     severity = models.ForeignKey(InvSeverity, on_delete=models.SET_DEFAULT, default="1", related_name="inv_severity")
     category = models.ForeignKey(InvCategory, on_delete=models.SET_DEFAULT, default="1", related_name="inv_category")
     priority = models.ForeignKey(InvPriority, on_delete=models.SET_NULL, null=True, default=None,
                                  related_name="inv_priority")
-    attackvector = models.ForeignKey(InvAttackvector, on_delete=models.SET_DEFAULT, default="1", blank=True, null=True,
+    attackvector = models.ForeignKey(InvAttackvector, on_delete=models.SET_DEFAULT, default="1", blank=False, null=False,
                                      related_name="inv_attackvector")
     description = models.CharField(max_length=200, default="")
     description_html = models.TextField(editable=True, default='', blank=True)
@@ -144,6 +166,8 @@ class Inv(models.Model):
     modified_at = models.DateTimeField(auto_now=True)
     modified_by = models.CharField(max_length=20, default="unknown")
 
+    monetaryloss = models.PositiveIntegerField(default=0, blank=False, null=False)
+    losscurrency = models.ForeignKey(CurrencyType, on_delete=models.SET_DEFAULT, default="1", related_name="inv_currencytype", blank=True, null=False)
     # check if the status has been changed
     __original_status = None
 
@@ -186,9 +210,6 @@ class Inv(models.Model):
         # super(Inv, self).save(*args, **kwargs)
         super(Inv, self).save(force_insert, force_update, *args, **kwargs)
         self.__original_status = self.status
-
-    def xxx(self):
-        return 'xxx'
 
     def invdurationprint(self):
         if self.invduration:
