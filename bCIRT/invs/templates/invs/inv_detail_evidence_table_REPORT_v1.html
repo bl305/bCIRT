@@ -78,8 +78,8 @@
                     <td colspan="8">
                         <table class="bcirttable">
                             <thead>
-                            <th>Attribute Type</th>
-                            <th>Attribute Value</th>
+                                <th>Attribute Type</th>
+                                <th>Attribute Value</th>
                             </thead>
                             <tbody>
                             {% for attr in invevidence.evattr_evidence.all %}
@@ -87,16 +87,16 @@
                                     <td>
                                             {% if attr %}
                                                 {% if attr.attr_reputation.pk == 1 %}
-                                                    ?
+                                        <font color="black"><strong>&quest;</strong></font>
                                                 {% else %}
                                                     {% if attr.attr_reputation.pk == 2 %}
-                                                        +
+                                                        <font color="green"><strong>&check;</strong></font>
                                                     {% else %}
                                                         {% if attr.attr_reputation.pk == 3 %}
-                                                        !
+                                                        <font color="orangered"><strong>&excl;</strong></font>
                                                         {% else %}
                                                             {% if attr.attr_reputation.pk == 4 %}
-                                                                x
+                                                                <font color="red"><strong>&cross;</strong></font>
                                                             {% else %}
                                                                 &nbsp;
                                                             {% endif %}
@@ -126,7 +126,7 @@
                   <td colspan="8">
                       <div class="invdescription2" style="max-width:1400px">
                         {% if invevidence.evidenceformat.pk == 2 %}
-                            {{ invevidence.description|safe }}
+                            {{ invevidence.description }}
                         {% else %}
                             {% if invevidence.evidenceformat.pk == 1 %}
                                 {{ invevidence.description|linebreaks }}
