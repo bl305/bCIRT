@@ -32,7 +32,7 @@
                         {% for inv in invs %}
                         <tr data-toggle="collapse" data-target="#myinvs{{inv.pk}}" class="accordion-toggle">
                             <td>
-                                <a class="badge" href="{% url 'invs:inv_detail' pk=inv.pk %}">{{ inv.invid }}</a>
+                                <a class="badge" href="{% url 'invs:inv_detail' pk=inv.pk %}">{{inv.id}}-{{ inv.invid }}</a>
                             </td>
                             <td>
                                 {{ inv.status }}
@@ -149,7 +149,7 @@
                         {% for uinv in uinvs %}
                         <tr data-toggle="collapse" data-target="#myuinvs{{uinv.pk}}" class="accordion-toggle">
                             <td>
-                                <a class="badge" href="{% url 'invs:inv_detail' pk=uinv.pk %}">{{ uinv.invid }}</a>
+                                <a class="badge" href="{% url 'invs:inv_detail' pk=uinv.pk %}">{{uinv.id}}-{{ uinv.invid }}</a>
                             </td>
                             <td>
                                 {{ uinv.status }}

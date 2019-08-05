@@ -10,9 +10,20 @@
 # Date        Author      Ref    Description
 # 2019.07.29  Lendvay     1      Initial file
 # **********************************************************************;
-from .models import Inv, InvStatus
-from tasks.models import TaskTemplate, PlaybookTemplate, Action, ActionGroup, ActionGroupMember
-from .forms import InvForm
+from tasks.models import TaskTemplate, PlaybookTemplate, Action, ActionGroupMember
+from tasks.models import new_playbook, new_evidence, task_close
+#from tasks.models import Task, Playbook
+
+# to manage manual uploads
+# from os import path
+# from bCIRT.custom_variables import MYMEDIA_ROOT
+# from django.http import HttpResponseRedirect
+# from django.shortcuts import render
+##############
+
+from .forms import InvForm, InvSuspiciousEmailForm
+from .models import Inv, InvStatus, new_inv, InvCategory, InvAttackvector, InvPhase, InvSeverity, CurrencyType,\
+    InvPriority
 from django.shortcuts import redirect, reverse    # ,render, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.mixins import (
@@ -48,7 +59,7 @@ class MyPDFView(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailView)
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(MyPDFView, self).__init__(*args, **kwargs)
 
@@ -78,7 +89,6 @@ class MyPDFView(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailView)
                                                     'footer-center': '[page]/[topage]',
                                                     "no-stop-slow-scripts": True},
                                        )
-
         return response
 
 
@@ -93,7 +103,7 @@ class InvDetailPrintView(LoginRequiredMixin, PermissionRequiredMixin, generic.De
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(InvDetailPrintView, self).__init__(*args, **kwargs)
 
@@ -133,7 +143,7 @@ class InvListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView)
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(InvListView, self).__init__(*args, **kwargs)
 
@@ -412,3 +422,138 @@ class InvAssignView(LoginRequiredMixin, PermissionRequiredMixin, generic.Redirec
         return redirect_to
         # return reverse('tasks:tsk_list')
         # return super().get_redirect_url(*args, **kwargs)
+
+
+
+############ TESTING
+# from django.shortcuts import render
+from django.conf import settings
+# from django.core.files.storage import FileSystemStorage
+#
+# def simple_upload(request):
+#     if request.method == 'POST' and request.FILES['myfile']:
+#         print(request.POST.get('description'))
+#         myfile = request.FILES['myfile']
+#         fs = FileSystemStorage()
+#         filename = fs.save(myfile.name, myfile)
+#         uploaded_file_url = fs.url(filename)
+#         return render(request, 'invs/inv_invphishing.html', {
+#             'uploaded_file_url': uploaded_file_url
+#         })
+#     return render(request, 'invs/inv_invphishing.html')
+
+# def upload_file(request):
+#     if request.method == 'POST':
+#         form = InvSuspiciousEmailForm(request.POST, request.FILES)
+#         if form.is_valid():
+#             handle_uploaded_file_chunks(request.FILES['file'], '/tmp/xxx.txt')
+#             return HttpResponseRedirect('home')
+#     else:
+#         form = InvSuspiciousEmailForm()
+#     return render(request, 'upload.html', {'form': form})
+
+
+class InvSuspiciousEmailCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.FormView):
+    # template_name = "invs/inv_invphishing.html"
+    template_name = 'invs/inv_form.html'
+    form_class = InvSuspiciousEmailForm
+    permission_required = ('invs.view_inv','tasks.view_task')
+    success_url = '../'
+
+    def get_context_data(self, **kwargs):
+        # check remaining session time
+        session_key = self.request.COOKIES["sessionid"]
+        session = Session.objects.get(session_key=session_key)
+        sessiontimeout = session.expire_date
+        servertime = datetime.now(timezone.utc)
+        # print(sessiontimeout)
+        # print(servertime)
+        # c = servertime - sessiontimeout
+        # print(divmod(c.days * 86400 + c.seconds, 60))
+
+        # check remaining session time
+
+        # kwargs['user'] = self.request.user
+        # kwargs['invs'] = Inv.objects.filter(user=self.request.user, status=3)
+        return super(InvSuspiciousEmailCreateView, self).get_context_data(**kwargs)
+
+    def form_valid(self, form):
+
+        cleandata = form.cleaned_data
+        auser = self.request.user.get_username()
+        auser_obj = self.request.user
+        cdescription = cleandata['description']
+        creference = cleandata['reference']
+        cfileref = cleandata['fileRef']
+        inv_obj = new_inv(puser=auser_obj,
+                pparent=None,
+                pinvid="Suspicious Email",
+                prefid=creference,
+                pstatus=InvStatus.objects.get(name="Assigned"),
+                pphase=InvPhase.objects.get(pk=2),
+                pseverity=InvSeverity.objects.get(pk=2),
+                pcategory=InvCategory.objects.get(pk=6),
+                ppriority=InvPriority.objects.get(pk=1),
+                pattackvector=InvAttackvector.objects.get(name="Phishing"),
+                pdescription=cdescription,
+                psummary="Suspicious email",
+                pcomment=None,
+                pstarttime=None,
+                pendtime=None,
+                pinvduration=None,
+                pcreated_at=None,
+                pcreated_by=auser,
+                pmodified_at=None,
+                pmodified_by=auser,
+                pmonetaryloss=0,
+                plosscurrency=CurrencyType.objects.get(pk=1),
+                pnumofvictims=1
+        )
+        # Need to create a playbook and tasks within it using the suspicious email template
+        playbooktemplate_obj = PlaybookTemplate.objects.get(name="Suspicious Email")
+        playbook_obj = new_playbook(pplaybooktemplate=playbooktemplate_obj,
+                     pname=playbooktemplate_obj.name,
+                     pversion=playbooktemplate_obj.version,
+                     puser=auser_obj,
+                     pinv=inv_obj,
+                     pdescription=playbooktemplate_obj.description,
+                     pmodified_by=auser,
+                     pcreated_by=auser
+                     )
+        # find first task
+        first_task = None
+        if playbook_obj.task_playbook.last():
+            first_task = playbook_obj.task_playbook.last()
+        # add evidence to the first task
+        evidence_obj = new_evidence(
+            puser=auser_obj,
+            ptask=first_task,
+            pinv=inv_obj,
+            pcreated_by=auser,
+            pmodified_by=auser,
+            pdescription=cdescription,
+            pevformat=None,
+            pparent=None,
+            pparentattr=None,
+            pfilename=cfileref.name,
+            # pfilename=None,
+            pfileref=cfileref,
+            # pfileref=None,
+            pforce=True,
+        )
+        # this will attach the file to the evidence
+        # evidence_obj.fileRef.save(cfileref.name, cfileref)
+
+        # need to close the first task
+        task_close(first_task.pk,'action')
+        return super(InvSuspiciousEmailCreateView, self).form_valid(form)
+#################################3
+# import os
+# from bCIRT.settings import MEDIA_ROOT
+# from django.core.files.storage import default_storage
+#
+# def file_upload(request):
+#     save_path = os.path.join(MEDIA_ROOT, 'uploads', request.FILES['file'])
+#     path = default_storage.save(save_path, request.FILES['file'])
+#     return default_storage.path(path)
+

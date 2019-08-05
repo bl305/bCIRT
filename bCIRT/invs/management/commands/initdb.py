@@ -11,7 +11,7 @@
 # 2019.07.29  Lendvay     1      Initial file
 # **********************************************************************;
 from django.core.management.base import BaseCommand, CommandError
-from invs.models import InvStatus, InvPriority, InvCategory, InvPhase, InvSeverity, InvAttackvector
+from invs.models import InvStatus, InvPriority, InvCategory, InvPhase, InvSeverity, InvAttackvector, CurrencyType
 from tasks.models import MitreAttck_Tactics, MitreAttck_Techniques
 from tasks.models import TaskVarType, TaskVarCategory, TaskType, TaskCategory, TaskStatus, TaskPriority
 from tasks.models import ScriptOs, ScriptType, ScriptCategory, Action, Type, ActionQStatus, OutputTarget, ScriptOutput
@@ -265,23 +265,23 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
     def populate_currencytype(self):
         currencytype = [
             {
-                "name": "Euro",
-                "shortname": "EUR",
+                "currencyname": "Euro",
+                "currencyshortname": "EUR",
                 "enabled": "1",
             },
             {
-                "name": "USA Dollar",
-                "shortname": "USD",
+                "currencyname": "USA Dollar",
+                "currencyshortname": "USD",
                 "enabled": "1",
             },
         ]
         try:
             self.stdout.write("Initiating CurrencyType")
             for currencytypeitem in currencytype:
-                InvPhase.objects.create(
-                    name=currencytypeitem['name'],
+                CurrencyType.objects.create(
+                    currencyname=currencytypeitem['currencyname'],
                     enabled=currencytypeitem['enabled'],
-                    shortname=currencytypeitem['shortname']
+                    currencyshortname=currencytypeitem['currencyshortname']
                 )
         except:
             raise CommandError("CurrencyType table could not be updated!")
@@ -538,7 +538,7 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
         try:
             self.stdout.write("Initiating InvAttackVecotr")
             for invattackvectoritem in invattackvector:
-                InvStatus.objects.create(
+                InvAttackvector.objects.create(
                     name=invattackvectoritem['name'],
                     enabled=invattackvectoritem['enabled'],
                     description=invattackvectoritem['description']

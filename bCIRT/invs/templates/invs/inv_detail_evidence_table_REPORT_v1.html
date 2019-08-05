@@ -126,7 +126,7 @@
                   <td colspan="8">
                       <div class="invdescription2" style="max-width:1400px">
                         {% if invevidence.evidenceformat.pk == 2 %}
-                            {{ invevidence.description }}
+                            {{ invevidence.description|safe }}
                         {% else %}
                             {% if invevidence.evidenceformat.pk == 1 %}
                                 {{ invevidence.description|linebreaks }}

@@ -15,7 +15,7 @@ from . import views
 # from django.contrib.auth import views as auth_views
 
 app_name = 'invs'
-
+from django.urls import path
 urlpatterns = [
 
     url(r"^$", views.InvListView.as_view(), name="inv_list"),
@@ -27,5 +27,7 @@ urlpatterns = [
 
     url(r'^export/pdf/(?P<pk>\d+)', views.MyPDFView.as_view(), name='inv_pdf'),
     url(r"^detailprint/(?P<pk>\d+)/$", views.InvDetailPrintView.as_view(), name="inv_detail_print"),
+    # url(r'^simpleupload/$', views.simple_upload, name='simple_upload'),
+    url(r'^newsuspiciousemail/$', views.InvSuspiciousEmailCreateView.as_view(), name='inv_suspiciousemail'),
 
 ]

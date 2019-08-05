@@ -126,20 +126,36 @@ class ReportsDashboardPage(LoginRequiredMixin, PermissionRequiredMixin, Template
             .annotate(Count('task_inv'))\
             .order_by('pk') \
             .aggregate(Min('task_inv__count'), Avg('task_inv__count'), Max('task_inv__count'))
-
-        kwargs['invs_closed_tasks_min'] = int(inv_closed_tasks['task_inv__count__min'])
-        kwargs['invs_closed_tasks_avg'] = round(inv_closed_tasks['task_inv__count__avg'])
-        kwargs['invs_closed_tasks_max'] = int(inv_closed_tasks['task_inv__count__max'])
-
+        if inv_closed_tasks['task_inv__count__min']:
+            kwargs['invs_closed_tasks_min'] = int(inv_closed_tasks['task_inv__count__min'])
+        else:
+            kwargs['invs_closed_tasks_min'] = 0
+        if inv_closed_tasks['task_inv__count__avg']:
+            kwargs['invs_closed_tasks_avg'] = round(inv_closed_tasks['task_inv__count__avg'])
+        else:
+            kwargs['invs_closed_tasks_avg'] = 0
+        if inv_closed_tasks['task_inv__count__max']:
+            kwargs['invs_closed_tasks_max'] = int(inv_closed_tasks['task_inv__count__max'])
+        else:
+            kwargs['invs_closed_tasks_max'] = 0
         inv_closed_tasks_manual = Inv.objects.filter(task_inv__type=2) \
             .filter(created_at__gt=timezone_now() - timedelta(days=30)) \
             .values('pk')\
             .annotate(Count('task_inv'))\
             .order_by('pk') \
             .aggregate(Min('task_inv__count'), Avg('task_inv__count'), Max('task_inv__count'))
-        kwargs['invs_closed_tasks_manual_min'] = int(inv_closed_tasks_manual['task_inv__count__min'])
-        kwargs['invs_closed_tasks_manual_avg'] = round(inv_closed_tasks_manual['task_inv__count__avg'])
-        kwargs['invs_closed_tasks_manual_max'] = int(inv_closed_tasks_manual['task_inv__count__max'])
+        if inv_closed_tasks_manual['task_inv__count__min']:
+            kwargs['invs_closed_tasks_manual_min'] = int(inv_closed_tasks_manual['task_inv__count__min'])
+        else:
+            kwargs['invs_closed_tasks_manual_min'] = 0
+        if inv_closed_tasks_manual['task_inv__count__avg']:
+            kwargs['invs_closed_tasks_manual_avg'] = round(inv_closed_tasks_manual['task_inv__count__avg'])
+        else:
+            kwargs['invs_closed_tasks_manual_avg'] = 0
+        if inv_closed_tasks_manual['task_inv__count__max']:
+            kwargs['invs_closed_tasks_manual_max'] = int(inv_closed_tasks_manual['task_inv__count__max'])
+        else:
+            kwargs['invs_closed_tasks_manual_max'] = 0
 
         inv_closed_tasks_auto = Inv.objects.filter(task_inv__type=1) \
             .filter(created_at__gt=timezone_now() - timedelta(days=30)) \
@@ -147,10 +163,19 @@ class ReportsDashboardPage(LoginRequiredMixin, PermissionRequiredMixin, Template
             .annotate(Count('task_inv'))\
             .order_by('pk') \
             .aggregate(Min('task_inv__count'), Avg('task_inv__count'), Max('task_inv__count'))
-        kwargs['invs_closed_tasks_auto_min'] = int(inv_closed_tasks_auto['task_inv__count__min'])
-        kwargs['invs_closed_tasks_auto_avg'] = round(inv_closed_tasks_auto['task_inv__count__avg'])
-        kwargs['invs_closed_tasks_auto_max'] = int(inv_closed_tasks_auto['task_inv__count__max'])
-        #  Tasks
+        if inv_closed_tasks_auto['task_inv__count__min']:
+            kwargs['invs_closed_tasks_auto_min'] = int(inv_closed_tasks_auto['task_inv__count__min'])
+        else:
+            kwargs['invs_closed_tasks_auto_min'] = 0
+        if inv_closed_tasks_auto['task_inv__count__avg']:
+            kwargs['invs_closed_tasks_auto_avg'] = round(inv_closed_tasks_auto['task_inv__count__avg'])
+        else:
+            kwargs['invs_closed_tasks_auto_avg'] = 0
+        if inv_closed_tasks_auto['task_inv__count__max']:
+            kwargs['invs_closed_tasks_auto_max'] = int(inv_closed_tasks_auto['task_inv__count__max'])
+        else:
+            kwargs['invs_closed_tasks_auto_max'] = 0
+            #  Tasks
         kwargs['tasks_closed'] = Task.objects.all()\
             .values('status__name')\
             .annotate(Count('status'))\

@@ -41,7 +41,7 @@ class InvForm(forms.ModelForm):
         self.fields['severity'].initial = 2
         self.fields['priority'].initial = 1
         self.fields['losscurrency'].initial = 1
-
+        self.fields['numofvictims'].initial = 1
 
     status = forms.ModelChoiceField(
         label='Status*',
@@ -217,6 +217,7 @@ class InvForm(forms.ModelForm):
         fields = ('invid',
                   'refid',
                   'status',
+                  'priority',
                   'description',
                   'summary',
                   'user',
@@ -225,8 +226,8 @@ class InvForm(forms.ModelForm):
                   'severity',
                   'category',
                   'attackvector',
-                  'priority',
                   'comment',
+                  'numofvictims',
                   'monetaryloss',
                   'losscurrency',
                   'starttime',
@@ -239,6 +240,7 @@ class InvForm(forms.ModelForm):
             'summary': "Executive Summary",
             'comment': "Attack Comment",
             'losscurrency': "Monetary Loss",
+            'numofvictims': "Victim Count:"
         }
         widgets = {
             'invid': forms.TextInput(attrs={
@@ -274,3 +276,27 @@ class InvForm(forms.ModelForm):
                 'class': 'form-control'}
             ),
         }
+
+
+class InvSuspiciousEmailForm(forms.Form):
+    description = forms.CharField(
+        label='Investigation Description',
+        max_length=50,
+        widget=forms.Textarea(attrs={
+                'rows': '1',
+                'cols': '48',
+                'style': 'resize:none;width:90%',
+                'class': 'form-control',
+                }
+            )
+    )
+    reference = forms.CharField(
+        label='Reference',
+        max_length=50,
+        widget=forms.TextInput(attrs={
+            'size': 20,
+            'style': 'width:50%;',
+            'class': 'form-control'}
+        )
+    )
+    fileRef = forms.FileField(label='Attachment')

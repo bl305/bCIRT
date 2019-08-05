@@ -279,6 +279,55 @@ class Playbook(models.Model):
         pass
 
 
+def new_playbook(pplaybooktemplate, pname, pversion, puser, pinv, pdescription, pmodified_by, pcreated_by):
+
+    playbook_obj = Playbook.objects.create(
+        name=pname,
+        version=pversion,
+        user=puser,
+        inv=pinv,
+        description=pdescription,
+        modified_by=pmodified_by,
+        created_by=pcreated_by,
+    )
+    item_mapping = dict()
+    for tmp_item in pplaybooktemplate.playbooktemplateitem_playbooktemplate.all().order_by('itemorder'):
+        tmp_to_copy = TaskTemplate.objects.get(pk=tmp_item.acttask.pk)
+        # if the playbooktemplateitem refers to a previous item, we need to
+        # find the pk of the newly created previous item matching the previous reference
+        if tmp_item.prevtask:
+            tmp_item_prevtaskpk = TaskTemplate.objects.get(pk=tmp_item.prevtask.pk).pk
+            # print(str(tmp_item.pk)+"->"+str(tmp_item_prevtaskpk))
+            tmp_item_prevtask = Task.objects.get(pk=item_mapping[tmp_item_prevtaskpk])
+            # print(tmp_item_prevtask)
+        else:
+            tmp_item_prevtask = None
+        # if tmp_item.prevtask:
+        #     tmp_item_prevtask=TaskTemplate.objects.get(pk=tmp_item.prevtask.pk)
+        # else:
+        #     tmp_item_prevtask = None
+        # tmp_item_prevtask = None
+        new_task = add_task_from_template(
+            atitle=tmp_to_copy.title,
+            astatus=tmp_to_copy.status,
+            aplaybook=playbook_obj,
+            auser=tmp_to_copy.user,
+            ainv=pinv,
+            aaction=tmp_to_copy.action,
+            aactiontarget=tmp_item_prevtask,
+            acategory=tmp_to_copy.category,
+            apriority=tmp_to_copy.priority,
+            atype=tmp_to_copy.type,
+            asummary=tmp_to_copy.summary,
+            adescription=tmp_to_copy.description,
+            amodified_by=str(puser),
+            acreated_by=str(puser)
+        )
+        # print(str(new_task)+"->->"+str(tmp_item_prevtask))
+        #  here I need to map the tampate pks to the new pks so I can assign the proper actions
+        item_mapping.update({tmp_item.pk: new_task.pk})
+    return playbook_obj
+
 # Create your models here.
 class Task(models.Model):
     objects = models.Manager()
@@ -1238,7 +1287,8 @@ def add_task_from_template(atitle, astatus, aplaybook, auser, ainv, aaction, aac
     return obj
 
 
-def new_evidence(puser, ptask, pinv, pcreated_by, pmodified_by, pdescription, pfilename=None, pfileref=None, pevformat=None, pforce=False, pparent=False, pparentattr=None):
+def new_evidence(puser, ptask, pinv, pcreated_by, pmodified_by, pdescription, pfilename=None, pfileref=None,
+                 pevformat=None, pforce=False, pparent=None, pparentattr=None):
     newev = None
     if pevformat is None:
         pevformat = EvidenceFormat.objects.get(pk=1)
@@ -1256,6 +1306,18 @@ def new_evidence(puser, ptask, pinv, pcreated_by, pmodified_by, pdescription, pf
             # fileName=pfilename,
             # fileRef=pfileref
         )
+        # Saving the file attachments
+        if pfilename and pfileref:
+            newev[0].fileName=pfilename
+            newev[0].fileRef.save(pfilename, pfileref)
+            # chunked upload
+            # save_relpath = upload_to_evidence(evidence_obj, cfileref.name)
+            # save_path = path.join(MYMEDIA_ROOT, str(save_relpath))
+            # handle_uploaded_file_chunks(cfileref , save_path)
+            # evidence_obj.fileRef=save_relpath
+            # evidence_obj.fileName=cfileref.name
+            # evidence_obj.save()
+
         newev = newev[0]
     else:
         newev = Evidence.objects.create(
@@ -1271,6 +1333,10 @@ def new_evidence(puser, ptask, pinv, pcreated_by, pmodified_by, pdescription, pf
             # fileName=pfilename,
             # fileRef=pfileref
         )
+        # Saving the file attachments
+        if pfilename and pfileref:
+            newev.fileName = pfilename
+            newev.fileRef.save(pfilename, pfileref)
     return newev
 
 
@@ -1997,5 +2063,12 @@ class FileHashCalc():
 
     #res_md5 = FileHashCals().md5sum('FilePath')
 
-def add_to_profile(pevattr):
-    print(pevattr)
+# def add_to_profile(pevattr):
+#     print(pevattr)
+
+
+# managing chunked uploads
+# def handle_uploaded_file_chunks(pfile, ppath):
+#     with open(ppath, 'wb+') as destination:
+#         for chunk in pfile.chunks():
+#             destination.write(chunk)

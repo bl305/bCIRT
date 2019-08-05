@@ -12,10 +12,10 @@
 # **********************************************************************;
 from .models import Task, TaskTemplate, TaskType, TaskPriority, TaskCategory, TaskStatus
 from .models import TaskVar  # , TaskVarType, TaskVarCategory
-from .models import Playbook, PlaybookTemplate, PlaybookTemplateItem
+from .models import Playbook, PlaybookTemplate, PlaybookTemplateItem, new_playbook
 from .models import Inv
 from .models import Evidence, EvidenceAttr  #  , EvidenceAttrFormat, EvidenceFormat
-from .models import add_task_from_template, run_action, add_to_profile
+from .models import add_task_from_template, run_action
 from .models import Action, ActionQ, ActionGroup, ActionGroupMember
 from .forms import TaskForm, TaskTemplateForm, TaskVarForm
 from .forms import ActionForm, ActionGroupForm, ActionGroupMemberForm
@@ -2128,52 +2128,63 @@ class PlaybookCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Re
             tmp_inv = Inv.objects.get(pk=inv_pk)
         else:
             tmp_inv = None
-        playbook_instance = Playbook.objects.create(
-            name=tmp_obj.name,
-            version=tmp_obj.version,
-            user=tmp_user,
-            inv=tmp_inv,
-            description=str(tmp_obj.description),
-            modified_by=str(self.request.user),
-            created_by=str(self.request.user),
+        new_playbook(
+            pplaybooktemplate=tmp_obj,
+            pname=tmp_obj.name,
+            pversion=tmp_obj.version,
+            puser=tmp_user,
+            pinv=tmp_inv,
+            pdescription=tmp_obj.description,
+            pmodified_by=str(self.request.user),
+            pcreated_by=str(self.request.user)
         )
-        item_mapping=dict()
-        for tmp_item in tmp_obj.playbooktemplateitem_playbooktemplate.all().order_by('itemorder'):
-            tmp_to_copy = TaskTemplate.objects.get(pk=tmp_item.acttask.pk)
-            # if the playbooktemplateitem refers to a previous item, we need to
-            # find the pk of the newly created previous item matching the previous reference
-            if tmp_item.prevtask:
-                tmp_item_prevtaskpk = TaskTemplate.objects.get(pk=tmp_item.prevtask.pk).pk
-                # print(str(tmp_item.pk)+"->"+str(tmp_item_prevtaskpk))
-                tmp_item_prevtask = Task.objects.get(pk=item_mapping[tmp_item_prevtaskpk])
-                # print(tmp_item_prevtask)
-            else:
-                tmp_item_prevtask = None
+
+# REMOVED
+#         playbook_instance = Playbook.objects.create(
+#             name=tmp_obj.name,
+#             version=tmp_obj.version,
+#             user=tmp_user,
+#             inv=tmp_inv,
+#             description=str(tmp_obj.description),
+#             modified_by=str(self.request.user),
+#             created_by=str(self.request.user),
+#         )
+#         item_mapping=dict()
+#         for tmp_item in tmp_obj.playbooktemplateitem_playbooktemplate.all().order_by('itemorder'):
+#             tmp_to_copy = TaskTemplate.objects.get(pk=tmp_item.acttask.pk)
+            ## if the playbooktemplateitem refers to a previous item, we need to
+            ## find the pk of the newly created previous item matching the previous reference
             # if tmp_item.prevtask:
-            #     tmp_item_prevtask=TaskTemplate.objects.get(pk=tmp_item.prevtask.pk)
+            #     tmp_item_prevtaskpk = TaskTemplate.objects.get(pk=tmp_item.prevtask.pk).pk
+                ## print(str(tmp_item.pk)+"->"+str(tmp_item_prevtaskpk))
+                # tmp_item_prevtask = Task.objects.get(pk=item_mapping[tmp_item_prevtaskpk])
+                ## print(tmp_item_prevtask)
             # else:
             #     tmp_item_prevtask = None
-            # tmp_item_prevtask = None
-            new_task = add_task_from_template(
-                atitle=tmp_to_copy.title,
-                astatus=tmp_to_copy.status,
-                aplaybook=playbook_instance,
-                auser=tmp_to_copy.user,
-                ainv=tmp_inv,
-                aaction=tmp_to_copy.action,
-                aactiontarget=tmp_item_prevtask,
-                acategory=tmp_to_copy.category,
-                apriority=tmp_to_copy.priority,
-                atype=tmp_to_copy.type,
-                asummary=tmp_to_copy.summary,
-                adescription=tmp_to_copy.description,
-                amodified_by=str(self.request.user),
-                acreated_by=str(self.request.user)
-            )
-            # print(str(new_task)+"->->"+str(tmp_item_prevtask))
-            #  here I need to map the tampate pks to the new pks so I can assign the proper actions
-            item_mapping.update({tmp_item.pk: new_task.pk})
-        # print(item_mapping)
+            ## if tmp_item.prevtask:
+            ##     tmp_item_prevtask=TaskTemplate.objects.get(pk=tmp_item.prevtask.pk)
+            ## else:
+            ##     tmp_item_prevtask = None
+            ## tmp_item_prevtask = None
+            # new_task = add_task_from_template(
+            #     atitle=tmp_to_copy.title,
+            #     astatus=tmp_to_copy.status,
+            #     aplaybook=playbook_instance,
+            #     auser=tmp_to_copy.user,
+            #     ainv=tmp_inv,
+            #     aaction=tmp_to_copy.action,
+            #     aactiontarget=tmp_item_prevtask,
+            #     acategory=tmp_to_copy.category,
+            #     apriority=tmp_to_copy.priority,
+            #     atype=tmp_to_copy.type,
+            #     asummary=tmp_to_copy.summary,
+            #     adescription=tmp_to_copy.description,
+            #     amodified_by=str(self.request.user),
+            #     acreated_by=str(self.request.user)
+            # )
+            ## print(str(new_task)+"->->"+str(tmp_item_prevtask))
+            ##  here I need to map the tampate pks to the new pks so I can assign the proper actions
+            # item_mapping.update({tmp_item.pk: new_task.pk})
         # Checks pass, let http method handlers process the request
         return super(PlaybookCreateView, self).dispatch(request, *args, **kwargs)
 
@@ -3540,7 +3551,7 @@ class AddToProfileRedirectView(LoginRequiredMixin, PermissionRequiredMixin, gene
         elif not self.request.user.has_perm('tasks.change_profile'):
             messages.error(self.request, "No permission to change a record !!!")
             return redirect('tasks:ev_list')
-        add_to_profile("aaa")
+
         # self.actq = run_action(
         #     pactuser=self.request.user,
         #     pactusername=self.request.user.get_username(),

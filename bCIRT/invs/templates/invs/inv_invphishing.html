@@ -1,0 +1,56 @@
+{% extends "invs/inv_base.html" %}
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : inv/inv_list.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.07.27
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.07.29  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+
+{% block invslist_active %}active{% endblock invslist_active %}
+
+{% block preinvs %}
+		{% if user.is_authenticated %}
+
+	    {% endif %}
+{% endblock %}
+
+{% block invs_content %}
+<div class="row">
+    <div class="col-sm-12">
+        <div align="center">
+            <div class="panel panel-primary">
+                <div class = "panel-heading">
+                    <div class="panel-title">
+                    File Upload Menu
+                    </div>
+                </div>
+                <div class="panel-body inv-panel-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                            <label>Description:</label>
+                            <input style="width:30%" type="text" name="description" value="Suspicious Email" placeholder="Short description"  class="form-control" >
+                            <input style="width:30%" type="file" name="myfile"  class="form-control">
+                            <button type="submit"  class="btn btn-md">Upload</button>
+
+                    </form>
+
+                    {% if uploaded_file_url %}
+                      <p>File uploaded at: <a href="{{ uploaded_file_url }}">{{ uploaded_file_url }}</a></p>
+                    {% endif %}
+
+                    <p><a href="{% url 'home' %}">Return to home</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

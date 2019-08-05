@@ -81,6 +81,8 @@ Menu - dropdown
                             <b class="caret"></b>
                         </a>
                         <ul class="dropdown-menu">
+                            <li><a href="{% url 'invs:inv_suspiciousemail' %}"><span class="glyphicon glyphicon-plus"></span> SuspiciousEmail</a></li>
+                            <li class="divider"></li>
                             <li><a href="{% url 'invs:inv_create' %}"><span class="glyphicon glyphicon-plus"></span> New</a></li>
                             <li class="divider"></li>
                             <li><a href="{% url 'invs:inv_list' %}"><span class="glyphicon glyphicon-th-list"></span> List</a></li>

@@ -168,6 +168,7 @@ class Inv(models.Model):
 
     monetaryloss = models.PositiveIntegerField(default=0, blank=False, null=False)
     losscurrency = models.ForeignKey(CurrencyType, on_delete=models.SET_DEFAULT, default="1", related_name="inv_currencytype", blank=True, null=False)
+    numofvictims = models.PositiveIntegerField(default=1, blank=False, null=False)
     # check if the status has been changed
     __original_status = None
 
@@ -258,3 +259,36 @@ class Inv(models.Model):
         if self.status.name == "Open" and self.user is not None:
             raise ValidationError(_('If status is "Open", the "Assigned to" user must be empty too.'))
         super(Inv, self).clean()
+
+
+def new_inv(pinvid, pstatus, ppriority, pdescription, pphase, pseverity, pcategory, pattackvector,
+            puser="action", pparent=None, prefid=None, psummary=None, pcomment=None, pstarttime=None, pendtime=None,
+            pinvduration=None, pcreated_at=None, pcreated_by=None, pmodified_at=None, pmodified_by=None,
+            pmonetaryloss=None, plosscurrency=None, pnumofvictims=None
+            ):
+    new_inv = Inv.objects.create(
+        user=puser,
+        parent=pparent,
+        invid=pinvid,
+        refid=prefid,
+        status=pstatus,
+        phase=pphase,
+        severity=pseverity,
+        category=pcategory,
+        priority=ppriority,
+        attackvector=pattackvector,
+        description=pdescription,
+        summary=psummary,
+        comment=pcomment,
+        starttime=pstarttime,
+        endtime=pendtime,
+        invduration=pinvduration,
+        created_at=pcreated_at,
+        created_by=pcreated_by,
+        modified_at=pmodified_at,
+        modified_by=pmodified_by,
+        monetaryloss=pmonetaryloss,
+        losscurrency=plosscurrency,
+        numofvictims=pnumofvictims
+    )
+    return new_inv
