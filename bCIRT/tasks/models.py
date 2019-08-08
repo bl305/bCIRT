@@ -1402,8 +1402,9 @@ def auto_make_readonly(sender, instance, **kwargs):
                 aevattrformat=EvidenceAttrFormat.objects.get(pk=9),
                 amodified_by=instance.user.username,
                 acreated_by=instance.user.username,
+                attr_automatic=True,
                 aattr_reputation=None,
-                aforce=True
+                aforce=False
             )
             res_sha1 = FileHashCalc().sha1sum(instance.fileRef.path)
             add_evattr(
@@ -1413,8 +1414,9 @@ def auto_make_readonly(sender, instance, **kwargs):
                 aevattrformat=EvidenceAttrFormat.objects.get(pk=10),
                 amodified_by=instance.user.username,
                 acreated_by=instance.user.username,
+                attr_automatic=True,
                 aattr_reputation=None,
-                aforce=True
+                aforce=False
             )
             res_sha256 = FileHashCalc().sha256sum(instance.fileRef.path)
             add_evattr(
@@ -1424,8 +1426,9 @@ def auto_make_readonly(sender, instance, **kwargs):
                 aevattrformat=EvidenceAttrFormat.objects.get(pk=11),
                 amodified_by=instance.user.username,
                 acreated_by=instance.user.username,
+                attr_automatic=True,
                 aattr_reputation=None,
-                aforce=True
+                aforce=False
             )
             res_sha512 = FileHashCalc().sha512sum(instance.fileRef.path)
             add_evattr(
@@ -1435,8 +1438,9 @@ def auto_make_readonly(sender, instance, **kwargs):
                 aevattrformat=EvidenceAttrFormat.objects.get(pk=12),
                 amodified_by=instance.user.username,
                 acreated_by=instance.user.username,
+                attr_automatic=True,
                 aattr_reputation=None,
-                aforce=True
+                aforce=False
             )
 
 @receiver(models.signals.pre_save, sender=Evidence)

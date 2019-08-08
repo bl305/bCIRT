@@ -41,7 +41,7 @@ class InvForm(forms.ModelForm):
         self.fields['severity'].initial = 2
         self.fields['priority'].initial = 1
         self.fields['losscurrency'].initial = 1
-        self.fields['numofvictims'].initial = 1
+        self.fields['numofvictims'].initial = None
 
     status = forms.ModelChoiceField(
         label='Status*',

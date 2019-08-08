@@ -88,6 +88,7 @@ pip install django-weasyprint cairocffi django-bootstrap-4 django-tinymce4-lite 
 ### 4. Change default values
 Go to the bCIRT/settings.py and change the followings:
 ```text
+DEBUG = "FALSE"
 BASE_URL = "http://127.0.0.1:8000"
 ALLOWED_HOSTS = ['127.0.0.1']
 INTERNAL_IPS = ['127.0.0.1']

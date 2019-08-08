@@ -246,7 +246,7 @@
                         {% for oinv in oinvs %}
                         <tr data-toggle="collapse" data-target="#myoinvs{{oinv.pk}}" class="accordion-toggle">
                             <td>
-                                <a class="badge" href="{% url 'invs:inv_detail' pk=oinv.pk %}">{{ oinv.invid }}</a>
+                                <a class="badge" href="{% url 'invs:inv_detail' pk=oinv.pk %}">{{ oinv.id }}-{{ oinv.invid }}</a>
                             </td>
                             <td>
                                 {% if oinv.user %}

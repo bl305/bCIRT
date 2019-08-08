@@ -168,7 +168,7 @@ class Inv(models.Model):
 
     monetaryloss = models.PositiveIntegerField(default=0, blank=False, null=False)
     losscurrency = models.ForeignKey(CurrencyType, on_delete=models.SET_DEFAULT, default="1", related_name="inv_currencytype", blank=True, null=False)
-    numofvictims = models.PositiveIntegerField(default=1, blank=False, null=False)
+    numofvictims = models.PositiveIntegerField(default=None, blank=True, null=True)
     # check if the status has been changed
     __original_status = None
 
@@ -239,6 +239,9 @@ class Inv(models.Model):
         if self.invid == '':
             raise ValidationError(_('You must enter an Investigation ID.'))
         if self.status.name == "Closed":
+            # check if the numofvictims is defined
+            if self.numofvictims is None:
+                raise ValidationError(_('Please define the "Victim Count"!'))
             if self.task_inv.all():
                 # status changed to closed, check if all tasks are closed
                 anyopen = 0

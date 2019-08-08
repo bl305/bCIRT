@@ -304,7 +304,7 @@ class ActionGroupMemberForm(forms.ModelForm):
         # self.fields['user'].initial = user
 
     actionid = forms.ModelChoiceField(
-        label='Status*',
+        label='Action*',
         queryset=Action.objects.filter(enabled=True),
         empty_label="--Select--",
         widget=forms.Select(
@@ -319,7 +319,7 @@ class ActionGroupMemberForm(forms.ModelForm):
     )
 
     actiongroupid = forms.ModelChoiceField(
-        label='Status*',
+        label='Action Group*',
         queryset=ActionGroup.objects.filter(enabled=True),
         empty_label="--Select--",
         widget=forms.Select(
@@ -334,10 +334,9 @@ class ActionGroupMemberForm(forms.ModelForm):
     )
 
 
-
     #   fileRef = forms.FileField(widget=CustomClearableFileInput)
     class Meta:
-        fields = ("actionid", "actiongroupid")
+        fields = ("actiongroupid", "actionid")
         model = ActionGroupMember
         # labels = {
         #     "description": "Description*",

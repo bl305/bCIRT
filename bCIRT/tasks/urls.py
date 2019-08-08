@@ -31,7 +31,7 @@ urlpatterns = [
         views.ActionExecScriptRedirectView.as_view(), name="act_exec_script"),
     url(r"^actions/execgrp/(?P<pk>\d+)/(?P<inv_pk>\d+)/(?P<task_pk>\d+)/(?P<ev_pk>\d+)/(?P<evattr_pk>\d+)/$",
         views.ActionExecScriptGroupRedirectView.as_view(), name="act_exec_scriptgroup"),
-    url(r"^evidences/addtoprofile/(?P<pk>\d+)/(?P<evattr_pk>\d+)/$",
+    url(r"^evidences/addtoprofile/(?P<pk>\d+)/(?P<evattr_pk>\d+)/(?P<ev_pk>\d+)/$",
         views.AddToProfileRedirectView.as_view(), name="ev_addtoprofile"),
 
     url(r"^actiongroups/$", views.ActionGroupListView.as_view(), name="actgrp_list"),

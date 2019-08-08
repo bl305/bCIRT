@@ -507,7 +507,7 @@ class InvSuspiciousEmailCreateView(LoginRequiredMixin, PermissionRequiredMixin, 
                 pmodified_by=auser,
                 pmonetaryloss=0,
                 plosscurrency=CurrencyType.objects.get(pk=1),
-                pnumofvictims=1
+                pnumofvictims=None
         )
         # Need to create a playbook and tasks within it using the suspicious email template
         playbooktemplate_obj = PlaybookTemplate.objects.get(name="Suspicious Email")

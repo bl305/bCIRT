@@ -24,7 +24,7 @@ urlpatterns = [
     url(r'^profile/(?P<pk>\d+)/edit/$', views.ProfileUpdateView.as_view(), name='prof_edit'),
     url(r'^profile/(?P<pk>\d+)/remove/$', views.ProfileRemoveView.as_view(), name='prof_remove'),
 
-    url(r"^profile/autoadd/(?P<inv_pk>\d+)/(?P<evattr_pk>\d+)/$",
+    url(r"^profile/autoadd/(?P<inv_pk>\d+)/(?P<evattr_pk>\d+)/(?P<ev_pk>\d+)/$",
         views.ProfileCreateRedirectView.as_view(), name="profile_autoadd"),
 
     url(r"^host$", views.HostListView.as_view(), name="host_list"),

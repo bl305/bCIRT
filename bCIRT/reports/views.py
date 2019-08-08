@@ -29,7 +29,8 @@ from bCIRT.custom_variables import LOGSEPARATOR, LOGLEVEL
 
 
 def durationprint(timevalue=None):
-    if timevalue:
+    retval = "-"
+    if timevalue is not None:
         tduration = timevalue
         day = int(tduration // (24 * 3600))
         tduration = tduration % (24 * 3600)
@@ -39,6 +40,8 @@ def durationprint(timevalue=None):
         tduration %= 60
         seconds = int(tduration)
         retval = str(day)+"d"+str(hour)+"h"+str(minutes)+"m"+str(seconds)+"s"
+    elif timevalue == 0:
+        retval = 0
     else:
         retval = "-"
     return retval
@@ -175,7 +178,7 @@ class ReportsDashboardPage(LoginRequiredMixin, PermissionRequiredMixin, Template
             kwargs['invs_closed_tasks_auto_max'] = int(inv_closed_tasks_auto['task_inv__count__max'])
         else:
             kwargs['invs_closed_tasks_auto_max'] = 0
-            #  Tasks
+        #  Tasks
         kwargs['tasks_closed'] = Task.objects.all()\
             .values('status__name')\
             .annotate(Count('status'))\
@@ -213,6 +216,51 @@ class ReportsDashboardPage(LoginRequiredMixin, PermissionRequiredMixin, Template
         kwargs['tasks_closed_stats90_min'] = durationprint(taskduration_values_90['taskduration__min'])
         kwargs['tasks_closed_stats90_avg'] = durationprint(taskduration_values_90['taskduration__avg'])
         kwargs['tasks_closed_stats90_max'] = durationprint(taskduration_values_90['taskduration__max'])
+
+        # Manual Tasks
+        kwargs['tasks_manual_closed'] = Task.objects.all() \
+            .filter(type__name='Manual') \
+            .values('status__name') \
+            .annotate(Count('status')) \
+            .order_by('status__name')
+
+        kwargs['tasks_manual_closed_30'] = Task.objects.all() \
+            .filter(type__name='Manual') \
+            .filter(created_at__gt=timezone_now() - timedelta(days=30)) \
+            .values('status__name') \
+            .annotate(Count('status')) \
+            .order_by('status__name')
+
+        kwargs['tasks_manual_closed_90'] = Task.objects.all() \
+            .filter(type__name='Manual') \
+            .filter(created_at__gt=timezone_now() - timedelta(days=30)) \
+            .values('status__name') \
+            .annotate(Count('status')) \
+            .order_by('status__name')
+
+        taskduration_manual_values = Task.objects.all() \
+            .filter(status=2) \
+            .filter(type__name='Manual') \
+            .aggregate(Min('taskduration'), Max('taskduration'), Avg('taskduration'))
+        kwargs['tasks_manual_closed_stats_min'] = durationprint(taskduration_manual_values['taskduration__min'])
+        kwargs['tasks_manual_closed_stats_avg'] = durationprint(taskduration_manual_values['taskduration__avg'])
+        kwargs['tasks_manual_closed_stats_max'] = durationprint(taskduration_manual_values['taskduration__max'])
+
+        taskduration_manual_values_30 = Task.objects.all() \
+            .filter(status=2) \
+            .filter(type__name='Manual') \
+            .aggregate(Min('taskduration'), Max('taskduration'), Avg('taskduration'))
+        kwargs['tasks_manual_closed_stats30_min'] = durationprint(taskduration_manual_values_30['taskduration__min'])
+        kwargs['tasks_manual_closed_stats30_avg'] = durationprint(taskduration_manual_values_30['taskduration__avg'])
+        kwargs['tasks_manual_closed_stats30_max'] = durationprint(taskduration_manual_values_30['taskduration__max'])
+
+        taskduration_manual_values_90 = Task.objects.all() \
+            .filter(status=2) \
+            .filter(type__name='Manual') \
+            .aggregate(Min('taskduration'), Max('taskduration'), Avg('taskduration'))
+        kwargs['tasks_manual_closed_stats90_min'] = durationprint(taskduration_manual_values_90['taskduration__min'])
+        kwargs['tasks_manual_closed_stats90_avg'] = durationprint(taskduration_manual_values_90['taskduration__avg'])
+        kwargs['tasks_manual_closed_stats90_max'] = durationprint(taskduration_manual_values_90['taskduration__max'])
 
         kwargs['invs_closed_attackvector'] = Inv.objects.all()\
             .filter(status=2)\

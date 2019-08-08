@@ -428,6 +428,89 @@
 			</div>
 		</div>
 	</div>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="well">
+                <p><strong>Tasks Duration Manual</strong></p>
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>Minimum</th>
+							<th>Average</th>
+							<th>Maximum</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-toggle="collapse" data-target="#mytasks{{task_manual_closed_stats.pk}}" class="accordion-toggle">
+                            <td>
+								{{ tasks_manual_closed_stats_min }}
+							</td>
+							<td>
+								{{ tasks_manual_closed_stats_avg }}
+							</td>
+							<td>
+								{{ tasks_manual_closed_stats_max }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+			</div>
+		</div>
+        <div class="col-md-4">
+            <div class="well">
+                <p><strong>Tasks Manual Duration 30 days</strong></p>
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>Minimum</th>
+							<th>Average</th>
+							<th>Maximum</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-toggle="collapse" data-target="#mytasks{{task_manual_closed_stats30.pk}}" class="accordion-toggle">
+                            <td>
+								{{ tasks_manual_closed_stats30_min }}
+							</td>
+							<td>
+								{{ tasks_manual_closed_stats30_avg }}
+							</td>
+							<td>
+								{{ tasks_manual_closed_stats30_max }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+			</div>
+		</div>
+        <div class="col-md-4">
+            <div class="well">
+                <p><strong>Tasks Manual Duration 90 days</strong></p>
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>Minimum</th>
+							<th>Average</th>
+							<th>Maximum</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-toggle="collapse" data-target="#mytasks{{task_manual_closed_stats90.pk}}" class="accordion-toggle">
+                            <td>
+								{{ tasks_manual_closed_stats90_min }}
+							</td>
+							<td>
+								{{ tasks_manual_closed_stats90_avg }}
+							</td>
+							<td>
+								{{ tasks_manual_closed_stats90_max }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+			</div>
+		</div>
+	</div>
 	<hr class="thick">
     <div class="row">
         <div class="col-md-4">

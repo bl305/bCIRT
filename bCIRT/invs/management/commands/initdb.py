@@ -901,13 +901,13 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
     def populate_tasktype(self):
         tasktype = [
             {
-                "name": "Automated Task",
+                "name": "Automated",
                 "enabled": "1",
                 "description": "Sample automated task",
                 "typeid": "T01"
             },
             {
-                "name": "Manual task",
+                "name": "Manual",
                 "enabled": "1",
                 "description": "Manual intervention required",
                 "typeid": "T02"

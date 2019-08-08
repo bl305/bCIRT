@@ -33,6 +33,9 @@
                         -
                       {% endif %}
                   </td>
+                    <td>
+                        {{ playbooktemplateitem.acttask.type }}
+                    </td>
                   <td>
                       {% if playbooktemplateitem.itemorder %}
                           {{ playbooktemplateitem.itemorder }}
@@ -82,12 +85,12 @@
                 </tr>
 
                 <tr class="invev-detail">
-                  <td colspan="9">{{ playbooktemplateitem.description|safe }}</td>
+                  <td colspan="10">{{ playbooktemplateitem.description|safe }}</td>
                 </tr>
 {% endfor %}
 {% else %}
           <tr>
-            <td colspan="9" class="text-center bg-warning">No matching record found</td>
+            <td colspan="10" class="text-center bg-warning">No matching record found</td>
           </tr>
 {% endif %}
 

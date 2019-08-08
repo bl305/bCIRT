@@ -533,41 +533,54 @@ class ProfileCreateRedirectView(LoginRequiredMixin, PermissionRequiredMixin, gen
         invpk = self.kwargs.get('inv_pk')
         invobj = Inv.objects.get(pk=invpk)
         evattrpk = self.kwargs.get('evattr_pk')
-        evattrobj = EvidenceAttr.objects.get(pk=evattrpk)
-        evattrtype = evattrobj.evattrformat.name
-        ausername = None
-        auserid = None
-        aemail = None
-        ahostname = None
-        aip = None
-        if evattrtype == "UserName":
-            ausername = evattrobj.evattrvalue
-        elif evattrtype == "UserID":
-            auserid = evattrobj.evattrvalue
-        elif evattrtype == "Email":
-            aemail = evattrobj.evattrvalue
-        elif evattrtype == "HostName":
-            ahostname = evattrobj.evattrvalue
-        elif evattrtype == "IPv4" or evattrtype == "IPv6":
-            aip = evattrobj.evattrvalue
+        evpk = self.kwargs.get('ev_pk')
+        attrpklist = []
+        # if ev_pk=0, it is only one attribute to deal with
+        if evpk == 0:
+            attrpklist.append(EvidenceAttr.objects.filter(pk=evattrpk))
         else:
-            pass
+            attributes = EvidenceAttr.objects.filter(ev__pk=evpk)
+            if attributes:
+                for attritem in attributes:
+                    attrpklist.append(attritem)
+        for evattrobj in attrpklist:
+            # find attributes and run the commands on them
+            # if ev_pk is not 0, then we need to run it on all evidence attributes
+            # evattrobj = EvidenceAttr.objects.get(pk=evattrpk)
+            evattrtype = evattrobj.evattrformat.name
+            ausername = None
+            auserid = None
+            aemail = None
+            ahostname = None
+            aip = None
+            if evattrtype == "UserName":
+                ausername = evattrobj.evattrvalue
+            elif evattrtype == "UserID":
+                auserid = evattrobj.evattrvalue
+            elif evattrtype == "Email":
+                aemail = evattrobj.evattrvalue
+            elif evattrtype == "HostName":
+                ahostname = evattrobj.evattrvalue
+            elif evattrtype == "IPv4" or evattrtype == "IPv6":
+                aip = evattrobj.evattrvalue
+            else:
+                pass
 
-        evattrvalue = evattrobj.evattrvalue
-        new_profile(
-            pinv=invobj,
-            pusername=ausername,
-            puserid=auserid,
-            pemail=aemail,
-            phost=ahostname,
-            pip=aip,
-            plocation=None,
-            pdepartment=None,
-            plocation_contact=None,
-            pcreated_by=self.request.user.get_username(),
-            pmodified_by=self.request.user.get_username(),
-            pdescription="",
-        )
+            # evattrvalue = evattrobj.evattrvalue
+            new_profile(
+                pinv=invobj,
+                pusername=ausername,
+                puserid=auserid,
+                pemail=aemail,
+                phost=ahostname,
+                pip=aip,
+                plocation=None,
+                pdepartment=None,
+                plocation_contact=None,
+                pcreated_by=self.request.user.get_username(),
+                pmodified_by=self.request.user.get_username(),
+                pdescription="",
+            )
 
         return super(ProfileCreateRedirectView, self).dispatch(request, *args, **kwargs)
 

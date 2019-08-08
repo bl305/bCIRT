@@ -30,7 +30,6 @@
                                 {{ invevidence.pk }}
                                 <span class="caret"></span>
                             </button>
-
                             <ul class="dropdown-menu" role="menu">
                                 {% if invevidence.inv.status.name != "Closed" %}
                                 <li>
@@ -63,6 +62,10 @@
                                     </a>
                                     <ul class="dropdown-menu dropdown-content" id="myDropdownEv">
                                         <input type="text" placeholder="Search.." id="myInputEv" onkeyup="filterFunctionEv()">
+                                        <a href="{% url 'assets:profile_autoadd' inv_pk=inv.pk evattr_pk=0 ev_pk=invevidence.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                        class="">
+                                              I - Add Attributes To Profile
+                                        </a>
                                         {% if actiongroups_desc %}
                                                   {% for actiongroup in actiongroups_desc %}
                                                   <li>
@@ -258,12 +261,12 @@
                                                 <ul class="dropdown-menu dropdown-content" id="myDropdownEvAttr">
                                                     <input type="text" placeholder="Search.." id="myInputEvAttr" onkeyup="filterFunctionEvAttr()">
                                                     <li>
-                                                    {% if attr.evattrformat.name == "UserName" or attr.evattrformat.name == "UserID" or attr.evattrformat.name == "Email" or attr.evattrformat.name == "HostName" or attr.evattrformat.name == "IPv4" or attr.evattrformat.name == "IPv6" %}
-                                                    <a href="{% url 'assets:profile_autoadd' inv_pk=inv.pk evattr_pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                                    class="">
-                                                          I - Add To Profile
-                                                    </a>
-                                                    {% endif %}
+                                                        {% if attr.evattrformat.name == "UserName" or attr.evattrformat.name == "UserID" or attr.evattrformat.name == "Email" or attr.evattrformat.name == "HostName" or attr.evattrformat.name == "IPv4" or attr.evattrformat.name == "IPv6" %}
+                                                            <a href="{% url 'assets:profile_autoadd' inv_pk=inv.pk evattr_pk=attr.pk ev_pk=0 %}?next1={{ request.get_full_path|urlencode }}"
+                                                            class="">
+                                                                  I - Add To Profile
+                                                            </a>
+                                                        {% endif %}
                                                     </li>
                                                     {% if actiongroups_attr %}
 
