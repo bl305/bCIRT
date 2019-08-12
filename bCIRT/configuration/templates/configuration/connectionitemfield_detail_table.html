@@ -1,0 +1,33 @@
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : configuration/connectionitemfield_detail_table.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.08.11
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.08.11  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+{% if connectionitemfield.pk %}
+    <tr>
+        <td><strong>Connection Field ID</strong><br> {{ connectionitemfield.pk }} </td>
+    </tr>
+    <tr>
+        <td><strong>Connection</strong><br> {{ connectionitemfield.connectionitemid.pk }}-{{ connectionitemfield.connectionitemid.name }} </td>
+    </tr>
+    <tr>
+        <td><strong>Connection Field Name</strong><br> {{ connectionitemfield.connectionitemfieldname }} </td>
+    </tr>
+    <tr>
+        {% if connectionitemfield.encryptvalue == True %}
+            <td><strong>Connection Field Value (encrypted)</strong><br> {{ connectionitemfield.decrypted_string }} </td>
+        {% else %}
+            <td><strong>Connection Field Value (cleartext)</strong><br> {{ connectionitemfield.connectionitemfieldvalue }} </td>
+        {% endif %}
+    </tr>
+{% else %}
+    <tr><td colspan="3">No Data available!</td></tr>
+{% endif %}

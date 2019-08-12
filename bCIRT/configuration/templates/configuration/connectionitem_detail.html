@@ -1,0 +1,65 @@
+{% extends "configuration/configuration_base.html" %}
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : configuration/connectionitem_detail.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.08.11
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.08.11  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+
+{% block configurationlist_active %}active{% endblock configurationlist_active%}
+
+{% block preconfiguration %}
+
+{% endblock %}
+
+
+{% block configuration_content %}
+    <div class="row">
+        <!-- Left Investigation Info -->
+        <div class="col-sm-12 col-md-12">
+            <div class="panel panel-primary">
+                <header class = "panel-heading">
+                    <div class="panel-title text-center">
+                        <div class="btn-group inline pull-left">
+                            <a href="{% url 'configuration:connitem_create' %}?next1={{ request.get_full_path|urlencode }}"
+                               class="btn btn-default btn-xs">
+                            <span class="glyphicon glyphicon-plus"></span>
+                            New Connection Item
+                            </a>
+                        </div>
+                        <strong>&nbsp;Connection Item Details | {{ connectionitem.pk }}</strong>
+                        <div class="btn-group inline ">
+                            <div class="btn btn-warning btn-xs">
+                            <a style="color:white" href="{% url 'configuration:connitem_edit' pk=connectionitem.pk %}?next1={{ request.get_full_path|urlencode }}">
+                            <span class="glyphicon glyphicon-pencil"></span>
+                            Edit
+                            </a>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+                <div class="panel-body inv-panel-body">
+                    <table class="table" id="connectionitem-detail">
+                        <tbody >
+                            {% include 'configuration/connectionitem_detail_table.html' %}
+                        </tbody>
+                    </table>
+                    <a href="{% url 'configuration:connitemf_list' %}" class="btn btn-primary pull-left">
+                        <span>Connection Fields</span>
+                    </a>
+                    <a href="{% url 'configuration:connitem_list' %}" class="btn btn-primary pull-right">
+                        <span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>
+                        <span>Connection Item list</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock configuration_content %}

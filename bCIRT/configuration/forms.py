@@ -12,7 +12,7 @@
 # **********************************************************************;
 from django import forms
 from tinymce import TinyMCE
-from .models import UpdatePackage
+from .models import UpdatePackage, ConnectionItem, ConnectionItemField
 # Get the user so we can use this
 from django.contrib.auth import get_user_model
 import logging
@@ -72,4 +72,83 @@ class UpdatePackageForm(forms.ModelForm):
                 'class': 'form-control'}
             ),
 
+        }
+
+
+
+class ConnectionItemForm(forms.ModelForm):
+    #  inv_pk and task_pk defaults to zero as they are not needed for updates
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop("user", None)
+        super(ConnectionItemForm, self).__init__(*args, **kwargs)
+        logger.info("ConnectionItemForm - "+str(user))
+        # self.fields['user'].initial = user
+
+    #   fileRef = forms.FileField(widget=CustomClearableFileInput)
+    class Meta:
+        fields = ("name", "enabled", "description")
+        model = ConnectionItem
+        labels = {
+            "description": "Description*",
+        }
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'size': 50,
+                'style': 'width:50%',
+                'class': 'form-control'}
+            ),
+            'description': TinyMCEWidget(
+                mce_attrs={
+                    'width': '90%',
+                },
+                attrs={
+                    'style': 'padding-right: 100px',
+                }
+            ),
+        }
+
+
+class ConnectionItemFieldForm(forms.ModelForm):
+    #  inv_pk and task_pk defaults to zero as they are not needed for updates
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop("user", None)
+        super(ConnectionItemFieldForm, self).__init__(*args, **kwargs)
+        logger.info("ConnectionItemFieldForm - "+str(user))
+        # self.fields['user'].initial = user
+
+    connectionitemid = forms.ModelChoiceField(
+        label='ConnectionItem*',
+        queryset=ConnectionItem.objects.filter(enabled=True),
+        empty_label="--Select--",
+        widget=forms.Select(
+            attrs={
+                'class': 'selectpicker show-tick form-control',  # form-control
+                'data-live-search': 'true',
+                'data-width': 'auto',
+                'data-style': 'btn-default btn-sm',
+                'style': 'width:50%',
+            }
+        )
+    )
+
+    #   fileRef = forms.FileField(widget=CustomClearableFileInput)
+    class Meta:
+        fields = ("connectionitemid", "connectionitemfieldname", "connectionitemfieldvalue", "encryptvalue")
+        model = ConnectionItemField
+        labels = {
+            "connectionitemfieldname": "Name*",
+            "connectionitemfieldvalue": "Value*",
+            "encryptvalue": "Encrypt Value*",
+        }
+        widgets = {
+            'connectionitemfieldname': forms.TextInput(attrs={
+                'size': 50,
+                'style': 'width:50%',
+                'class': 'form-control'}
+            ),
+            'connectionitemfieldvalue': forms.TextInput(attrs={
+                'size': 256,
+                'style': 'width:50%;',
+                'class': 'form-control'}
+            ),
         }

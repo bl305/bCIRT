@@ -9,6 +9,7 @@
 # Revision History  : v1
 # Date        Author      Ref    Description
 # 2019.07.29  Lendvay     1      Initial file
+# 2019.08.12  Lendvay     2      Added decrypt_string function
 # **********************************************************************;
 from django.db import models
 from tinymce.models import HTMLField
@@ -19,6 +20,9 @@ import string
 import random
 from django.urls import reverse
 from django.dispatch import receiver
+import misaka
+from SupportingScripts.encrypion_bcirt_simple import bCIRT_Encryption
+from bCIRT.custom_variables import ENCRYPTION_KEY_1, SALT_1
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
@@ -85,6 +89,50 @@ class UpdatePackage(models.Model):
 
     def clean(self):
         super(UpdatePackage, self).clean()
+
+# Connections model
+class ConnectionItem(models.Model):
+    objects = models.Manager()
+    enabled = models.BooleanField(default=True)
+    name = models.CharField(max_length=20, blank=False, null=False)
+    description = models.TextField(max_length=500, default="")
+    description_html = models.TextField(editable=True, default='', blank=True)
+
+    def __str__(self):
+        return str(self.name)
+
+    def save(self, *args, **kwargs):
+        self.description_html = misaka.html(self.description)
+        super(ConnectionItem, self).save(*args, **kwargs)
+
+
+class ConnectionItemField(models.Model):
+    objects = models.Manager()
+    connectionitemid = models.ForeignKey(ConnectionItem, on_delete=models.CASCADE, blank=False, null=False,
+                                    related_name="connectionitemfield_connectionitem")
+    connectionitemfieldname = models.CharField(max_length=20, blank=False, null=False)
+    connectionitemfieldvalue = models.CharField(max_length=256, blank=False, null=False)
+    encryptvalue = models.BooleanField(default=True)
+
+    def __str__(self):
+        return str(self.connectionitemfieldname)
+
+    def save(self, *args, **kwargs):
+        if self.encryptvalue:
+            key = bCIRT_Encryption().generate_key_manual(ENCRYPTION_KEY_1, SALT_1)
+            strenc = bCIRT_Encryption().encrypt_string(self.connectionitemfieldvalue, key)
+            self.connectionitemfieldvalue = strenc.decode()
+        super(ConnectionItemField, self).save(*args, **kwargs)
+
+    def decrypted_string(self):
+        key = bCIRT_Encryption().generate_key_manual(ENCRYPTION_KEY_1, SALT_1)
+        strdec = bCIRT_Encryption().decrypt_string(key, self.connectionitemfieldvalue.encode()).decode()
+        return strdec
+
+def decrypt_string(pstr):
+    key = bCIRT_Encryption().generate_key_manual(ENCRYPTION_KEY_1, SALT_1)
+    strdec = bCIRT_Encryption().decrypt_string(key, pstr.encode()).decode()
+    return strdec
 
 
 # Replace/delete files

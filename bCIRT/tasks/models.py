@@ -9,6 +9,7 @@
 # Revision History  : v1
 # Date        Author      Ref    Description
 # 2019.07.29  Lendvay     1      Initial file
+# 2019.08.12  Lendvay     2      Added temp folder for each action and connections
 # **********************************************************************;
 from django.db import models
 from django.urls import reverse
@@ -36,6 +37,7 @@ import hashlib
 from shutil import copy
 from base64 import b64encode
 from bCIRT.settings import MEDIA_ROOT
+from configuration.models import ConnectionItem, ConnectionItemField, decrypt_string
 from .scriptmanager.run_script import run_script_class
 import logging
 logger = logging.getLogger('log_file_verbose')
@@ -385,11 +387,14 @@ class Task(models.Model):
         #  this is to check if the status record has been changed or not
         if self.status != self.__original_status:
             if self.status.name == "Completed":
-                # status changed do something here
-                # print("completed"+str(self.status))
-                if Task.objects.filter(actiontarget=self.pk).exists():
-                    #  exclude tasks that are already completed (pk=2)
-                    targettasks = Task.objects.filter(actiontarget=self.pk).exclude(status=2).order_by('pk')
+                # if status changed do something here
+                # check for tasks which are target of any action and are automatic tasks (type=1) and not closed
+                # exclude tasks that are already completed (pk=2,4)
+                if Task.objects.filter(actiontarget=self.pk, type=1).exclude(status=2).exclude(status=4).exists():
+                    targettasks = Task.objects.filter(actiontarget=self.pk, type=1)\
+                        .exclude(status=2)\
+                        .exclude(status=4)\
+                        .order_by('pk')
                     for targettask in targettasks:
                         targettaskactionpk = int()
                         if targettask.type.pk == 1:
@@ -404,7 +409,7 @@ class Task(models.Model):
                             sourcetask = Task.objects.get(pk=self.pk)
                             evid = sourcetask.evidence_task.all()
                             evattrs = None
-                            # # here we will need a nested for loop
+                            # here we will need a nested for loop
                             if TaskVar.objects.filter(task=sourcetask, name='ActionTarget', category=2).exists():
                                 taskvar_obj = TaskVar.objects.get(task=sourcetask, name='ActionTarget', category=2)
                                 taskvar_value = taskvar_obj.value
@@ -1003,6 +1008,9 @@ class Action(models.Model):
     outputdescformat = models.ForeignKey(EvidenceFormat, on_delete=models.SET_DEFAULT, default=1, blank=True, null=True,
                                      related_name="action_outputdescformat")
     argument = models.CharField(max_length=2048, default=None, blank=True, null=True)
+    connectionitemid = models.ForeignKey(ConnectionItem, on_delete=models.SET_NULL, default=None, blank=True, null=True,
+                                    related_name="action_connectionitem")
+
     timeout = models.PositiveIntegerField(default=300, null=False, blank=False)
     #  300 seconds
     code = models.TextField(editable=True, default='', blank=True)
@@ -1402,7 +1410,7 @@ def auto_make_readonly(sender, instance, **kwargs):
                 aevattrformat=EvidenceAttrFormat.objects.get(pk=9),
                 amodified_by=instance.user.username,
                 acreated_by=instance.user.username,
-                attr_automatic=True,
+                aattr_automatic=True,
                 aattr_reputation=None,
                 aforce=False
             )
@@ -1414,7 +1422,7 @@ def auto_make_readonly(sender, instance, **kwargs):
                 aevattrformat=EvidenceAttrFormat.objects.get(pk=10),
                 amodified_by=instance.user.username,
                 acreated_by=instance.user.username,
-                attr_automatic=True,
+                aattr_automatic=True,
                 aattr_reputation=None,
                 aforce=False
             )
@@ -1426,7 +1434,7 @@ def auto_make_readonly(sender, instance, **kwargs):
                 aevattrformat=EvidenceAttrFormat.objects.get(pk=11),
                 amodified_by=instance.user.username,
                 acreated_by=instance.user.username,
-                attr_automatic=True,
+                aattr_automatic=True,
                 aattr_reputation=None,
                 aforce=False
             )
@@ -1438,7 +1446,7 @@ def auto_make_readonly(sender, instance, **kwargs):
                 aevattrformat=EvidenceAttrFormat.objects.get(pk=12),
                 amodified_by=instance.user.username,
                 acreated_by=instance.user.username,
-                attr_automatic=True,
+                aattr_automatic=True,
                 aattr_reputation=None,
                 aforce=False
             )
@@ -1545,7 +1553,8 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
     action_obj = Action.objects.get(pk=act_id)
     action_outputtarget = action_obj.outputtarget.pk
     interpreter = ScriptType.objects.filter(action_scripttype__pk=act_id)[0].interpreter
-    cmd = Action.objects.get(pk=act_id).code_file_path
+    cmd = action_obj.code_file_path
+
     # actioncode = Action.objects.get(pk=act_id).code
     timeout = Action.objects.get(pk=act_id).timeout
     argumentm = str(Action.objects.get(pk=act_id).argument)
@@ -1566,6 +1575,61 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
     tempfile.tempdir = path.join(MEDIA_ROOT, "tmp")
     destoutdirname = None
     mytempdir = None
+
+
+
+
+    #  Create a temporary folder with the script in it
+    #  generate a random folder with some prefix:
+    myprefix = "EV-" + str(ev_pk) + "-" + str(evattr_pk) + "-"
+    mytempdir = tempfile.TemporaryDirectory(prefix=myprefix)
+    #  make the tempdir the temp root
+    tempfile.tempdir = mytempdir.name
+    # with tempfile.TemporaryDirectory() as directory:
+    # 2. copy script into temp folder
+#    srcfile = path.join(MEDIA_ROOT, cmd)
+    destdir = mytempdir.name
+    # destfile_clean = os.path.join(destdir, re.escape(oldev_file_name))
+    # destfile = os.path.join(destdir, oldev_file_name)
+    # I have used the renamed file because the Popen had issues with the special chars
+    # and spaces in filenames...
+#    destfile = os.path.join(destdir, os.path.basename(cmd))
+#    copy(srcfile, destfile)
+#    print("SRCFILE:%s"%(srcfile))
+#    print("DSTFILE:%s" % (destfile))
+    newname = str(act_id)+"_"
+    newscript = tempfile.NamedTemporaryFile(mode='w+t', prefix=newname)
+    # Put tuhe code into the temp file from action code
+    putintofile = action_obj.code#.\
+        # replace('echo', '#echo')#.\
+        # replace('$FILE$', destfile)
+    # replace('$EVIDENCE$', destfile)
+    # replace('$OUTDIR$', destfile)
+
+    connectionitemfields = ConnectionItemField.objects.filter(connectionitemid=action_obj.connectionitemid)
+    if connectionitemfields:
+        for connitemfield in connectionitemfields:
+            if connitemfield:
+                # replace the connection item names with the values
+                # the scripts should contain the same names case sensitive
+                # bordered by "$" signs
+                fieldname = connitemfield.connectionitemfieldname
+                replacethis = "$%s$" % (fieldname)
+                if connitemfield.encryptvalue:
+                    fieldvalue = decrypt_string(connitemfield.connectionitemfieldvalue)
+                    putintofile = putintofile.replace(replacethis, fieldvalue)
+                else:
+                    fieldvalue = connitemfield.connectionitemfieldvalue
+                    putintofile = putintofile.replace(replacethis, fieldvalue)
+    if newscript:
+        cmd = newscript.name
+
+        newscript.writelines(putintofile)
+        newscript.seek(0)
+        # print(newscript.name)
+        # print(newscript.read())
+
+
 
     if argument != "None":
         if action_obj.scriptinput.pk == 1 or action_obj.scriptinput.pk == 3:
@@ -1598,11 +1662,11 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
                 # this means the output is a file
                 #  generate a random folder with some prefix:
                 myprefix = "EV-" + str(ev_pk) + "-"
-                mytempdir = tempfile.TemporaryDirectory(prefix=myprefix)
+                myouttempdir = tempfile.TemporaryDirectory(prefix=myprefix)
                 #  make the tempdir the temp root
-                tempfile.tempdir = mytempdir.name
+                tempfile.tempdir = myouttempdir.name
                 # with tempfile.TemporaryDirectory() as directory:
-                destdir = mytempdir.name
+                destdir = myouttempdir.name
                 # argument replace the $OUTDIR$ with the standard dir where output files will be stored
                 destoutdir = tempfile.mkdtemp()
                 destoutdirname = str(destoutdir) + "/"
@@ -1612,8 +1676,8 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
             #  need to have a file to work on, that's "2"
             #  create a temporary file so the original remains intact
             #  generate a random folder with some prefix:
-            myprefix = "EV-"+str(ev_pk)+"-"
-            mytempdir = tempfile.TemporaryDirectory(prefix=myprefix)
+#            myprefix = "EV-"+str(ev_pk)+"-"
+#            mytempdir = tempfile.TemporaryDirectory(prefix=myprefix)
             #  make the tempdir the temp root
             tempfile.tempdir = mytempdir.name
             # with tempfile.TemporaryDirectory() as directory:
@@ -1635,8 +1699,8 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
             destoutdir = tempfile.mkdtemp()
             destoutdirname = str(destoutdir) + "/"
             argument = argument.replace('$OUTDIR$', destoutdirname)
-
         cmdin = [interpreter, cmd, argument]
+
     else:
         cmdin = [interpreter, cmd]
     scripttype = action_obj.script_type
@@ -1946,6 +2010,8 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
         # Output to be dropped
         pass
     # actq = actionq_stopid.pk
+    newscript.close()
+
     return actq
 
 

@@ -5,11 +5,12 @@
 # License           : GPL-3.0
 # Program name      : configuration/configuration_base.html
 # Author            : Balazs Lendvay
-# Date created      : 2019.07.27
+# Date created      : 2019.08.11
 # Purpose           : Template file for the bCIRT
 # Revision History  : v1
 # Date        Author      Ref    Description
 # 2019.07.29  Lendvay     1      Initial file
+# 2019.08.11  Lendvay     2      Connections menu
 # **********************************************************************;
 -->
 
@@ -20,8 +21,24 @@
 {% block content %}
 
     <ul class="nav nav-tabs">
-        <li class="nav-item">
-            <a class="nav-link" href="#">Credentials</a>
+        <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                Connections
+                <span class="caret"></span></a>
+            <ul class="dropdown-menu">
+                <li>
+                    <a class="nav-link" href="{% url 'configuration:connitem_list' %}">
+                    <span class="glyphicon glyphicon-th-list"></span>
+                    List Connections
+                    </a>
+                </li>
+                <li>
+                    <a class="nav-link" href="{% url 'configuration:connitemf_list' %}">
+                    <span class="glyphicon glyphicon-th-list"></span>
+                    List Connection Fields
+                    </a>
+                </li>
+            </ul>
         </li>
         <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#">Theme<span class="caret"></span></a>

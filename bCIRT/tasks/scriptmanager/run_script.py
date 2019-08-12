@@ -9,6 +9,7 @@
 # Revision History  : v1
 # Date        Author      Ref    Description
 # 2019.07.29  Lendvay     1      Initial file
+# 2019.08.12  Lendvay     2      commented out the debug prints
 # **********************************************************************;
 # https://www.daniweb.com/programming/software-development/code/257449/a-command-class-to-run-shell-commands
 # https://pymotw.com/2/argparse/
@@ -26,10 +27,10 @@ class run_script_class(object):
         self.commandline = str(interpreter)
         if command != "None":
             self.commandline = self.commandline + " " + str(command)
-            print(self.commandline)
+            # print(self.commandline)
         if argument != "None" and argument != "":
             self.commandline = self.commandline + " " + str(argument)
-            print(self.commandline)
+            # print(self.commandline)
         self.command = self.commandline.split()
         self.timeout = timeout
 
