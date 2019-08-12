@@ -19,7 +19,7 @@ app_name = 'assets'
 
 urlpatterns = [
     url(r"^profile$", views.ProfileListView.as_view(), name="prof_list"),
-    url(r"^profiles/new/(?P<inv_pk>\d+)/$", views.ProfileCreateView.as_view(), name="prof_create"),
+    url(r"^profile/new/(?P<inv_pk>\d+)/$", views.ProfileCreateView.as_view(), name="prof_create"),
     url(r"^profile/detail/(?P<pk>\d+)/$", views.ProfileDetailView.as_view(), name="prof_detail"),
     url(r'^profile/(?P<pk>\d+)/edit/$', views.ProfileUpdateView.as_view(), name='prof_edit'),
     url(r'^profile/(?P<pk>\d+)/remove/$', views.ProfileRemoveView.as_view(), name='prof_remove'),

@@ -18,6 +18,13 @@ MYPATH = '/home/bali/PycharmProjects/bCIRT'
 
 MYMEDIA_ROOT = path_join(MYPATH, 'media')
 
+# Recommend SecurityNow! grc.com :)
+ENCRYPTION_KEY_1 = "qDqiih0JQgtr6ahdKR0yieQf59MtweBYJ7GbDIA9cWgWBh53cT8j0Zvr1hFsgup"
+# Should be a 16byte random string in base64 encoded format
+# use this site:
+# https://nitratine.net/blog/post/encryption-and-decryption-in-python/
+SALT_1 = b'Pr1YFcgFTIQMZERvJf0ySpUEiAniiiRS6NEOkcVbHLQ='
+
 MYDB = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',

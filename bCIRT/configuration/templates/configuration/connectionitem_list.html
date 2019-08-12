@@ -1,0 +1,78 @@
+{% extends "configuration/configuration_base.html" %}
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : configuration/connectionitem_list.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.08.11
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.08.11  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+
+{% block configurationlist_active %}active{% endblock configurationlist_active %}
+
+{% block preconfiguration %}
+		{% if user.is_authenticated %}
+
+	    {% endif %}
+{% endblock %}
+
+{% block configuration_content %}
+<div class="row">
+    <div class="col-sm-12">
+        <div align="center">
+            <div class="panel panel-primary">
+                <div class = "panel-heading">
+                    <div class="panel-title">
+                          <div class="btn-group inline pull-left">
+                              {% if user.is_authenticated %}
+                                <a href="{% url 'configuration:connitem_create' %}" class="btn btn-default btn-xs">
+                                    <span class="glyphicon glyphicon-plus-sign"></span>
+                                    Connection Item
+                                </a>
+                              {% endif %}
+                           </div>
+                    </div>
+                        <strong>Connection Item list at {% now "Y/m/d H:i:s" %} (UTC)</strong>
+                </div>
+                <div class="panel-body" style="color:black;height:80%;width:100%;overflow:auto;">
+                    <table class="table table-hover display order-column" id="investigations-invi"
+                           style="min-height:45vh"
+                        data-toggle="table"
+                        data-classes="table table-no-bordered"
+                        data-pagination="true"
+                        data-search="true"
+                        data-show-refresh="true"
+                        data-show-toggle="true"
+                        data-show-columns="true"
+                        data-minimum-count-columns="2"
+                        data-show-pagination-switch="true"
+                        data-id-field="id"
+                        data-page-list="[10, 25, 50, 100, ALL]"
+                        data-show-footer="false"
+                        data-side-pagination="client"
+                        data-sort-name="title"
+                    >
+                        <thead>
+                        <tr>
+                            <th data-field="id" data-sortable="true">ID</th>
+                            <th data-field="name" data-sortable="true">Name</th>
+                            <th data-field="enabled" data-sortable="true">Enabled</th>
+                            <th data-field="description" data-sortable="true">Description</th>
+                            <th data-field="actions" data-sortable="false">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            {% include 'configuration/connectionitem_list_table.html' %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

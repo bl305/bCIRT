@@ -1,0 +1,48 @@
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : configuration/connectionitemfield_list_table.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.08.11
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.08.11  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+{% if object_list %}
+{% for connectionitemfield in object_list %}
+                <tr>
+                    <td>
+                        <a class="badge" href="{% url 'configuration:connitemf_detail' pk=connectionitemfield.pk %}?next1={{ request.get_full_path|urlencode }}">
+                            {{ connectionitemfield.pk }}
+                        </a>
+                    </td>
+                    <td>
+                        {{ connectionitemfield.connectionitemid }}
+                    </td>
+                    <td>
+                        {{ connectionitemfield}}
+                    </td>
+                    <td>
+	                	{% if user.is_authenticated %}
+                        <div>
+                            <a href="{% url 'configuration:connitemf_edit' pk=connectionitemfield.pk %}"
+                               class="btn btn-warning btn-xs">
+                                <span class="glyphicon glyphicon-pencil"></span>
+                            </a>
+                            <a href="{% url 'configuration:connitemf_remove' pk=connectionitemfield.pk %}" title="delete" class="btn btn-danger btn-xs pull-right">
+                                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                                <span class="icon-label"></span>
+                            </a>
+                        </div>
+                        {% endif %}
+                    </td>
+              </tr>
+{% endfor %}
+{% else %}
+          <tr>
+              <td colspan="11" class="text-center bg-warning">No Connection Item Field</td>
+          </tr>
+{% endif %}

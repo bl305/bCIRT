@@ -1,0 +1,53 @@
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : configuration/connectionitem_list_table.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.08.11
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.08.11  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+{% if object_list %}
+{% for connectionitem in object_list %}
+                <tr>
+                    <td>
+                        <a class="badge" href="{% url 'configuration:connitem_detail' pk=connectionitem.pk %}?next1={{ request.get_full_path|urlencode }}">
+                            {{ connectionitem.pk }}
+                        </a>
+                    </td>
+                    <td>
+                        {{ connectionitem.name }}
+                    </td>
+                    <td>
+                        {{ connectionitem.enabled }}
+                    </td>
+                    <td>
+                        <div class="container inv-index">
+                            {{ connectionitem.description | safe }}
+                        </div>
+                    </td>
+                    <td>
+	                	{% if user.is_authenticated %}
+                        <div>
+                            <a href="{% url 'configuration:connitem_edit' pk=connectionitem.pk %}"
+                               class="btn btn-warning btn-xs">
+                                <span class="glyphicon glyphicon-pencil"></span>
+                            </a>
+                            <a href="{% url 'configuration:connitem_remove' pk=connectionitem.pk %}" title="delete" class="btn btn-danger btn-xs pull-right">
+                                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                                <span class="icon-label"></span>
+                            </a>
+                        </div>
+                        {% endif %}
+                    </td>
+              </tr>
+{% endfor %}
+{% else %}
+          <tr>
+              <td colspan="11" class="text-center bg-warning">No Connection Items</td>
+          </tr>
+{% endif %}
