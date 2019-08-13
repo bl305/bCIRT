@@ -9,7 +9,7 @@
 # Revision History  : v1
 # Date        Author      Ref    Description
 # 2019.07.29  Lendvay     1      Initial file
-# 2019.08.12  Lendvay     2      Added temp folder for each action and connections
+# 2019.08.13  Lendvay     2      Added temp folder for each action and connections
 # **********************************************************************;
 from django.db import models
 from django.urls import reverse
@@ -421,49 +421,55 @@ class Task(models.Model):
                                 elif int(taskvar_value):
                                     evidpk = int(taskvar_value)
                                 else:
-                                    evidpk = evid.first().pk
+                                    if evid.first():
+                                        evidpk = evid.first().pk  # Task.objects.get(pk=evid.first().pk)
+                                    else:
+                                        evidpk = None
                             else:
-                                evidpk = evid.first().pk  #Task.objects.get(pk=evid.first().pk)
-
-                            # checking for a list of all attributes which match the attribute filter in the action
-                            evidobj = Evidence.objects.get(pk=evidpk)
-                            curraction = Action.objects.get(pk=targettaskactionpk)
-                            filterforpk = None
-                            evidattrs = None
-                            if curraction.scriptinputattrtypeall and curraction.scriptinput.name == 'Attribute':
-                                evidattrs = evidobj.evattr_evidence.all()
-                            elif not curraction.scriptinputattrtypeall and curraction.scriptinput.name == 'Attribute':
-                                filterforpk = curraction.scriptinputattrtype
-                                evidattrs = evidobj.evattr_evidence.filter(evattrformat=filterforpk)
-                            if evidattrs:
-                                for evidattr1 in evidattrs:
+                                if evid.first():
+                                    evidpk = evid.first().pk  #Task.objects.get(pk=evid.first().pk)
+                                else:
+                                    evidpk = None
+                            if evidpk:
+                                # checking for a list of all attributes which match the attribute filter in the action
+                                evidobj = Evidence.objects.get(pk=evidpk)
+                                curraction = Action.objects.get(pk=targettaskactionpk)
+                                filterforpk = None
+                                evidattrs = None
+                                if curraction.scriptinputattrtypeall and curraction.scriptinput.name == 'Attribute':
+                                    evidattrs = evidobj.evattr_evidence.all()
+                                elif not curraction.scriptinputattrtypeall and curraction.scriptinput.name == 'Attribute':
+                                    filterforpk = curraction.scriptinputattrtype
+                                    evidattrs = evidobj.evattr_evidence.filter(evattrformat=filterforpk)
+                                if evidattrs:
+                                    for evidattr1 in evidattrs:
+                                        # print("AUTOMATED: "+str(targettaskactionpk)+":"+str(targettaskinvpk)+":"+str(targettaskpk)+":"+str(evidpk))
+                                        #  Call the function that has to be executed upon close
+                                        run_action(
+                                            pactuser=self.user,
+                                            pactusername="action",
+                                            pev_pk=evidpk,
+                                            pevattr_pk=evidattr1.pk,
+                                            ptask_pk=targettaskpk,
+                                            pact_pk=targettaskactionpk,
+                                            pinv_pk=targettaskinvpk,
+                                            pargdyn='',
+                                            pattr=''
+                                        )
+                                else:
                                     # print("AUTOMATED: "+str(targettaskactionpk)+":"+str(targettaskinvpk)+":"+str(targettaskpk)+":"+str(evidpk))
                                     #  Call the function that has to be executed upon close
                                     run_action(
                                         pactuser=self.user,
                                         pactusername="action",
                                         pev_pk=evidpk,
-                                        pevattr_pk=evidattr1.pk,
+                                        pevattr_pk=None,
                                         ptask_pk=targettaskpk,
                                         pact_pk=targettaskactionpk,
                                         pinv_pk=targettaskinvpk,
                                         pargdyn='',
                                         pattr=''
                                     )
-                            else:
-                                # print("AUTOMATED: "+str(targettaskactionpk)+":"+str(targettaskinvpk)+":"+str(targettaskpk)+":"+str(evidpk))
-                                #  Call the function that has to be executed upon close
-                                run_action(
-                                    pactuser=self.user,
-                                    pactusername="action",
-                                    pev_pk=evidpk,
-                                    pevattr_pk=None,
-                                    ptask_pk=targettaskpk,
-                                    pact_pk=targettaskactionpk,
-                                    pinv_pk=targettaskinvpk,
-                                    pargdyn='',
-                                    pattr=''
-                                )
 
                         task_close(
                             ptaskpk=targettaskpk,
