@@ -95,7 +95,7 @@
             {% else %}
                 -
             {% endif %}
-            {% if task.action.code_file %}
+            {% if task.action.automation %}
                 {% if task.actev %}
                     {% if task.action.scriptinput.pk == 2 and task.actiontarget.evidence_task.all.first.fileName or task.action.scriptinput.pk == 1 %}
                         {% if task.inv %}

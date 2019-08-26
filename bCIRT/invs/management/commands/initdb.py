@@ -4,11 +4,12 @@
 # License           : GPL-3.0
 # Program name      : invs/management/commands/initdb.py
 # Author            : Balazs Lendvay
-# Date created      : 2019.07.27
+# Date created      : 2019.08.19
 # Purpose           : Initdb file for the bCIRT
 # Revision History  : v1
 # Date        Author      Ref    Description
 # 2019.07.29  Lendvay     1      Initial file
+# 2019.08.19  Lendvay     1      Added domain to the attributes
 # **********************************************************************;
 from django.core.management.base import BaseCommand, CommandError
 from invs.models import InvStatus, InvPriority, InvCategory, InvPhase, InvSeverity, InvAttackvector, CurrencyType
@@ -216,6 +217,12 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
                 "enabled": "1",
                 "description": "UserID of a user"
             },
+            {
+                "name": "Domain",
+                "enabled": "1",
+                "description": "Domain address"
+            },
+
         ]
         try:
             self.stdout.write("Initiating EvidenceAttrFormat")

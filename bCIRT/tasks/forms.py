@@ -9,6 +9,7 @@
 # Revision History  : v1
 # Date        Author      Ref    Description
 # 2019.07.29  Lendvay     1      Initial file
+# 2019.08.19  Lendvay     1      Added "enabled" ot the form for actions
 # **********************************************************************;
 from django import forms
 from tinymce import TinyMCE
@@ -16,7 +17,7 @@ from .models import Task, TaskCategory, TaskPriority, TaskStatus, TaskTemplate, 
     TaskVarType, Type, EvidenceFormat, EvidenceAttrFormat, EvidenceAttr, Evidence, EvReputation, \
     Action, ActionGroup, ActionGroupMember, Playbook, PlaybookTemplate, PlaybookTemplateItem, \
     ScriptType, ScriptOutput, ScriptCategory, ScriptInput, OutputTarget,\
-    Inv, MitreAttck_Tactics
+    Inv, MitreAttck_Tactics, Automation
 from assets.models import Host, Hostname, Ipaddress, Profile
 from configuration.models import ConnectionItem
 # from django.core.exceptions import ValidationError
@@ -63,9 +64,9 @@ class ActionForm(forms.ModelForm):
         min_value=0,
     )
 
-    type = forms.ModelChoiceField(
-        label="Type*",
-        queryset=Type.objects.filter(enabled=True),
+    automationid = forms.ModelChoiceField(
+        label="Automation",
+        queryset=Automation.objects.filter(enabled=True),
         empty_label="--None--",
         widget=forms.Select(
             attrs={
@@ -94,7 +95,7 @@ class ActionForm(forms.ModelForm):
     )
 
     scriptinput = forms.ModelChoiceField(
-        label="Input Format*",
+        label="Input Source*",
         queryset=ScriptInput.objects.filter(enabled=True),
         empty_label="--None--",
         widget=forms.Select(
@@ -169,38 +170,6 @@ class ActionForm(forms.ModelForm):
         )
     )
 
-    script_type = forms.ModelChoiceField(
-            label="Script Type*",
-            queryset=ScriptType.objects.filter(enabled=True),
-            empty_label="--None--",
-            required=True,
-            widget=forms.Select(
-                attrs={
-                    'class': 'selectpicker show-tick form-control',  # form-control
-                    'data-live-search': 'true',
-                    'data-width': 'auto',
-                    'data-style': 'btn-default btn-sm',
-                    'style': 'width:50%',
-                }
-            )
-        )
-
-    script_category = forms.ModelChoiceField(
-        label="Script Category*",
-        queryset=ScriptCategory.objects.filter(enabled=True),
-        empty_label="--None--",
-        required=True,
-        widget=forms.Select(
-            attrs={
-                'class': 'selectpicker show-tick form-control',  # form-control
-                'data-live-search': 'true',
-                'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
-                'style': 'width:50%',
-            }
-        )
-    )
-
     connectionitemid = forms.ModelChoiceField(
         label="Use Connection",
         queryset=ConnectionItem.objects.filter(enabled=True),
@@ -219,10 +188,9 @@ class ActionForm(forms.ModelForm):
 
     #   fileRef = forms.FileField(widget=CustomClearableFileInput)
     class Meta:
-        fields = ("user", "title", "version", "type", "script_type", "script_category", "scriptinput",
-                  "scriptinputattrtype", "scriptinputattrtypeall", "scriptoutput",  "scriptoutputtype", "outputtarget",
-                  "outputdescformat",
-                  "argument","connectionitemid", "timeout", "code", "fileRef", "description")
+        fields = ("user", "title", "version", "enabled", "automationid", "scriptinput", "scriptinputattrtype", "scriptinputattrtypeall",
+                  "scriptoutput",  "scriptoutputtype", "outputtarget", "outputdescformat",
+                  "argument","connectionitemid", "timeout", "fileRef", "description")
         model = Action
         labels = {
             "description": "Description*",
@@ -255,12 +223,6 @@ class ActionForm(forms.ModelForm):
             ),
             'timeout': forms.NumberInput(attrs={
                 'style': 'width:20%',
-                'class': 'form-control'}
-            ),
-            'code': forms.Textarea(attrs={
-                'rows': '10',
-                'cols': '68',
-                'style': 'width:90%',
                 'class': 'form-control'}
             ),
             # 'fileRef': CustomClearableFileInput,
@@ -1634,15 +1596,145 @@ class EvidenceAttrForm(forms.ModelForm):
 
 
     class Meta:
-        fields = ("user", "ev", "evattrformat", "evattrvalue", "attr_reputation")
+        fields = ("user", "ev", "evattrformat", "evattrvalue", "attr_reputation", "observable")
         model = EvidenceAttr
         labels = {
             "evattrvalue": "Value*",
+            "observable": "Observable"
         }
         widgets = {
+            'observable': forms.CheckboxInput(
+                attrs={
+                    'class': 'custom-control-input custom-control-label',
+                }
+            ),
             'evattrvalue': forms.TextInput(attrs={
                 'size': 100,
                 'style': 'width:50%',
                 'class': 'form-control'}
+            ),
+        }
+
+
+
+#########################################
+    #
+    # 'code': forms.Textarea(attrs={
+    #     'rows': '10',
+    #     'cols': '68',
+    #     'style': 'width:90%',
+    #     'class': 'form-control'}
+    # ),
+
+class AutomationForm(forms.ModelForm):
+    #  inv_pk and task_pk defaults to zero as they are not needed for updates
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop("user", None)
+        super(AutomationForm, self).__init__(*args, **kwargs)
+        logger.info("AutomationForm - "+str(user))
+        self.fields['user'].initial = user
+
+    user = forms.ModelChoiceField(
+        label='Owner*',
+        queryset=User.objects.all(),
+        empty_label="--Select--",
+        widget=forms.Select(
+            attrs={
+                'class': 'selectpicker show-tick form-control',  # form-control
+                'data-live-search': 'true',
+                'data-width': 'auto',
+                'data-style': 'btn-default btn-sm',
+                'style': 'width:50%',
+            }
+        )
+    )
+
+    type = forms.ModelChoiceField(
+        label="Type*",
+        queryset=Type.objects.filter(enabled=True),
+        empty_label="--None--",
+        widget=forms.Select(
+            attrs={
+                'class': 'selectpicker show-tick form-control',  # form-control
+                'data-live-search': 'true',
+                'data-width': 'auto',
+                'data-style': 'btn-default btn-sm',
+                'style': 'width:50%',
+            }
+        )
+    )
+
+    script_type = forms.ModelChoiceField(
+            label="Script Type*",
+            queryset=ScriptType.objects.filter(enabled=True),
+            empty_label="--None--",
+            required=True,
+            widget=forms.Select(
+                attrs={
+                    'class': 'selectpicker show-tick form-control',  # form-control
+                    'data-live-search': 'true',
+                    'data-width': 'auto',
+                    'data-style': 'btn-default btn-sm',
+                    'style': 'width:50%',
+                }
+            )
+        )
+
+    script_category = forms.ModelChoiceField(
+        label="Script Category*",
+        queryset=ScriptCategory.objects.filter(enabled=True),
+        empty_label="--None--",
+        required=True,
+        widget=forms.Select(
+            attrs={
+                'class': 'selectpicker show-tick form-control',  # form-control
+                'data-live-search': 'true',
+                'data-width': 'auto',
+                'data-style': 'btn-default btn-sm',
+                'style': 'width:50%',
+            }
+        )
+    )
+
+    #   fileRef = forms.FileField(widget=CustomClearableFileInput)
+    class Meta:
+        fields = ("user", "name", "version", "type", "script_type", "script_category", "code", "fileRef", "description")
+        model = Automation
+        labels = {
+            "description": "Description*",
+            "fileRef": "Attachment",
+            'name': 'Name*',
+            'version': 'Version*',
+        }
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'size': 50,
+                'style': 'width:50%',
+                'class': 'form-control'}
+            ),
+            'version': forms.TextInput(attrs={
+                'size': 20,
+                'style': 'width:50%',
+                'class': 'form-control'}
+            ),
+            'code': forms.Textarea(attrs={
+                'size': 20,
+                'style': 'width:50%',
+                'class': 'form-control'}
+            ),
+            # 'fileRef': CustomClearableFileInput,
+            'description': TinyMCEWidget(
+                mce_attrs={
+                    'width': '90%',
+
+                    # 'readonly': True,
+                    # 'menubar': False,
+                    # 'toolbar': False,
+                    #                    'autoresize_overflow_padding': 10,
+
+                },
+                attrs={
+                    'style': 'padding-right: 100px',
+                }
             ),
         }

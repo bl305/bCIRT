@@ -4,11 +4,12 @@
 # License           : GPL-3.0
 # Program name      : tasks/admin.py
 # Author            : Balazs Lendvay
-# Date created      : 2019.07.27
+# Date created      : 2019.08.19
 # Purpose           : Admin file for the bCIRT
 # Revision History  : v1
 # Date        Author      Ref    Description
 # 2019.07.29  Lendvay     1      Initial file
+# 2019.08.19  Lendvay     1      Added automation models
 # **********************************************************************;
 from django.contrib import admin
 # Register your models here.
@@ -27,6 +28,7 @@ class GroupMemberInline(admin.TabularInline):
     model = models.Playbook
     model = models.PlaybookTemplate
     model = models.PlaybookTemplateItem
+    model = models.Automation
     model = models.Action
     model = models.ActionGroup
     model = models.ActionGroupMember
@@ -99,6 +101,11 @@ class EvidenceAttrFormatAdmin(ImportExportModelAdmin):
 
 @admin.register(models.EvReputation)
 class EvReputationAdmin(ImportExportModelAdmin):
+    pass
+
+
+@admin.register(models.Automation)
+class AutomationAdmin(ImportExportModelAdmin):
     pass
 
 

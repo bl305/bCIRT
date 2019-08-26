@@ -1,0 +1,146 @@
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : inv/inv_detail_tab_evidences_table_REPORT_v1.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.07.27
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.07.29  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+{% if inv.evidence_inv %}
+
+{% for invevidence in inv.evidence_inv.all %}
+    <!-- Guardian authentication check -->
+            <!-- |dictsortreversed:"id" -->
+                <tr class="mylist-meta" style="background-color:#e6e6e6" id="item-inve{{ invevidence.pk }}">
+                   <!-- e.g.: #item-7 -->
+                  <td>
+                      {{ invevidence.pk }}
+                  </td>
+                  <td>
+                      {{ invevidence.created_at|date:"Y/m/d H:i:s" }}
+                  </td>
+                  <td>
+                      {{ invevidence.created_by }}
+                  </td>
+                  <td>
+                       {{ invevidence.modified_at|date:"Y/m/d H:i:s" }}
+                  </td>
+                  <td>
+                       {{ invevidence.modified_by }}
+                  </td>
+                  <td>
+                        {% if invevidence.fileRef %}
+                            {{ invevidence.fileName }}
+                        {% else %}
+                        -
+                        {% endif %}
+                  </td>
+                  <td>
+                      {% if invevidence.task %}
+                      <a class="badge" href="{% url 'tasks:tsk_detail' pk=invevidence.task.pk %}?next1={{ request.get_full_path|urlencode }}">
+                          {{ invevidence.task }}
+                      </a>
+                      {% else %}
+                      -
+                      {% endif %}
+                  </td>
+                    <td>
+                        MITRE&ATTCK: <strong>{{ invevidence.mitretactic }}</strong>
+                        <br>
+                        Parent:
+                        {% if invevidence.parent %}
+                            <a class="badge" href="{% url 'tasks:ev_detail' pk=invevidence.parent.pk %}?next1={{ request.get_full_path|urlencode }}">
+                                {{ invevidence.parent }}
+                            </a>
+                            {% if invevidence.parentattr %}
+                                - <a class="badge" href="{% url 'tasks:evattr_detail' pk=invevidence.parentattr.pk %}?next1={{ request.get_full_path|urlencode }}">
+                                {{ invevidence.parentattr }}
+                                </a>
+                            {% endif %}
+                        {% endif %}
+                        <br>
+                        Actions:
+                        {% if invevidence.actionq_evidence.all %}
+                            {% for oneaction in invevidence.actionq_evidence.all %}
+                                <a class="badge" href="{% url 'tasks:actq_detail' pk=oneaction.pk %}?next1={{ request.get_full_path|urlencode }}">
+                                    {{ oneaction }}
+                                </a>
+                            {% endfor %}
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="8">
+                        <table class="bcirttable">
+                            <thead>
+                                <th>Attribute Type</th>
+                                <th>Attribute Value</th>
+                            </thead>
+                            <tbody>
+                            {% for attr in invevidence.evattr_evidence.all %}
+                                <tr id="item-attr-{{attr.pk}}">
+                                    <td>
+                                            {% if attr %}
+                                                {% if attr.attr_reputation.pk == 1 %}
+                                        <font color="black"><strong>&quest;</strong></font>
+                                                {% else %}
+                                                    {% if attr.attr_reputation.pk == 2 %}
+                                                        <font color="green"><strong>&check;</strong></font>
+                                                    {% else %}
+                                                        {% if attr.attr_reputation.pk == 3 %}
+                                                        <font color="orangered"><strong>&excl;</strong></font>
+                                                        {% else %}
+                                                            {% if attr.attr_reputation.pk == 4 %}
+                                                                <font color="red"><strong>&cross;</strong></font>
+                                                            {% else %}
+                                                                &nbsp;
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    {% endif %}
+                                                {% endif %}
+                                            {% else %}
+                                                &nbsp;
+                                            {% endif %}
+
+
+                                        {{ attr.evattrformat }}
+                                    </td>
+                                    <td>
+                                        <a class="badge" href="{% url 'tasks:evattr_detail' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}">
+                                            {{ attr.evattrvalue }}
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+
+                <tr class="invev-detail" id="item-invev-detail{{ invevidence.pk }}">
+                  <td colspan="8">
+                      <div class="invdescription2" style="max-width:1400px">
+                        {% if invevidence.evidenceformat.pk == 2 %}
+                            {{ invevidence.description|safe }}
+                        {% else %}
+                            {% if invevidence.evidenceformat.pk == 1 %}
+                                {{ invevidence.description|linebreaks }}
+                            {% else %}
+                                Uknown evidence format!!!
+                            {% endif %}
+                        {% endif %}
+                      </div>
+                  </td>
+                </tr>
+{% endfor %}
+{% else %}
+          <tr>
+            <td colspan="8" class="text-center bg-warning">No matching record found</td>
+          </tr>
+{% endif %}
+

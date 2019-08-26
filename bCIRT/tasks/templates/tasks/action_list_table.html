@@ -24,7 +24,7 @@
                         {{ action.title }}
                     </td>
                     <td>
-                        {{ action.type }}
+                        {{ action.automationid.type.name }}
                     </td>
                     <td>
                         {{ action.scriptinput }}
@@ -33,7 +33,7 @@
                         {{ action.outputtarget.name }}
                     </td>
                     <td>
-                        {{ action.script_type }}
+                        {{ action.automationid.script_type.name }}
                     </td>
                     <td>
                         {{ action.created_at|date:"Y/m/d H:i:s" }}
@@ -50,18 +50,34 @@
                     <td>
 	                	{% if user.is_authenticated %}
                         <div>
-                            {% if action.code_file %}
+                            {% if action.enabled %}
+                            <a href="#"
+                               class="btn btn-primary btn-xs">
+                                <span title="Enabled" class="glyphicon glyphicon-ok-circle"></span>
+                            </a>
+                            {% else %}
+                            <a href="#"
+                               class="btn btn-primary btn-xs">
+                                <span title="Disabled" class="glyphicon glyphicon-ban-circle"></span>
+                            </a>
+                            {% endif %}
+                            {% if action.automationid %}
                             <a href="{% url 'tasks:act_exec_script' pk=action.pk inv_pk=0 task_pk=0 ev_pk=0 evattr_pk=0%}"
                                class="btn btn-success btn-xs">
-                                <span class="glyphicon glyphicon-play"></span>
+                                <span title="Run" class="glyphicon glyphicon-play"></span>
+                            </a>
+                            {% else %}
+                            <a href="#"
+                               class="btn btn-primary btn-xs">
+                                <span title="No Automation" class="glyphicon glyphicon-remove-sign"></span>
                             </a>
                             {% endif %}
                             <a href="{% url 'tasks:act_edit' pk=action.pk %}"
                                class="btn btn-warning btn-xs">
-                                <span class="glyphicon glyphicon-pencil"></span>
+                                <span title="Edit" class="glyphicon glyphicon-pencil"></span>
                             </a>
                             <a href="{% url 'tasks:act_remove' pk=action.pk %}" title="delete" class="btn btn-danger btn-xs pull-right">
-                                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                                <span title="Delete" class="glyphicon glyphicon-trash" aria-hidden="true"></span>
                                 <span class="icon-label"></span>
                             </a>
                         </div>

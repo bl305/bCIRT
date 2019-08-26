@@ -1,0 +1,72 @@
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : inv/inv_detail_tab_tasks_table_REPORT_v1.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.07.27
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.07.29  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+{% if inv.task_inv.count > 0 %}
+{% for task in inv.task_inv.all %}
+                    <tr class="mylist-meta" style="background-color:#e6e6e6" id="item-task-{{ task.pk }}">
+                        <td>
+                            <a class="badge" href="{% url 'tasks:tsk_detail' pk=task.pk %}?next1={{ request.get_full_path|urlencode }}">
+                            {{ task.pk }}
+                            </a>
+                        </td>
+                        <td>
+                            <a class="badge" href="{% url 'tasks:tsk_detail' pk=task.pk %}?next1={{ request.get_full_path|urlencode }}">
+                            {{ task.title }}
+                            </a>
+                            </td>
+                        <td>
+                            {{ task.status }}
+                        </td>
+                        <td>
+                            {% if task.playbook %}
+                            <a class="badge" href="{% url 'tasks:play_detail' pk=task.playbook.pk %}?next1={{ request.get_full_path|urlencode }}">
+                                {{ task.playbook }}
+                            </a>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ task.type }}
+                        </td>
+                        <td>
+                            {{ task.created_at|date:"Y/m/d H:i:s" }}
+                        </td>
+                        <td>
+                            {{ task.created_by }}
+                        </td>
+                        <td>
+                            {{ task.modified_at|date:"Y/m/d H:i:s" }}
+                        </td>
+                        <td>
+                            {{ task.modified_by }}
+                        </td>
+                    </tr>
+                    <tr >
+                        <td colspan="9">
+                            <div class="accordian-body collapse" id="mytasks{{task.pk}}">
+                                <!--<table class="invdescription2" style="max-width:100vw">-->
+                                <table class="bcirttable" style="max-width:100vw">
+
+                                    {{ task.description|safe }}
+                                </table>
+
+                            </div>
+                        </td>
+                    </tr>
+{% endfor %}
+{% else %}
+          <tr>
+            <td colspan="8" class="text-center bg-warning">No matching record found</td>
+          </tr>
+{% endif %}

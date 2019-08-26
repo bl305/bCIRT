@@ -1,0 +1,74 @@
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : tasks/automation_list_table.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.07.27
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.07.29  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+{% if object_list %}
+{% for automation in object_list %}
+                <tr>
+                    <td>
+                        <a class="badge" href="{% url 'tasks:auto_detail' pk=automation.pk %}?next1={{ request.get_full_path|urlencode }}">{{ automation.pk }}</a>
+                    </td>
+                    <td>
+                        {{ automation.user }}
+                    </td>
+                    <td>
+                        {{ automation.name }}
+                    </td>
+                    <td>
+                        {{ automation.type }}
+                    </td>
+                    <td>
+                        {{ automation.script_type }}
+                    </td>
+                    <td>
+                        {{ automation.script_category }}
+                    </td>
+                    <td>
+                        {{ automation.created_at|date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                        {{ automation.created_by }}
+                    </td>
+                    <td>
+                        {{ automation.modified_at|date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                        {{ automation.modified_by }}
+                    </td>
+                    <td>
+	                	{% if user.is_authenticated %}
+                        <div>
+                            {% if automation.code_file %}
+                            <a href="{% url 'tasks:act_exec_script' pk=automation.pk inv_pk=0 task_pk=0 ev_pk=0 evattr_pk=0%}"
+                               class="btn btn-success btn-xs">
+                                <span class="glyphicon glyphicon-play"></span>
+                            </a>
+                            {% endif %}
+                            <a href="{% url 'tasks:auto_edit' pk=automation.pk %}"
+                               class="btn btn-warning btn-xs">
+                                <span class="glyphicon glyphicon-pencil"></span>
+                            </a>
+                            <a href="{% url 'tasks:auto_remove' pk=automation.pk %}" title="delete" class="btn btn-danger btn-xs pull-right">
+                                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                                <span class="icon-label"></span>
+                            </a>
+                        </div>
+                        {% endif %}
+
+                    </td>
+              </tr>
+{% endfor %}
+{% else %}
+          <tr>
+              <td colspan="11" class="text-center bg-warning">No Automations</td>
+          </tr>
+{% endif %}

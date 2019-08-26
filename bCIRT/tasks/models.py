@@ -9,7 +9,7 @@
 # Revision History  : v1
 # Date        Author      Ref    Description
 # 2019.07.29  Lendvay     1      Initial file
-# 2019.08.13  Lendvay     2      Added temp folder for each action and connections
+# 2019.08.13  Lendvay     2      Added temp folder for each action and connections, removed action file
 # **********************************************************************;
 from django.db import models
 from django.urls import reverse
@@ -657,7 +657,6 @@ class Evidence(models.Model):
             Inv.objects.filter(pk=self.inv.pk).update(modified_at=timezone_now(), modified_by=self.modified_by)
         if self.task:
             Task.objects.filter(pk=self.task.pk).update(modified_at=timezone_now(), modified_by=self.modified_by)
-
         super(Evidence, self).save(*args, **kwargs)
 
     def clean(self):
@@ -671,6 +670,7 @@ class Evidence(models.Model):
             if Inv.objects.get(pk=self.inv.pk).status.name == "Closed" or \
                 Inv.objects.get(pk=self.inv.pk).status.name == "Archived":
                 raise ValidationError(_('Investigation cannot be closed!'))
+
         super(Evidence, self).clean()
 
 
@@ -710,6 +710,7 @@ class EvidenceAttr(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="evattr_users")
     ev = models.ForeignKey(Evidence, on_delete=models.CASCADE, null=True, blank=True, related_name="evattr_evidence")
     evattrvalue = models.CharField(max_length=2048)
+    observable = models.BooleanField(default=False, null=False, blank=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.CharField(max_length=20, default="unknown")
@@ -748,6 +749,11 @@ class EvidenceAttr(models.Model):
         # if self.inv is None and self.task is None:
         #     raise ValidationError(_('You must select an Investigation or a Task.'))
         pass
+
+def evidenceattrobservabletoggle(pattrpk):
+    evattr_obj = EvidenceAttr.objects.get(pk=pattrpk)
+    evattr_obj.observable = not evattr_obj.observable
+    evattr_obj.save()
 
 
 class ExtractAttr():
@@ -973,33 +979,78 @@ class OutputTarget(models.Model):
         super(OutputTarget, self).save(*args, **kwargs)
 
 
-def save_code(logfile, script_code):
-    try:
-        code_field = script_code
-    except Exception as err:
-        code_field += str(err)
-    finally:
-        try:
-            with open(logfile, 'w') as f:
-                #  replace newlines as the HTML will likely contain those...in windows format
-                newdata = code_field.replace("\r\n", "\n")
-                f.write(newdata)
-                return 1
-        except Exception as e:
-            return 0
+# def save_code(logfile, script_code):
+#     try:
+#         code_field = script_code
+#     except Exception as err:
+#         code_field += str(err)
+#     finally:
+#         try:
+#             with open(logfile, 'w') as f:
+#                 #  replace newlines as the HTML will likely contain those...in windows format
+#                 newdata = code_field.replace("\r\n", "\n")
+#                 f.write(newdata)
+#                 return 1
+#         except Exception as e:
+#             return 0
+
+class Automation(models.Model):
+    objects = models.Manager()
+    enabled = models.BooleanField(default=True)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="automation_users")
+    type = models.ForeignKey(Type, on_delete=models.SET_NULL, blank=False, null=True, related_name="automation_type")
+    name = models.CharField(max_length=50, blank=False, null=False)
+    version = models.CharField(max_length=20, default=None, null=True)
+    script_type = models.ForeignKey(ScriptType, on_delete=models.SET_DEFAULT, default='1', blank=False, null=False,
+                                    related_name="automation_scripttype")
+    script_category = models.ForeignKey(ScriptCategory, on_delete=models.SET_DEFAULT, default='1', blank=False,
+                                        null=False, related_name="automation_scriptcategory")
+    code = models.TextField(editable=True, default='', blank=True)
+    fileName = models.CharField(max_length=255, default="", null=True, blank=True)
+    fileRef = models.FileField(upload_to=upload_to_action, null=True, blank=True)
+    filecreated_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.CharField(max_length=20, default="unknown")
+    modified_at = models.DateTimeField(auto_now=True)
+    modified_by = models.CharField(max_length=20, default="unknown")
+    description = HTMLField()
+    description_html = models.TextField(editable=True, default='', blank=True)
+
+    # class Meta:
+#       ordering = ['-id']
+    #  to satisfy pyCharm
+
+    def __str__(self):
+        return str(self.name)
+
+    def save(self, *args, **kwargs):
+        self.description_html = misaka.html(self.description)
+        super(Automation, self).save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse(
+            "tasks:auto_detail",
+            kwargs={
+                # "username": self.user.username,
+                "pk": self.pk
+            })
+
+    def clean(self):
+        # Don't allow draft entries to have a pub_date.
+        if (self.fileRef == "") and (self.code == ""):
+            # raise ValidationError(_('You must define Code or upload a script.'))
+            raise ValidationError(_("You must either define Code or upload a script file!"))
+        pass
 
 
 class Action(models.Model):
     objects = models.Manager()
     enabled = models.BooleanField(default=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="action_users")
-    type = models.ForeignKey(Type, on_delete=models.SET_NULL, blank=False, null=True, related_name="action_type")
     title = models.CharField(max_length=50, blank=False, null=False)
     version = models.CharField(max_length=20, default=None, null=True)
-    script_type = models.ForeignKey(ScriptType, on_delete=models.SET_DEFAULT, default='1', blank=False, null=False,
-                                    related_name="action_scripttype")
-    script_category = models.ForeignKey(ScriptCategory, on_delete=models.SET_DEFAULT, default='1', blank=False,
-                                        null=False, related_name="action_scriptcategory")
+    automationid = models.ForeignKey(Automation, on_delete=models.SET_NULL, default=None, blank=False, null=True,
+                                     related_name="action_automation")
     scriptoutput = models.ForeignKey(ScriptOutput, on_delete=models.SET_NULL, default='1', blank=False, null=True,
                                      related_name="action_scriptoutput")
     scriptoutputtype = models.ForeignKey(EvidenceAttrFormat, on_delete=models.SET_NULL, default='1', blank=True, null=True,
@@ -1019,10 +1070,6 @@ class Action(models.Model):
 
     timeout = models.PositiveIntegerField(default=300, null=False, blank=False)
     #  300 seconds
-    code = models.TextField(editable=True, default='', blank=True)
-    code_file = models.BooleanField(default=False)
-    code_file_path = models.CharField(max_length=255, default=None, blank=True, null=True)
-    code_file_name = models.CharField(max_length=255, default=None, blank=True, null=True)
     fileName = models.CharField(max_length=255, default="", null=True, blank=True)
     fileRef = models.FileField(upload_to=upload_to_action, null=True, blank=True)
     filecreated_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
@@ -1033,10 +1080,6 @@ class Action(models.Model):
     description = HTMLField()
     description_html = models.TextField(editable=True, default='', blank=True)
 
-
-    #    class Meta:
-    #        ordering = ['-id']
-
     # class Meta:
 #       ordering = ['-id']
     #  to satisfy pyCharm
@@ -1045,21 +1088,11 @@ class Action(models.Model):
         return str(self.title)+" ("+str(self.scriptinput.shortname)+"->"+str(self.outputtarget.shortname)+")"
 
     def save(self, *args, **kwargs):
+        if not self.automationid:
+            print(self.automationid)
+            self.enabled = False
+
         self.description_html = misaka.html(self.description)
-
-        savepath = os.path.join(PROJECT_ROOT, 'tasks', 'actions', str(self.pk))
-        pathlib.Path(savepath).mkdir(parents=True, exist_ok=True)
-        filename = str(self.pk)+'_'+str(datetime.utcnow().strftime('%Y-%m-%d_%H-%M-%S'))
-        self.code_file_name = filename
-        savefile = os.path.join(PROJECT_ROOT, 'tasks', 'actions', str(self.pk), filename)
-        self.code_file_path = savefile
-
-        saved = save_code(savefile, self.code)
-        if saved:
-            self.code_file = True
-        else:
-            self.code_file = False
-
         super(Action, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
@@ -1074,9 +1107,9 @@ class Action(models.Model):
 
     def clean(self):
         # Don't allow draft entries to have a pub_date.
-        if (self.fileRef == "") and (self.code == ""):
+        # if (self.fileRef == "") and (self.code == ""):
             # raise ValidationError(_('You must define Code or upload a script.'))
-            raise ValidationError(_("You must either define Code or upload a script file!"))
+            # raise ValidationError(_("You must either define Code or upload a script file!"))
         pass
 
 
@@ -1396,6 +1429,38 @@ def auto_delete_file_on_delete(sender, instance, **kwargs):
             os.remove(instance.fileRef.path)
             instance.fileName = None
 
+# @receiver(models.signals.post_save, sender=Evidence)
+# def check_if_malicious(sender, instance, **kwargs):
+#     auser = instance.user
+#     aactusername = str(instance.user)
+#     aev_pk = instance.pk
+#     aaevattr_pk = None
+#     atask_pk = None
+#     if instance.task:
+#         atask_pk = instance.task.pk
+#     else:
+#         atask_pk = None
+#     ainv_pk = None
+#     if instance.inv:
+#         ainv_pk = instance.inv.pk
+#     else:
+#         ainv_pk = None
+#     aargdyn = kwargs.get('argdyn')
+#     apattr = None
+#     if Action.objects.get(title='Is Malicious?'):
+#         aact_pk = Action.objects.get(title='Is Malicious?').pk
+#         run_action(
+#             pactuser=auser,
+#             pactusername=aactusername,
+#             pev_pk=aev_pk,
+#             pevattr_pk=aaevattr_pk,
+#             ptask_pk=atask_pk,
+#             pact_pk=aact_pk,
+#             pinv_pk=ainv_pk,
+#             pargdyn=aargdyn,
+#             pattr=apattr
+#         )
+
 
 @receiver(models.signals.post_save, sender=Evidence)
 def auto_make_readonly(sender, instance, **kwargs):
@@ -1558,9 +1623,11 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
     act_id = pact_pk
     action_obj = Action.objects.get(pk=act_id)
     action_outputtarget = action_obj.outputtarget.pk
-    interpreter = ScriptType.objects.filter(action_scripttype__pk=act_id)[0].interpreter
-    cmd = action_obj.code_file_path
-
+    # automation_scripttype = action_obj.automation.script_type.pk
+    #interpreter = ScriptType.objects.filter(action__automation_script_type__pk=act_id)[0].interpreter
+    interpreter = action_obj.automationid.script_type.interpreter
+    # cmd = action_obj.code_file_path
+    cmd = None
     # actioncode = Action.objects.get(pk=act_id).code
     timeout = Action.objects.get(pk=act_id).timeout
     argumentm = str(Action.objects.get(pk=act_id).argument)
@@ -1605,8 +1672,8 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
 #    print("DSTFILE:%s" % (destfile))
     newname = str(act_id)+"_"
     newscript = tempfile.NamedTemporaryFile(mode='w+t', prefix=newname)
-    # Put tuhe code into the temp file from action code
-    putintofile = action_obj.code#.\
+    # Put the code into the temp file from action code
+    putintofile = action_obj.automationid.code#.\
         # replace('echo', '#echo')#.\
         # replace('$FILE$', destfile)
     # replace('$EVIDENCE$', destfile)
@@ -1635,8 +1702,6 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
         # print(newscript.name)
         # print(newscript.read())
 
-
-
     if argument != "None":
         if action_obj.scriptinput.pk == 1 or action_obj.scriptinput.pk == 3:
             # 1 represents description field as the input
@@ -1657,7 +1722,7 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
                         #  if it is in an unknown format, just use it
                         desc = oldev_obj.description
             #  replace the $EVIDENCES$ with the description value
-            if action_obj.type.pk == 4:
+            if action_obj.automationid.type.pk == 4:
                 #  b64 encrypted values
                 argument_cleartext = argument.replace('$EVIDENCE$', desc)
                 argument = argument.replace('$EVIDENCE$', b64encode(desc.encode()).decode())
@@ -1709,26 +1774,26 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
 
     else:
         cmdin = [interpreter, cmd]
-    scripttype = action_obj.script_type
+    scripttype = action_obj.automationid.script_type
     actionq_startid = None
     results = ""
-    if action_obj.type.pk == 1:  # Command
+    if action_obj.automationid.type.pk == 1:  # Command
         # /bin/bash -c "`cat /tmp/cmd` -c3 8.8.8.8"
         # need to run as a command, later probably need to use interpreter...or something
-        cmd = action_obj.code
+        cmd = action_obj.automationid.code
         results = run_script_class("", cmd, argument, timeout).runcmd()
         pass
-    elif action_obj.type.pk == 2:  # Executable
+    elif action_obj.automationid.type.pk == 2:  # Executable
         pass
-    elif action_obj.type.pk == 3:  # Script
+    elif action_obj.automationid.type.pk == 3:  # Script
         results = run_script_class(interpreter, cmd, argument, timeout).runscript()
-    elif action_obj.type.pk == 4:  # Script with b64 encrypted values to pass over
+    elif action_obj.automationid.type.pk == 4:  # Script with b64 encrypted values to pass over
         results = run_script_class(interpreter, cmd, argument, timeout).runscript()
-    elif action_obj.type.pk == 5:  # Internal command
+    elif action_obj.automationid.type.pk == 5:  # Internal command
         from tasks.scripts import String_Parser
         sp1 = String_Parser.StringParser
-        afuncoutput = getattr(sp1, action_obj.code)('',argument)
-        if action_obj.code == "check_malicious":
+        afuncoutput = getattr(sp1, action_obj.automationid.code)('',argument)
+        if action_obj.automationid.code == "check_malicious":
             ismalicious = afuncoutput
             if action_obj.scriptinput.pk == 1:
                 # description input
@@ -1844,7 +1909,7 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
         ActionQ.objects.filter(pk=actionq_startid.pk).update(parent=actionq_stopid)
         #  Output to the attribute in the same evidence
         ActionQ.objects.filter(pk=actionq_stopid.pk).update(evid=oldev_obj.pk)
-        if action_obj.code == 'check_malicious':
+        if action_obj.automationid.code == 'check_malicious':
             currevattrformat = EvidenceAttrFormat.objects.get(name='Reputation')
         else:
             currevattrformat = EvidenceAttrFormat.objects.get(name='Unknown')

@@ -15,10 +15,10 @@ from .models import TaskVar  # , TaskVarType, TaskVarCategory
 from .models import Playbook, PlaybookTemplate, PlaybookTemplateItem, new_playbook
 from .models import Inv
 from .models import Evidence, EvidenceAttr  #  , EvidenceAttrFormat, EvidenceFormat
-from .models import add_task_from_template, run_action
-from .models import Action, ActionQ, ActionGroup, ActionGroupMember
+from .models import add_task_from_template, run_action, evidenceattrobservabletoggle
+from .models import Action, ActionQ, ActionGroup, ActionGroupMember, Automation
 from .forms import TaskForm, TaskTemplateForm, TaskVarForm
-from .forms import ActionForm, ActionGroupForm, ActionGroupMemberForm
+from .forms import ActionForm, ActionGroupForm, ActionGroupMemberForm, AutomationForm
 from .forms import EvidenceAttrForm, EvidenceForm
 from .forms import PlaybookForm, PlaybookTemplateForm, PlaybookTemplateItemForm
 from django.shortcuts import redirect, reverse
@@ -346,6 +346,244 @@ class GetFileZippedView(LoginRequiredMixin, PermissionRequiredMixin, generic.Det
 
 # Create your views here.
 # #############################################################################3
+class AutomationListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
+    model = Automation
+    form_class = AutomationForm
+    permission_required = ('tasks.view_automation',)
+
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logger.info(logmsg)
+        super(AutomationListView, self).__init__(*args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        # check remaining session time
+        session_key = self.request.COOKIES["sessionid"]
+        session = Session.objects.get(session_key=session_key)
+
+        sessiontimeout = session.expire_date
+        servertime = datetime.now(timezone.utc)
+        # check remaining session time
+        return super(AutomationListView, self).get_context_data(**kwargs)
+
+
+class AutomationCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
+    #  fields = ("inv", "user", "description", "fileRef")
+    model = Automation
+    form_class = AutomationForm
+    permission_required = ('tasks.add_automation',)
+    success_url = 'tasks:auto_list'
+
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logger.info(logmsg)
+        super(AutomationCreateView, self).__init__(*args, **kwargs)
+
+    def get_success_url(self):
+        if 'next1' in self.request.GET:
+            redirect_to = self.request.GET['next1']
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
+                return reverse(self.success_url)
+        else:
+            return reverse(self.success_url)
+        return redirect_to
+
+    def get_context_data(self, **kwargs):
+        # check remaining session time
+        session_key = self.request.COOKIES["sessionid"]
+        session = Session.objects.get(session_key=session_key)
+
+        sessiontimeout = session.expire_date
+        servertime = datetime.now(timezone.utc)
+        # check remaining session time
+        return super(AutomationCreateView, self).get_context_data(**kwargs)
+
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.user = self.request.user
+        self.object.modified_by = self.request.user.get_username()
+        self.object.created_by = self.request.user.get_username()
+        if self.request.FILES:
+            self.object.fileName = self.request.FILES['fileRef'].name
+        self.object.save()
+        return super(AutomationCreateView, self).form_valid(form)
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            # This will redirect to the login view
+            return self.handle_no_permission()
+        elif not self.request.user.has_perm('tasks.add_automation'):
+            messages.error(self.request, "No permission to add a record !!!")
+            return redirect('tasks:auto_list')
+        # Checks pass, let http method handlers process the request
+        return super(AutomationCreateView, self).dispatch(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        """This method is what injects forms with their keyword
+            arguments."""
+        # grab the current set of form #kwargs
+        kwargs = super(AutomationCreateView, self).get_form_kwargs()
+        # Update the kwargs with the user_id
+        kwargs['user'] = self.request.user
+        return kwargs
+
+
+class AutomationDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailView):
+    model = Automation
+    permission_required = ('tasks.view_automation',)
+
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logger.info(logmsg)
+        super(AutomationDetailView, self).__init__(*args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        # check remaining session time
+        session_key = self.request.COOKIES["sessionid"]
+        session = Session.objects.get(session_key=session_key)
+
+        sessiontimeout = session.expire_date
+        servertime = datetime.now(timezone.utc)
+        # check remaining session time
+        return super(AutomationDetailView, self).get_context_data(**kwargs)
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            # This will redirect to the login view
+            return self.handle_no_permission()
+        elif not self.request.user.has_perm('tasks.view_automation'):
+            messages.error(self.request, "No permission to view a record !!!")
+            return redirect('tasks:auto_detail', pk=self.kwargs.get('pk'))
+        # Checks pass, let http method handlers process the request
+        return super(AutomationDetailView, self).dispatch(request, *args, **kwargs)
+
+
+class AutomationUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
+    login_url = '/'
+    # redirect_field_name = 'tasks/evidence_detail.html'
+    form_class = AutomationForm
+    model = Automation
+    permission_required = ('tasks.change_automation',)
+    success_url = 'tasks:auto_list'
+
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logger.info(logmsg)
+        super(AutomationUpdateView, self).__init__(*args, **kwargs)
+
+    def get_success_url(self):
+        if 'next1' in self.request.GET:
+            redirect_to = self.request.GET['next1']
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
+                return reverse(self.success_url)
+        else:
+            return reverse(self.success_url)
+        return redirect_to
+
+    def get_context_data(self, **kwargs):
+        # check remaining session time
+        session_key = self.request.COOKIES["sessionid"]
+        session = Session.objects.get(session_key=session_key)
+
+        sessiontimeout = session.expire_date
+        servertime = datetime.now(timezone.utc)
+        # check remaining session time
+        return super(AutomationUpdateView, self).get_context_data(**kwargs)
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            # This will redirect to the login view
+            return self.handle_no_permission()
+        elif not self.request.user.has_perm('tasks.change_automation'):
+            messages.error(self.request, "No permission to change a record !!!")
+            return redirect('tasks:auto_detail', pk=self.kwargs.get('pk'))
+        # Checks pass, let http method handlers process the request
+        return super(AutomationUpdateView, self).dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.modified_by = self.request.user.get_username()
+        if self.request.FILES:
+            self.object.fileName = self.request.FILES['fileRef'].name
+        self.object.save()
+        return super(AutomationUpdateView, self).form_valid(form)
+
+    def get_form_kwargs(self):
+        """This method is what injects forms with their keyword
+            arguments."""
+        # grab the current set of form #kwargs
+        kwargs = super(AutomationUpdateView, self).get_form_kwargs()
+        # Update the kwargs with the user_id
+        kwargs['user'] = self.request.user
+        return kwargs
+
+
+class AutomationRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView):
+    model = Automation
+#    success_url = reverse_lazy('tasks:ev_list')
+    permission_required = ('tasks.delete_automation', 'tasks.view_automation',)
+    success_url = 'tasks:auto_list'
+
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logger.info(logmsg)
+        super(AutomationRemoveView, self).__init__(*args, **kwargs)
+
+    def get_success_url(self):
+        if 'next1' in self.request.GET:
+            redirect_to = self.request.GET['next1']
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
+                return reverse(self.success_url)
+        else:
+            return reverse(self.success_url)
+        return redirect_to
+
+    def get_context_data(self, **kwargs):
+        # check remaining session time
+        session_key = self.request.COOKIES["sessionid"]
+        session = Session.objects.get(session_key=session_key)
+
+        sessiontimeout = session.expire_date
+        servertime = datetime.now(timezone.utc)
+        # check remaining session time
+        return super(AutomationRemoveView, self).get_context_data(**kwargs)
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            # This will redirect to the login view
+            return self.handle_no_permission()
+        elif not self.request.user.has_perm('tasks.delete_automation'):
+            messages.error(self.request, "No permission to delete a record !!!")
+            return redirect('tasks:auto_detail', pk=self.kwargs.get('pk'))
+        # Checks pass, let http method handlers process the request
+        return super(AutomationRemoveView, self).dispatch(request, *args, **kwargs)
+
+# ##############################################################################
 class ActionListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
     model = Action
     form_class = ActionForm
@@ -3525,6 +3763,48 @@ class EvidenceAttrRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generi
             return redirect('tasks:evattr_detail', pk=self.kwargs.get('pk'))
         # Checks pass, let http method handlers process the request
         return super(EvidenceAttrRemoveView, self).dispatch(request, *args, **kwargs)
+
+
+class EvidenceAttrObservableToggleView(LoginRequiredMixin, PermissionRequiredMixin, generic.RedirectView):
+    permission_required = ('tasks.view_evidenceattr', 'tasks.change_evidenceattr')
+    success_url = 'tasks:evattr_list'
+
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logger.info(logmsg)
+        super(EvidenceAttrObservableToggleView, self).__init__(*args, **kwargs)
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            # This will redirect to the login view
+            return self.handle_no_permission()
+        elif not self.request.user.has_perm('tasks.change_evidenceattr'):
+            messages.error(self.request, "No permission to change a record !!!")
+            return redirect('tasks:evattr_list')
+        evattr_pk = self.kwargs.get('pk')
+        evidenceattrobservabletoggle(evattr_pk)
+        # evattr_obj = EvidenceAttr.objects.get(pk=evattr_pk)
+        # evattr_obj.observable = True
+        # evattr_obj.save()
+
+        # return redirect(self.success_url)
+        return super(EvidenceAttrObservableToggleView, self).dispatch(request, *args, **kwargs)
+
+    def get_redirect_url(self, *args, **kwargs):
+        if 'next1' in self.request.GET:
+            redirect_to = self.request.GET['next1']
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
+                return reverse(self.success_url)
+        else:
+            return reverse(self.success_url)
+        return redirect_to
+        # return reverse('tasks:tsk_list')
+        # return super().get_redirect_url(*args, **kwargs)
 
 # #######################################################
 class AddToProfileRedirectView(LoginRequiredMixin, PermissionRequiredMixin, generic.RedirectView):

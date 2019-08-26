@@ -1,0 +1,61 @@
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : inv/inv_detail_tab_playbooks_table.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.07.27
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.07.29  Lendvay     1      Initial file
+# 2019.08.26  Lendvay     1      Rename file
+# **********************************************************************;
+-->
+{% if inv.playbook_inv.count > 0 %}
+{% for playbook in inv.playbook_inv.all %}
+                <tr>
+                    <td>
+                        <a class="badge" href="{% url 'tasks:play_detail' pk=playbook.pk %}?next1={{ request.get_full_path|urlencode }}">
+                            {{ playbook.pk }}
+                        </a>
+                    </td>
+                    <td>
+                        {{ playbook.name }}
+                    </td>
+                    <td>
+                        {{ playbook.version }}
+                    </td>
+                    <td>
+                        {{ playbook.created_at|date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                        {{ playbook.created_by }}
+                    </td>
+                    <td>
+                        {{ playbook.modified_at|date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                        {{ playbook.modified_by }}
+                    </td>
+                    <td>
+	                	{% if user.is_authenticated %}
+                            <a href="{% url 'tasks:play_edit' pk=playbook.pk %}?next1={{ request.get_full_path|urlencode }}"
+                               class="btn btn-warning btn-xs">
+                                <span class="glyphicon glyphicon-pencil"></span>
+                            </a>
+                            <a href="{% url 'tasks:play_remove' pk=playbook.pk %}?next1={{ request.get_full_path|urlencode }}" title="delete"
+                               class="btn btn-danger btn-xs pull-right">
+                                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                                <span class="icon-label"></span>
+                            </a>
+                        {% endif %}
+
+                    </td>
+              </tr>
+{% endfor %}
+{% else %}
+          <tr>
+            <td colspan="8" class="text-center bg-warning">No matching record found</td>
+          </tr>
+{% endif %}

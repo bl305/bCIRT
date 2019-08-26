@@ -1,0 +1,64 @@
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : tasks/auto__detail_table.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.07.27
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.07.29  Lendvay     1      Initial file
+# 2019.08.13  Lendvay     2      Removed action files
+# **********************************************************************;
+-->
+{% if automation.pk %}
+    <tr>
+        <td><strong>Automation ID</strong><br> {{ automation.pk }} </td>
+        <td><strong>Name</strong><br> {{ automation.name }} </td>
+        <td><strong>Owner</strong><br> {{ automation.user }} </td>
+        <td><strong>Version</strong><br> {{ automation.version }} </td>
+        <td><strong>Created on</strong><br> {{ automation.created_at|date:"Y/m/d H:i:s" }} </td>
+        <td><strong>Created by</strong><br> {{ automation.created_by }} </td>
+    </tr>
+    <tr>
+        <td colspan="2"><strong>Script Type</strong><br> {{ automation.script_type }} </td>
+        <td><strong>Script Category</strong><br> {{ automation.script_category }} </td>
+        <td><strong>TBD</strong><br> TBD </td>
+        <td><strong>Modified on</strong><br> {{ automation.modified_at|date:"Y/m/d H:i:s" }} </td>
+        <td><strong>Modified by</strong><br> {{ automation.modified_by }} </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <strong>Attachment<br></strong>
+            {% if automation.fileRef %}
+                <a href="{{BASE_URL}}{{MEDIA_URL}}{{ automation.fileRef.name }}"
+                  class="btn btn-default btn-xs" target="_blank">
+                  <span class="glyphicon glyphicon-floppy-disk">{{ automation.fileName }}</span>
+                </a>
+            {% else %}
+                None
+            {% endif %}
+        </td>
+        <td colspan="2">
+            <div class="row">
+            <div class="container invdescription2">
+                <strong>Description</strong>
+                {{ automation.description_html|safe }}
+            </div>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="6">
+            <div class="row">
+                <div class="container invdescription">
+                <strong>Code</strong><br>
+                    <textarea readonly style="width:100%;height:300px">{{ automation.code }}</textarea>
+                </div>
+            </div>
+        </td>
+    </tr>
+{% else %}
+    <tr><td colspan="6">No Header available!</td></tr>
+{% endif %}

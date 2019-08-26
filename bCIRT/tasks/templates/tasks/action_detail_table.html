@@ -9,24 +9,27 @@
 # Revision History  : v1
 # Date        Author      Ref    Description
 # 2019.07.29  Lendvay     1      Initial file
+# 2019.08.13  Lendvay     2      Removed action files
 # **********************************************************************;
 -->
 {% if action.pk %}
     <tr>
         <td><strong>Action ID</strong><br> {{ action.pk }} </td>
-        <td><strong>Owner</strong><br> {{ action.user }} </td>
         <td><strong>Title</strong><br> {{ action.title }} </td>
-        <td><strong>Version</strong><br> {{ action.version }} </td>
-        <td><strong>Script Type</strong><br> {{ action.script_type }} </td>
-        <td><strong>Script Category</strong><br> {{ action.scriptinput }} </td>
-    </tr>
-    <tr>
-        <td><strong>Exec Ready</strong><br> {{ action.code_file }} </td>
+        <td><strong>Owner</strong><br> {{ action.user }} </td>
         <td><strong>Created on</strong><br> {{ action.created_at|date:"Y/m/d H:i:s" }} </td>
         <td><strong>Created by</strong><br> {{ action.created_by }} </td>
-        <td><strong>Modified on</strong><br> {{ action.modified_at|date:"Y/m/d H:i:s" }} </td>
-        <td><strong>Modified by</strong><br> {{ action.modified_by }} </td>
-        <td><strong>Output Target</strong><br> {{ action.outputtarget }} </td>
+    </tr>
+    <tr>
+        <td><strong>Enabled</strong><br> {{ action.enabled }} </td>
+        <td colspan="4">
+            <div class="row">
+            <div class="container invdescription2">
+                <strong>Description</strong>
+                {{ action.description_html|safe }}
+            </div>
+            </div>
+        </td>
     </tr>
     <tr>
         <td colspan="2">
@@ -40,31 +43,41 @@
                 None
             {% endif %}
         </td>
-        <td colspan="2">
+        <td colspan="3">
             <strong>Arguments</strong><br> {{ action.argument }}
         </td>
-        <td colspan="2">
-            <div class="row">
-            <div class="container invdescription2">
-                <strong>Description</strong>
-                {{ action.description_html|safe }}
-            </div>
-            </div>
-        </td>
     </tr>
     <tr>
-        <td colspan="6"><strong>Connection</strong><br> {{ action.connectionitemid }} </td>
+        <td><strong>Input Source</strong><br> {{ action.scriptinput }} </td>
+        <td><strong>Input Attr Filter</strong><br> {{ action.scriptinputattrtype }} </td>
+        <td><strong>Run on All Attrs</strong><br> {{ action.scriptinputattrtypeall }} </td>
+        <td><strong>Modified on</strong><br> {{ action.modified_at|date:"Y/m/d H:i:s" }} </td>
+        <td><strong>Modified by</strong><br> {{ action.modified_by }} </td>
     </tr>
     <tr>
-        <td colspan="6">
+        <td><strong>Output Target</strong><br> {{ action.outputtarget }} </td>
+        <td><strong>Output Format</strong><br> {{ action.scriptoutput }} </td>
+        <td><strong>Output Data Type</strong><br> {{ action.scriptoutputtype }} </td>
+        <td><strong>Output Evidence Format</strong><br> {{ action.outputdescformat }} </td>
+        <td></td>
+    </tr>
+    <tr>
+        <td><strong>Automation</strong><br> {{ action.automationid.name }} </td>
+        <td><strong>Connection</strong><br> {{ action.connectionitemid }} </td>
+        <td><strong>Version</strong><br> {{ action.version }} </td>
+        <td><strong>Script Category</strong><br> {{ action.automationid.script_category }} </td>
+        <td><strong>Script Type</strong><br> {{ action.automationid.script_type }} </td>
+    </tr>
+    <tr>
+        <td colspan="5">
             <div class="row">
                 <div class="container invdescription">
                 <strong>Code</strong><br>
-                    <textarea readonly style="width:100%;height:300px">{{ action.code }}</textarea>
+                    <textarea readonly style="width:100%;height:300px">{{ action.automationid.code }}</textarea>
                 </div>
             </div>
         </td>
     </tr>
 {% else %}
-    <tr><td colspan="6">No Header available!</td></tr>
+    <tr><td colspan="5">No Header available!</td></tr>
 {% endif %}

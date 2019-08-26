@@ -5,11 +5,12 @@
 # License           : GPL-3.0
 # Program name      : base.html
 # Author            : Balazs Lendvay
-# Date created      : 2019.07.27
+# Date created      : 2019.08.14
 # Purpose           : Template file for the bCIRT
 # Revision History  : v1
 # Date        Author      Ref    Description
 # 2019.07.29  Lendvay     1      Initial file
+# 2019.08.14  Lendvay     1      Added automation
 # **********************************************************************;
 -->
 
@@ -103,6 +104,13 @@ Menu - dropdown
                             </li>
                             <li class="divider"></li>
                             <li>
+                                <a href="{% url 'tasks:playtmp_create' %}">
+                                <span class="glyphicon glyphicon-plus"></span>
+                                New Playbook Template
+                                </a>
+                            </li>
+                            <li class="divider"></li>
+                            <li>
                                 <a href="{% url 'tasks:tsk_list' %}"><span class="glyphicon glyphicon-th-list"></span>
                                 Tasks
                                 </a>
@@ -117,13 +125,6 @@ Menu - dropdown
                             <li>
                                 <a href="{% url 'tasks:tvar_list' %}"><span class="glyphicon glyphicon-th-list"></span>
                                 Task Variables
-                                </a>
-                            </li>
-                            <li class="divider"></li>
-                            <li>
-                                <a href="{% url 'tasks:playtmp_create' %}">
-                                <span class="glyphicon glyphicon-plus"></span>
-                                New Playbook Template
                                 </a>
                             </li>
                             <li class="divider"></li>
@@ -158,7 +159,14 @@ Menu - dropdown
                             <li>
                                 <a href="{% url 'tasks:ev_create' inv_pk=0 task_pk=0 %}">
                                     <span class="glyphicon glyphicon-plus"></span>
-                                    New
+                                    New Evidence
+                                </a>
+                            </li>
+                            <li class="divider"></li>
+                            <li>
+                                <a href="{% url 'tasks:evattr_create' pk=0 %}">
+                                    <span class="glyphicon glyphicon-plus"></span>
+                                    New Attribute
                                 </a>
                             </li>
                             <li class="divider"></li>
@@ -188,7 +196,14 @@ Menu - dropdown
                             <li>
                                 <a href="{% url 'tasks:act_create' %}">
                                     <span class="glyphicon glyphicon-plus"></span>
-                                    New
+                                    New Action
+                                </a>
+                            </li>
+                            <li class="divider"></li>
+                            <li>
+                                <a href="{% url 'tasks:auto_create' %}">
+                                    <span class="glyphicon glyphicon-plus"></span>
+                                    New Automation
                                 </a>
                             </li>
                             <li class="divider"></li>
@@ -212,6 +227,14 @@ Menu - dropdown
                                     ActionGroupMembers
                                 </a>
                             </li>
+                            <li class="divider"></li>
+                            <li>
+                                <a href="{% url 'tasks:auto_list' %}">
+                                    <span class="glyphicon glyphicon-th-list"></span>
+                                    Automations
+                                </a>
+                            </li>
+                            <li class="divider"></li>
                         </ul>
                     </li>
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#**********************************************************************;
+# **********************************************************************;
 # Project           : bCIRT
 # License           : GPL-3.0
 # Program name      : accounts/views.py
@@ -9,7 +9,7 @@
 # Revision History  : v1
 # Date        Author      Ref    Description
 # 2019.07.29  Lendvay     1      Initial file
-#**********************************************************************;
+# **********************************************************************;
 from __future__ import unicode_literals
 
 from django.urls import reverse_lazy
@@ -28,16 +28,16 @@ class RegisterAccountPage(CreateView):
     form_class = forms.UserCreateForm
     success_url = reverse_lazy("login")
     template_name = "accounts/account_register.html"
+
     def __init__(self, *args, **kwargs):
         if LOGLEVEL == 1:
             pass
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(RegisterAccountPage, self).__init__(*args, **kwargs)
-
 
 
 @receiver(pre_save, sender=User)

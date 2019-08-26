@@ -17,7 +17,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_logged_in, user_logged_out, user_login_failed
 from django.dispatch import receiver
 import logging
-#from django.utils.timezone import now as timezone_now
+# from django.utils.timezone import now as timezone_now
 
 
 # from django.db import models
@@ -35,14 +35,16 @@ class UserAudit(models.Model):
     event_time = models.DateTimeField(auto_now=True)
 
     def __unicode__(self):
-        return '{0} - {1} - {2} - {3} - {4} - {5}'.format(self.event_time, self.eventtype, self.action, self.username, self.ip, self.host)
+        return '{0} - {1} - {2} - {3} - {4} - {5}'.format(self.event_time, self.eventtype, self.action, self.username,
+                                                          self.ip, self.host)
 
     def __str__(self):
-        return '{0} - {1} - {2} - {3} - {4} - {5}'.format(self.event_time, self.eventtype, self.action, self.username, self.ip, self.host)
-
+        return '{0} - {1} - {2} - {3} - {4} - {5}'.format(self.event_time, self.eventtype, self.action, self.username,
+                                                          self.ip, self.host)
 
 # for logging - define "error" named logging handler and logger in settings.py
-error_log=logging.getLogger('error')
+error_log = logging.getLogger('error')
+
 
 @receiver(user_logged_in)
 def user_logged_in_callback(sender, request, user, **kwargs):
@@ -59,6 +61,7 @@ def user_logged_in_callback(sender, request, user, **kwargs):
     except Exception:
         # log the error
         error_log.error("log_user_logged_in request: %s, error: %s" % (request, Exception))
+
 
 @receiver(user_logged_out)
 def user_logged_out_callback(sender, request, user, **kwargs):
@@ -83,7 +86,7 @@ def user_logged_out_callback(sender, request, user, **kwargs):
     #                                      user=user)
     #         login_logout_log.save()
     # except Exception:
-        #log the error
+        # log the error
         # error_log.error("log_user_logged_out request: %s, error: %s" % (request, Exception))
 
 @receiver(user_login_failed)

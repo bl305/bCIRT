@@ -26,6 +26,12 @@ urlpatterns = [
     url(r'^actions/edit/(?P<pk>\d+)/$', views.ActionUpdateView.as_view(), name='act_edit'),
     url(r'^actions/remove/(?P<pk>\d+)/$', views.ActionRemoveView.as_view(), name='act_remove'),
 
+    url(r"^automation/$", views.AutomationListView.as_view(), name="auto_list"),
+    url(r"^automation/new/$", views.AutomationCreateView.as_view(), name="auto_create"),
+    url(r"^automation/detail/(?P<pk>\d+)/$", views.AutomationDetailView.as_view(), name="auto_detail"),
+    url(r'^automation/edit/(?P<pk>\d+)/$', views.AutomationUpdateView.as_view(), name='auto_edit'),
+    url(r'^automation/remove/(?P<pk>\d+)/$', views.AutomationRemoveView.as_view(), name='auto_remove'),
+
     url(r"^actions/qdetail/(?P<pk>\d+)/$", views.ActionQDetailView.as_view(), name="actq_detail"),
     url(r"^actions/exec/(?P<pk>\d+)/(?P<inv_pk>\d+)/(?P<task_pk>\d+)/(?P<ev_pk>\d+)/(?P<evattr_pk>\d+)/$",
         views.ActionExecScriptRedirectView.as_view(), name="act_exec_script"),
@@ -59,6 +65,8 @@ urlpatterns = [
     # url(r'^(?P<pk>\d+)/(?P<inv_pk>\d+)/(?P<task_pk>\d+)/edit/$', views.EvidenceUpdateView.as_view(), name='ev_edit'),
     url(r'^evidences/evattr/edit/(?P<pk>\d+)/$', views.EvidenceAttrUpdateView.as_view(), name='evattr_edit'),
     url(r'^evidences/evattr/remove/(?P<pk>\d+)/$', views.EvidenceAttrRemoveView.as_view(), name='evattr_remove'),
+    url(r'^evidences/evattr/obstoggle/(?P<pk>\d+)/$', views.EvidenceAttrObservableToggleView.as_view(),
+        name='evattr_observabletoggle'),
 
     url(r"^$", views.TaskListView.as_view(), name="tsk_list"),
     url(r"^new/(?P<inv_pk>\d+)/$", views.TaskCreateView.as_view(), name="tsk_create"),

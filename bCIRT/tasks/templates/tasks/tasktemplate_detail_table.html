@@ -67,7 +67,7 @@
             {% else %}
                 -
             {% endif %}
-            {% if tasktemplate.action.code_file %}
+            {% if tasktemplate.action.automation %}
                 {% if tasktemplate.actev %}
                     {% if tasktemplate.inv %}
                         <a href="{% url 'tasks:act_exec_script' pk=tasktemplate.action.pk inv_pk=tasktemplate.inv.pk task_pk=task.pk ev_pk=task.actev evattr_pk=0 %}"

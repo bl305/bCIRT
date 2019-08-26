@@ -12,6 +12,8 @@
 # 2019.07.29  Lendvay     1      Initial file
 # **********************************************************************;
 -->
+{% block ptitle %}Investigations {{ inv.id }}-{{ inv.invid }} {% endblock %}
+
 {% block invslist_active %}active{% endblock invslist_active%}
 
 {% block preinvs %}
@@ -25,9 +27,10 @@
   <script>
   $( function() {
     $( "#tabs" ).tabs(
-        {event: "mouseover"}
+        {event: "click"}
     );
   } );
+
   </script>
 
      <div class="container-fluid">

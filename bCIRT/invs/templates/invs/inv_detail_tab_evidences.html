@@ -32,7 +32,22 @@
                             <strong>&nbsp;Evidences |  {{ inv.evidence_inv.count }} item{{ inv.evidence_inv.count|pluralize }} | {{ user }} at {% now "Y/m/d H:i:s" %} (UTC)</strong>
                         </div>
                     </div>
+                    <div align="center"><h3><strong>Observables</strong></h3></div>
                     <div class="panel-body inv-panel-body">
+                        <table class="table" style="">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Actions</th>
+                                    <th scope="col">Type</th>
+                                    <th scope="col">Reputation</th>
+                                    <th scope="col">Value</th>
+                                </tr>
+                            </thead>
+                        <tbody>
+                            {% include 'invs/inv_detail_tab_evidences_observable_table.html' %}
+                        </tbody>
+                        </table>
 
 <!--                        data-pagination="false"-->
 <!--                        data-show-pagination-switch="true"-->
@@ -40,7 +55,7 @@
 <!--                        data-pagination-h-align="left"-->
 <!--                        data-pagination-detail-h-align="right"-->
 <!--                        https://bootstrap-table.com/docs/api/table-options/#pagination-->
-
+                        <div align="center"><h3><strong>Evidences</strong></h3></div>
                         <table class="table table-hover table-striped table-condensed" id="investigations-inve"
                                style="min-height:45vh;"
                         data-toggle="table"
@@ -72,7 +87,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% include 'invs/inv_detail_evidence_table.html' %}
+                                {% include 'invs/inv_detail_tab_evidences_table.html' %}
                             <!--<tr><td colspan="8" style="min-height:400px">&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;</td></tr>-->
                             </tbody>
                         </table>

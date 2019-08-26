@@ -530,19 +530,29 @@ class ProfileCreateRedirectView(LoginRequiredMixin, PermissionRequiredMixin, gen
             messages.error(self.request, "No permission to change a record !!!")
             return redirect('assets:profile_list')
         # Creating a new profile based on the attribute calling this function
-        invpk = self.kwargs.get('inv_pk')
+        invpk = int(self.kwargs.get('inv_pk'))
         invobj = Inv.objects.get(pk=invpk)
-        evattrpk = self.kwargs.get('evattr_pk')
-        evpk = self.kwargs.get('ev_pk')
-        attrpklist = []
+        evattrpk = int(self.kwargs.get('evattr_pk'))
+        evattr_obj = EvidenceAttr.objects.get(pk=evattrpk)
+        evpk = int(self.kwargs.get('ev_pk'))
+        # print("invpk:%s"%(invpk))
+        # print("invobj:%s" % (invobj))
+        # print("evattrpk:%s" % (evattrpk))
+        # print("evattrobj:%s" % (evattr_obj))
+        # print("evpk:%s" % (evpk))
+        attrpklist = list()
         # if ev_pk=0, it is only one attribute to deal with
         if evpk == 0:
-            attrpklist.append(EvidenceAttr.objects.filter(pk=evattrpk))
+            attrpklist.append(evattr_obj)
+            # print("attrpklist:%s" % (attrpklist))
         else:
             attributes = EvidenceAttr.objects.filter(ev__pk=evpk)
+            # print("Attributes:%s"%(attributes))
             if attributes:
                 for attritem in attributes:
                     attrpklist.append(attritem)
+        # print("Attrpklist:%s"%(attrpklist))
+        # print(type(attrpklist))
         for evattrobj in attrpklist:
             # find attributes and run the commands on them
             # if ev_pk is not 0, then we need to run it on all evidence attributes

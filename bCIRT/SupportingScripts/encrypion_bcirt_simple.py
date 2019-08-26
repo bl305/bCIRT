@@ -1,5 +1,18 @@
 #!/usr/bin/python
 #https://nitratine.net/blog/post/encryption-and-decryption-in-python/
+# -*- coding: utf-8 -*-
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : scripts/encryption_bcirt_simple.py
+# Author            : Balazs Lendvay
+# Date created      : 2019.08.18
+# Purpose           : Encryption script for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.08.18  Lendvay     1      Initial file
+# **********************************************************************;
+# from django.shortcuts import render
 
 from cryptography.fernet import Fernet
 import base64

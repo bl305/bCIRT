@@ -1,0 +1,59 @@
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : inv/inv_detail_tab_profile_table_REPORT_v1.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.07.27
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.07.29  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+{% if inv.profile_inv.count > 0 %}
+{% for profile in inv.profile_inv.all %}
+                <tr>
+                    <td>
+                        <a class="badge" href="{% url 'assets:prof_detail' pk=profile.pk %}?next1={{ request.get_full_path|urlencode }}">{{ profile.pk }}</a>
+                    </td>
+                    <td>
+                        {% if profile.username %}
+                            {{ profile.username }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if profile.userid %}
+                            {{ profile.userid }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if profile.email %}
+                            {{ profile.email }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if profile.host %}
+                            {{ profile.host }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if profile.ip %}
+                            {{ profile.ip }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if profile.location %}
+                            {{ profile.location }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ profile.modified_at|date:"Y/m/d H:i:s" }}
+                    </td>
+              </tr>
+{% endfor %}
+{% else %}
+          <tr>
+            <td colspan="8" class="text-center bg-warning">No matching record found</td>
+          </tr>
+{% endif %}

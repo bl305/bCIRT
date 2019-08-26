@@ -1,0 +1,53 @@
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : inv/inv_evidence_table.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.07.27
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.07.29  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+{% if inv.evidence_inv %}
+
+{% for invevidence in inv.evidence_inv.all %}
+    {% for attr in invevidence.evattr_evidence.all %}
+        {% if attr.observable %}
+            <tr>
+              <th scope="row">{{attr.pk}}</th>
+              <td>
+                <div class="pull-left">
+                        <a href="{% url 'tasks:evattr_edit' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}"
+                            class="btn btn-default btn-xs">
+                            <span class="glyphicon glyphicon-pencil" data-toggle="tooltip" data-placement="top" title="Edit item">
+                            </span>
+                        </a>
+                          <a href="{% url 'tasks:evattr_remove' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}"
+                              class="btn btn-danger btn-xs">
+                          <span class="glyphicon glyphicon-trash" data-toggle="tooltip" data-placement="top" title="Edit item">
+                          </span>
+                          </a>
+                </div>
+              </td>
+              <td>{{ attr.evattrformat }}</td>
+              <td>{{ attr.attr_reputation }}</td>
+                <td style="max-width: 800px;">
+                    <a class="" href="{% url 'tasks:evattr_detail' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}"
+                       style="max-width: 800px;overflow: auto;text-overflow: word-wrap;overflow-wrap: break-word;"
+                    >
+                    {{ attr.evattrvalue }}
+                    </a>
+                </td>
+            </tr>
+        {% endif %}
+    {% endfor %}
+{% endfor %}
+{% else %}
+          <tr>
+            <td colspan="5" class="text-center bg-warning">No matching record found</td>
+          </tr>
+{% endif %}
+
