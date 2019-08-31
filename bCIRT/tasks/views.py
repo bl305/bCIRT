@@ -68,11 +68,11 @@ class PlaybookTemplateExportView(LoginRequiredMixin, PermissionRequiredMixin, ge
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(PlaybookTemplateExportView, self).__init__(*args, **kwargs)
 
-    def download_dir_zipped(self,p_dir):
+    def download_dir_zipped(self, p_dir):
         in_memory = BytesIO()
         os.chdir(os.path.dirname(p_dir))
         with zipfile.ZipFile(in_memory,
@@ -236,7 +236,7 @@ class GetFileRawView(LoginRequiredMixin, PermissionRequiredMixin, generic.Detail
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(GetFileRawView, self).__init__(*args, **kwargs)
 
@@ -276,7 +276,7 @@ class GetFileZippedView(LoginRequiredMixin, PermissionRequiredMixin, generic.Det
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(GetFileZippedView, self).__init__(*args, **kwargs)
 
@@ -357,7 +357,7 @@ class AutomationListView(LoginRequiredMixin, PermissionRequiredMixin, generic.Li
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(AutomationListView, self).__init__(*args, **kwargs)
 
@@ -385,7 +385,7 @@ class AutomationCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(AutomationCreateView, self).__init__(*args, **kwargs)
 
@@ -448,7 +448,7 @@ class AutomationDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(AutomationDetailView, self).__init__(*args, **kwargs)
 
@@ -487,7 +487,7 @@ class AutomationUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(AutomationUpdateView, self).__init__(*args, **kwargs)
 
@@ -550,7 +550,7 @@ class AutomationRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generic.
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(AutomationRemoveView, self).__init__(*args, **kwargs)
 
@@ -595,7 +595,7 @@ class ActionListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListVi
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(ActionListView, self).__init__(*args, **kwargs)
 
@@ -623,7 +623,7 @@ class ActionCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Crea
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(ActionCreateView, self).__init__(*args, **kwargs)
 
@@ -686,7 +686,7 @@ class ActionDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.Deta
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(ActionDetailView, self).__init__(*args, **kwargs)
 
@@ -725,7 +725,7 @@ class ActionUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Upda
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(ActionUpdateView, self).__init__(*args, **kwargs)
 
@@ -788,7 +788,7 @@ class ActionRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generic.Dele
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(ActionRemoveView, self).__init__(*args, **kwargs)
 
@@ -832,7 +832,7 @@ class ActionQDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.Det
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(ActionQDetailView, self).__init__(*args, **kwargs)
 
@@ -868,7 +868,7 @@ class ActionGroupListView(LoginRequiredMixin, PermissionRequiredMixin, generic.L
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(ActionGroupListView, self).__init__(*args, **kwargs)
 
@@ -896,7 +896,7 @@ class ActionGroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(ActionGroupCreateView, self).__init__(*args, **kwargs)
 
@@ -952,7 +952,7 @@ class ActionGroupDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(ActionGroupDetailView, self).__init__(*args, **kwargs)
 
@@ -991,7 +991,7 @@ class ActionGroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(ActionGroupUpdateView, self).__init__(*args, **kwargs)
 
@@ -1049,7 +1049,7 @@ class ActionGroupRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generic
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(ActionGroupRemoveView, self).__init__(*args, **kwargs)
 
@@ -1094,7 +1094,7 @@ class ActionGroupMemberListView(LoginRequiredMixin, PermissionRequiredMixin, gen
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(ActionGroupMemberListView, self).__init__(*args, **kwargs)
 
@@ -1122,7 +1122,7 @@ class ActionGroupMemberCreateView(LoginRequiredMixin, PermissionRequiredMixin, g
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(ActionGroupMemberCreateView, self).__init__(*args, **kwargs)
 
@@ -1178,7 +1178,7 @@ class ActionGroupMemberDetailView(LoginRequiredMixin, PermissionRequiredMixin, g
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(ActionGroupMemberDetailView, self).__init__(*args, **kwargs)
 
@@ -1217,7 +1217,7 @@ class ActionGroupMemberUpdateView(LoginRequiredMixin, PermissionRequiredMixin, g
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(ActionGroupMemberUpdateView, self).__init__(*args, **kwargs)
 
@@ -1275,7 +1275,7 @@ class ActionGroupMemberRemoveView(LoginRequiredMixin, PermissionRequiredMixin, g
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(ActionGroupMemberRemoveView, self).__init__(*args, **kwargs)
 
@@ -1317,7 +1317,7 @@ class OutputProcessor():
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(OutputProcessor, self).__init__(*args, **kwargs)
 
@@ -1340,7 +1340,7 @@ class ActionExecScriptRedirectView(LoginRequiredMixin, PermissionRequiredMixin, 
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(ActionExecScriptRedirectView, self).__init__(*args, **kwargs)
 
@@ -1393,7 +1393,7 @@ class ActionExecScriptGroupRedirectView(LoginRequiredMixin, PermissionRequiredMi
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(ActionExecScriptGroupRedirectView, self).__init__(*args, **kwargs)
 
@@ -1446,7 +1446,7 @@ class TaskListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(TaskListView, self).__init__(*args, **kwargs)
 
@@ -1476,7 +1476,7 @@ class TaskCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Create
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(TaskCreateView, self).__init__(*args, **kwargs)
 
@@ -1545,7 +1545,7 @@ class TaskDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.Detail
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(TaskDetailView, self).__init__(*args, **kwargs)
 
@@ -1585,7 +1585,7 @@ class TaskUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Update
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(TaskUpdateView, self).__init__(*args, **kwargs)
 
@@ -1646,7 +1646,7 @@ class TaskRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generic.Delete
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(TaskRemoveView, self).__init__(*args, **kwargs)
 
@@ -1692,7 +1692,7 @@ class TaskTemplateListView(LoginRequiredMixin, PermissionRequiredMixin, generic.
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(TaskTemplateListView, self).__init__(*args, **kwargs)
 
@@ -1721,7 +1721,7 @@ class TaskTemplateCreateView(LoginRequiredMixin, PermissionRequiredMixin, generi
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(TaskTemplateCreateView, self).__init__(*args, **kwargs)
 
@@ -1783,7 +1783,7 @@ class TaskTemplateDetailView(LoginRequiredMixin, PermissionRequiredMixin, generi
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(TaskTemplateDetailView, self).__init__(*args, **kwargs)
 
@@ -1822,7 +1822,7 @@ class TaskTemplateUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generi
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(TaskTemplateUpdateView, self).__init__(*args, **kwargs)
 
@@ -1883,7 +1883,7 @@ class TaskTemplateRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generi
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(TaskTemplateRemoveView, self).__init__(*args, **kwargs)
 
@@ -1953,7 +1953,7 @@ class TaskTemplateAddView(LoginRequiredMixin, PermissionRequiredMixin, generic.R
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(TaskTemplateAddView, self).__init__(*args, **kwargs)
 
@@ -2050,8 +2050,9 @@ class TaskTemplateAddView(LoginRequiredMixin, PermissionRequiredMixin, generic.R
         # return reverse('tasks:tsk_list')
         # return super().get_redirect_url(*args, **kwargs)
 
-
 ########## Task Var views
+
+
 class TaskVarListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
     model = TaskVar
     form_class = TaskVarForm
@@ -2063,7 +2064,7 @@ class TaskVarListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListV
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(TaskVarListView, self).__init__(*args, **kwargs)
 
@@ -2092,7 +2093,7 @@ class TaskVarCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Cre
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(TaskVarCreateView, self).__init__(*args, **kwargs)
 
@@ -2166,7 +2167,7 @@ class TaskVarDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.Det
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(TaskVarDetailView, self).__init__(*args, **kwargs)
 
@@ -2205,7 +2206,7 @@ class TaskVarUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Upd
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(TaskVarUpdateView, self).__init__(*args, **kwargs)
 
@@ -2264,7 +2265,7 @@ class TaskVarRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generic.Del
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(TaskVarRemoveView, self).__init__(*args, **kwargs)
 
@@ -2308,7 +2309,7 @@ class PlaybookListView(LoginRequiredMixin, PermissionRequiredMixin, generic.List
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(PlaybookListView, self).__init__(*args, **kwargs)
 
@@ -2333,7 +2334,7 @@ class PlaybookCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Re
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(PlaybookCreateView, self).__init__(*args, **kwargs)
 
@@ -2442,7 +2443,7 @@ class PlaybookDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.De
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(PlaybookDetailView, self).__init__(*args, **kwargs)
 
@@ -2479,7 +2480,7 @@ class PlaybookUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Up
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(PlaybookUpdateView, self).__init__(*args, **kwargs)
 
@@ -2538,7 +2539,7 @@ class PlaybookRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generic.De
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(PlaybookRemoveView, self).__init__(*args, **kwargs)
 
@@ -2583,7 +2584,7 @@ class PlaybookTemplateListView(LoginRequiredMixin, PermissionRequiredMixin, gene
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(PlaybookTemplateListView, self).__init__(*args, **kwargs)
 
@@ -2611,7 +2612,7 @@ class PlaybookTemplateCreateView(LoginRequiredMixin, PermissionRequiredMixin, ge
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(PlaybookTemplateCreateView, self).__init__(*args, **kwargs)
 
@@ -2672,7 +2673,7 @@ class PlaybookTemplateDetailView(LoginRequiredMixin, PermissionRequiredMixin, ge
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(PlaybookTemplateDetailView, self).__init__(*args, **kwargs)
 
@@ -2710,7 +2711,7 @@ class PlaybookTemplateUpdateView(LoginRequiredMixin, PermissionRequiredMixin, ge
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(PlaybookTemplateUpdateView, self).__init__(*args, **kwargs)
 
@@ -2771,7 +2772,7 @@ class PlaybookTemplateRemoveView(LoginRequiredMixin, PermissionRequiredMixin, ge
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(PlaybookTemplateRemoveView, self).__init__(*args, **kwargs)
 
@@ -2817,7 +2818,7 @@ class PlaybookTemplateItemListView(LoginRequiredMixin, PermissionRequiredMixin, 
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(PlaybookTemplateItemListView, self).__init__(*args, **kwargs)
 
@@ -2846,7 +2847,7 @@ class PlaybookTemplateItemCreateView(LoginRequiredMixin, PermissionRequiredMixin
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(PlaybookTemplateItemCreateView, self).__init__(*args, **kwargs)
 
@@ -2916,7 +2917,7 @@ class PlaybookTemplateItemDetailView(LoginRequiredMixin, PermissionRequiredMixin
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(PlaybookTemplateItemDetailView, self).__init__(*args, **kwargs)
 
@@ -2955,7 +2956,7 @@ class PlaybookTemplateItemUpdateView(LoginRequiredMixin, PermissionRequiredMixin
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(PlaybookTemplateItemUpdateView, self).__init__(*args, **kwargs)
 
@@ -3023,7 +3024,7 @@ class PlaybookTemplateItemRemoveView(LoginRequiredMixin, PermissionRequiredMixin
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(PlaybookTemplateItemRemoveView, self).__init__(*args, **kwargs)
 
@@ -3071,7 +3072,7 @@ class TaskAssignView(LoginRequiredMixin, PermissionRequiredMixin, generic.Redire
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(TaskAssignView, self).__init__(*args, **kwargs)
 
@@ -3120,7 +3121,7 @@ class TaskCloseView(LoginRequiredMixin, PermissionRequiredMixin, generic.Redirec
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(TaskCloseView, self).__init__(*args, **kwargs)
 
@@ -3165,7 +3166,7 @@ class TaskOpenView(LoginRequiredMixin, PermissionRequiredMixin, generic.Redirect
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(TaskOpenView, self).__init__(*args, **kwargs)
 
@@ -3211,7 +3212,7 @@ class EvidenceListView(LoginRequiredMixin, PermissionRequiredMixin, generic.List
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(EvidenceListView, self).__init__(*args, **kwargs)
 
@@ -3242,7 +3243,7 @@ class EvidenceCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Cr
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(EvidenceCreateView, self).__init__(*args, **kwargs)
 
@@ -3324,7 +3325,7 @@ class EvidenceDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.De
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(EvidenceDetailView, self).__init__(*args, **kwargs)
 
@@ -3364,7 +3365,7 @@ class EvidenceUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Up
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(EvidenceUpdateView, self).__init__(*args, **kwargs)
 
@@ -3456,7 +3457,7 @@ class EvidenceRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generic.De
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(EvidenceRemoveView, self).__init__(*args, **kwargs)
 
@@ -3516,7 +3517,7 @@ class EvidenceAttrListView(LoginRequiredMixin, PermissionRequiredMixin, generic.
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(EvidenceAttrListView, self).__init__(*args, **kwargs)
 
@@ -3547,7 +3548,7 @@ class EvidenceAttrCreateView(LoginRequiredMixin, PermissionRequiredMixin, generi
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(EvidenceAttrCreateView, self).__init__(*args, **kwargs)
 
@@ -3614,7 +3615,7 @@ class EvidenceAttrDetailView(LoginRequiredMixin, PermissionRequiredMixin, generi
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(EvidenceAttrDetailView, self).__init__(*args, **kwargs)
 
@@ -3654,7 +3655,7 @@ class EvidenceAttrUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generi
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(EvidenceAttrUpdateView, self).__init__(*args, **kwargs)
 
@@ -3729,7 +3730,7 @@ class EvidenceAttrRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generi
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(EvidenceAttrRemoveView, self).__init__(*args, **kwargs)
 
@@ -3775,7 +3776,7 @@ class EvidenceAttrObservableToggleView(LoginRequiredMixin, PermissionRequiredMix
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(EvidenceAttrObservableToggleView, self).__init__(*args, **kwargs)
 
@@ -3820,7 +3821,7 @@ class AddToProfileRedirectView(LoginRequiredMixin, PermissionRequiredMixin, gene
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(AddToProfileRedirectView, self).__init__(*args, **kwargs)
 

@@ -142,18 +142,24 @@ def timediff(pdate1, pdate2):
 # Create your models here.
 class Inv(models.Model):
     objects = models.Manager()
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="inv_users")
-    parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name="inv_parent")
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True,
+                             related_name="inv_users")
+    parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True,
+                               related_name="inv_parent")
     invid = models.CharField(max_length=20, default="", null=False, blank=False)
     refid = models.CharField(max_length=20, default="", null=True, blank=True)
-    status = models.ForeignKey(InvStatus, on_delete=models.SET_DEFAULT, default="1", related_name="inv_status")
-    phase = models.ForeignKey(InvPhase, on_delete=models.SET_DEFAULT, default="1", related_name="inv_phase")
-    severity = models.ForeignKey(InvSeverity, on_delete=models.SET_DEFAULT, default="1", related_name="inv_severity")
-    category = models.ForeignKey(InvCategory, on_delete=models.SET_DEFAULT, default="1", related_name="inv_category")
+    status = models.ForeignKey(InvStatus, on_delete=models.SET_DEFAULT, default="1",
+                               related_name="inv_status")
+    phase = models.ForeignKey(InvPhase, on_delete=models.SET_DEFAULT, default="1",
+                              related_name="inv_phase")
+    severity = models.ForeignKey(InvSeverity, on_delete=models.SET_DEFAULT, default="1",
+                                 related_name="inv_severity")
+    category = models.ForeignKey(InvCategory, on_delete=models.SET_DEFAULT, default="1",
+                                 related_name="inv_category")
     priority = models.ForeignKey(InvPriority, on_delete=models.SET_NULL, null=True, default=None,
                                  related_name="inv_priority")
-    attackvector = models.ForeignKey(InvAttackvector, on_delete=models.SET_DEFAULT, default="1", blank=False, null=False,
-                                     related_name="inv_attackvector")
+    attackvector = models.ForeignKey(InvAttackvector, on_delete=models.SET_DEFAULT, default="1", blank=False,
+                                     null=False, related_name="inv_attackvector")
     description = models.CharField(max_length=200, default="")
     description_html = models.TextField(editable=True, default='', blank=True)
     summary = models.CharField(max_length=2000, default="", blank=True, null=True)
@@ -167,7 +173,8 @@ class Inv(models.Model):
     modified_by = models.CharField(max_length=20, default="unknown")
 
     monetaryloss = models.PositiveIntegerField(default=0, blank=False, null=False)
-    losscurrency = models.ForeignKey(CurrencyType, on_delete=models.SET_DEFAULT, default="1", related_name="inv_currencytype", blank=True, null=False)
+    losscurrency = models.ForeignKey(CurrencyType, on_delete=models.SET_DEFAULT, default="1",
+                                     related_name="inv_currencytype", blank=True, null=False)
     numofvictims = models.PositiveIntegerField(default=None, blank=True, null=True)
     # check if the status has been changed
     __original_status = None
@@ -269,29 +276,29 @@ def new_inv(pinvid, pstatus, ppriority, pdescription, pphase, pseverity, pcatego
             pinvduration=None, pcreated_at=None, pcreated_by=None, pmodified_at=None, pmodified_by=None,
             pmonetaryloss=None, plosscurrency=None, pnumofvictims=None
             ):
-    new_inv = Inv.objects.create(
-        user=puser,
-        parent=pparent,
-        invid=pinvid,
-        refid=prefid,
-        status=pstatus,
-        phase=pphase,
-        severity=pseverity,
-        category=pcategory,
-        priority=ppriority,
-        attackvector=pattackvector,
-        description=pdescription,
-        summary=psummary,
-        comment=pcomment,
-        starttime=pstarttime,
-        endtime=pendtime,
-        invduration=pinvduration,
-        created_at=pcreated_at,
-        created_by=pcreated_by,
-        modified_at=pmodified_at,
-        modified_by=pmodified_by,
-        monetaryloss=pmonetaryloss,
-        losscurrency=plosscurrency,
-        numofvictims=pnumofvictims
-    )
-    return new_inv
+    new_inv_item = Inv.objects.create(
+                                user=puser,
+                                parent=pparent,
+                                invid=pinvid,
+                                refid=prefid,
+                                status=pstatus,
+                                phase=pphase,
+                                severity=pseverity,
+                                category=pcategory,
+                                priority=ppriority,
+                                attackvector=pattackvector,
+                                description=pdescription,
+                                summary=psummary,
+                                comment=pcomment,
+                                starttime=pstarttime,
+                                endtime=pendtime,
+                                invduration=pinvduration,
+                                created_at=pcreated_at,
+                                created_by=pcreated_by,
+                                modified_at=pmodified_at,
+                                modified_by=pmodified_by,
+                                monetaryloss=pmonetaryloss,
+                                losscurrency=plosscurrency,
+                                numofvictims=pnumofvictims
+                            )
+    return new_inv_item

@@ -27,7 +27,7 @@ User = get_user_model()
 
 class HomePage(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
     template_name = "index.html"
-    permission_required = ('invs.view_inv','tasks.view_task')
+    permission_required = ('invs.view_inv', 'tasks.view_task')
 
     def get_context_data(self, **kwargs):
         # check remaining session time
@@ -51,6 +51,3 @@ class HomePage(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
         kwargs['otasks'] = Task.objects.exclude(user=self.request.user).exclude(status=2).exclude(type=1)
         kwargs['rtasks'] = Task.objects.filter(user=self.request.user).order_by('-modified_at')[:5]
         return super(HomePage, self).get_context_data(**kwargs)
-
-
-

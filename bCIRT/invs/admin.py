@@ -36,9 +36,11 @@ class GroupMemberInline(admin.TabularInline):
 # admin.site.register(models.InvSeverity)
 # admin.site.register(models.InvStatus)
 
+
 @admin.register(models.CurrencyType)
 class CurrencyTypeAdmin(ImportExportModelAdmin):
     pass
+
 
 @admin.register(models.InvAttackvector)
 class InvAttackvectorAdmin(ImportExportModelAdmin):

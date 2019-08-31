@@ -27,19 +27,19 @@ import os
 # custom_variables.py
 try:
     from bCIRT.custom_variables import MYDB
-except:
+except Exception:
     MYDB = None
 try:
     from bCIRT.custom_variables import MYPATH
-except:
+except Exception:
     MYPATH = None
 try:
     from bCIRT.custom_variables import MYALLOWED_HOSTS
-except:
+except Exception:
     MYALLOWED_HOSTS = None
 try:
     from bCIRT.custom_variables import LOGLEVEL
-except:
+except Exception:
     LOGLEVEL = 0
 
 # custom backup constants start

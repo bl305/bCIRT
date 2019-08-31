@@ -104,7 +104,7 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
                     print(tablename + " imported successfully")
-            except:
+            except Exception:
                 raise CommandError(tablename + " table could not be imported!")
         else:
             print(fname+" is not readable!")
@@ -123,7 +123,7 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
                     print(tablename + " imported successfully")
-            except:
+            except Exception:
                 raise CommandError(tablename + " table could not be imported!")
         else:
             print(fname+" is not readable!")
@@ -142,7 +142,7 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
                     print(tablename + " imported successfully")
-            except:
+            except Exception:
                 raise CommandError(tablename + " table could not be imported!")
         else:
             print(fname+" is not readable!")
@@ -161,7 +161,7 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
                     print(tablename + " imported successfully")
-            except:
+            except Exception:
                 raise CommandError(tablename + " table could not be imported!")
         else:
             print(fname+" is not readable!")
@@ -180,7 +180,7 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
                     print(tablename + " imported successfully")
-            except:
+            except Exception:
                 raise CommandError(tablename + " table could not be imported!")
         else:
             print(fname+" is not readable!")
@@ -199,7 +199,7 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
                     print(tablename + " imported successfully")
-            except:
+            except Exception:
                 raise CommandError(tablename + " table could not be imported!")
         else:
             print(fname+" is not readable!")
@@ -218,7 +218,7 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
                     print(tablename + " imported successfully")
-            except:
+            except Exception:
                 raise CommandError(tablename + " table could not be imported!")
         else:
             print(fname+" is not readable!")
@@ -237,7 +237,7 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
                     print(tablename + " imported successfully")
-            except:
+            except Exception:
                 raise CommandError(tablename + " table could not be imported!")
         else:
             print(fname+" is not readable!")
@@ -256,7 +256,7 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
                     print(tablename + " imported successfully")
-            except:
+            except Exception:
                 raise CommandError(tablename + " table could not be imported!")
         else:
             print(fname+" is not readable!")
@@ -275,7 +275,7 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
                     print(tablename + " imported successfully")
-            except:
+            except Exception:
                 raise CommandError(tablename + " table could not be imported!")
         else:
             print(fname+" is not readable!")
@@ -294,7 +294,7 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
                     print(tablename + " imported successfully")
-            except:
+            except Exception:
                 raise CommandError(tablename + " table could not be imported!")
         else:
             print(fname+" is not readable!")
@@ -313,7 +313,7 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
                     print(tablename + " imported successfully")
-            except:
+            except Exception:
                 raise CommandError(tablename + " table could not be imported!")
         else:
             print(fname+" is not readable!")
@@ -332,7 +332,7 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
                     print(tablename + " imported successfully")
-            except:
+            except Exception:
                 raise CommandError(tablename + " table could not be imported!")
         else:
             print(fname+" is not readable!")
@@ -351,7 +351,7 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
                     print(tablename + " imported successfully")
-            except:
+            except Exception:
                 raise CommandError(tablename + " table could not be imported!")
         else:
             print(fname+" is not readable!")
@@ -370,7 +370,7 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
                     print(tablename + " imported successfully")
-            except:
+            except Exception:
                 raise CommandError(tablename + " table could not be imported!")
         else:
             print(fname+" is not readable!")
@@ -389,7 +389,7 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
                     print(tablename + " imported successfully")
-            except:
+            except Exception:
                 raise CommandError(tablename + " table could not be imported!")
         else:
             print(fname+" is not readable!")
@@ -408,7 +408,7 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
                     print(tablename + " imported successfully")
-            except:
+            except Exception:
                 raise CommandError(tablename + " table could not be imported!")
         else:
             print(fname+" is not readable!")
@@ -427,7 +427,7 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
                     print(tablename + " imported successfully")
-            except:
+            except Exception:
                 raise CommandError(tablename + " table could not be imported!")
         else:
             print(fname+" is not readable!")
@@ -446,7 +446,7 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
                     print(tablename + " imported successfully")
-            except:
+            except Exception:
                 raise CommandError(tablename + " table could not be imported!")
         else:
             print(fname+" is not readable!")
@@ -465,7 +465,7 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
                     print(tablename + " imported successfully")
-            except:
+            except Exception:
                 raise CommandError(tablename + " table could not be imported!")
         else:
             print(fname+" is not readable!")
@@ -484,7 +484,7 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
                     print(tablename + " imported successfully")
-            except:
+            except Exception:
                 raise CommandError(tablename + " table could not be imported!")
         else:
             print(fname+" is not readable!")
@@ -503,7 +503,7 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
                     print(tablename + " imported successfully")
-            except:
+            except Exception:
                 raise CommandError(tablename + " table could not be imported!")
         else:
             print(fname+" is not readable!")
@@ -522,7 +522,7 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
                     print(tablename+" imported successfully")
-            except:
+            except Exception:
                 raise CommandError(tablename+" table could not be imported!")
         else:
             print(fname+" is not readable!")
@@ -541,7 +541,7 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
                     print(tablename+" imported successfully")
-            except:
+            except Exception:
                 raise CommandError(tablename+" table could not be imported!")
         else:
             print(fname+" is not readable!")
@@ -560,7 +560,7 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
                     print(tablename+" imported successfully")
-            except:
+            except Exception:
                 raise CommandError(tablename+" table could not be imported!")
         else:
             print(fname+" is not readable!")
@@ -579,7 +579,7 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
                     print(tablename+" imported successfully")
-            except:
+            except Exception:
                 raise CommandError(tablename+" table could not be imported!")
         else:
             print(fname+" is not readable!")
@@ -598,7 +598,7 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
                     print(tablename+" imported successfully")
-            except:
+            except Exception:
                 raise CommandError(tablename+" table could not be imported!")
         else:
             print(fname+" is not readable!")
@@ -617,7 +617,7 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
                     print(tablename+" imported successfully")
-            except:
+            except Exception:
                 raise CommandError(tablename+" table could not be imported!")
         else:
             print(fname+" is not readable!")
@@ -636,7 +636,7 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
                     print(tablename+" imported successfully")
-            except:
+            except Exception:
                 raise CommandError(tablename+" table could not be imported!")
         else:
             print(fname+" is not readable!")
@@ -655,7 +655,7 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
                     print(tablename+" imported successfully")
-            except:
+            except Exception:
                 raise CommandError(tablename+" table could not be imported!")
         else:
             print(fname+" is not readable!")
@@ -674,7 +674,7 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
                     print(tablename+" imported successfully")
-            except:
+            except Exception:
                 raise CommandError(tablename+" table could not be imported!")
         else:
             print(fname+" is not readable!")
@@ -693,7 +693,7 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
                     print(tablename+" imported successfully")
-            except:
+            except Exception:
                 raise CommandError(tablename+" table could not be imported!")
         else:
             print(fname+" is not readable!")
@@ -712,7 +712,7 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
                     print(tablename+" imported successfully")
-            except:
+            except Exception:
                 raise CommandError(tablename+" table could not be imported!")
         else:
             print(fname+" is not readable!")
@@ -731,7 +731,7 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
                     print(tablename+" imported successfully")
-            except:
+            except Exception:
                 raise CommandError(tablename+" table could not be imported!")
         else:
             print(fname+" is not readable!")
@@ -750,7 +750,7 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
                     print(tablename+" imported successfully")
-            except:
+            except Exception:
                 raise CommandError(tablename+" table could not be imported!")
         else:
             print(fname+" is not readable!")
@@ -769,11 +769,10 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
                     print(tablename+" imported successfully")
-            except:
+            except Exception:
                 raise CommandError(tablename+" table could not be imported!")
         else:
             print(fname+" is not readable!")
-
 
     def import_updatepackage(self, p_format):
         tablename = "UpdatePackage"
@@ -789,7 +788,7 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
                     print(tablename+" imported successfully")
-            except:
+            except Exception:
                 raise CommandError(tablename+" table could not be imported!")
         else:
             print(fname+" is not readable!")

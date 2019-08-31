@@ -91,6 +91,8 @@ class UpdatePackage(models.Model):
         super(UpdatePackage, self).clean()
 
 # Connections model
+
+
 class ConnectionItem(models.Model):
     objects = models.Manager()
     enabled = models.BooleanField(default=True)
@@ -109,7 +111,7 @@ class ConnectionItem(models.Model):
 class ConnectionItemField(models.Model):
     objects = models.Manager()
     connectionitemid = models.ForeignKey(ConnectionItem, on_delete=models.CASCADE, blank=False, null=False,
-                                    related_name="connectionitemfield_connectionitem")
+                                         related_name="connectionitemfield_connectionitem")
     connectionitemfieldname = models.CharField(max_length=20, blank=False, null=False)
     connectionitemfieldvalue = models.CharField(max_length=256, blank=False, null=False)
     encryptvalue = models.BooleanField(default=True)
@@ -128,6 +130,7 @@ class ConnectionItemField(models.Model):
         key = bCIRT_Encryption().generate_key_manual(ENCRYPTION_KEY_1, SALT_1)
         strdec = bCIRT_Encryption().decrypt_string(key, self.connectionitemfieldvalue.encode()).decode()
         return strdec
+
 
 def decrypt_string(pstr):
     key = bCIRT_Encryption().generate_key_manual(ENCRYPTION_KEY_1, SALT_1)

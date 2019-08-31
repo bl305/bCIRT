@@ -1,0 +1,150 @@
+{% extends "configuration/configuration_base.html" %}
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : configuration/configuration_about.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.08.29
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.08.29  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+
+{% block preconfiguration %}
+<div class="container">
+	<div class="col-md-12">
+		<div class="content">
+			<h2>About</h2>
+		</div>
+	</div>
+{% endblock %}
+{% block configuration_content %}
+	<div class="col-md-12">
+		<div class="list-group">
+
+
+<div class="Box-body">
+        <article class="markdown-body entry-content p-5" itemprop="text"><h1><a id="user-content-balazss-computer-incident-response-tool-bcirt" class="anchor" aria-hidden="true" href="#balazss-computer-incident-response-tool-bcirt"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Balazs's Computer Incident Response Tool (bCIRT)</h1>
+<h2><a id="user-content-what-is-it" class="anchor" aria-hidden="true" href="#what-is-it"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>What is it?</h2>
+<p>This is an incident response team case management "tool", that can be utilized to automate the response procedures and keep record of the performed actions.
+It will be integrated with external tools via scripts and APIs.</p>
+<h2><a id="user-content-what-is-it-not" class="anchor" aria-hidden="true" href="#what-is-it-not"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>What is it not?</h2>
+<p>It is not a SIEM or a log management tool. It's purpose is not to collect logs from other systems, however I plan integration with SIEM tools.
+It is not a helpdesk system either, there are cool solutions out there.</p>
+<h2><a id="user-content-license" class="anchor" aria-hidden="true" href="#license"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>License</h2>
+<p>I provide this tool for free of charge for ANYONE who needs it.<br>
+I will NOT restrict it, because I want everyone to benefit from it who wants.
+Of course if you find this tool useful and make a billion dollar business out of it please think about me and invite me for a lunch or so:)<br>
+It is using multiple third-party tools/scripts that I found awesome!!! Please think about those people also when using this tool, I'll provide a detailed list with licenses for each on this page.<br>
+I never wanted to misuse a license or a tool, so if you notice that I am not following an of the licenses as much as possible, please let me know and I'll try to fix it.<br>
+All external tools/ideas integrated into this I find brilliant and <strong>THANK YOU</strong>!!!</p>
+<h2><a id="user-content-distribution" class="anchor" aria-hidden="true" href="#distribution"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Distribution</h2>
+<p>It is primarily a package of Python Django scripts, but I plan to provide either a Virtual Machine or a script that installs the necessary tools to support easy deployment and a demo environment.
+I will share the code as I develop it.</p>
+<h2><a id="user-content-warning" class="anchor" aria-hidden="true" href="#warning"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Warning</h2>
+<p>Although it is about information security, the tool is heavily leveraging Django's security features and nothing is perfect. For this reason I recommend securig the tool and it's environment as much as possible.<br>
+I am NOT a developer, I am far away from being one! So this code is probably not the most effective, "ugly", "bad". If you wish to educate me, you are more than welcome, I appreciate any advice.
+This is a tool in development, not intended for production use. It will likely not lose any data, but anyways, use it at your own risk!
+Don't install this on a server where the users of it should not have admin access, as the current controls allow easy takeover of the host server (via script executions). This will be managed later, right now I don't have issue with being admin of the server.
+Updates to the packages should be allowed to be installed, the version stated in the requirements.txt are the versions used during development and will continuously be updated as I update the development environment.</p>
+<h2><a id="user-content-what-is-the-driver-of-this-project" class="anchor" aria-hidden="true" href="#what-is-the-driver-of-this-project"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>What is the driver of this project:</h2>
+<ul>
+<li>learn the Python Django framework because it's cool</li>
+<li>develop a tool that I can customize as needed</li>
+<li>give back to the community by sharing the tool</li>
+</ul>
+<h2><a id="user-content-long-term-goals-for-the-tool" class="anchor" aria-hidden="true" href="#long-term-goals-for-the-tool"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Long term goals for the tool:</h2>
+<ul>
+<li>Case management</li>
+<li>Task management</li>
+<li>Automated and manual Script, command and tool execution</li>
+<li>Playbook creation</li>
+<li>Email notification</li>
+<li>External authentication (minimum Active Directory, maybe SAML)</li>
+<li>Potentially internationalize the strings</li>
+</ul>
+<h2><a id="user-content-issuebug-tracking-and-todonext-list" class="anchor" aria-hidden="true" href="#issuebug-tracking-and-todonext-list"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Issue/Bug tracking and TODO/NEXT list:</h2>
+<ol>
+<li>integrate MITRE/ATTACK framework</li>
+<li>create indicators like url, file, hash etc for evidences</li>
+<li>remove buttons based on permissions and fix any potential permission issues - not tested in detail yet</li>
+<li>enable command history/logging</li>
+<li>concurrent edit of records in two browsers/windows - latest wins</li>
+<li>builtin scripts/task templates etc</li>
+<li>field validation for future indicators</li>
+<li>GET/POST request additional value validation on the server side</li>
+<li>workflow controls, like don't allow to close an investigation with open tasks</li>
+<li>a few more fixes</li>
+</ol>
+<h2><a id="user-content-install-guide-for-demo-ing" class="anchor" aria-hidden="true" href="#install-guide-for-demo-ing"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Install guide for demo-ing</h2>
+<p>Key steps to get going:</p>
+<ol>
+<li>Dowload the source code</li>
+<li>Install virtual envrionment</li>
+<li>Install Django and install supporting python dependency packages</li>
+<li>Change defaults</li>
+<li>Init database</li>
+<li>Start django</li>
+</ol>
+<h3><a id="user-content-1-download-sourcecode" class="anchor" aria-hidden="true" href="#1-download-sourcecode"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>1. download sourcecode</h3>
+<p>Click on the download icon and save the zip file somewhere.</p>
+<h3><a id="user-content-2-install-virtual-environment-linux" class="anchor" aria-hidden="true" href="#2-install-virtual-environment-linux"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>2. install virtual environment (Linux)</h3>
+<p>Go to a directory where you would like to have your virtual environment and create a standar python virtual env, like:
+Follow this for more details: <a href="https://packaging.python.org/guides/installing-using-pip-and-virtualenv/" rel="nofollow">https://packaging.python.org/guides/installing-using-pip-and-virtualenv/</a>
+Basically, run:</p>
+<div class="highlight highlight-source-python"><pre>python3 <span class="pl-k">-</span>m virtualenv env
+source env<span class="pl-k">/</span><span class="pl-c1">bin</span><span class="pl-k">/</span>activate</pre></div>
+<h3><a id="user-content-3-install-django-and-other-python-packages" class="anchor" aria-hidden="true" href="#3-install-django-and-other-python-packages"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>3. Install Django and other python packages</h3>
+<p>Go to the virtual environment by activating it, then:</p>
+<div class="highlight highlight-source-python"><pre>pip install django</pre></div>
+<p>The next will install a bunch of dependencies and you might need to do some additional stuff to get weasyprint run, then go to <a href="https://weasyprint.readthedocs.io/en/stable/install.html" rel="nofollow">https://weasyprint.readthedocs.io/en/stable/install.html</a></p>
+<div class="highlight highlight-source-python"><pre>pip install django<span class="pl-k">-</span>weasyprint cairocffi django<span class="pl-k">-</span>bootstrap<span class="pl-k">-</span><span class="pl-c1">4</span> django<span class="pl-k">-</span>tinymce4<span class="pl-k">-</span>lite misaka <span class="pl-k">import</span><span class="pl-k">-</span>export</pre></div>
+<h3><a id="user-content-4-change-default-values" class="anchor" aria-hidden="true" href="#4-change-default-values"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>4. Change default values</h3>
+<p>Go to the bCIRT/settings.py and change the followings:</p>
+<pre lang="text"><code>BASE_URL = "http://127.0.0.1:8000"
+ALLOWED_HOSTS = ['127.0.0.1']
+INTERNAL_IPS = ['127.0.0.1']
+PROJECT_ROOT='/home/bali/PycharmProjects/bCIRT'
+
+</code></pre>
+<p>Go to the bCIRT/custom_params.py and change:</p>
+<pre lang="text"><code>ALLOWED_HOSTS = '127.0.0.1'
+</code></pre>
+<h3><a id="user-content-5-init-database" class="anchor" aria-hidden="true" href="#5-init-database"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>5. Init database</h3>
+<p>To init the database with default values, run this command:</p>
+<div class="highlight highlight-source-python"><pre>python3 manage.py makemigrations
+python3 manage.py migrate
+python3 manage.py createsuperuser
+<span class="pl-c"><span class="pl-c">#</span>follow steps</span>
+python3 manage.py initdb <span class="pl-ii">--</span><span class="pl-c1">all</span></pre></div>
+<p>Tables can be added by applications, using the</p>
+<div class="highlight highlight-source-python"><pre>python3 manage.py initdb <span class="pl-k">-</span>i appname</pre></div>
+<h3><a id="user-content-6-start-django" class="anchor" aria-hidden="true" href="#6-start-django"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>6. Start Django</h3>
+<p>Simply run in the virtual env:</p>
+<div class="highlight highlight-source-python"><pre>python3 manage.py runserver</pre></div>
+<h2><a id="user-content-used-tools-modules-respect-to-the-developers" class="anchor" aria-hidden="true" href="#used-tools-modules-respect-to-the-developers"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Used tools, modules, respect to the developers!</h2>
+<p>Any coding I did not following best practices is my fault, don't blame any of the tools which I might not use properly:)</p>
+<p>First of all I used this website a lot, a LOT, many thanks: <a href="https://simpleisbetterthancomplex.com/" rel="nofollow">https://simpleisbetterthancomplex.com/</a>
+Favourite editors for home users: <a href="https://www.jetbrains.com/pycharm/" rel="nofollow">https://www.jetbrains.com/pycharm/</a>, <a href="https://atom.io/" rel="nofollow">https://atom.io/</a></p>
+<p>Tools integrated in the bCIRT:
+bootstrap (MIT): <a href="https://getbootstrap.com/" rel="nofollow">https://getbootstrap.com/</a><br>
+bootstrap table (MIT): <a href="https://github.com/wenzhixin/bootstrap-table">https://github.com/wenzhixin/bootstrap-table</a><br>
+bootstrap-datepicker (Apache 2.0): <a href="https://github.com/uxsolutions/bootstrap-datepicker">https://github.com/uxsolutions/bootstrap-datepicker</a><br>
+bootstrap-select (MIT): <a href="https://github.com/snapappointments/bootstrap-select">https://github.com/snapappointments/bootstrap-select</a><br>
+Fontawesome (Free/Open source GPL friendly): <a href="https://github.com/FortAwesome/Font-Awesome">https://github.com/FortAwesome/Font-Awesome</a><br>
+jquery (MIT): <a href="https://jquery.com" rel="nofollow">https://jquery.com</a><br>
+jquery UI (MIT): <a href="https://jqueryui.com" rel="nofollow">https://jqueryui.com</a><br>
+django-bootstrap-4 (BSD-3-Clause): <a href="https://github.com/zostera/django-bootstrap4">https://github.com/zostera/django-bootstrap4</a><br>
+django-tinymce4-lite (MIT): <a href="https://github.com/romanvm/django-tinymce4-lite">https://github.com/romanvm/django-tinymce4-lite</a><br>
+misaka (MIT): <a href="https://pypi.org/project/misaka" rel="nofollow">https://pypi.org/project/misaka</a><br>
+weasyprint (BSD): <a href="https://weasyprint.org" rel="nofollow">https://weasyprint.org</a> PyPI: <a href="https://pypi.org/project/WeasyPrint" rel="nofollow">https://pypi.org/project/WeasyPrint</a></p>
+</div>
+
+
+		</div>
+	</div>
+</div>
+{% endblock %}

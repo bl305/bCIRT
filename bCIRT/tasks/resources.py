@@ -15,7 +15,7 @@ from .models import Task, TaskCategory, TaskPriority, TaskStatus, TaskType,\
     TaskTemplate, TaskVar, TaskVarCategory, TaskVarType, \
     Playbook, PlaybookTemplate, PlaybookTemplateItem,\
     Evidence, EvidenceFormat, EvidenceAttr, EvidenceAttrFormat, \
-    Action, ScriptType, ScriptOs, ScriptCategory, ScriptOutput, OutputTarget,ScriptInput,\
+    Action, ScriptType, ScriptOs, ScriptCategory, ScriptOutput, OutputTarget, ScriptInput,\
     Type, ActionQ, ActionQStatus, MitreAttck_Tactics, MitreAttck_Techniques,\
     ActionGroup, ActionGroupMember
 
@@ -78,6 +78,7 @@ class ScriptOutputResource(resources.ModelResource):
 class ScriptInputResource(resources.ModelResource):
     class Meta:
         model = ScriptInput
+
 
 class OutputTargetResource(resources.ModelResource):
     class Meta:

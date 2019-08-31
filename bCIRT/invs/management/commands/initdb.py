@@ -17,8 +17,8 @@ from tasks.models import MitreAttck_Tactics, MitreAttck_Techniques
 from tasks.models import TaskVarType, TaskVarCategory, TaskType, TaskCategory, TaskStatus, TaskPriority
 from tasks.models import ScriptOs, ScriptType, ScriptCategory, Action, Type, ActionQStatus, OutputTarget, ScriptOutput
 from tasks.models import EvidenceFormat, EvidenceAttrFormat, EvReputation, ScriptInput
-from bCIRT.settings import PROJECT_ROOT
-from os import path
+# from bCIRT.settings import PROJECT_ROOT
+# from os import path
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
@@ -70,7 +70,7 @@ class Command(BaseCommand):
             self.populate_actoutputtarget()
             self.populate_acttype()
             self.populate_actionqstatus()
-            self.populate_action()
+            # self.populate_action()
 
             self.populate_mitreattck_tactics()
             # self.populate_mitreattck_techniques()
@@ -106,7 +106,7 @@ class Command(BaseCommand):
                 self.populate_actoutputtarget()
                 self.populate_acttype()
                 self.populate_actionqstatus()
-                self.populate_action()
+                # self.populate_action()
             elif p_table == "mitre":
                 self.populate_mitreattck_tactics()
                 # self.populate_mitreattck_techniques()
@@ -142,7 +142,7 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
                     enabled=evformatitem['enabled'],
                     description=evformatitem['description']
                 )
-        except:
+        except Exception:
             raise CommandError("EvidenceFormat table could not be updated!")
 
     def populate_evidenceattrformat(self):
@@ -232,7 +232,7 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
                     enabled=evattrformatitem['enabled'],
                     description=evattrformatitem['description']
                 )
-        except:
+        except Exception:
             raise CommandError("EvidenceAttrFormat table could not be updated!")
 
     def populate_evreputation(self):
@@ -240,7 +240,8 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
             {
                 "name": "Unknown",
                 "enabled": "1",
-                "description": "Item has been checked, but reputation databases have no good or bad reputation value for this item."
+                "description": "Item has been checked, but reputation databases have no good or bad reputation value "
+                               "for this item."
             },
             {
                 "name": "Clean",
@@ -266,7 +267,7 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
                     enabled=evreputationitem['enabled'],
                     description=evreputationitem['description']
                 )
-        except:
+        except Exception:
             raise CommandError("Evidence Reputation table could not be updated!")
 
     def populate_currencytype(self):
@@ -290,7 +291,7 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
                     enabled=currencytypeitem['enabled'],
                     currencyshortname=currencytypeitem['currencyshortname']
                 )
-        except:
+        except Exception:
             raise CommandError("CurrencyType table could not be updated!")
 
     def populate_invstatus(self):
@@ -324,7 +325,7 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
                     enabled=invstatitem['enabled'],
                     description=invstatitem['description']
                 )
-        except:
+        except Exception:
             raise CommandError("InvStatus table could not be updated!")
 
     def populate_invseverity(self):
@@ -369,7 +370,7 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
                     enabled=invsevitem['enabled'],
                     description=invsevitem['description']
                 )
-        except:
+        except Exception:
             raise CommandError("InvSeverity table could not be updated!")
 
     def populate_invpriority(self):
@@ -398,7 +399,7 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
                     enabled=invprioitem['enabled'],
                     description=invprioitem['description']
                 )
-        except:
+        except Exception:
             raise CommandError("InvPriority table could not be updated!")
 
     def populate_invphase(self):
@@ -433,7 +434,7 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
                     enabled=invphaitem['enabled'],
                     description=invphaitem['description']
                 )
-        except:
+        except Exception:
             raise CommandError("InvPhase table could not be updated!")
 
     def populate_invcategory(self):
@@ -441,44 +442,59 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
             {
                 "name": "Exercise/Network Defense Testing",
                 "enabled": "1",
-                "reporting_timeframe": "Not Applicable; this category is for each agency's internal use during exercises.",
+                "reporting_timeframe": "Not Applicable; this category is for each agency's internal use during"
+                                       " exercises.",
                 "catid": "CAT 0",
-                "description": "This category is used during state, federal, national, international exercises and approved activity testing of internal/external network defenses or responses."
+                "description": "This category is used during state, federal, national, international exercises"
+                               " and approved activity testing of internal/external network defenses or responses."
             },
             {
                 "name": "Unauthorized Access",
                 "enabled": "1",
                 "reporting_timeframe": "Within one (1) hour of discovery/detection.",
                 "catid": "CAT 1",
-                "description": "In this category an individual gains logical or physical access without permission to a federal agency network, system, application, data, or other resource"
+                "description": "In this category an individual gains logical or physical access without permission to"
+                               " a federal agency network, system, application, data, or other resource"
             },
             {
                 "name": "Denial of Service (DoS)",
                 "enabled": "1",
-                "reporting_timeframe": "Within two (2) hours of discovery/detection if the successful attack is still ongoing and the agency is unable to successfully mitigate activity.",
+                "reporting_timeframe": "Within two (2) hours of discovery/detection if the successful attack is still "
+                                       "ongoing and the agency is unable to successfully mitigate activity.",
                 "catid": "CAT 2",
-                "description": "An attack that successfully prevents or impairs the normal authorized functionality of networks, systems or applications by exhausting resources. This activity includes being the victim or participating in the DoS."
+                "description": "An attack that successfully prevents or impairs the normal authorized functionality"
+                               " of networks, systems or applications by exhausting resources. This activity includes"
+                               " being the victim or participating in the DoS."
             },
             {
                 "name": "Malicious Code",
                 "enabled": "1",
-                "reporting_timeframe": "Daily \nNote: Within one (1) hour of discovery/detection if widespread across agency.",
+                "reporting_timeframe": "Daily \nNote: Within one (1) hour of discovery/detection if widespread across "
+                                       "agency.",
                 "catid": "CAT 3",
-                "description": "Successful installation of malicious software (e.g., virus, worm, Trojan horse, or other code-based malicious entity) that infects an operating system or application. Agencies are NOT required to report malicious logic that has been successfully quarantined by antivirus (AV) software."
+                "description": "Successful installation of malicious software (e.g., virus, worm, Trojan horse, "
+                               "or other code-based malicious entity) that infects an operating system or application."
+                               " Agencies are NOT required to report malicious logic that has been successfully"
+                               " quarantined by antivirus (AV) software."
             },
             {
                 "name": "Improper Usage",
                 "enabled": "1",
-                "reporting_timeframe": "Monthly\nNote: If system is classified, report within one (1) hour of discovery.",
+                "reporting_timeframe": "Monthly\nNote: If system is classified, report within one (1) hour of "
+                                       "discovery.",
                 "catid": "CAT 4",
-                "description": "This category includes any activity that seeks to access or identify a federal agency computer, open ports, protocols, service, or any combination for later exploit. This activity does not directly result in a compromise or denial of service."
+                "description": "This category includes any activity that seeks to access or identify a federal agency"
+                               " computer, open ports, protocols, service, or any combination for later exploit. This"
+                               " activity does not directly result in a compromise or denial of service."
             },
             {
                 "name": "Investigation",
                 "enabled": "1",
-                "reporting_timeframe": "Not Applicable; this category is for each agency's use to categorize a potential incident that is currently being investigated.",
+                "reporting_timeframe": "Not Applicable; this category is for each agency's use to categorize a"
+                                       " potential incident that is currently being investigated.",
                 "catid": "CAT 6",
-                "description": "Unconfirmed incidents that are potentially malicious or anomalous activity deemed by the reporting entity to warrant further review."
+                "description": "Unconfirmed incidents that are potentially malicious or anomalous activity deemed by"
+                               " the reporting entity to warrant further review."
             },
         ]
         try:
@@ -491,7 +507,7 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
                     catid=invcatitem['catid'],
                     description=invcatitem['description']
                 )
-        except:
+        except Exception:
             raise CommandError("InvCategory table could not be updated!")
 
     def populate_invattackvector(self):
@@ -550,7 +566,7 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
                     enabled=invattackvectoritem['enabled'],
                     description=invattackvectoritem['description']
                 )
-        except:
+        except Exception:
             raise CommandError("InvAttackVector table could not be updated!")
 
     def populate_actscriptos(self):
@@ -577,7 +593,7 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
                     enabled=actscriptositem['enabled'],
                     description=actscriptositem['description']
                 )
-        except:
+        except Exception:
             raise CommandError("ActionScriptOs table could not be updated!")
 
     def populate_actscriptcategory(self):
@@ -597,7 +613,7 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
                     enabled=actscriptcategoryitem['enabled'],
                     description=actscriptcategoryitem['description']
                 )
-        except:
+        except Exception:
             raise CommandError("ActionScriptCategory table could not be updated!")
 
     def populate_actscripttype(self):
@@ -630,7 +646,7 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
                     os=actscripttypeitem['os'],
                     interpreter=actscripttypeitem['interpreter']
                 )
-        except:
+        except Exception:
             raise CommandError("ActionScriptType table could not be updated!")
 
     def populate_actoutputtarget(self):
@@ -668,7 +684,7 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
                     enabled=actscripttypeitem['enabled'],
                     description=actscripttypeitem['description'],
                 )
-        except:
+        except Exception:
             raise CommandError("ActionOutputTarget table could not be updated!")
 
     def populate_actscriptoutput(self):
@@ -707,7 +723,7 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
                     delimiter=actscriptoutputitem['delimiter'],
                     description=actscriptoutputitem['description'],
                 )
-        except:
+        except Exception:
             raise CommandError("ActionScriptOutput table could not be updated!")
 
     def populate_actscriptinput(self):
@@ -739,9 +755,8 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
                     enabled=actscriptinputitem['enabled'],
                     description=actscriptinputitem['description'],
                 )
-        except:
+        except Exception:
             raise CommandError("ActionScriptInput table could not be updated!")
-
 
     def populate_acttype(self):
         acttype = [
@@ -779,7 +794,7 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
                     enabled=acttypeitem['enabled'],
                     description=acttypeitem['description'],
                 )
-        except:
+        except Exception:
             raise CommandError("ActionType table could not be updated!")
 
     def populate_taskcategory(self):
@@ -837,7 +852,7 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
                     acknowledge_required=taskcategoryitem['acknowledge_required'],
                     resolution_required=taskcategoryitem['resolution_required']
                 )
-        except:
+        except Exception:
             raise CommandError("TaskCategory table could not be updated!")
 
     def populate_taskpriority(self):
@@ -867,7 +882,7 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
                     enabled=taskpriorityitem['enabled'],
                     description=taskpriorityitem['description'],
                 )
-        except:
+        except Exception:
             raise CommandError("TaskPriority table could not be updated!")
 
     def populate_taskstatus(self):
@@ -902,7 +917,7 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
                     enabled=taskstatusitem['enabled'],
                     description=taskstatusitem['description'],
                 )
-        except:
+        except Exception:
             raise CommandError("TaskStatus table could not be updated!")
 
     def populate_tasktype(self):
@@ -930,7 +945,7 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
                     description=tasktypeitem['description'],
                     typeid=tasktypeitem['typeid']
                 )
-        except:
+        except Exception:
             raise CommandError("TaskType table could not be updated!")
 
     def populate_taskvarcategory(self):
@@ -955,7 +970,7 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
                     enabled=taskvarcategoryitem['enabled'],
                     description=taskvarcategoryitem['description'],
                 )
-        except:
+        except Exception:
             raise CommandError("TaskVarCategory table could not be updated!")
 
     def populate_taskvartype(self):
@@ -978,7 +993,8 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
             {
                 "name": "File",
                 "enabled": "1",
-                "description": "Provide the file as an evidence record. It will get the attachment from the referred evidence."
+                "description": "Provide the file as an evidence record. It will get the attachment from the referred"
+                               " evidence."
             },
             {
                 "name": "List",
@@ -995,34 +1011,49 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
                     enabled=taskvartypeitem['enabled'],
                     description=taskvartypeitem['description'],
                 )
-        except:
+        except Exception:
             raise CommandError("TaskVarType table could not be updated!")
 
     def populate_action(self):
-        from django.core.files import File
+        # from django.core.files import File
 
         actions = [
             {
-                "title": "Hello World CMD",
-                "code": r"""
-echo "Hello World"
-sleep 2 &                
-                                """,
-                "description": "<p>Prints a hello world</p>",
-                "script_type": ScriptType.objects.get(pk=2),
-                "script_category": ScriptCategory.objects.get(pk=1),
-                "user": User.objects.get(pk=1),
-                "version": "1",
                 "enabled": "1",
-                "type": Type.objects.get(pk=1),
-                "code_file": "0",
-                "code_file_path": path.join(PROJECT_ROOT,"/tasks/scripts/2/2_2019-01-20_21-11-28"),
-                "code_file_name": "2_2019-01-20_21-11-28",
-                "fileName": "",
-                "timeout": "300",
-                "argument": "",
+                "user": User.objects.get(pk=1),
+                "title": "Hello World CMD",
+                "version": "1",
+                "automationid": None,
+                # "scriptoutput": ScriptOutput.objects.get(pk=1),
+                # "scriptoutputtype": EvidenceAttrFormat.objects.get(pk=1),
+                # "scriptinput": ScriptInput.objects.get(pk=1),
+                # "scriptinputattrtype": EvidenceAttrFormat.objects.get(pk=1),
+                # "scriptinputattrtypeall": False,
+                # "outputtarget": OutputTarget.objects.get(pk=1),
+                # "outputdescformat": EvidenceFormat.objects.get(pk=1),
+                # "argument": None,
+                # "connectionitemid": None,
+                # "timeout": "300",
+                # "fileName": "",
+                # "fileRef": None,
                 "created_by": "admin",
-                "modified_by": "admin"
+                "modified_by": "admin",
+                "description": None,
+
+                # "code": r"""
+# echo "Hello World"
+# sleep 2 &
+#                                 """,
+#                 "description": "<p>Prints a hello world</p>",
+#                 "script_type": ScriptType.objects.get(pk=2),
+#                 "script_category": ScriptCategory.objects.get(pk=1),
+#                 "type": Type.objects.get(pk=1),
+#                 "code_file": "0",
+#                 "code_file_path": path.join(PROJECT_ROOT,"/tasks/scripts/2/2_2019-01-20_21-11-28"),
+#                 "code_file_name": "2_2019-01-20_21-11-28",
+
+
+
             },
         ]
 
@@ -1031,29 +1062,30 @@ sleep 2 &
             for actionitem in actions:
                 # m=Action.objects.create(
                 m = Action.objects.create(
-                    title=actionitem['title'],
-                    code=actionitem['code'],
-                    description=actionitem['description'],
-                    script_type=actionitem['script_type'],
-                    script_category=actionitem['script_category'],
-                    user=actionitem['user'],
-                    version=actionitem['version'],
                     enabled=actionitem['enabled'],
-                    type=actionitem['type'],
-                    code_file=actionitem['code_file'],
-                    code_file_path=actionitem['code_file_path'],
-                    code_file_name=actionitem['code_file_name'],
-                    fileName=actionitem['fileName'],
-                    timeout=actionitem['timeout'],
-                    argument=actionitem['argument'],
+                    user=actionitem['user'],
+                    title=actionitem['title'],
+                    version=actionitem['version'],
+                    automationid=actionitem['automationid'],
+                    # code=actionitem['code'],
+                    description=actionitem['description'],
+                    # script_type=actionitem['script_type'],
+                    # script_category=actionitem['script_category'],
+                    # type=actionitem['type'],
+                    # code_file=actionitem['code_file'],
+                    # code_file_path=actionitem['code_file_path'],
+                    # code_file_name=actionitem['code_file_name'],
+                    # fileName=actionitem['fileName'],
+                    # timeout=actionitem['timeout'],
+                    # argument=actionitem['argument'],
                     created_by=actionitem['created_by'],
                     modified_by=actionitem['modified_by']
                 )
-                m.save()  #  this creates the scripts in the folders
+                m.save()  # this creates the scripts in the folders
                 # This line below will be useful to define builtin script locations...otherwise the model pk=None if
                 # called from here
                 # Action.objects.filter(pk=m.pk).update(code_file_name=actionitem['code_file_name'])
-        except:
+        except Exception:
             raise CommandError("Action table could not be updated!")
 
     def populate_actionqstatus(self):
@@ -1077,9 +1109,8 @@ sleep 2 &
                     enabled=actstatitem['enabled'],
                     description=actstatitem['description']
                 )
-        except:
+        except Exception:
             raise CommandError("InvStatus table could not be updated!")
-
 
     def populate_mitreattck_tactics(self):
         mitretactics = [
@@ -1231,14 +1262,13 @@ sleep 2 &
                     enabled=mitretacticsitem['enabled'],
                     description=mitretacticsitem['description']
                 )
-        except:
+        except Exception:
             raise CommandError("MitreAttck_Tactics table could not be updated!")
-
 
     def populate_mitreattck_techniques(self):
         mitretechniques = [
             {
-                "matacref":"",
+                "matacref": "",
                 "matecid": "",
                 "name": "",
                 "enabled": "1",
@@ -1255,5 +1285,5 @@ sleep 2 &
                     enabled=mitretechniquesitem['enabled'],
                     description=mitretechniquesitem['description']
                 )
-        except:
+        except Exception:
             raise CommandError("MitreAttck_Techniques table could not be updated!")

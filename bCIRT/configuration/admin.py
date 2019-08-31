@@ -13,13 +13,14 @@
 from django.contrib import admin
 from . import models
 from import_export.admin import ImportExportModelAdmin
-
 # Register your models here.
+
 
 class GroupMemberInline(admin.TabularInline):
     model = models.ConnectionItem
     model = models.ConnectionItemField
     model = models.UpdatePackage
+
 
 @admin.register(models.ConnectionItem)
 class ConnectionItemTypeAdmin(ImportExportModelAdmin):

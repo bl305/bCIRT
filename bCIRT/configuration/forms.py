@@ -26,7 +26,8 @@ class TinyMCEWidget(TinyMCE):
 
 
 class UpdatePackageForm(forms.ModelForm):
-    def __init__(self, conf_pk=0, *args, **kwargs):
+    # def __init__(self, conf_pk=0, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         user = kwargs.pop("user", None)
         super(UpdatePackageForm, self).__init__(*args, **kwargs)
         logger.info("UpdatePackageForm - "+str(user))
@@ -73,7 +74,6 @@ class UpdatePackageForm(forms.ModelForm):
             ),
 
         }
-
 
 
 class ConnectionItemForm(forms.ModelForm):

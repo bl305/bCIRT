@@ -38,6 +38,8 @@ logger = logging.getLogger('log_file_verbose')
 # Create your views here.
 # #############################################################################3
 # Investigation related views
+
+
 class HostListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
     model = Host
     form_class = HostForm
@@ -49,7 +51,7 @@ class HostListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(HostListView, self).__init__(*args, **kwargs)
 
@@ -76,7 +78,7 @@ class HostCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Create
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(HostCreateView, self).__init__(*args, **kwargs)
 
@@ -134,7 +136,7 @@ class HostDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.Detail
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(HostDetailView, self).__init__(*args, **kwargs)
 
@@ -172,7 +174,7 @@ class HostUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Update
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(HostUpdateView, self).__init__(*args, **kwargs)
 
@@ -232,7 +234,7 @@ class HostRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generic.Delete
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(HostRemoveView, self).__init__(*args, **kwargs)
 
@@ -281,7 +283,7 @@ class ProfileListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListV
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(ProfileListView, self).__init__(*args, **kwargs)
 
@@ -307,7 +309,7 @@ class ProfileCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Cre
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(ProfileCreateView, self).__init__(*args, **kwargs)
 
@@ -372,7 +374,7 @@ class ProfileDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.Det
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(ProfileDetailView, self).__init__(*args, **kwargs)
 
@@ -410,7 +412,7 @@ class ProfileUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Upd
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(ProfileUpdateView, self).__init__(*args, **kwargs)
 
@@ -471,7 +473,7 @@ class ProfileRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generic.Del
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(ProfileRemoveView, self).__init__(*args, **kwargs)
 
@@ -518,7 +520,7 @@ class ProfileCreateRedirectView(LoginRequiredMixin, PermissionRequiredMixin, gen
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(ProfileCreateRedirectView, self).__init__(*args, **kwargs)
 

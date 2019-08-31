@@ -23,9 +23,9 @@ from django.contrib.sessions.models import Session
 from datetime import datetime, timezone
 from django.utils.timezone import now as timezone_now
 from django.db.models import Count, Avg, Min, Max
+from bCIRT.custom_variables import LOGSEPARATOR, LOGLEVEL
 import logging
 logger = logging.getLogger('log_file_verbose')
-from bCIRT.custom_variables import LOGSEPARATOR, LOGLEVEL
 
 
 def durationprint(timevalue=None):
@@ -57,13 +57,14 @@ class ReportsPage(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(ReportsPage, self).__init__(*args, **kwargs)
 
+
 class ReportsDashboardPage(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
     template_name = 'reports/reports_dashboard.html'
-    permission_required = ('invs.view_inv','tasks.view_task')
+    permission_required = ('invs.view_inv', 'tasks.view_task')
 
     def __init__(self, *args, **kwargs):
         if LOGLEVEL == 1:
@@ -71,7 +72,7 @@ class ReportsDashboardPage(LoginRequiredMixin, PermissionRequiredMixin, Template
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(ReportsDashboardPage, self).__init__(*args, **kwargs)
 
@@ -281,6 +282,3 @@ class ReportsDashboardPage(LoginRequiredMixin, PermissionRequiredMixin, Template
             .order_by('attackvector__name')
 
         return super(ReportsDashboardPage, self).get_context_data(**kwargs)
-
-
-

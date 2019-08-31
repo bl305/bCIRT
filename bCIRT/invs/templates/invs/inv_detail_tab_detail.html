@@ -42,16 +42,8 @@
                                             </a>
                                         </li>
                                         <li class="dropdown-submenu">
-                                            <a tabindex="-1" href="#" class="btn btn-default btn-xs">Export PDF<span class="glyphicon glyphicon-export"></span></a>
+                                            <a tabindex="-1" href="#" class="btn btn-default btn-xs">Export<span class="glyphicon glyphicon-export"></span></a>
                                             <ul class="dropdown-menu dropdown-content">
-                                                <li>
-                                                    <a href="{% url 'invs:inv_pdf' pk=inv.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                                      class="btn btn-default btn-xs">
-                                                      Export Investigation
-                                                      <span class="glyphicon glyphicon-export" data-toggle="tooltip" data-placement="top" title="Edit item">
-                                                    </span>
-                                                    </a>
-                                                </li>
                                                 <li>
                                                     <a href="{% url 'invs:inv_detail_print' pk=inv.pk %}?next1={{ request.get_full_path|urlencode }}"
                                                       class="btn btn-default btn-xs">

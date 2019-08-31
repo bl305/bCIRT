@@ -10,6 +10,7 @@
 # Date        Author      Ref    Description
 # 2019.07.29  Lendvay     1      Initial file
 # 2019.08.13  Lendvay     2      Added temp folder for each action and connections, removed action file
+# 2019.08.30  Lendvay     1      Added playbooktemplate graph
 # **********************************************************************;
 from django.db import models
 from django.urls import reverse
@@ -25,6 +26,7 @@ from django.dispatch import receiver
 from stat import S_IREAD, S_IRGRP, S_IROTH, S_IWUSR, S_IWGRP
 import ipaddress
 import re
+import pydot
 import pathlib
 from bCIRT.settings import PROJECT_ROOT
 from django.utils.timezone import now as timezone_now
@@ -101,7 +103,7 @@ def timediff(pdate1, pdate2):
         # minutes = (seconds % 3600) // 60
         # seconds = seconds % 60
         # return {'hours': hours, 'minutes': minutes, 'seconds': seconds}
-        #minutes = (diff.seconds % 3600) // 60
+        # minutes = (diff.seconds % 3600) // 60
     else:
         retval = None
     return retval
@@ -116,6 +118,7 @@ def check_file_type(pfile):
         return "text"
     else:
         return "na"
+
 
 class MitreAttck_Tactics(models.Model):
     objects = models.Manager()
@@ -331,6 +334,8 @@ def new_playbook(pplaybooktemplate, pname, pversion, puser, pinv, pdescription, 
     return playbook_obj
 
 # Create your models here.
+
+
 class Task(models.Model):
     objects = models.Manager()
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="task_users")
@@ -405,7 +410,7 @@ class Task(models.Model):
                             targettaskactionpk = targettask.action.pk
                             targettaskinvpk = targettask.inv.pk
                             # targettaskactiontarget = targettask.actiontarget.pk
-                            #  here we need to find the proper evidence...
+                            # here we need to find the proper evidence...
                             sourcetask = Task.objects.get(pk=self.pk)
                             evid = sourcetask.evidence_task.all()
                             evattrs = None
@@ -427,7 +432,7 @@ class Task(models.Model):
                                         evidpk = None
                             else:
                                 if evid.first():
-                                    evidpk = evid.first().pk  #Task.objects.get(pk=evid.first().pk)
+                                    evidpk = evid.first().pk  # Task.objects.get(pk=evid.first().pk)
                                 else:
                                     evidpk = None
                             if evidpk:
@@ -443,7 +448,8 @@ class Task(models.Model):
                                     evidattrs = evidobj.evattr_evidence.filter(evattrformat=filterforpk)
                                 if evidattrs:
                                     for evidattr1 in evidattrs:
-                                        # print("AUTOMATED: "+str(targettaskactionpk)+":"+str(targettaskinvpk)+":"+str(targettaskpk)+":"+str(evidpk))
+                                        # print("AUTOMATED: "+str(targettaskactionpk)+":"+str(targettaskinvpk)+":"+
+                                        #  str(targettaskpk)+":"+str(evidpk))
                                         #  Call the function that has to be executed upon close
                                         run_action(
                                             pactuser=self.user,
@@ -457,7 +463,8 @@ class Task(models.Model):
                                             pattr=''
                                         )
                                 else:
-                                    # print("AUTOMATED: "+str(targettaskactionpk)+":"+str(targettaskinvpk)+":"+str(targettaskpk)+":"+str(evidpk))
+                                    # print("AUTOMATED: "+str(targettaskactionpk)+":"+str(targettaskinvpk)+":"+
+                                    #  str(targettaskpk)+":"+str(evidpk))
                                     #  Call the function that has to be executed upon close
                                     run_action(
                                         pactuser=self.user,
@@ -555,7 +562,7 @@ class Task(models.Model):
                     retval = int(taskvar_value)
             else:
                 retval = Task.objects.get(pk=self.actiontarget.pk).evidence_task.first()
-        except:
+        except Exception:
             retval = None
         return retval
 
@@ -788,7 +795,7 @@ class ExtractAttr():
         try:
             ipver = ipaddress.ip_address(address)
             return ipver
-        except:
+        except Exception:
             return False
 
     def find_email(self, str1):
@@ -1053,20 +1060,20 @@ class Action(models.Model):
                                      related_name="action_automation")
     scriptoutput = models.ForeignKey(ScriptOutput, on_delete=models.SET_NULL, default='1', blank=False, null=True,
                                      related_name="action_scriptoutput")
-    scriptoutputtype = models.ForeignKey(EvidenceAttrFormat, on_delete=models.SET_NULL, default='1', blank=True, null=True,
-                                         related_name="action_scriptoutputtype")
+    scriptoutputtype = models.ForeignKey(EvidenceAttrFormat, on_delete=models.SET_NULL, default='1', blank=True,
+                                         null=True, related_name="action_scriptoutputtype")
     scriptinput = models.ForeignKey(ScriptInput, on_delete=models.SET_NULL, default='1', blank=False, null=True,
-                                     related_name="action_scriptinput")
+                                    related_name="action_scriptinput")
     scriptinputattrtype = models.ForeignKey(EvidenceAttrFormat, on_delete=models.SET_NULL, default=None, blank=True,
-                                       null=True, related_name="action_scriptinputattrtype")
+                                            null=True, related_name="action_scriptinputattrtype")
     scriptinputattrtypeall = models.BooleanField(default=False)
     outputtarget = models.ForeignKey(OutputTarget, on_delete=models.SET_DEFAULT, default=1, blank=True, null=True,
                                      related_name="action_outputtarget")
     outputdescformat = models.ForeignKey(EvidenceFormat, on_delete=models.SET_DEFAULT, default=1, blank=True, null=True,
-                                     related_name="action_outputdescformat")
+                                         related_name="action_outputdescformat")
     argument = models.CharField(max_length=2048, default=None, blank=True, null=True)
     connectionitemid = models.ForeignKey(ConnectionItem, on_delete=models.SET_NULL, default=None, blank=True, null=True,
-                                    related_name="action_connectionitem")
+                                         related_name="action_connectionitem")
 
     timeout = models.PositiveIntegerField(default=300, null=False, blank=False)
     #  300 seconds
@@ -1131,9 +1138,9 @@ class ActionGroup(models.Model):
 class ActionGroupMember(models.Model):
     objects = models.Manager()
     actionid = models.ForeignKey(Action, on_delete=models.CASCADE, blank=False, null=False,
-                                    related_name="actiongroupmember_action")
+                                 related_name="actiongroupmember_action")
     actiongroupid = models.ForeignKey(ActionGroup, on_delete=models.CASCADE, default=None, blank=True, null=True,
-                                    related_name="actiongroupmember_actiongroup")
+                                      related_name="actiongroupmember_actiongroup")
     def __str__(self):
         return str(self.actionid)
 
@@ -1287,7 +1294,7 @@ class PlaybookTemplateItem(models.Model):
     description_html = models.TextField(editable=True, default='', blank=True)
 
     def __str__(self):
-        return str(self.pk)+" - "+str(self.acttask.title)
+        return str(self.pk) + " - " + str(self.acttask.title)
 
     def get_absolute_url(self):
         return reverse(
@@ -1299,6 +1306,11 @@ class PlaybookTemplateItem(models.Model):
 
     def save(self, *args, **kwargs):
         self.description_html = misaka.html(self.description)
+        # PlaybookTemplate.objects.filter(pk=self.playbooktemplateid.pk).update(modified_at=timezone_now(), modified_by=self.modified_by)
+        playbooktemplate_obj = PlaybookTemplate.objects.filter(pk=self.playbooktemplateid.pk)
+        playbooktemplate_obj.update(modified_at=timezone_now(), modified_by=self.modified_by)
+        playbooktemplate_obj[0].save()
+        # PlaybookTemplate.objects.get(pk=self.playbooktemplateid.pk).save()
         super(PlaybookTemplateItem, self).save(*args, **kwargs)
 
     def clean(self):
@@ -1310,6 +1322,75 @@ class PlaybookTemplateItem(models.Model):
         pass
 
 # #### PROCEDURES
+@receiver(models.signals.post_save, sender=PlaybookTemplate)
+def generate_graph_PlaybookTemplate(sender, instance, **kwargs):
+    """
+    Generate playbooktemplate graph
+    """
+    curr_pk = instance.pk
+    graphfilecontents = "digraph demo1 {\nsubgraph cluster_p {\nlabel = \"PlaybookTemplate #"+str(curr_pk)+" - "+instance.name+"\"; \n" \
+                        "node [shape=record fontname=Arial];\nStart [shape=circle]\n"
+    # ptmpitem_related_obj = PlaybookTemplateItem.objects.filter(playbooktemplateid=instance.pk)
+    ptmpitem_related_obj =  instance.playbooktemplateitem_playbooktemplate.all()
+    # print("Steps:%d"%(len(ptmpitem_related_obj)))
+    for pbtmpitem in ptmpitem_related_obj:
+        if pbtmpitem.prevtask:
+            prevtask = pbtmpitem.prevtask.pk
+        else:
+            prevtask = "Start"
+        taskinfo = "%d - %s"%(pbtmpitem.pk, pbtmpitem.acttask.title)
+        # print("%s - %d - %d"%(taskinfo,pbtmpitem.itemorder,prevtask))
+        alabel = "  %d [label=\"#%d: %s\"]\n"%(pbtmpitem.pk, pbtmpitem.itemorder, taskinfo)
+        aitem = "  %s -> %s\n" % (prevtask, pbtmpitem.pk)
+        graphfilecontents += alabel
+        graphfilecontents += aitem
+    graphfilecontents +="\n}\n}"
+    # https://renenyffenegger.ch/notes/tools/Graphviz/examples/index
+    try:
+        (graph,) = pydot.graph_from_dot_data(graphfilecontents)
+        pngfile = "pbtmp_%s.png"%(curr_pk)
+        pngfilepath = path.join(MEDIA_ROOT, "graphs", pngfile)
+        graph.write_png(pngfilepath)
+    except Exception:
+        logger.error(Exception)
+
+@receiver(models.signals.post_delete, sender=PlaybookTemplateItem)
+def auto_save_PlaybookTemplate(sender, instance, **kwargs):
+    playbooktemplate_obj=instance.playbooktemplateid
+    playbooktemplate_obj.save()
+
+@receiver(models.signals.post_save, sender=Playbook)
+def generate_graph_Playbook(sender, instance, **kwargs):
+    """
+    Generate playbooktemplate graph
+    """
+
+    curr_pk=instance.pk
+    graphfilecontents = "digraph demo1 {\nsubgraph cluster_p {\nlabel = \"Playbook #"+str(curr_pk)+" - "+instance.name+"\"; \nnode [shape=record fontname=Arial];\nStart [shape=circle]\n"
+
+    # ptmpitem_related_obj = PlaybookTemplateItem.objects.filter(playbooktemplateid=instance.pk)
+    pitem_related_obj =  instance.task_playbook.all()
+    # print("Steps:%d"%(len(ptmpitem_related_obj)))
+    for pitem in pitem_related_obj:
+        if pitem.actiontarget:
+            prevtask = pitem.actiontarget.pk
+        else:
+            prevtask = "Start"
+        taskinfo = "%d - %s"%(pitem.pk, pitem.title)
+        # print("%s - %d - %d"%(taskinfo,pbtmpitem.itemorder,prevtask))
+        alabel = "  %d [label=\"%s\"]\n"%(pitem.pk, taskinfo)
+        aitem = "  %s -> %s\n" % (prevtask, pitem.pk)
+        graphfilecontents += alabel
+        graphfilecontents += aitem
+    graphfilecontents +="\n}\n}"
+    # https://renenyffenegger.ch/notes/tools/Graphviz/examples/index
+    try:
+        (graph,) = pydot.graph_from_dot_data(graphfilecontents)
+        pngfile = "pb_%s.png"%(curr_pk)
+        pngfilepath = path.join(MEDIA_ROOT, "graphs", pngfile)
+        graph.write_png(pngfilepath)
+    except Exception:
+        logger.error(Exception)
 
 
 def add_task_from_template(atitle, astatus, aplaybook, auser, ainv, aaction, aactiontarget,
@@ -1624,7 +1705,7 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
     action_obj = Action.objects.get(pk=act_id)
     action_outputtarget = action_obj.outputtarget.pk
     # automation_scripttype = action_obj.automation.script_type.pk
-    #interpreter = ScriptType.objects.filter(action__automation_script_type__pk=act_id)[0].interpreter
+    # interpreter = ScriptType.objects.filter(action__automation_script_type__pk=act_id)[0].interpreter
     interpreter = action_obj.automationid.script_type.interpreter
     # cmd = action_obj.code_file_path
     cmd = None
@@ -1649,9 +1730,6 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
     destoutdirname = None
     mytempdir = None
 
-
-
-
     #  Create a temporary folder with the script in it
     #  generate a random folder with some prefix:
     myprefix = "EV-" + str(ev_pk) + "-" + str(evattr_pk) + "-"
@@ -1660,20 +1738,20 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
     tempfile.tempdir = mytempdir.name
     # with tempfile.TemporaryDirectory() as directory:
     # 2. copy script into temp folder
-#    srcfile = path.join(MEDIA_ROOT, cmd)
+    # srcfile = path.join(MEDIA_ROOT, cmd)
     destdir = mytempdir.name
     # destfile_clean = os.path.join(destdir, re.escape(oldev_file_name))
     # destfile = os.path.join(destdir, oldev_file_name)
     # I have used the renamed file because the Popen had issues with the special chars
     # and spaces in filenames...
-#    destfile = os.path.join(destdir, os.path.basename(cmd))
-#    copy(srcfile, destfile)
-#    print("SRCFILE:%s"%(srcfile))
-#    print("DSTFILE:%s" % (destfile))
+    # destfile = os.path.join(destdir, os.path.basename(cmd))
+    # copy(srcfile, destfile)
+    # print("SRCFILE:%s"%(srcfile))
+    # print("DSTFILE:%s" % (destfile))
     newname = str(act_id)+"_"
     newscript = tempfile.NamedTemporaryFile(mode='w+t', prefix=newname)
     # Put the code into the temp file from action code
-    putintofile = action_obj.automationid.code#.\
+    putintofile = action_obj.automationid.code  # .\
         # replace('echo', '#echo')#.\
         # replace('$FILE$', destfile)
     # replace('$EVIDENCE$', destfile)
@@ -1743,13 +1821,13 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
                 destoutdirname = str(destoutdir) + "/"
                 argument = argument.replace('$OUTDIR$', destoutdirname)
         elif action_obj.scriptinput.pk == 2 and oldev_file:
-            #  this represents file type so reads the file from the evidence
-            #  need to have a file to work on, that's "2"
-            #  create a temporary file so the original remains intact
-            #  generate a random folder with some prefix:
-#            myprefix = "EV-"+str(ev_pk)+"-"
-#            mytempdir = tempfile.TemporaryDirectory(prefix=myprefix)
-            #  make the tempdir the temp root
+            # this represents file type so reads the file from the evidence
+            # need to have a file to work on, that's "2"
+            # create a temporary file so the original remains intact
+            # generate a random folder with some prefix:
+            # myprefix = "EV-"+str(ev_pk)+"-"
+            # mytempdir = tempfile.TemporaryDirectory(prefix=myprefix)
+            # make the tempdir the temp root
             tempfile.tempdir = mytempdir.name
             # with tempfile.TemporaryDirectory() as directory:
             # 2. copy file into temp folder
@@ -2167,42 +2245,42 @@ class FileHashCalc():
         pass
 
     def md5sum(self, filename):
-        h  = hashlib.md5()
-        b  = bytearray(128*1024)
+        h = hashlib.md5()
+        b = bytearray(128*1024)
         mv = memoryview(b)
         with open(filename, 'rb', buffering=0) as f:
-            for n in iter(lambda : f.readinto(mv), 0):
+            for n in iter(lambda: f.readinto(mv), 0):
                 h.update(mv[:n])
         return h.hexdigest()
 
     def sha1sum(self, filename):
-        h  = hashlib.sha1()
-        b  = bytearray(128*1024)
+        h = hashlib.sha1()
+        b = bytearray(128*1024)
         mv = memoryview(b)
         with open(filename, 'rb', buffering=0) as f:
-            for n in iter(lambda : f.readinto(mv), 0):
+            for n in iter(lambda: f.readinto(mv), 0):
                 h.update(mv[:n])
         return h.hexdigest()
 
     def sha256sum(self, filename):
-        h  = hashlib.sha256()
-        b  = bytearray(128*1024)
+        h = hashlib.sha256()
+        b = bytearray(128*1024)
         mv = memoryview(b)
         with open(filename, 'rb', buffering=0) as f:
-            for n in iter(lambda : f.readinto(mv), 0):
+            for n in iter(lambda: f.readinto(mv), 0):
                 h.update(mv[:n])
         return h.hexdigest()
 
     def sha512sum(self, filename):
-        h  = hashlib.sha512()
-        b  = bytearray(128*1024)
+        h = hashlib.sha512()
+        b = bytearray(128*1024)
         mv = memoryview(b)
         with open(filename, 'rb', buffering=0) as f:
-            for n in iter(lambda : f.readinto(mv), 0):
+            for n in iter(lambda: f.readinto(mv), 0):
                 h.update(mv[:n])
         return h.hexdigest()
 
-    #res_md5 = FileHashCals().md5sum('FilePath')
+    # res_md5 = FileHashCals().md5sum('FilePath')
 
 # def add_to_profile(pevattr):
 #     print(pevattr)

@@ -188,9 +188,9 @@ class ActionForm(forms.ModelForm):
 
     #   fileRef = forms.FileField(widget=CustomClearableFileInput)
     class Meta:
-        fields = ("user", "title", "version", "enabled", "automationid", "scriptinput", "scriptinputattrtype", "scriptinputattrtypeall",
-                  "scriptoutput",  "scriptoutputtype", "outputtarget", "outputdescformat",
-                  "argument","connectionitemid", "timeout", "fileRef", "description")
+        fields = ("user", "title", "version", "enabled", "automationid", "scriptinput", "scriptinputattrtype",
+                  "scriptinputattrtypeall", "scriptoutput",  "scriptoutputtype", "outputtarget", "outputdescformat",
+                  "argument", "connectionitemid", "timeout", "fileRef", "description")
         model = Action
         labels = {
             "description": "Description*",
@@ -312,7 +312,6 @@ class ActionGroupMemberForm(forms.ModelForm):
             }
         )
     )
-
 
     #   fileRef = forms.FileField(widget=CustomClearableFileInput)
     class Meta:
@@ -1017,7 +1016,6 @@ class PlaybookTemplateItemForm(forms.ModelForm):
         else:
             self.fields['itemorder'].initial = 100
 
-
         if kwargs.get('instance'):
             currentitem_pk = kwargs.get('instance').pk
         else:
@@ -1052,7 +1050,7 @@ class PlaybookTemplateItemForm(forms.ModelForm):
                 else:
                     self.fields['prevtask'].queryset = PlaybookTemplateItem.objects.filter(pk=0)
                     self.fields['nexttask'].queryset = PlaybookTemplateItem.objects.filter(pk=0)
-            except:
+            except Exception:
                 # self.fields['nexttask'].queryset = PlaybookTemplateItem.objects.filter(pk=0)
                 # self.fields['prevtask'].queryset = PlaybookTemplateItem.objects.filter(pk=0)
                 self.fields['nexttask'].queryset = PlaybookTemplateItem.objects.filter(enabled=True)
@@ -1457,7 +1455,6 @@ class EvidenceForm(forms.ModelForm):
         )
     )
 
-
     evidenceformat = forms.ModelChoiceField(
         label="Evidence format*",
         queryset=EvidenceFormat.objects.filter(enabled=True),  # .values_list('name',flat=True),
@@ -1495,9 +1492,8 @@ class EvidenceForm(forms.ModelForm):
             }
         )
     )
-
-
     # fileRef = forms.FileField(widget=CustomClearableFileInput)
+
     class Meta:
         fields = ("user", "inv", "task", "parent", "evidenceformat", "mitretactic", "description", "fileRef")
         # fields = ( "user", "inv", "description")
@@ -1594,7 +1590,6 @@ class EvidenceAttrForm(forms.ModelForm):
         )
     )
 
-
     class Meta:
         fields = ("user", "ev", "evattrformat", "evattrvalue", "attr_reputation", "observable")
         model = EvidenceAttr
@@ -1615,8 +1610,6 @@ class EvidenceAttrForm(forms.ModelForm):
             ),
         }
 
-
-
 #########################################
     #
     # 'code': forms.Textarea(attrs={
@@ -1625,6 +1618,7 @@ class EvidenceAttrForm(forms.ModelForm):
     #     'style': 'width:90%',
     #     'class': 'form-control'}
     # ),
+
 
 class AutomationForm(forms.ModelForm):
     #  inv_pk and task_pk defaults to zero as they are not needed for updates

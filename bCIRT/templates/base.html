@@ -84,9 +84,9 @@ Menu - dropdown
                         <ul class="dropdown-menu">
                             <li><a href="{% url 'invs:inv_suspiciousemail' %}"><span class="glyphicon glyphicon-plus"></span> SuspiciousEmail</a></li>
                             <li class="divider"></li>
-                            <li><a href="{% url 'invs:inv_create' %}"><span class="glyphicon glyphicon-plus"></span> New</a></li>
+                            <li><a href="{% url 'invs:inv_create' %}"><span class="glyphicon glyphicon-plus"></span> New Investigation</a></li>
                             <li class="divider"></li>
-                            <li><a href="{% url 'invs:inv_list' %}"><span class="glyphicon glyphicon-th-list"></span> List</a></li>
+                            <li><a href="{% url 'invs:inv_list' %}"><span class="glyphicon glyphicon-th-list"></span> Investigations</a></li>
                         </ul>
                     </li>
 
@@ -97,12 +97,15 @@ Menu - dropdown
                             <b class="caret"></b>
                         </a>
                         <ul class="dropdown-menu">
+                            {% if perms.tasks.add_task %}
                             <li>
                                 <a href="{% url 'tasks:tsk_create' inv_pk=0 %}"><span class="glyphicon glyphicon-plus"></span>
                                 New Task
                                 </a>
                             </li>
                             <li class="divider"></li>
+                            {% endif %}
+                            {% if perms.tasks.add_playbooktemplate %}
                             <li>
                                 <a href="{% url 'tasks:playtmp_create' %}">
                                 <span class="glyphicon glyphicon-plus"></span>
@@ -110,41 +113,54 @@ Menu - dropdown
                                 </a>
                             </li>
                             <li class="divider"></li>
+                            {% endif %}
+                            {% if perms.tasks.view_tasks %}
                             <li>
                                 <a href="{% url 'tasks:tsk_list' %}"><span class="glyphicon glyphicon-th-list"></span>
                                 Tasks
                                 </a>
                             </li>
                             <li class="divider"></li>
+                            {% endif %}
+                            {% if perms.tasks.view_tasktemplate %}
                             <li>
                                 <a href="{% url 'tasks:tmp_list' %}"><span class="glyphicon glyphicon-th-list"></span>
                                 Task Templates
                                 </a>
                             </li>
                             <li class="divider"></li>
+                            {% endif %}
+                            {% if perms.tasks.view_taskvar %}
                             <li>
                                 <a href="{% url 'tasks:tvar_list' %}"><span class="glyphicon glyphicon-th-list"></span>
                                 Task Variables
                                 </a>
                             </li>
                             <li class="divider"></li>
+                            {% endif %}
+                            {% if perms.tasks.view_playbook %}
                             <li>
                                 <a href="{% url 'tasks:play_list' %}"><span class="glyphicon glyphicon-th-list"></span>
                                 Playbooks
                                 </a>
                             </li>
                             <li class="divider"></li>
+                            {% endif %}
+                            {% if perms.tasks.view_playbooktemplate %}
                             <li>
                                 <a href="{% url 'tasks:playtmp_list' %}"><span class="glyphicon glyphicon-th-list"></span>
                                 Playbook Templates
                                 </a>
                             </li>
                             <li class="divider"></li>
+                            {% endif %}
+                            {% if perms.tasks.view_playbooktemplateitem %}
                             <li>
                                 <a href="{% url 'tasks:playittmp_list' %}"><span class="glyphicon glyphicon-th-list"></span>
                                 Playbook Template Items
                                 </a>
                             </li>
+                            {% endif %}
                         </ul>
                     </li>
 
@@ -200,6 +216,7 @@ Menu - dropdown
                                 </a>
                             </li>
                             <li class="divider"></li>
+                            {% if perms.tasks.add_automation %}
                             <li>
                                 <a href="{% url 'tasks:auto_create' %}">
                                     <span class="glyphicon glyphicon-plus"></span>
@@ -207,6 +224,7 @@ Menu - dropdown
                                 </a>
                             </li>
                             <li class="divider"></li>
+                            {% endif %}
                             <li>
                                 <a href="{% url 'tasks:act_list' %}">
                                     <span class="glyphicon glyphicon-th-list"></span>
@@ -228,12 +246,14 @@ Menu - dropdown
                                 </a>
                             </li>
                             <li class="divider"></li>
+                            {% if perms.tasks.view_automation %}
                             <li>
                                 <a href="{% url 'tasks:auto_list' %}">
                                     <span class="glyphicon glyphicon-th-list"></span>
                                     Automations
                                 </a>
                             </li>
+                            {% endif %}
                             <li class="divider"></li>
                         </ul>
                     </li>

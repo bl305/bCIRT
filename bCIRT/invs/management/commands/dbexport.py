@@ -141,7 +141,8 @@ class Command(BaseCommand):
                 self.export_updatepackage(p_format)
                 print("Database export to " + p_dir + " finished.")
             else:
-                print("Wrong parameter! Options:\ninvestigations / tasks / taskvars / actions / evidences / configuration\n")
+                print("Wrong parameter! Options:\ninvestigations / tasks / taskvars / actions / evidences / "
+                      "configuration\n")
         else:
             print(r"""
 usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--version]
@@ -175,7 +176,7 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
             elif p_format == "csv":
                 self.save_to_file(a_filename=tablename+'.csv',
                                   a_content=dataset.csv)
-        except:
+        except Exception:
             raise CommandError("EvidenceFormat table could not be exported!")
 
     def export_evidenceattrformat(self, p_format):
@@ -191,7 +192,7 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
             elif p_format == "csv":
                 self.save_to_file(a_filename=tablename+'.csv',
                                   a_content=dataset.csv)
-        except:
+        except Exception:
             raise CommandError("EvidenceAttrFormat table could not be exported!")
 
     def export_evidence(self, p_format):
@@ -210,7 +211,7 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
             elif p_format == "csv":
                 self.save_to_file(a_filename=tablename+'.csv',
                                   a_content=dataset.csv)
-        except:
+        except Exception:
             raise CommandError("Evidence table could not be exported!")
 
     def export_evidenceattr(self, p_format):
@@ -229,7 +230,7 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
             elif p_format == "csv":
                 self.save_to_file(a_filename=tablename+'.csv',
                                   a_content=dataset.csv)
-        except:
+        except Exception:
             raise CommandError("EvidenceAttr table could not be exported!")
 
     def export_host(self, p_format):
@@ -248,7 +249,7 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
             elif p_format == "csv":
                 self.save_to_file(a_filename=tablename+'.csv',
                                   a_content=dataset.csv)
-        except:
+        except Exception:
             raise CommandError("Host table could not be exported!")
 
     def export_hostname(self, p_format):
@@ -267,7 +268,7 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
             elif p_format == "csv":
                 self.save_to_file(a_filename=tablename+'.csv',
                                   a_content=dataset.csv)
-        except:
+        except Exception:
             raise CommandError("Hostname table could not be exported!")
 
     def export_ipaddress(self, p_format):
@@ -286,7 +287,7 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
             elif p_format == "csv":
                 self.save_to_file(a_filename=tablename+'.csv',
                                   a_content=dataset.csv)
-        except:
+        except Exception:
             raise CommandError("Ipaddress table could not be exported!")
 
     def export_profile(self, p_format):
@@ -305,7 +306,7 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
             elif p_format == "csv":
                 self.save_to_file(a_filename=tablename+'.csv',
                                   a_content=dataset.csv)
-        except:
+        except Exception:
             raise CommandError("Profile table could not be exported!")
 
     def export_invstatus(self, p_format):
@@ -321,7 +322,7 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
             elif p_format == "csv":
                 self.save_to_file(a_filename=tablename+'.csv',
                                   a_content=dataset.csv)
-        except:
+        except Exception:
             raise CommandError("InvStatus table could not be exported!")
 
     def export_invseverity(self, p_format):
@@ -337,7 +338,7 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
             elif p_format == "csv":
                 self.save_to_file(a_filename=tablename+'.csv',
                                   a_content=dataset.csv)
-        except:
+        except Exception:
             raise CommandError("InvSeverity table could not be exported!")
 
     def export_invpriority(self, p_format):
@@ -353,7 +354,7 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
             elif p_format == "csv":
                 self.save_to_file(a_filename=tablename+'.csv',
                                   a_content=dataset.csv)
-        except:
+        except Exception:
             raise CommandError("InvPriority table could not be exported!")
 
     def export_invphase(self, p_format):
@@ -369,7 +370,7 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
             elif p_format == "csv":
                 self.save_to_file(a_filename=tablename+'.csv',
                                   a_content=dataset.csv)
-        except:
+        except Exception:
             raise CommandError("InvPhase table could not be exported!")
 
     def export_invcategory(self, p_format):
@@ -385,7 +386,7 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
             elif p_format == "csv":
                 self.save_to_file(a_filename=tablename+'.csv',
                                   a_content=dataset.csv)
-        except:
+        except Exception:
             raise CommandError("InvCategory table could not be exported!")
 
     def export_invattackvector(self, p_format):
@@ -401,7 +402,7 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
             elif p_format == "csv":
                 self.save_to_file(a_filename=tablename+'.csv',
                                   a_content=dataset.csv)
-        except:
+        except Exception:
             raise CommandError("InvAttackVector table could not be exported!")
 
     def export_inv(self, p_format):
@@ -417,7 +418,7 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
             elif p_format == "csv":
                 self.save_to_file(a_filename=tablename+'.csv',
                                   a_content=dataset.csv)
-        except:
+        except Exception:
             raise CommandError("Inv table could not be exported!")
 
     def export_actscriptos(self, p_format):
@@ -433,7 +434,7 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
             elif p_format == "csv":
                 self.save_to_file(a_filename=tablename+'.csv',
                                   a_content=dataset.csv)
-        except:
+        except Exception:
             raise CommandError("ActionScriptOs table could not be exported!")
 
     def export_actscriptcategory(self, p_format):
@@ -449,7 +450,7 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
             elif p_format == "csv":
                 self.save_to_file(a_filename=tablename+'.csv',
                                   a_content=dataset.csv)
-        except:
+        except Exception:
             raise CommandError("ActionScriptCategory table could not be exported!")
 
     def export_actscripttype(self, p_format):
@@ -465,7 +466,7 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
             elif p_format == "csv":
                 self.save_to_file(a_filename=tablename+'.csv',
                                   a_content=dataset.csv)
-        except:
+        except Exception:
             raise CommandError("ActionScriptType table could not be exported!")
 
     def export_actoutputtarget(self, p_format):
@@ -481,7 +482,7 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
             elif p_format == "csv":
                 self.save_to_file(a_filename=tablename+'.csv',
                                   a_content=dataset.csv)
-        except:
+        except Exception:
             raise CommandError("ActionOutputTarget table could not be exported!")
 
     def export_actscriptoutput(self, p_format):
@@ -497,7 +498,7 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
             elif p_format == "csv":
                 self.save_to_file(a_filename=tablename+'.csv',
                                   a_content=dataset.csv)
-        except:
+        except Exception:
             raise CommandError("ActionScriptOutput table could not be exported!")
 
     def export_acttype(self, p_format):
@@ -513,7 +514,7 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
             elif p_format == "csv":
                 self.save_to_file(a_filename=tablename+'.csv',
                                   a_content=dataset.csv)
-        except:
+        except Exception:
             raise CommandError("ActionType table could not be exported!")
 
     def export_taskcategory(self, p_format):
@@ -529,7 +530,7 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
             elif p_format == "csv":
                 self.save_to_file(a_filename=tablename+'.csv',
                                   a_content=dataset.csv)
-        except:
+        except Exception:
             raise CommandError("TaskCategory table could not be exported!")
 
     def export_taskpriority(self, p_format):
@@ -545,7 +546,7 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
             elif p_format == "csv":
                 self.save_to_file(a_filename=tablename+'.csv',
                                   a_content=dataset.csv)
-        except:
+        except Exception:
             raise CommandError("TaskPriority table could not be exported!")
 
     def export_taskstatus(self, p_format):
@@ -561,7 +562,7 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
             elif p_format == "csv":
                 self.save_to_file(a_filename=tablename+'.csv',
                                   a_content=dataset.csv)
-        except:
+        except Exception:
             raise CommandError("TaskStatus table could not be exported!")
 
     def export_tasktype(self, p_format):
@@ -577,7 +578,7 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
             elif p_format == "csv":
                 self.save_to_file(a_filename=tablename+'.csv',
                                   a_content=dataset.csv)
-        except:
+        except Exception:
             raise CommandError("TaskType table could not be exported!")
 
     def export_task(self, p_format):
@@ -593,7 +594,7 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
             elif p_format == "csv":
                 self.save_to_file(a_filename=tablename+'.csv',
                                   a_content=dataset.csv)
-        except:
+        except Exception:
             raise CommandError("Task table could not be exported!")
 
     def export_tasktemplate(self, p_format):
@@ -609,7 +610,7 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
             elif p_format == "csv":
                 self.save_to_file(a_filename=tablename+'.csv',
                                   a_content=dataset.csv)
-        except:
+        except Exception:
             raise CommandError("TaskTemplate table could not be exported!")
 
     def export_taskvar(self, p_format):
@@ -625,7 +626,7 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
             elif p_format == "csv":
                 self.save_to_file(a_filename=tablename+'.csv',
                                   a_content=dataset.csv)
-        except:
+        except Exception:
             raise CommandError("TaskVar table could not be exported!")
 
     def export_playbook(self, p_format):
@@ -641,7 +642,7 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
             elif p_format == "csv":
                 self.save_to_file(a_filename=tablename+'.csv',
                                   a_content=dataset.csv)
-        except:
+        except Exception:
             raise CommandError("Playbook table could not be exported!")
 
     def export_playbooktemplate(self, p_format):
@@ -657,7 +658,7 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
             elif p_format == "csv":
                 self.save_to_file(a_filename=tablename+'.csv',
                                   a_content=dataset.csv)
-        except:
+        except Exception:
             raise CommandError("PlaybookTemplate table could not be exported!")
 
     def export_playbooktemplateitem(self, p_format):
@@ -673,7 +674,7 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
             elif p_format == "csv":
                 self.save_to_file(a_filename=tablename+'.csv',
                                   a_content=dataset.csv)
-        except:
+        except Exception:
             raise CommandError("PlaybookTemplateItem table could not be exported!")
 
     def export_taskvarcategory(self, p_format):
@@ -689,7 +690,7 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
             elif p_format == "csv":
                 self.save_to_file(a_filename=tablename+'.csv',
                                   a_content=dataset.csv)
-        except:
+        except Exception:
             raise CommandError("TaskVarCategory table could not be exported!")
 
     def export_taskvartype(self, p_format):
@@ -705,7 +706,7 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
             elif p_format == "csv":
                 self.save_to_file(a_filename=tablename+'.csv',
                                   a_content=dataset.csv)
-        except:
+        except Exception:
             raise CommandError("TaskVarType table could not be exported!")
 
     def export_action(self, p_format):
@@ -721,7 +722,7 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
             elif p_format == "csv":
                 self.save_to_file(a_filename=tablename+'.csv',
                                   a_content=dataset.csv)
-        except:
+        except Exception:
             raise CommandError("Action table could not be exported!")
 
     def export_actionqstatus(self, p_format):
@@ -737,7 +738,7 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
             elif p_format == "csv":
                 self.save_to_file(a_filename=tablename+'.csv',
                                   a_content=dataset.csv)
-        except:
+        except Exception:
             raise CommandError("ActionQStatus table could not be exported!")
 
     def export_actionq(self, p_format):
@@ -753,7 +754,7 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
             elif p_format == "csv":
                 self.save_to_file(a_filename=tablename+'.csv',
                                   a_content=dataset.csv)
-        except:
+        except Exception:
             raise CommandError("ActionQ table could not be exported!")
 
     def export_updatepackage(self, p_format):
@@ -769,6 +770,5 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
             elif p_format == "csv":
                 self.save_to_file(a_filename=tablename+'.csv',
                                   a_content=dataset.csv)
-        except:
+        except Exception:
             raise CommandError("UpdatePackage table could not be exported!")
-

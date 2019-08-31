@@ -148,6 +148,7 @@ class Profile(models.Model):
     class Meta:
         ordering = ["id"]
 
+
 def new_profile(pinv, pusername=None, puserid=None, pemail=None, phost=None, pip=None, plocation=None,
                 pdepartment=None, plocation_contact=None, pcreated_by=None, pmodified_by=None, pdescription=None):
     newprofile = Profile.objects.update_or_create(

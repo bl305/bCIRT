@@ -55,4 +55,5 @@ urlpatterns = [
         name='connitemf_remove'),
 
     url(r"logging$", views.ConfigurationLoggingPage.as_view(), name='conf_logging'),
+    url(r"about$", views.ConfigurationAboutPage.as_view(), name='conf_about'),
 ]

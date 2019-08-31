@@ -13,19 +13,21 @@
 # from django.shortcuts import render
 # https://realpython.com/testing-in-django-part-1-best-practices-and-examples/
 # https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django/Testing
-from django.test import TestCase
+# from django.test import TestCase
 # Create your tests here.
-from django.test import TestCase
-from assets.models import Profile
-from django.utils import timezone
+# from django.test import TestCase
+# from assets.models import Profile
+# from django.utils import timezone
 from django.urls import reverse
-from assets.forms import ProfileForm
+# from assets.forms import ProfileForm
 
 # models test
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import User, Permission, Group
+from django.contrib.auth.models import User  # , Permission, Group
 from django.test import TestCase
 from django.test import Client
+
+
 class ProfileTest(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -47,7 +49,6 @@ class ProfileTest(TestCase):
     def tearDown(self):
         self.user.delete()
         # self.group.delete()
-
 
     def test_create_user(self):
         User = get_user_model()
@@ -72,7 +73,7 @@ class ProfileTest(TestCase):
 
     def test_create_superuser(self):
         User = get_user_model()
-        admin_user = User.objects.create_superuser(username='admin',email='admin@bcirt.com', password='AlmaFa1.')
+        admin_user = User.objects.create_superuser(username='admin', email='admin@bcirt.com', password='AlmaFa1.')
         self.assertEqual(admin_user.email, 'admin@bcirt.com')
         self.assertTrue(admin_user.is_active)
         self.assertTrue(admin_user.is_staff)
@@ -88,12 +89,9 @@ class ProfileTest(TestCase):
         #     User.objects.create_superuser(
         #         username='admin', email='admin@bcirt.com', password='AlmaFa1.', is_superuser=False)
 
-
-
-
     def test_user_can_access(self):
-    #     self.user.groups.add(self.group)
-    #     self.user.save()
+        #     self.user.groups.add(self.group)
+        #     self.user.save()
         self.c.login(username='admin', password='Almafa1.')
         response = self.c.get(reverse('assets:host_list'))
         self.assertEqual(response.status_code, 200, u'user should have access')
@@ -127,11 +125,6 @@ class ProfileTest(TestCase):
     #
     #     self.assertEqual(resp.status_code, 200)
     #     self.assertIn(w.title, resp.content)
-
-
-
-
-
 
 # class MyTestTemplateClass(TestCase):
 #     @classmethod

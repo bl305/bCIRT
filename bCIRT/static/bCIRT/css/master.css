@@ -98,7 +98,6 @@ hr.large {
   width: 70%;
 }
 
-
 .attributefield {
   margin:1px;
   word-wrap:break-word;
@@ -139,6 +138,11 @@ hr.large {
   overflow-x: hidden;
 //  height: 1500px; /* Used in this example to enable scrolling */
 }
+
+.mylist-header{
+//  color:red;
+}
+
 
 .myregister {
     max-width:500px;

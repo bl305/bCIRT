@@ -28,6 +28,7 @@
             <div class="panel panel-primary">
                 <header class = "panel-heading">
                     <div class="panel-title text-center">
+                        {% if perms.tasks.add_automation %}
                         <div class="btn-group inline pull-left">
                             <a href="{% url 'tasks:auto_create' %}?next1={{ request.get_full_path|urlencode }}"
                                class="btn btn-default btn-xs">
@@ -35,7 +36,9 @@
                             New Automation Script
                             </a>
                         </div>
+                        {% endif %}
                         <strong>&nbsp;Automation Details | {{ automation.pk }}</strong>
+                        {% if perms.tasks.change_automation %}
                         <div class="btn-group inline ">
                             <div class="btn btn-warning btn-xs">
                             <a style="color:white" href="{% url 'tasks:auto_edit' pk=automation.pk %}?next1={{ request.get_full_path|urlencode }}">
@@ -44,6 +47,7 @@
                             </a>
                             </div>
                         </div>
+                        {% endif %}
                     </div>
                 </header>
                 <div class="panel-body inv-panel-body">

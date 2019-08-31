@@ -12,7 +12,7 @@
 # **********************************************************************;
 from tasks.models import TaskTemplate, PlaybookTemplate, Action, ActionGroupMember
 from tasks.models import new_playbook, new_evidence, task_close
-#from tasks.models import Task, Playbook
+# from tasks.models import Task, Playbook
 
 # to manage manual uploads
 # from os import path
@@ -169,7 +169,7 @@ class InvCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateV
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(InvCreateView, self).__init__(*args, **kwargs)
 
@@ -222,6 +222,7 @@ class InvCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateV
         kwargs['user'] = self.request.user
         return kwargs
 
+
 class InvDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailView):
     model = Inv
     permission_required = ('invs.view_inv',)
@@ -232,7 +233,7 @@ class InvDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailV
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(InvDetailView, self).__init__(*args, **kwargs)
 
@@ -306,7 +307,7 @@ class InvUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateV
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(InvUpdateView, self).__init__(*args, **kwargs)
 
@@ -356,7 +357,7 @@ class InvRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteV
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(InvRemoveView, self).__init__(*args, **kwargs)
 
@@ -393,7 +394,7 @@ class InvAssignView(LoginRequiredMixin, PermissionRequiredMixin, generic.Redirec
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(InvAssignView, self).__init__(*args, **kwargs)
 
@@ -423,11 +424,9 @@ class InvAssignView(LoginRequiredMixin, PermissionRequiredMixin, generic.Redirec
         # return reverse('tasks:tsk_list')
         # return super().get_redirect_url(*args, **kwargs)
 
-
-
-############ TESTING
+# ########### TESTING
 # from django.shortcuts import render
-from django.conf import settings
+# from django.conf import settings
 # from django.core.files.storage import FileSystemStorage
 #
 # def simple_upload(request):
@@ -457,7 +456,7 @@ class InvSuspiciousEmailCreateView(LoginRequiredMixin, PermissionRequiredMixin, 
     # template_name = "invs/inv_invphishing.html"
     template_name = 'invs/inv_form.html'
     form_class = InvSuspiciousEmailForm
-    permission_required = ('invs.view_inv','tasks.view_task')
+    permission_required = ('invs.view_inv', 'tasks.view_task')
     success_url = '../'
 
     def get_context_data(self, **kwargs):
@@ -486,40 +485,40 @@ class InvSuspiciousEmailCreateView(LoginRequiredMixin, PermissionRequiredMixin, 
         creference = cleandata['reference']
         cfileref = cleandata['fileRef']
         inv_obj = new_inv(puser=auser_obj,
-                pparent=None,
-                pinvid="Suspicious Email",
-                prefid=creference,
-                pstatus=InvStatus.objects.get(name="Assigned"),
-                pphase=InvPhase.objects.get(pk=2),
-                pseverity=InvSeverity.objects.get(pk=2),
-                pcategory=InvCategory.objects.get(pk=6),
-                ppriority=InvPriority.objects.get(pk=1),
-                pattackvector=InvAttackvector.objects.get(name="Phishing"),
-                pdescription=cdescription,
-                psummary="Suspicious email",
-                pcomment=None,
-                pstarttime=None,
-                pendtime=None,
-                pinvduration=None,
-                pcreated_at=None,
-                pcreated_by=auser,
-                pmodified_at=None,
-                pmodified_by=auser,
-                pmonetaryloss=0,
-                plosscurrency=CurrencyType.objects.get(pk=1),
-                pnumofvictims=None
+                          pparent=None,
+                          pinvid="Suspicious Email",
+                          prefid=creference,
+                          pstatus=InvStatus.objects.get(name="Assigned"),
+                          pphase=InvPhase.objects.get(pk=2),
+                          pseverity=InvSeverity.objects.get(pk=2),
+                          pcategory=InvCategory.objects.get(pk=6),
+                          ppriority=InvPriority.objects.get(pk=1),
+                          pattackvector=InvAttackvector.objects.get(name="Phishing"),
+                          pdescription=cdescription,
+                          psummary="Suspicious email",
+                          pcomment=None,
+                          pstarttime=None,
+                          pendtime=None,
+                          pinvduration=None,
+                          pcreated_at=None,
+                          pcreated_by=auser,
+                          pmodified_at=None,
+                          pmodified_by=auser,
+                          pmonetaryloss=0,
+                          plosscurrency=CurrencyType.objects.get(pk=1),
+                          pnumofvictims=None
         )
         # Need to create a playbook and tasks within it using the suspicious email template
         playbooktemplate_obj = PlaybookTemplate.objects.get(name="Suspicious Email")
         playbook_obj = new_playbook(pplaybooktemplate=playbooktemplate_obj,
-                     pname=playbooktemplate_obj.name,
-                     pversion=playbooktemplate_obj.version,
-                     puser=auser_obj,
-                     pinv=inv_obj,
-                     pdescription=playbooktemplate_obj.description,
-                     pmodified_by=auser,
-                     pcreated_by=auser
-                     )
+                                    pname=playbooktemplate_obj.name,
+                                    pversion=playbooktemplate_obj.version,
+                                    puser=auser_obj,
+                                    pinv=inv_obj,
+                                    pdescription=playbooktemplate_obj.description,
+                                    pmodified_by=auser,
+                                    pcreated_by=auser
+                                    )
         # find first task
         first_task = None
         if playbook_obj.task_playbook.last():
@@ -545,7 +544,7 @@ class InvSuspiciousEmailCreateView(LoginRequiredMixin, PermissionRequiredMixin, 
         # evidence_obj.fileRef.save(cfileref.name, cfileref)
 
         # need to close the first task
-        task_close(first_task.pk,'action')
+        task_close(first_task.pk, 'action')
         return super(InvSuspiciousEmailCreateView, self).form_valid(form)
 #################################3
 # import os
@@ -556,4 +555,3 @@ class InvSuspiciousEmailCreateView(LoginRequiredMixin, PermissionRequiredMixin, 
 #     save_path = os.path.join(MEDIA_ROOT, 'uploads', request.FILES['file'])
 #     path = default_storage.save(save_path, request.FILES['file'])
 #     return default_storage.path(path)
-

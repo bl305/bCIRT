@@ -40,10 +40,9 @@ class ConfigurationPage(LoginRequiredMixin, TemplateView):
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(ConfigurationPage, self).__init__(*args, **kwargs)
-
 
 
 class ConfigurationLoggingPage(LoginRequiredMixin, TemplateView):
@@ -55,9 +54,23 @@ class ConfigurationLoggingPage(LoginRequiredMixin, TemplateView):
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(ConfigurationLoggingPage, self).__init__(*args, **kwargs)
+
+
+class ConfigurationAboutPage(LoginRequiredMixin, TemplateView):
+    template_name = 'configuration/configuration_about.html'
+
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
+            logger.info(logmsg)
+        super(ConfigurationAboutPage, self).__init__(*args, **kwargs)
 
 
 class UpdatePackageListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
@@ -71,7 +84,7 @@ class UpdatePackageListView(LoginRequiredMixin, PermissionRequiredMixin, ListVie
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(UpdatePackageListView, self).__init__(*args, **kwargs)
 
@@ -96,7 +109,7 @@ class UpdatePackageCreateView(LoginRequiredMixin, PermissionRequiredMixin, Creat
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(UpdatePackageCreateView, self).__init__(*args, **kwargs)
 
@@ -148,6 +161,7 @@ class UpdatePackageCreateView(LoginRequiredMixin, PermissionRequiredMixin, Creat
         kwargs['user'] = self.request.user
         return kwargs
 
+
 class UpdatePackageDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
     model = UpdatePackage
     permission_required = ('configuration.view_updatepackage',)
@@ -158,7 +172,7 @@ class UpdatePackageDetailView(LoginRequiredMixin, PermissionRequiredMixin, Detai
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(UpdatePackageDetailView, self).__init__(*args, **kwargs)
 
@@ -195,7 +209,7 @@ class UpdatePackageUpdateView(LoginRequiredMixin, PermissionRequiredMixin, Updat
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(UpdatePackageUpdateView, self).__init__(*args, **kwargs)
 
@@ -257,7 +271,7 @@ class UpdatePackageRemoveView(LoginRequiredMixin, PermissionRequiredMixin, Delet
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(UpdatePackageRemoveView, self).__init__(*args, **kwargs)
 
@@ -303,7 +317,7 @@ class InstallPackageRedirectView(LoginRequiredMixin, PermissionRequiredMixin, ge
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(InstallPackageRedirectView, self).__init__(*args, **kwargs)
 
@@ -320,7 +334,7 @@ class InstallPackageRedirectView(LoginRequiredMixin, PermissionRequiredMixin, ge
             p_path = path.dirname(p_root)
             conf_obj = UpdatePackage.objects.get(pk=self.kwargs.get('pk'))
             if conf_obj.fileRef:
-                update_file = path.join(MEDIA_ROOT,str(conf_obj.fileRef))
+                update_file = path.join(MEDIA_ROOT, str(conf_obj.fileRef))
                 import zipfile
                 with zipfile.ZipFile(update_file, "r") as zip_ref:
                     zip_ref.extractall(p_path)
@@ -351,7 +365,7 @@ class ConnectionItemListView(LoginRequiredMixin, PermissionRequiredMixin, generi
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(ConnectionItemListView, self).__init__(*args, **kwargs)
 
@@ -379,7 +393,7 @@ class ConnectionItemCreateView(LoginRequiredMixin, PermissionRequiredMixin, gene
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(ConnectionItemCreateView, self).__init__(*args, **kwargs)
 
@@ -435,7 +449,7 @@ class ConnectionItemDetailView(LoginRequiredMixin, PermissionRequiredMixin, gene
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(ConnectionItemDetailView, self).__init__(*args, **kwargs)
 
@@ -474,7 +488,7 @@ class ConnectionItemUpdateView(LoginRequiredMixin, PermissionRequiredMixin, gene
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(ConnectionItemUpdateView, self).__init__(*args, **kwargs)
 
@@ -532,7 +546,7 @@ class ConnectionItemRemoveView(LoginRequiredMixin, PermissionRequiredMixin, gene
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(ConnectionItemRemoveView, self).__init__(*args, **kwargs)
 
@@ -566,6 +580,8 @@ class ConnectionItemRemoveView(LoginRequiredMixin, PermissionRequiredMixin, gene
         return super(ConnectionItemRemoveView, self).dispatch(request, *args, **kwargs)
 
 # ConnectionItemFields
+
+
 class ConnectionItemFieldListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
     model = ConnectionItemField
     form_class = ConnectionItemFieldForm
@@ -577,7 +593,7 @@ class ConnectionItemFieldListView(LoginRequiredMixin, PermissionRequiredMixin, g
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(ConnectionItemFieldListView, self).__init__(*args, **kwargs)
 
@@ -605,7 +621,7 @@ class ConnectionItemFieldCreateView(LoginRequiredMixin, PermissionRequiredMixin,
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(ConnectionItemFieldCreateView, self).__init__(*args, **kwargs)
 
@@ -661,7 +677,7 @@ class ConnectionItemFieldDetailView(LoginRequiredMixin, PermissionRequiredMixin,
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(ConnectionItemFieldDetailView, self).__init__(*args, **kwargs)
 
@@ -700,7 +716,7 @@ class ConnectionItemFieldUpdateView(LoginRequiredMixin, PermissionRequiredMixin,
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(ConnectionItemFieldUpdateView, self).__init__(*args, **kwargs)
 
@@ -758,7 +774,7 @@ class ConnectionItemFieldRemoveView(LoginRequiredMixin, PermissionRequiredMixin,
         elif LOGLEVEL == 2:
             pass
         elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR +"call"+LOGSEPARATOR+self.__class__.__name__
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(ConnectionItemFieldRemoveView, self).__init__(*args, **kwargs)
 
