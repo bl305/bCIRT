@@ -91,6 +91,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'session_security',
     'bootstrap4',
     'tinymce',
     'accounts',
@@ -111,12 +112,14 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'session_security.middleware.SessionSecurityMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
 ROOT_URLCONF = 'bCIRT.urls'
-
+SESSION_SECURITY_WARN_AFTER = 2700
+SESSION_SECURITY_EXPIRE_AFTER = 3600
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -334,7 +337,7 @@ INTERNAL_IPS = ['127.0.0.1']
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 # hard coded session close - this will expire regardless of activity
 # SESSION_COOKIE_AGE = 5 * 60 #5 minutes
-SESSION_COOKIE_AGE = 60 * 60  # 1 hour
+#SESSION_COOKIE_AGE = 60 * 60  # 1 hour
 SESSION_SAVE_EVERY_REQUEST = True  # refresh session timeout
 # TBD session timeout - it's only client side
 

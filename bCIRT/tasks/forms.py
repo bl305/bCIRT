@@ -1020,7 +1020,6 @@ class PlaybookTemplateItemForm(forms.ModelForm):
             currentitem_pk = kwargs.get('instance').pk
         else:
             currentitem_pk = 0
-
         if self.play_pk != "0":
 
             # print("play_pk:"+str(self.play_pk))
@@ -1033,7 +1032,7 @@ class PlaybookTemplateItemForm(forms.ModelForm):
                     # actual_playbooktemplate = actual_playbookitem.playbooktemplateid.pk
                     # print("PBTITEM:"+str(actual_playbookitem))
                     #     print("PB:"+str(actual_playbooktemplate))
-                    actual_playbooktemplate = PlaybookTemplateItem.objects.get(pk=currentitem_pk).playbooktemplateid.pk
+
 
                     # print("PBNEW:"+str(actual_playbooktemplate))
                     # print(PlaybookTemplateItem.objects.filter(playbooktemplateid=actual_playbooktemplate).
@@ -1043,21 +1042,38 @@ class PlaybookTemplateItemForm(forms.ModelForm):
                     # playbooktemplateid=self.play_pk)
                     #     self.fields['nexttask'].queryset = PlaybookTemplateItem.objects.filter(
                     #     playbooktemplateid=actual_playbooktemplate).exclude(pk=actual_playbookitem.pk)
+                    actual_playbooktemplate = PlaybookTemplateItem.objects.get(pk=currentitem_pk).playbooktemplateid.pk
+                    actual_playbooktemplateitem_obj = PlaybookTemplateItem.objects.get(pk=currentitem_pk)
+                    actual_playbooktemplate_obj = actual_playbooktemplateitem_obj.playbooktemplateid
+                    actual_playbooktemplate = actual_playbooktemplate_obj.pk
+
                     self.fields['nexttask'].queryset = PlaybookTemplateItem.objects.filter(
                         playbooktemplateid=actual_playbooktemplate).exclude(pk=currentitem_pk)
                     self.fields['prevtask'].queryset = PlaybookTemplateItem.objects.filter(
-                        playbooktemplateid=actual_playbooktemplate).exclude(pk=currentitem_pk)
+                        playbooktemplateid=actual_playbooktemplate).\
+                        exclude(pk=currentitem_pk).\
+                        filter(itemorder__lt=actual_playbooktemplateitem_obj.itemorder)
                 else:
                     self.fields['prevtask'].queryset = PlaybookTemplateItem.objects.filter(pk=0)
                     self.fields['nexttask'].queryset = PlaybookTemplateItem.objects.filter(pk=0)
+
             except Exception:
                 # self.fields['nexttask'].queryset = PlaybookTemplateItem.objects.filter(pk=0)
                 # self.fields['prevtask'].queryset = PlaybookTemplateItem.objects.filter(pk=0)
                 self.fields['nexttask'].queryset = PlaybookTemplateItem.objects.filter(enabled=True)
-                self.fields['prevtask'].queryset = PlaybookTemplateItem.objects.filter(enabled=True)
+                if currentitem_pk != 0:
+                    actual_playbooktemplateitem_obj = PlaybookTemplateItem.objects.get(pk=currentitem_pk)
+                    self.fields['prevtask'].queryset = PlaybookTemplateItem.objects.\
+                        filter(enabled=True).\
+                        filter(itemorder__lt=actual_playbooktemplateitem_obj.itemorder)
+                else:
+                    self.fields['prevtask'].queryset = PlaybookTemplateItem.objects.filter(enabled=True)
+
+
         else:
             # self.fields['nexttask'].queryset = TaskTemplate.objects.filter(enabled=True)
             self.fields['nexttask'].queryset = PlaybookTemplateItem.objects.filter(enabled=True)
+
 
     user = forms.ModelChoiceField(
         label='Owner:',
@@ -1658,6 +1674,10 @@ class AutomationForm(forms.ModelForm):
         )
     )
 
+    # max_number = forms.ChoiceField(widget=forms.Select(),
+    #                                choices=([('check_malicious', 'check_malicious'),
+    #                                          ('find_ipv4', 'find_ipv4'), ('3', '3'), ]), initial='1', required=True, )
+
     script_type = forms.ModelChoiceField(
             label="Script Type*",
             queryset=ScriptType.objects.filter(enabled=True),
@@ -1713,7 +1733,7 @@ class AutomationForm(forms.ModelForm):
             ),
             'code': forms.Textarea(attrs={
                 'size': 20,
-                'style': 'width:50%',
+                'style': 'width:90%',
                 'class': 'form-control'}
             ),
             # 'fileRef': CustomClearableFileInput,

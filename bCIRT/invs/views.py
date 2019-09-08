@@ -9,10 +9,18 @@
 # Revision History  : v1
 # Date        Author      Ref    Description
 # 2019.07.29  Lendvay     1      Initial file
+# 2019.09.06  Lendvay     2      Added session security
 # **********************************************************************;
 from tasks.models import TaskTemplate, PlaybookTemplate, Action, ActionGroupMember
 from tasks.models import new_playbook, new_evidence, task_close
 # from tasks.models import Task, Playbook
+import os
+import shutil
+from django.core.files import File
+import tempfile
+from zipfile import ZipFile
+from bCIRT.settings import MEDIA_ROOT
+from shutil import copyfile
 
 # to manage manual uploads
 # from os import path
@@ -36,8 +44,8 @@ from bCIRT.custom_variables import LOGLEVEL, LOGSEPARATOR
 from django.utils.http import is_safe_url
 from bCIRT.settings import ALLOWED_HOSTS
 # check remaining session time
-from django.contrib.sessions.models import Session
-from datetime import datetime, timezone
+# from django.contrib.sessions.models import Session
+# from datetime import datetime, timezone
 # check remaining session time
 from django.template.loader import get_template
 from wkhtmltopdf.views import PDFTemplateResponse
@@ -108,12 +116,6 @@ class InvDetailPrintView(LoginRequiredMixin, PermissionRequiredMixin, generic.De
         super(InvDetailPrintView, self).__init__(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         kwargs['templatecategories'] = TaskTemplate.objects.filter(enabled=True)
         kwargs['playbooks'] = PlaybookTemplate.objects.filter(enabled=True)
         kwargs['actions'] = Action.objects.filter(enabled=True)
@@ -148,12 +150,6 @@ class InvListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView)
         super(InvListView, self).__init__(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(InvListView, self).get_context_data(**kwargs)
 
 
@@ -183,12 +179,6 @@ class InvCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateV
         return redirect_to
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(InvCreateView, self).get_context_data(**kwargs)
 
     def form_valid(self, form):
@@ -238,12 +228,6 @@ class InvDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailV
         super(InvDetailView, self).__init__(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         kwargs['templatecategories'] = TaskTemplate.objects.filter(enabled=True)
         kwargs['playbooks'] = PlaybookTemplate.objects.filter(enabled=True)
         kwargs['actions'] = Action.objects.filter(enabled=True)
@@ -321,12 +305,6 @@ class InvUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateV
         return redirect_to
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(InvUpdateView, self).get_context_data(**kwargs)
 
     def dispatch(self, request, *args, **kwargs):
@@ -365,12 +343,6 @@ class InvRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteV
         return reverse(self.success_url)
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(InvRemoveView, self).get_context_data(**kwargs)
 
     def dispatch(self, request, *args, **kwargs):
@@ -460,18 +432,6 @@ class InvSuspiciousEmailCreateView(LoginRequiredMixin, PermissionRequiredMixin, 
     success_url = '../'
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # print(sessiontimeout)
-        # print(servertime)
-        # c = servertime - sessiontimeout
-        # print(divmod(c.days * 86400 + c.seconds, 60))
-
-        # check remaining session time
-
         # kwargs['user'] = self.request.user
         # kwargs['invs'] = Inv.objects.filter(user=self.request.user, status=3)
         return super(InvSuspiciousEmailCreateView, self).get_context_data(**kwargs)
@@ -484,6 +444,7 @@ class InvSuspiciousEmailCreateView(LoginRequiredMixin, PermissionRequiredMixin, 
         cdescription = cleandata['description']
         creference = cleandata['reference']
         cfileref = cleandata['fileRef']
+
         inv_obj = new_inv(puser=auser_obj,
                           pparent=None,
                           pinvid="Suspicious Email",
@@ -508,25 +469,11 @@ class InvSuspiciousEmailCreateView(LoginRequiredMixin, PermissionRequiredMixin, 
                           plosscurrency=CurrencyType.objects.get(pk=1),
                           pnumofvictims=None
         )
-        # Need to create a playbook and tasks within it using the suspicious email template
-        playbooktemplate_obj = PlaybookTemplate.objects.get(name="Suspicious Email")
-        playbook_obj = new_playbook(pplaybooktemplate=playbooktemplate_obj,
-                                    pname=playbooktemplate_obj.name,
-                                    pversion=playbooktemplate_obj.version,
-                                    puser=auser_obj,
-                                    pinv=inv_obj,
-                                    pdescription=playbooktemplate_obj.description,
-                                    pmodified_by=auser,
-                                    pcreated_by=auser
-                                    )
-        # find first task
-        first_task = None
-        if playbook_obj.task_playbook.last():
-            first_task = playbook_obj.task_playbook.last()
-        # add evidence to the first task
+        # add the uploaded file to evidences without assigning to any task
+        # if the file is email, the evidence need to be attached to the first task
         evidence_obj = new_evidence(
             puser=auser_obj,
-            ptask=first_task,
+            ptask=None,
             pinv=inv_obj,
             pcreated_by=auser,
             pmodified_by=auser,
@@ -540,11 +487,154 @@ class InvSuspiciousEmailCreateView(LoginRequiredMixin, PermissionRequiredMixin, 
             # pfileref=None,
             pforce=True,
         )
-        # this will attach the file to the evidence
-        # evidence_obj.fileRef.save(cfileref.name, cfileref)
 
-        # need to close the first task
-        task_close(first_task.pk, 'action')
+        cfileext = os.path.basename(str(cfileref)).split(".")[-1]
+        if (cfileext.lower() == 'eml') or (cfileext.lower() == 'msg'):
+            # use the file as an evidence, assign it to the first task
+            # Need to create a playbook and tasks within it using the suspicious email template
+            playbooktemplate_obj = PlaybookTemplate.objects.get(name="Suspicious Email")
+            playbook_obj = new_playbook(pplaybooktemplate=playbooktemplate_obj,
+                                        pname=playbooktemplate_obj.name,
+                                        pversion=playbooktemplate_obj.version,
+                                        puser=auser_obj,
+                                        pinv=inv_obj,
+                                        pdescription=playbooktemplate_obj.description,
+                                        pmodified_by=auser,
+                                        pcreated_by=auser
+                                        )
+            # find first task
+            first_task = None
+            if playbook_obj.task_playbook.last():
+                first_task = playbook_obj.task_playbook.last()
+            # add evidence to the first task
+            evidence_obj.task=first_task
+            evidence_obj.save()
+            # this will attach the file to the first evidence
+
+            # need to close the first task
+            task_close(first_task.pk, 'action')
+
+        elif cfileext == 'zip':
+            # this means the intput is a ZIP file
+            # generate a random folder with some prefix:
+
+            ev_pk = evidence_obj.pk
+            tempfile.tempdir = os.path.join(MEDIA_ROOT, "tmp")
+            myprefix1 = "EVtmp-" + str(ev_pk) + "-"
+            myouttempdir1 = tempfile.TemporaryDirectory(prefix=myprefix1)
+            #  make the tempdir the temp root
+            tempfile.tempdir = myouttempdir1.name
+            # with tempfile.TemporaryDirectory() as directory:
+            # destdir = myouttempdir.name
+            # standard dir where output files will be stored
+            #            destoutdir = tempfile.mkdtemp()
+            #           destoutdirpath = MEDIA_ROOT +  destoutdir
+            # destoutdirname = MEDIA_ROOT + str(destoutdir) + str(cfileref)
+            destoutdirpath = tempfile.gettempdir()
+            # destoutdirfilename = os.path.join(destoutdirpath, cfileref.name)
+            destoutdirfilename = os.path.join(destoutdirpath, evidence_obj.fileName)
+            # destoutdirname = destoutdirpath + "/" + cfileref.name
+            # Create a ZipFile Object and load sample.zip in it
+            # oldfile = MEDIA_ROOT + str(evidence_obj.fileRef)
+            oldfile = os.path.join(MEDIA_ROOT, str(evidence_obj.fileRef))
+            #            print("tempdir: %s"%(destoutdir.gettempdir()))
+            # TBD copy the original evidence
+            # copyfile(oldfile, destoutdirname)
+            # adding exception handling
+            try:
+                copyfile(oldfile, destoutdirfilename)
+            except IOError as e:
+                print("Unable to copy file. %s" % e)
+                # exit(1)
+            except Exception:
+                print("Unexpected error:", Exception)
+                # exit(1)
+
+            # print("LIST1:%s"%(str(os.listdir(str(destoutdirpath)))))
+
+            # TBD create a copy in a subfolder
+            # copy files into it
+            # ...
+            # https://thispointer.com/python-how-to-unzip-a-file-extract-single-multiple-or-all-files-from-a-zip-archive/
+            #            with ZipFile(destoutdirname, 'r') as zipObj:
+            #                # Extract all the contents of zip file in different directory
+            #                # zipObj.extractall(path=destoutdirpath, pwd=None)
+            #                # Get a list of all archived file names from the zip
+            #                listOfFileNames = zipObj.namelist()
+            #                # Iterate over the file names
+            #                for fileName in listOfFileNames:
+            #                    # Check filename
+            #                    if fileName.endswith('.txt') or fileName.endswith('txt'):
+            #                        # Extract a single file from zip
+            #                        zipObj.extract(member=fileName, path=destoutdirpath, pwd=None)
+
+            my_dir = destoutdirpath
+            my_zip = destoutdirfilename
+            with ZipFile(my_zip) as zip_file:
+                for member in zip_file.namelist():
+                    filename = os.path.basename(member)
+                    # skip directories
+                    if not filename:
+                        continue
+                    if filename.lower().endswith(".eml") or filename.lower().endswith(".msg"):
+                        source = zip_file.open(member)
+                        target = open(os.path.join(my_dir, filename), "wb")
+                        with source, target:
+                            try:
+                                shutil.copyfileobj(source, target)
+                            except Exception:
+                                print("Error:%s" % (Exception))
+
+                        # print(os.path.join(destoutdirpath,filename))
+
+                        # 2 create playbook for each file
+
+                        # use the file as an evidence, assign it to the first task
+                        # Need to create a playbook and tasks within it using the suspicious email template
+                        playbooktemplate_obj = PlaybookTemplate.objects.get(name="Suspicious Email")
+                        playbook_obj = new_playbook(pplaybooktemplate=playbooktemplate_obj,
+                                                    pname=playbooktemplate_obj.name,
+                                                    pversion=playbooktemplate_obj.version,
+                                                    puser=auser_obj,
+                                                    pinv=inv_obj,
+                                                    pdescription=playbooktemplate_obj.description,
+                                                    pmodified_by=auser,
+                                                    pcreated_by=auser
+                                                    )
+                        # find first task
+                        first_task = None
+                        if playbook_obj.task_playbook.last():
+                            first_task = playbook_obj.task_playbook.last()
+                        # add evidence to the first task
+                        filetouploadpath = os.path.join(destoutdirpath, target.name)
+                        print("filetouploadpath:%s" % (filetouploadpath))
+                        filetoupload = open(filetouploadpath)
+
+                        evidence_obj = new_evidence(
+                            puser=auser_obj,
+                            ptask=first_task,
+                            pinv=inv_obj,
+                            pcreated_by=auser,
+                            pmodified_by=auser,
+                            pdescription=cdescription,
+                            pevformat=None,
+                            pparent=None,
+                            pparentattr=None,
+                            # pfilename=cfileref.name,
+                            pfilename=target.name,
+                            # pfilename=None,
+                            # pfileref=cfileref,
+                            pfileref=File(filetoupload),
+                            # pfileref=None,
+                            pforce=True,
+                        )
+                        filetoupload.close()
+                        # this will attach the file to the evidence
+                        # evidence_obj.fileRef.save(cfileref.name, cfileref)
+
+                        # need to close the first task
+                        task_close(first_task.pk, 'action')
+
         return super(InvSuspiciousEmailCreateView, self).form_valid(form)
 #################################3
 # import os

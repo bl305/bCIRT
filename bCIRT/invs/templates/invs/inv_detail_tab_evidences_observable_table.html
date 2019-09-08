@@ -9,6 +9,7 @@
 # Revision History  : v1
 # Date        Author      Ref    Description
 # 2019.07.29  Lendvay     1      Initial file
+# 2019.09.05  Lendvay     2      Added observables fields
 # **********************************************************************;
 -->
 {% if inv.evidence_inv %}
@@ -17,7 +18,14 @@
     {% for attr in invevidence.evattr_evidence.all %}
         {% if attr.observable %}
             <tr>
-              <th scope="row">{{attr.pk}}</th>
+                <td>
+                    {{attr.pk}}
+                </td>
+                <td>
+                    <a class="badge" href="#item-inve{{ invevidence.pk }}">
+                        {{invevidence.pk}}
+                    </a>
+                </td>
               <td>
                 <div class="pull-left">
                         <a href="{% url 'tasks:evattr_edit' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}"
@@ -25,11 +33,17 @@
                             <span class="glyphicon glyphicon-pencil" data-toggle="tooltip" data-placement="top" title="Edit item">
                             </span>
                         </a>
-                          <a href="{% url 'tasks:evattr_remove' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}"
-                              class="btn btn-danger btn-xs">
-                          <span class="glyphicon glyphicon-trash" data-toggle="tooltip" data-placement="top" title="Edit item">
-                          </span>
-                          </a>
+                        <a href="{% url 'tasks:evattr_observabletoggle' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ invevidence.pk }}"
+                            class="btn btn-default btn-xs">
+                        {% if attr.observable %}
+                            <span class="glyphicon glyphicon-eye-open" data-toggle="tooltip" data-placement="top" title="Toggle Observable">
+                            </span>
+                        {% else %}
+                            <span class="glyphicon glyphicon-ban-circle" data-toggle="tooltip" data-placement="top" title="Toggle Observable">
+                            </span>
+                        {% endif %}
+                        </a>
+
                 </div>
               </td>
               <td>{{ attr.evattrformat }}</td>
@@ -68,7 +82,7 @@
 {% endfor %}
 {% else %}
           <tr>
-            <td colspan="5" class="text-center bg-warning">No matching record found</td>
+            <td colspan="6" class="text-center bg-warning">No matching record found</td>
           </tr>
 {% endif %}
 

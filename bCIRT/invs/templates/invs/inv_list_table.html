@@ -26,6 +26,9 @@
                         {{ inv.priority }}
                     </td>
                     <td>
+                        {{ inv.refid }}
+                    </td>
+                    <td>
                         <div class="container inv-index">
                             {{ inv.description_html|safe }}
 
@@ -70,6 +73,6 @@
 {% endfor %}
 {% else %}
           <tr>
-            <td colspan="11" class="text-center bg-warning">No Investigation</td>
+            <td colspan="12" class="text-center bg-warning">No Investigation</td>
           </tr>
 {% endif %}

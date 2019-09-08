@@ -9,6 +9,7 @@
 # Revision History  : v1
 # Date        Author      Ref    Description
 # 2019.07.29  Lendvay     1      Initial file
+# 2019.09.06  Lendvay     2      Print preview in new window
 # **********************************************************************;
 -->    <div class="row">
 
@@ -45,7 +46,7 @@
                                             <a tabindex="-1" href="#" class="btn btn-default btn-xs">Export<span class="glyphicon glyphicon-export"></span></a>
                                             <ul class="dropdown-menu dropdown-content">
                                                 <li>
-                                                    <a href="{% url 'invs:inv_detail_print' pk=inv.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                                    <a href="{% url 'invs:inv_detail_print' pk=inv.pk %}?next1={{ request.get_full_path|urlencode }}" target="_blank"
                                                       class="btn btn-default btn-xs">
                                                       Print Preview
                                                       <span class="glyphicon glyphicon-export" data-toggle="tooltip" data-placement="top" title="Edit item">

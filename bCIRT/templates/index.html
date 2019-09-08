@@ -24,6 +24,7 @@
                     <thead>
                         <tr>
                             <th>#</th>
+                            <th>Reference</th>
                             <th>Status</th>
                             <th>Modified</th>
                         </tr>
@@ -33,6 +34,9 @@
                         <tr data-toggle="collapse" data-target="#myinvs{{inv.pk}}" class="accordion-toggle">
                             <td>
                                 <a class="badge" href="{% url 'invs:inv_detail' pk=inv.pk %}">{{inv.id}}-{{ inv.invid }}</a>
+                            </td>
+                            <td>
+                                {{ inv.refid }}
                             </td>
                             <td>
                                 {{ inv.status }}
@@ -62,6 +66,7 @@
                     <thead>
                         <tr>
                             <th>#</th>
+                            <th>Reference</th>
                             <th>Title</th>
                             <th>Modified</th>
                         </tr>
@@ -71,6 +76,9 @@
                         <tr data-toggle="collapse" data-target="#mytasks{{task.pk}}" class="accordion-toggle">
                             <td>
                                 <a class="badge" href="{% url 'tasks:tsk_detail' pk=task.pk %}">{{ task.pk }}</a>
+                            </td>
+                            <td>
+                                {{ task.inv.refid }}
                             </td>
                             <td>
                                 {{ task.title }}
@@ -100,6 +108,7 @@
                     <thead>
                         <tr>
                             <th>#</th>
+                            <td>Reference</td>
                             <th>Title</th>
                             <th>Modified</th>
                         </tr>
@@ -109,6 +118,9 @@
                         <tr data-toggle="collapse" data-target="#mytasks{{task.pk}}" class="accordion-toggle">
                             <td>
                                 <a class="badge" href="{% url 'tasks:tsk_detail' pk=task.pk %}">{{ task.pk }}</a>
+                            </td>
+                            <td>
+                                {{ task.inv.refid }}
                             </td>
                             <td>
                                 {{ task.title }}

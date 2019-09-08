@@ -11,6 +11,7 @@
 # 2019.07.29  Lendvay     1      Initial file
 # 2019.08.13  Lendvay     2      Added temp folder for each action and connections, removed action file
 # 2019.08.30  Lendvay     1      Added playbooktemplate graph
+# 2019.09.03  Lendvay     1      Fixed add new playbook
 # **********************************************************************;
 from django.db import models
 from django.urls import reverse
@@ -126,7 +127,7 @@ class MitreAttck_Tactics(models.Model):
     name = models.CharField(max_length=25, blank=False, null=False)
     enabled = models.BooleanField(default=True)
     description = models.TextField(max_length=500, default="")
-    description_html = models.TextField(editable=True, default='', blank=True)
+    description_html = models.TextField(max_length=750, editable=True, default='', blank=True)
 
     def __str__(self):
         return self.name
@@ -143,7 +144,7 @@ class MitreAttck_Techniques(models.Model):
     name = models.CharField(max_length=25, blank=False, null=False)
     enabled = models.BooleanField(default=True)
     description = models.TextField(max_length=500, default="")
-    description_html = models.TextField(editable=True, default='', blank=True)
+    description_html = models.TextField(max_length=750, editable=True, default='', blank=True)
 
     def __str__(self):
         return self.name
@@ -158,7 +159,7 @@ class TaskStatus(models.Model):
     name = models.CharField(max_length=20)
     enabled = models.BooleanField(default=True)
     description = models.TextField(max_length=500, default="")
-    description_html = models.TextField(editable=True, default='', blank=True)
+    description_html = models.TextField(max_length=750, editable=True, default='', blank=True)
 
     def __str__(self):
         return self.name
@@ -174,7 +175,7 @@ class TaskType(models.Model):
     name = models.CharField(max_length=20)
     enabled = models.BooleanField(default=True)
     description = models.TextField(max_length=500, default="")
-    description_html = models.TextField(editable=True, default='', blank=True)
+    description_html = models.TextField(max_length=750, editable=True, default='', blank=True)
 
     def __str__(self):
         return str(self.typeid) + " - " + str(self.name)
@@ -190,7 +191,7 @@ class TaskCategory(models.Model):
     name = models.CharField(max_length=40)
     enabled = models.BooleanField(default=True)
     description = models.TextField(max_length=500, default="")
-    description_html = models.TextField(editable=True, default='', blank=True)
+    description_html = models.TextField(max_length=750, editable=True, default='', blank=True)
     acknowledge_required = models.IntegerField(default=1)
     resolution_required = models.IntegerField(default=1)
 
@@ -207,7 +208,7 @@ class TaskPriority(models.Model):
     name = models.CharField(max_length=40)
     enabled = models.BooleanField(default=True)
     description = models.TextField(max_length=500, default="")
-    description_html = models.TextField(editable=True, default='', blank=True)
+    description_html = models.TextField(max_length=750, editable=True, default='', blank=True)
 
     def __str__(self):
         return self.name
@@ -222,7 +223,7 @@ class TaskVarType(models.Model):
     name = models.CharField(max_length=20)
     enabled = models.BooleanField(default=True)
     description = models.TextField(max_length=500, default="")
-    description_html = models.TextField(editable=True, default='', blank=True)
+    description_html = models.TextField(max_length=750, editable=True, default='', blank=True)
 
     def __str__(self):
         return self.name
@@ -237,7 +238,7 @@ class TaskVarCategory(models.Model):
     name = models.CharField(max_length=20)
     enabled = models.BooleanField(default=True)
     description = models.TextField(max_length=500, default="")
-    description_html = models.TextField(editable=True, default='', blank=True)
+    description_html = models.TextField(max_length=750, editable=True, default='', blank=True)
 
     def __str__(self):
         return self.name
@@ -259,8 +260,10 @@ class Playbook(models.Model):
     modified_at = models.DateTimeField(auto_now=True)
     modified_by = models.CharField(max_length=20, default="unknown")
 
-    description = models.TextField(max_length=500, default="")
-    description_html = models.TextField(editable=True, default='', blank=True)
+    # description = models.TextField(max_length=500, default="")
+    description = HTMLField()
+    # description_html = models.TextField(max_length=750, editable=True, default='', blank=True)
+    description_html = HTMLField()
 
     def __str__(self):
         return str(self.pk)+" - "+str(self.name)
@@ -296,22 +299,34 @@ def new_playbook(pplaybooktemplate, pname, pversion, puser, pinv, pdescription, 
         created_by=pcreated_by,
     )
     item_mapping = dict()
-    for tmp_item in pplaybooktemplate.playbooktemplateitem_playbooktemplate.all().order_by('itemorder'):
+    pbtmpitem_list = pplaybooktemplate.playbooktemplateitem_playbooktemplate.all().order_by('itemorder')
+    for tmp_item in pbtmpitem_list:
         tmp_to_copy = TaskTemplate.objects.get(pk=tmp_item.acttask.pk)
+        # logger.info("01 tmp_item:%s"%(tmp_item))
+        # logger.info("02 tmp_to_copy:%d %s"%(tmp_to_copy.pk, tmp_to_copy))
         # if the playbooktemplateitem refers to a previous item, we need to
         # find the pk of the newly created previous item matching the previous reference
         if tmp_item.prevtask:
-            tmp_item_prevtaskpk = TaskTemplate.objects.get(pk=tmp_item.prevtask.pk).pk
+            # logger.info("11 IF tmp_item.prevtask:%s" % (tmp_item.prevtask))
+            # logger.info("XXX:%s" % (tmp_item.prevtask.pk))
+            # tmp_item_prevtaskpk = TaskTemplate.objects.get(pk=tmp_item.prevtask.pk).pk
+            tmp_item_prevtaskpk = PlaybookTemplateItem.objects.get(pk=tmp_item.prevtask.pk).pk
+            # logger.info("12 IF tmp_item_prevtaskpk:%s" % (tmp_item_prevtaskpk))
             # print(str(tmp_item.pk)+"->"+str(tmp_item_prevtaskpk))
+            # logger.info("13 IF item_mapping")
+            # logger.info(item_mapping)
             tmp_item_prevtask = Task.objects.get(pk=item_mapping[tmp_item_prevtaskpk])
+            # logger.info("14 IF tmp_item_prevtask:%s" % (tmp_item_prevtask))
             # print(tmp_item_prevtask)
         else:
+            # logger.info("21 ELSE tmp_item_prevtask_none")
             tmp_item_prevtask = None
         # if tmp_item.prevtask:
         #     tmp_item_prevtask=TaskTemplate.objects.get(pk=tmp_item.prevtask.pk)
         # else:
         #     tmp_item_prevtask = None
         # tmp_item_prevtask = None
+        # logger.info("31 NEW TASK:%s" % (tmp_item_prevtask))
         new_task = add_task_from_template(
             atitle=tmp_to_copy.title,
             astatus=tmp_to_copy.status,
@@ -329,8 +344,10 @@ def new_playbook(pplaybooktemplate, pname, pversion, puser, pinv, pdescription, 
             acreated_by=str(puser)
         )
         # print(str(new_task)+"->->"+str(tmp_item_prevtask))
-        #  here I need to map the tampate pks to the new pks so I can assign the proper actions
+        #  here I need to map the tempate pks to the new pks so I can assign the proper actions
         item_mapping.update({tmp_item.pk: new_task.pk})
+    # to run the post-save function:
+    playbook_obj.save()
     return playbook_obj
 
 # Create your models here.
@@ -359,7 +376,8 @@ class Task(models.Model):
                                  related_name="task_priority")
     type = models.ForeignKey(TaskType, on_delete=models.SET_DEFAULT, default="1", related_name="task_type")
     description = HTMLField()
-    description_html = models.TextField(editable=True, default='', blank=True)
+    # description_html = models.TextField(editable=True, default='', blank=True)
+    description_html = HTMLField()
     summary = models.CharField(max_length=2000, default="", blank=True, null=True)
     starttime = models.DateTimeField(auto_now=False, blank=True, null=True)
     endtime = models.DateTimeField(auto_now=False, blank=True, null=True)
@@ -1021,7 +1039,8 @@ class Automation(models.Model):
     modified_at = models.DateTimeField(auto_now=True)
     modified_by = models.CharField(max_length=20, default="unknown")
     description = HTMLField()
-    description_html = models.TextField(editable=True, default='', blank=True)
+    # description_html = models.TextField(editable=True, default='', blank=True)
+    description_html = HTMLField()
 
     # class Meta:
 #       ordering = ['-id']
@@ -1085,7 +1104,8 @@ class Action(models.Model):
     modified_at = models.DateTimeField(auto_now=True)
     modified_by = models.CharField(max_length=20, default="unknown")
     description = HTMLField()
-    description_html = models.TextField(editable=True, default='', blank=True)
+    # description_html = models.TextField(editable=True, default='', blank=True)
+    description_html = HTMLField()
 
     # class Meta:
 #       ordering = ['-id']
@@ -1166,7 +1186,8 @@ class TaskTemplate(models.Model):
     actiontarget = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True,
                                      related_name="tasktemplate_actiontarget")
     description = HTMLField()
-    description_html = models.TextField(editable=True, default='', blank=True)
+    # description_html = models.TextField(editable=True, default='', blank=True)
+    description_html = HTMLField()
     summary = models.CharField(max_length=2000, default="", blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.CharField(max_length=20, default="unknown")
@@ -1247,8 +1268,10 @@ class PlaybookTemplate(models.Model):
     modified_at = models.DateTimeField(auto_now=True)
     modified_by = models.CharField(max_length=20, default="unknown")
 
-    description = models.TextField(max_length=500, default="")
-    description_html = models.TextField(editable=True, default='', blank=True)
+    # description = models.TextField(max_length=500, default="")
+    # description_html = models.TextField(editable=True, default='', blank=True)
+    description = HTMLField()
+    description_html = HTMLField()
 
     def __str__(self):
         return str(self.pk)+" - "+str(self.name)
@@ -1290,8 +1313,10 @@ class PlaybookTemplateItem(models.Model):
     modified_at = models.DateTimeField(auto_now=True)
     modified_by = models.CharField(max_length=20, default="unknown")
 
-    description = models.TextField(max_length=500, default="")
-    description_html = models.TextField(editable=True, default='', blank=True)
+    # description = models.TextField(max_length=500, default="")
+    # description_html = models.TextField(editable=True, default='', blank=True)
+    description = HTMLField()
+    description_html = HTMLField()
 
     def __str__(self):
         return str(self.pk) + " - " + str(self.acttask.title)
@@ -1313,15 +1338,45 @@ class PlaybookTemplateItem(models.Model):
         # PlaybookTemplate.objects.get(pk=self.playbooktemplateid.pk).save()
         super(PlaybookTemplateItem, self).save(*args, **kwargs)
 
+    def delete(self, *args, **kwargs):
+        if self.playbooktemplateid.playbooktemplateitem_playbooktemplate.filter(prevtask=self.pk):
+            reftasks = self.playbooktemplateid.playbooktemplateitem_playbooktemplate.filter(prevtask=self.pk)
+            reftaskout = list()
+            for i in reftasks:
+                reftaskout.append(i.pk)
+            raise ValidationError("Task #%s is providing input for other tasks: #%s"%(self.pk, reftaskout))
+        super(PlaybookTemplateItem, self).delete(*args, **kwargs)
+
     def clean(self):
         # Don't allow draft entries to have a pub_date.
         if not self.acttask:
             raise ValidationError(_('You must select an actual Task.'))
-        if self.prevtask == self.nexttask and self.prevtask is not None:
-            raise ValidationError(_('Previous and Next tasks cannot be the same.'))
-        pass
+        # Check for duplicate itemorder
+        if self.playbooktemplateid.playbooktemplateitem_playbooktemplate:
+            if self.playbooktemplateid.playbooktemplateitem_playbooktemplate.\
+                    filter(itemorder=self.itemorder).\
+                    exclude(pk=self.pk):
+                raise ValidationError(_('The Itemorder is already in use.'))
+        # check if the previous task is a later task in the queue or if it is the same as the nexttask
+        if self.prevtask:
+            if self.prevtask == self.nexttask and self.prevtask is not None:
+                raise ValidationError(_('Previous and Next tasks cannot be the same.'))
+            if self.prevtask.itemorder > self.itemorder:
+                raise ValidationError(_('Previous Task ID cannot be lower than the Actual Task ID.'))
+        # pass
 
 # #### PROCEDURES
+def playbooktemplateitem_check_delete_condition(ptmpitem_pk):
+    reftaskout = list()
+    ptmpitem_obj = PlaybookTemplateItem.objects.get(pk=ptmpitem_pk)
+    print(ptmpitem_obj.playbooktemplateid.playbooktemplateitem_playbooktemplate)
+    if ptmpitem_obj.playbooktemplateid.playbooktemplateitem_playbooktemplate.filter(prevtask=ptmpitem_pk):
+        reftasks = ptmpitem_obj.playbooktemplateid.playbooktemplateitem_playbooktemplate.filter(prevtask=ptmpitem_pk)
+        for i in reftasks:
+            reftaskout.append(i.pk)
+    return reftaskout
+
+
 @receiver(models.signals.post_save, sender=PlaybookTemplate)
 def generate_graph_PlaybookTemplate(sender, instance, **kwargs):
     """
@@ -1364,7 +1419,6 @@ def generate_graph_Playbook(sender, instance, **kwargs):
     """
     Generate playbooktemplate graph
     """
-
     curr_pk=instance.pk
     graphfilecontents = "digraph demo1 {\nsubgraph cluster_p {\nlabel = \"Playbook #"+str(curr_pk)+" - "+instance.name+"\"; \nnode [shape=record fontname=Arial];\nStart [shape=circle]\n"
 
@@ -1739,7 +1793,7 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
     # with tempfile.TemporaryDirectory() as directory:
     # 2. copy script into temp folder
     # srcfile = path.join(MEDIA_ROOT, cmd)
-    destdir = mytempdir.name
+    # destdir = mytempdir.name
     # destfile_clean = os.path.join(destdir, re.escape(oldev_file_name))
     # destfile = os.path.join(destdir, oldev_file_name)
     # I have used the renamed file because the Popen had issues with the special chars
@@ -1809,9 +1863,11 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
                 argument_cleartext = argument
             if action_obj.outputtarget.name == 'File':
                 # this means the output is a file
-                #  generate a random folder with some prefix:
+                # generate a random folder with some prefix:
                 myprefix = "EV-" + str(ev_pk) + "-"
+                # print("XXXXX:%s"%(myprefix))
                 myouttempdir = tempfile.TemporaryDirectory(prefix=myprefix)
+                # print("YYYYY:%s"%(myouttempdir))
                 #  make the tempdir the temp root
                 tempfile.tempdir = myouttempdir.name
                 # with tempfile.TemporaryDirectory() as directory:
@@ -1892,6 +1948,9 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
                 # attribute input
                 # EvidenceAttr.objects.filter(pk=evattr_pk).update(attr_reputation = EvReputation.objects.get(pk=1))
                 pass
+        if action_obj.automationid.code == "StringParser.extract_ipv4":
+            print("xxxx")
+
         results = {"command": str(cmd), "status": "1", "error": "0", "output": afuncoutput, "pid": 1}
         # if True: # SUCCESS
         #     results = {"command": str(cmd), "status": "1", "error": "0", "output": afuncoutput, "pid": 1}
@@ -1963,7 +2022,10 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
             # Creating a clone for the attribute item inspected
             if oldev_obj.parentattr:
                 cloneevidattr = oldev_obj.parentattr
+                # defuning PK as none will make sure a new item is created
                 cloneevidattr.pk = None
+                if cloneevidattr.evreputation.name == 'Suspicious' or cloneevidattr.evreputation.name == 'Malicious':
+                    cloneevidattr.observable = True
                 cloneevidattr.attr_reputation = attr_rep
                 newclone = cloneevidattr.save()
 

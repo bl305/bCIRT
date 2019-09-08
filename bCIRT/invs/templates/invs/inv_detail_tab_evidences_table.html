@@ -12,6 +12,9 @@
 # 2019.08.26  Lendvay     1      Rename file
 # **********************************************************************;
 -->
+
+
+
 {% if inv.evidence_inv %}
 
 {% for invevidence in inv.evidence_inv.all %}
@@ -33,7 +36,7 @@
                             <ul class="dropdown-menu" role="menu">
                                 {% if invevidence.inv.status.name != "Closed" %}
                                 <li>
-                                      <a href="{% url 'tasks:evattr_create' pk=invevidence.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                      <a href="{% url 'tasks:evattr_create' pk=invevidence.pk %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ invevidence.pk }}"
                                           class="btn btn-default btn-xs">
                                           Attribute
                                           <span class="glyphicon glyphicon-plus" data-toggle="tooltip" data-placement="top" title="Edit item">
@@ -42,7 +45,7 @@
                                 </li>
                                 {% endif %}
                                 <li>
-                                    <a href="{% url 'tasks:ev_detail' pk=invevidence.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                    <a href="{% url 'tasks:ev_detail' pk=invevidence.pk %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ invevidence.pk }}"
                                         class="btn btn-default btn-xs">
                                         Open&nbsp;
                                         <span class="glyphicon glyphicon-eye-open" data-toggle="tooltip" data-placement="top" title="Open item"></span>
@@ -50,7 +53,7 @@
                                 </li>
                                 {% if invevidence.inv.status.name != "Closed" %}
                                 <li>
-                                    <a href="{% url 'tasks:ev_edit' pk=invevidence.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                    <a href="{% url 'tasks:ev_edit' pk=invevidence.pk %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ invevidence.pk }}"
                                       class="btn btn-default btn-xs">
                                       Edit&nbsp;
                                       <span class="glyphicon glyphicon-pencil" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
@@ -62,14 +65,14 @@
                                     </a>
                                     <ul class="dropdown-menu dropdown-content" id="myDropdownEv">
                                         <input type="text" placeholder="Search.." id="myInputEv" onkeyup="filterFunctionEv()">
-                                        <a href="{% url 'assets:profile_autoadd' inv_pk=inv.pk evattr_pk=0 ev_pk=invevidence.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                        <a href="{% url 'assets:profile_autoadd' inv_pk=inv.pk evattr_pk=0 ev_pk=invevidence.pk %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ invevidence.pk }}"
                                         class="">
                                               I - Add Attributes To Profile
                                         </a>
                                         {% if actiongroups_desc %}
                                                   {% for actiongroup in actiongroups_desc %}
                                                   <li>
-                                                      <a href="{% url 'tasks:act_exec_scriptgroup' pk=actiongroup.pk inv_pk=invevidence.inv.pk task_pk=0 ev_pk=invevidence.pk evattr_pk=0 %}?next1={{ request.get_full_path|urlencode }}">
+                                                      <a href="{% url 'tasks:act_exec_scriptgroup' pk=actiongroup.pk inv_pk=invevidence.inv.pk task_pk=0 ev_pk=invevidence.pk evattr_pk=0 %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ invevidence.pk }}">
                                                       <span></span>
                                                           G{{ actiongroup.pk}} - {{ actiongroup }}
                                                       </a>
@@ -80,7 +83,7 @@
                                                   {% if invevidence.fileRef %}
                                                   {% for actiongroup in actiongroups_file %}
                                                   <li>
-                                                      <a href="{% url 'tasks:act_exec_scriptgroup' pk=actiongroup.pk inv_pk=invevidence.inv.pk task_pk=0 ev_pk=invevidence.pk evattr_pk=0 %}?next1={{ request.get_full_path|urlencode }}">
+                                                      <a href="{% url 'tasks:act_exec_scriptgroup' pk=actiongroup.pk inv_pk=invevidence.inv.pk task_pk=0 ev_pk=invevidence.pk evattr_pk=0 %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ invevidence.pk }}">
                                                       <span></span>
                                                           G{{ actiongroup.pk}} - {{ actiongroup }}
                                                       </a>
@@ -91,7 +94,7 @@
                                         {% for actid in actions %}
                                             {% if actid.scriptinput.pk == 1 %}
                                                 <li>
-                                                    <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=invevidence.inv.pk task_pk=0 ev_pk=invevidence.pk evattr_pk=0 %}?next1={{ request.get_full_path|urlencode }}">
+                                                    <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=invevidence.inv.pk task_pk=0 ev_pk=invevidence.pk evattr_pk=0 %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ invevidence.pk }}">
                                                     <span></span>
                                                     {{ actid.pk }} - {{ actid.title }} ({{ actid.outputtarget.shortname }})
                                                     </a>
@@ -100,7 +103,7 @@
                                             {% elif actid.scriptinput.pk == 2 %}
                                                 {% if invevidence.fileRef %}
                                                       <li>
-                                                          <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=invevidence.inv.pk task_pk=0 ev_pk=invevidence.pk evattr_pk=0 %}?next1={{ request.get_full_path|urlencode }}">
+                                                          <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=invevidence.inv.pk task_pk=0 ev_pk=invevidence.pk evattr_pk=0 %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ invevidence.pk }}">
                                                           <span></span>
                                                           {{ actid.pk }} - {{ actid.title }} ({{ actid.outputtarget.shortname }})
                                                           </a>
@@ -115,7 +118,7 @@
                                 </li>
                                 <li>&nbsp;</li>
                                 <li>
-                                      <a href="{% url 'tasks:ev_remove' pk=invevidence.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                      <a href="{% url 'tasks:ev_remove' pk=invevidence.pk %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ invevidence.pk }}"
                                           class="btn btn-danger btn-xs">
                                       <span class="glyphicon glyphicon-trash" data-toggle="tooltip" data-placement="top" title="Edit item">
                                           Delete
@@ -145,11 +148,11 @@
 <!--                                <span class="glyphicon glyphicon-floppy-disk">{{ evidence.fileName }}</span>-->
 <!--                            </a>-->
                             {{ invevidence.fileName }}
-                            <a href="{% url 'tasks:get_file_raw' ev_pk=invevidence.pk %}?next1={{ request.get_full_path|urlencode }}"
+                            <a href="{% url 'tasks:get_file_raw' ev_pk=invevidence.pk %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ invevidence.pk }}"
                                 class="btn btn-default btn-xs" target="_blank">
                                 <span class="glyphicon glyphicon-floppy-disk"> </span>
                             </a>
-                            <a href="{% url 'tasks:get_file_zipped' ev_pk=invevidence.pk %}?next1={{ request.get_full_path|urlencode }}"
+                            <a href="{% url 'tasks:get_file_zipped' ev_pk=invevidence.pk %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ invevidence.pk }}"
                                 class="btn btn-default btn-xs" target="_blank">
                                 <span class="glyphicon glyphicon-compressed"> </span>
                             </a>
@@ -159,7 +162,7 @@
                   </td>
                     <td>
                         {% if invevidence.task %}
-                        <a class="badge" href="{% url 'tasks:tsk_detail' pk=invevidence.task.pk %}?next1={{ request.get_full_path|urlencode }}">
+                        <a class="badge" href="{% url 'tasks:tsk_detail' pk=invevidence.task.pk %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ invevidence.pk }}">
                           {{ invevidence.task }}
                         </a>
                         {% else %}
@@ -171,11 +174,11 @@
                         <br>
                         Parent:
                         {% if invevidence.parent %}
-                            <a class="badge" href="{% url 'tasks:ev_detail' pk=invevidence.parent.pk %}?next1={{ request.get_full_path|urlencode }}">
+                            <a class="badge" href="{% url 'tasks:ev_detail' pk=invevidence.parent.pk %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ invevidence.pk }}">
                                 {{ invevidence.parent }}
                             </a>
                             {% if invevidence.parentattr %}
-                                - <a class="badge" href="{% url 'tasks:evattr_detail' pk=invevidence.parentattr.pk %}?next1={{ request.get_full_path|urlencode }}">
+                                - <a class="badge" href="{% url 'tasks:evattr_detail' pk=invevidence.parentattr.pk %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ invevidence.pk }}">
                                 {{ invevidence.parentattr }}
                                 </a>
                             {% endif %}
@@ -184,7 +187,7 @@
                         Actions:
                         {% if invevidence.actionq_evidence.all %}
                             {% for oneaction in invevidence.actionq_evidence.all %}
-                                <a class="badge" href="{% url 'tasks:actq_detail' pk=oneaction.pk %}?next1={{ request.get_full_path|urlencode }}">
+                                <a class="badge" href="{% url 'tasks:actq_detail' pk=oneaction.pk %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ invevidence.pk }}">
                                     {{ oneaction }}
                                 </a>
                             {% endfor %}
@@ -217,13 +220,13 @@
                                                     {% else %}
                                                         {% if attr.attr_reputation.pk == 3 %}
                                                             <strong>
-                                                            <span style="color:orange;" class="glyphicon glyphicon-alert" data-toggle="tooltip" data-placement="top" title="Suspicious">
+                                                                <span style="color:orange;" class="glyphicon glyphicon-alert" data-toggle="tooltip" data-placement="top" title="Suspicious"></span>
                                                                 </strong>
                                                         {% else %}
                                                             {% if attr.attr_reputation.pk == 4 %}
-                                                                <span style="color:red;" class="glyphicon glyphicon-remove-sign" data-toggle="tooltip" data-placement="top" title="Malicious">
+                                                            <span style="color:red;" class="glyphicon glyphicon-remove-sign" data-toggle="tooltip" data-placement="top" title="Malicious"></span>
                                                             {% else %}
-                                                                <span data-toggle="tooltip" data-placement="top" title="-">-
+                                                            <span data-toggle="tooltip" data-placement="top" title="-">-</span>
                                                             {% endif %}
                                                         {% endif %}
                                                     {% endif %}
@@ -240,7 +243,7 @@
                                             </button>
                                             <ul class="dropdown-menu" role="menu">
                                                 <li>
-                                                    <a href="{% url 'tasks:evattr_create' pk=invevidence.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                                    <a href="{% url 'tasks:evattr_create' pk=invevidence.pk %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ invevidence.pk }}"
                                                         class="btn btn-default btn-xs">
                                                         Attribute
                                                         <span class="glyphicon glyphicon-plus" data-toggle="tooltip" data-placement="top" title="Edit item">
@@ -248,7 +251,7 @@
                                                     </a>
                                                 </li>
                                                 <li>
-                                                    <a href="{% url 'tasks:evattr_edit' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                                    <a href="{% url 'tasks:evattr_edit' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ invevidence.pk }}"
                                                         class="btn btn-default btn-xs">
                                                         Edit
                                                         <span class="glyphicon glyphicon-pencil" data-toggle="tooltip" data-placement="top" title="Edit item">
@@ -261,7 +264,7 @@
                                                     <input type="text" placeholder="Search.." id="myInputEvAttr" onkeyup="filterFunctionEvAttr()">
                                                     <li>
                                                         {% if attr.evattrformat.name == "UserName" or attr.evattrformat.name == "UserID" or attr.evattrformat.name == "Email" or attr.evattrformat.name == "HostName" or attr.evattrformat.name == "IPv4" or attr.evattrformat.name == "IPv6" %}
-                                                            <a href="{% url 'assets:profile_autoadd' inv_pk=inv.pk evattr_pk=attr.pk ev_pk=0 %}?next1={{ request.get_full_path|urlencode }}"
+                                                            <a href="{% url 'assets:profile_autoadd' inv_pk=inv.pk evattr_pk=attr.pk ev_pk=0 %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ invevidence.pk }}"
                                                             class="">
                                                                   I - Add To Profile
                                                             </a>
@@ -271,9 +274,9 @@
                                                               {% for actiongroup in actiongroups_attr %}
                                                               <li>
                                                                 {% if invevidence.task %}
-                                                                    <a href="{% url 'tasks:act_exec_scriptgroup' pk=actiongroup.pk inv_pk=inv.pk task_pk=invevidence.task.pk ev_pk=invevidence.pk evattr_pk=attr.pk %}?attr={{attr.pk}}&next1={{ request.get_full_path|urlencode }}">
+                                                                    <a href="{% url 'tasks:act_exec_scriptgroup' pk=actiongroup.pk inv_pk=inv.pk task_pk=invevidence.task.pk ev_pk=invevidence.pk evattr_pk=attr.pk %}?attr={{attr.pk}}&next1={{ request.get_full_path|urlencode }}#item-inve{{ invevidence.pk }}">
                                                                 {% else %}
-                                                                    <a href="{% url 'tasks:act_exec_scriptgroup' pk=actiongroup.pk inv_pk=inv.pk task_pk=0 ev_pk=invevidence.pk evattr_pk=attr.pk %}?attr={{attr.pk}}&next1={{ request.get_full_path|urlencode }}">
+                                                                    <a href="{% url 'tasks:act_exec_scriptgroup' pk=actiongroup.pk inv_pk=inv.pk task_pk=0 ev_pk=invevidence.pk evattr_pk=attr.pk %}?attr={{attr.pk}}&next1={{ request.get_full_path|urlencode }}#item-inve{{ invevidence.pk }}">
                                                                 {% endif %}
                                                                   <span></span>
                                                                       G{{ actiongroup.pk}} - {{ actiongroup }}
@@ -286,9 +289,9 @@
                                                             {% if actid.scriptinput.pk == 3 %}
                                                                 {% if attr.evattrformat.pk == actid.scriptinputattrtype.pk or actid.scriptinputattrtype.pk is None %}
                                                                     {% if invevidence.task %}
-                                                                        <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=inv.pk task_pk=invevidence.task.pk ev_pk=invevidence.pk evattr_pk=attr.pk %}?attr={{attr.pk}}&next1={{ request.get_full_path|urlencode }}">
+                                                                        <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=inv.pk task_pk=invevidence.task.pk ev_pk=invevidence.pk evattr_pk=attr.pk %}?attr={{attr.pk}}&next1={{ request.get_full_path|urlencode }}#item-inve{{ invevidence.pk }}">
                                                                     {% else %}
-                                                                        <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=inv.pk task_pk=0 ev_pk=invevidence.pk evattr_pk=attr.pk %}?attr={{attr.pk}}&next1={{ request.get_full_path|urlencode }}">
+                                                                        <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=inv.pk task_pk=0 ev_pk=invevidence.pk evattr_pk=attr.pk %}?attr={{attr.pk}}&next1={{ request.get_full_path|urlencode }}#item-inve{{ invevidence.pk }}">
                                                                     {% endif %}
                                                                     <span></span>
                                                                     {{ actid.pk }} - {{ actid.title }} ({{ actid.outputtarget.shortname }})
@@ -304,7 +307,7 @@
                                             </li>
                                             <li>&nbsp;</li>
                                             <li>
-                                                  <a href="{% url 'tasks:evattr_remove' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                                  <a href="{% url 'tasks:evattr_remove' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ invevidence.pk }}"
                                                       class="btn btn-danger btn-xs">
                                                   <span class="glyphicon glyphicon-trash" data-toggle="tooltip" data-placement="top" title="Edit item">
                                                       Delete
@@ -317,18 +320,18 @@
 
                                     </td>
                                     <td>
-<a href="{% url 'tasks:evattr_observabletoggle' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}"
+<a href="{% url 'tasks:evattr_observabletoggle' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ invevidence.pk }}"
     class="btn btn-default btn-xs">
 {% if attr.observable %}
-    <span class="glyphicon glyphicon-eye-open" data-toggle="tooltip" data-placement="top" title="Edit item">
+    <span class="glyphicon glyphicon-eye-open" data-toggle="tooltip" data-placement="top" title="Toggle Observable">
     </span>
 {% else %}
-    <span class="glyphicon glyphicon-ban-circle" data-toggle="tooltip" data-placement="top" title="Edit item">
+    <span class="glyphicon glyphicon-ban-circle" data-toggle="tooltip" data-placement="top" title="Toggle Observable">
     </span>
 {% endif %}
 </a>
 
-                                        <a class="" href="{% url 'tasks:evattr_detail' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                        <a class="" href="{% url 'tasks:evattr_detail' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ invevidence.pk }}"
                                         style="max-width: 1100px;overflow: auto;text-overflow: word-wrap;overflow-wrap: break-word;">
 <!--                                            style="max-width: 1100px;overflow: auto;">-->
 <!--                                        style=" word-wrap: break-word; width: 200px; display: block; "-->
@@ -360,4 +363,5 @@
             <td colspan="8" class="text-center bg-warning">No matching record found</td>
           </tr>
 {% endif %}
+
 

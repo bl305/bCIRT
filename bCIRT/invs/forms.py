@@ -231,7 +231,8 @@ class InvForm(forms.ModelForm):
                   'monetaryloss',
                   'losscurrency',
                   'starttime',
-                  'endtime')
+                  'endtime',
+                  'processimprovement')
         labels = {
             'invid': "Investigation ID*",
             'refid': "Reference",
@@ -240,7 +241,8 @@ class InvForm(forms.ModelForm):
             'summary': "Executive Summary",
             'comment': "Attack Comment",
             'losscurrency': "Monetary Loss",
-            'numofvictims': "Victim Count:"
+            'numofvictims': "Victim Count:",
+            'processimprovement': "Process Improvement"
         }
         widgets = {
             'invid': forms.TextInput(attrs={
@@ -254,9 +256,15 @@ class InvForm(forms.ModelForm):
                 'class': 'form-control'}
             ),
             'description': forms.Textarea(attrs={
-                'rows': '1',
-                'cols': '48',
-                'style': 'resize:none;width:90%',
+                'rows': '5',
+                'cols': '68',
+                'style': 'width:90%',
+                'class': 'form-control'}
+            ),
+            'processimprovement': forms.Textarea(attrs={
+                'rows': '5',
+                'cols': '68',
+                'style': 'width:90%',
                 'class': 'form-control'}
             ),
             'summary': forms.Textarea(attrs={

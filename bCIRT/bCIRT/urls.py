@@ -47,6 +47,9 @@ urlpatterns = [
     url(r"^configuration/", include("configuration.urls", namespace="configuration")),
     url(r"^reports/", include("reports.urls", namespace="reports")),
 
+    url(r'session_security/', include('session_security.urls')),
+
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:

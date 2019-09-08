@@ -20,6 +20,7 @@ from django.utils.timezone import now as timezone_now
 # Get the user so we can use this
 from django import template
 from django.contrib.auth import get_user_model
+from tinymce.models import HTMLField
 User = get_user_model()
 # https://docs.djangoproject.com/en/1.11/howto/custom-template-tags/#inclusion-tags
 # This is for the in_group_members check template tag
@@ -39,8 +40,8 @@ class InvStatus(models.Model):
     objects = models.Manager()
     name = models.CharField(max_length=20)
     enabled = models.BooleanField(default=True)
-    description = models.TextField(max_length=500, default="")
-    description_html = models.TextField(editable=True, default='', blank=True)
+    description = models.TextField(max_length=500, default='')
+    description_html = models.TextField(max_length=750, editable=True, default='', blank=True)
 
     def __str__(self):
         return self.name
@@ -54,8 +55,8 @@ class InvPhase(models.Model):
     objects = models.Manager()
     name = models.CharField(max_length=40)
     enabled = models.BooleanField(default=True)
-    description = models.TextField(max_length=500, default="")
-    description_html = models.TextField(editable=True, default='', blank=True)
+    description = models.TextField(max_length=100, default="")
+    description_html = models.TextField(max_length=150, editable=True, default='', blank=True)
 
     def __str__(self):
         return self.name
@@ -70,7 +71,7 @@ class InvSeverity(models.Model):
     name = models.CharField(max_length=40)
     enabled = models.BooleanField(default=True)
     description = models.CharField(max_length=500, default="")
-    description_html = models.TextField(editable=True, default='', blank=True)
+    description_html = models.TextField(max_length=750, editable=True, default='', blank=True)
 
     def __str__(self):
         return self.name
@@ -86,7 +87,7 @@ class InvCategory(models.Model):
     name = models.CharField(max_length=40)
     enabled = models.BooleanField(default=True)
     description = models.TextField(max_length=500, default="")
-    description_html = models.TextField(editable=True, default='', blank=True)
+    description_html = models.TextField(max_length=750, editable=True, default='', blank=True)
     reporting_timeframe = models.TextField(max_length=500, default="")
 
     def __str__(self):
@@ -102,7 +103,7 @@ class InvPriority(models.Model):
     name = models.CharField(max_length=40)
     enabled = models.BooleanField(default=True)
     description = models.TextField(max_length=500, default="")
-    description_html = models.TextField(editable=True, default='', blank=True)
+    description_html = models.TextField(max_length=750, editable=True, default='', blank=True)
 
     def __str__(self):
         return self.name
@@ -117,7 +118,7 @@ class InvAttackvector(models.Model):
     name = models.CharField(max_length=40)
     enabled = models.BooleanField(default=True)
     description = models.CharField(max_length=500, default="")
-    description_html = models.TextField(editable=True, default='', blank=True)
+    description_html = models.TextField(max_length=750, editable=True, default='', blank=True)
 
     def __str__(self):
         return self.name
@@ -160,10 +161,13 @@ class Inv(models.Model):
                                  related_name="inv_priority")
     attackvector = models.ForeignKey(InvAttackvector, on_delete=models.SET_DEFAULT, default="1", blank=False,
                                      null=False, related_name="inv_attackvector")
-    description = models.CharField(max_length=200, default="")
-    description_html = models.TextField(editable=True, default='', blank=True)
+    # description = models.CharField(max_length=200, default="")
+    # description_html = models.TextField(editable=True, default='', blank=True)
+    description = HTMLField()
+    description_html = HTMLField()
     summary = models.CharField(max_length=2000, default="", blank=True, null=True)
     comment = models.CharField(max_length=50, default="", blank=True, null=True)
+    processimprovement = models.CharField(max_length=2000, default="", blank=True, null=True)
     starttime = models.DateTimeField(auto_now=False, blank=True, null=True)
     endtime = models.DateTimeField(auto_now=False, blank=True, null=True)
     invduration = models.PositiveIntegerField(blank=True, null=True, default=None)

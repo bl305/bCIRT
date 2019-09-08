@@ -488,6 +488,16 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
                                " activity does not directly result in a compromise or denial of service."
             },
             {
+                "name": 'Scans/Probes/Attempted Access',
+                "enabled": "1",
+                "reporting_timeframe": "Monthly\nNote: If system is classified, report within one (1) hour of "
+                                       "discovery.",
+                "catid": "CAT 5",
+                "description": "This category includes any activity that seeks to access or identify a computer,"
+                               " open ports, protocols, service, or any combination for later exploit. "
+                               "This activity does not directly result in a compromise or denial of service."
+            },
+            {
                 "name": "Investigation",
                 "enabled": "1",
                 "reporting_timeframe": "Not Applicable; this category is for each agency's use to categorize a"
@@ -906,6 +916,11 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
                 "name": "Skipped",
                 "enabled": "1",
                 "description": "Skipped"
+            },
+            {
+                "name": "Waiting",
+                "enabled": "1",
+                "description": "Waiting"
             },
         ]
 

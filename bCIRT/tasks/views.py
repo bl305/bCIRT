@@ -9,6 +9,7 @@
 # Revision History  : v1
 # Date        Author      Ref    Description
 # 2019.07.29  Lendvay     1      Initial file
+# 2019.09.06  Lendvay     2      Added session security
 # **********************************************************************;
 from .models import Task, TaskTemplate, TaskType, TaskPriority, TaskCategory, TaskStatus
 from .models import TaskVar  # , TaskVarType, TaskVarCategory
@@ -35,8 +36,8 @@ import logging
 from bCIRT.custom_variables import MYMEDIA_ROOT
 from bCIRT.settings import ALLOWED_HOSTS
 # check remaining session time
-from django.contrib.sessions.models import Session
-from datetime import timezone
+# from django.contrib.sessions.models import Session
+# from datetime import timezone
 # check remaining session time
 from django.utils.http import is_safe_url
 import os
@@ -326,23 +327,21 @@ class GetFileZippedView(LoginRequiredMixin, PermissionRequiredMixin, generic.Det
         try:
             # Add file, at correct path
             zf.write(fpath, zip_path)
-           # fix for Linux zip files read in Windows
+            # fix for Linux zip files read in Windows
             for file in zf.filelist:
                 file.create_system = 0
         finally:
             # Must close zip for all contents to be written
             zf.close()
-
         # Grab ZIP file from in-memory, make response with correct MIME-type
-        resp = HttpResponse(content_type = "application/x-zip-compressed")
+        resp = HttpResponse(content_type="application/x-zip-compressed")
         # ..and correct content-disposition
         resp['Content-Disposition'] = 'attachment; filename=%s' % zip_filename
-
         in_memory.seek(0)
-
         resp.write(in_memory.read())
 
         return resp
+
 
 # Create your views here.
 # #############################################################################3
@@ -362,13 +361,6 @@ class AutomationListView(LoginRequiredMixin, PermissionRequiredMixin, generic.Li
         super(AutomationListView, self).__init__(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(AutomationListView, self).get_context_data(**kwargs)
 
 
@@ -399,13 +391,6 @@ class AutomationCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.
         return redirect_to
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(AutomationCreateView, self).get_context_data(**kwargs)
 
     def form_valid(self, form):
@@ -453,13 +438,6 @@ class AutomationDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.
         super(AutomationDetailView, self).__init__(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(AutomationDetailView, self).get_context_data(**kwargs)
 
     def dispatch(self, request, *args, **kwargs):
@@ -501,13 +479,6 @@ class AutomationUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.
         return redirect_to
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(AutomationUpdateView, self).get_context_data(**kwargs)
 
     def dispatch(self, request, *args, **kwargs):
@@ -564,13 +535,6 @@ class AutomationRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generic.
         return redirect_to
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(AutomationRemoveView, self).get_context_data(**kwargs)
 
     def dispatch(self, request, *args, **kwargs):
@@ -582,6 +546,7 @@ class AutomationRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generic.
             return redirect('tasks:auto_detail', pk=self.kwargs.get('pk'))
         # Checks pass, let http method handlers process the request
         return super(AutomationRemoveView, self).dispatch(request, *args, **kwargs)
+
 
 # ##############################################################################
 class ActionListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
@@ -600,13 +565,6 @@ class ActionListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListVi
         super(ActionListView, self).__init__(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(ActionListView, self).get_context_data(**kwargs)
 
 
@@ -637,13 +595,6 @@ class ActionCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Crea
         return redirect_to
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(ActionCreateView, self).get_context_data(**kwargs)
 
     def form_valid(self, form):
@@ -691,13 +642,6 @@ class ActionDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.Deta
         super(ActionDetailView, self).__init__(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(ActionDetailView, self).get_context_data(**kwargs)
 
     def dispatch(self, request, *args, **kwargs):
@@ -739,13 +683,6 @@ class ActionUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Upda
         return redirect_to
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(ActionUpdateView, self).get_context_data(**kwargs)
 
     def dispatch(self, request, *args, **kwargs):
@@ -802,13 +739,6 @@ class ActionRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generic.Dele
         return redirect_to
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(ActionRemoveView, self).get_context_data(**kwargs)
 
     def dispatch(self, request, *args, **kwargs):
@@ -837,13 +767,6 @@ class ActionQDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.Det
         super(ActionQDetailView, self).__init__(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(ActionQDetailView, self).get_context_data(**kwargs)
 
     def dispatch(self, request, *args, **kwargs):
@@ -873,13 +796,6 @@ class ActionGroupListView(LoginRequiredMixin, PermissionRequiredMixin, generic.L
         super(ActionGroupListView, self).__init__(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(ActionGroupListView, self).get_context_data(**kwargs)
 
 
@@ -910,13 +826,6 @@ class ActionGroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic
         return redirect_to
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(ActionGroupCreateView, self).get_context_data(**kwargs)
 
     # def form_valid(self, form):
@@ -957,13 +866,6 @@ class ActionGroupDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic
         super(ActionGroupDetailView, self).__init__(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(ActionGroupDetailView, self).get_context_data(**kwargs)
 
     def dispatch(self, request, *args, **kwargs):
@@ -1005,13 +907,6 @@ class ActionGroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic
         return redirect_to
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(ActionGroupUpdateView, self).get_context_data(**kwargs)
 
     def dispatch(self, request, *args, **kwargs):
@@ -1063,13 +958,6 @@ class ActionGroupRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generic
         return redirect_to
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(ActionGroupRemoveView, self).get_context_data(**kwargs)
 
     def dispatch(self, request, *args, **kwargs):
@@ -1081,6 +969,7 @@ class ActionGroupRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generic
             return redirect('tasks:actgrp_detail', pk=self.kwargs.get('pk'))
         # Checks pass, let http method handlers process the request
         return super(ActionGroupRemoveView, self).dispatch(request, *args, **kwargs)
+
 
 # ActionGroupMembers
 class ActionGroupMemberListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
@@ -1099,13 +988,6 @@ class ActionGroupMemberListView(LoginRequiredMixin, PermissionRequiredMixin, gen
         super(ActionGroupMemberListView, self).__init__(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(ActionGroupMemberListView, self).get_context_data(**kwargs)
 
 
@@ -1136,13 +1018,6 @@ class ActionGroupMemberCreateView(LoginRequiredMixin, PermissionRequiredMixin, g
         return redirect_to
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(ActionGroupMemberCreateView, self).get_context_data(**kwargs)
 
     # def form_valid(self, form):
@@ -1183,13 +1058,6 @@ class ActionGroupMemberDetailView(LoginRequiredMixin, PermissionRequiredMixin, g
         super(ActionGroupMemberDetailView, self).__init__(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(ActionGroupMemberDetailView, self).get_context_data(**kwargs)
 
     def dispatch(self, request, *args, **kwargs):
@@ -1231,13 +1099,6 @@ class ActionGroupMemberUpdateView(LoginRequiredMixin, PermissionRequiredMixin, g
         return redirect_to
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(ActionGroupMemberUpdateView, self).get_context_data(**kwargs)
 
     def dispatch(self, request, *args, **kwargs):
@@ -1289,13 +1150,6 @@ class ActionGroupMemberRemoveView(LoginRequiredMixin, PermissionRequiredMixin, g
         return redirect_to
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(ActionGroupMemberRemoveView, self).get_context_data(**kwargs)
 
     def dispatch(self, request, *args, **kwargs):
@@ -1453,13 +1307,6 @@ class TaskListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView
 
     def get_context_data(self, **kwargs):
         # create_task()
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         kwargs['templatecategories'] = TaskTemplate.objects.filter(enabled=True)
         return super(TaskListView, self).get_context_data(**kwargs)
 
@@ -1490,14 +1337,6 @@ class TaskCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Create
         return redirect_to
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
-
         return super(TaskCreateView, self).get_context_data(**kwargs)
 
     def form_valid(self, form):
@@ -1550,13 +1389,6 @@ class TaskDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.Detail
         super(TaskDetailView, self).__init__(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         kwargs['actions'] = Action.objects.filter(enabled=True).order_by('title')
         return super(TaskDetailView, self).get_context_data(**kwargs)
 
@@ -1599,13 +1431,6 @@ class TaskUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Update
         return redirect_to
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(TaskUpdateView, self).get_context_data(**kwargs)
 
     def dispatch(self, request, *args, **kwargs):
@@ -1650,7 +1475,6 @@ class TaskRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generic.Delete
             logger.info(logmsg)
         super(TaskRemoveView, self).__init__(*args, **kwargs)
 
-
     def get_success_url(self):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
@@ -1661,13 +1485,6 @@ class TaskRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generic.Delete
         return redirect_to
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(TaskRemoveView, self).get_context_data(**kwargs)
 
     def dispatch(self, request, *args, **kwargs):
@@ -1696,16 +1513,8 @@ class TaskTemplateListView(LoginRequiredMixin, PermissionRequiredMixin, generic.
             logger.info(logmsg)
         super(TaskTemplateListView, self).__init__(*args, **kwargs)
 
-
     def get_context_data(self, **kwargs):
         # create_task()
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(TaskTemplateListView, self).get_context_data(**kwargs)
 
 
@@ -1735,14 +1544,6 @@ class TaskTemplateCreateView(LoginRequiredMixin, PermissionRequiredMixin, generi
         return redirect_to
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
-
         return super(TaskTemplateCreateView, self).get_context_data(**kwargs)
 
     def form_valid(self, form):
@@ -1788,13 +1589,6 @@ class TaskTemplateDetailView(LoginRequiredMixin, PermissionRequiredMixin, generi
         super(TaskTemplateDetailView, self).__init__(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(TaskTemplateDetailView, self).get_context_data(**kwargs)
 
     def dispatch(self, request, *args, **kwargs):
@@ -1836,13 +1630,6 @@ class TaskTemplateUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generi
         return redirect_to
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(TaskTemplateUpdateView, self).get_context_data(**kwargs)
 
     def dispatch(self, request, *args, **kwargs):
@@ -1897,13 +1684,6 @@ class TaskTemplateRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generi
         return redirect_to
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(TaskTemplateRemoveView, self).get_context_data(**kwargs)
 
     def dispatch(self, request, *args, **kwargs):
@@ -1974,7 +1754,7 @@ class TaskTemplateAddView(LoginRequiredMixin, PermissionRequiredMixin, generic.R
         else:
             tmp_user = None
         inv_obj = self.kwargs.get('inv_pk')
-        if inv_obj!=None and inv_obj!='0':
+        if inv_obj != None and inv_obj!='0':
             tmp_inv = Inv.objects.get(pk=self.kwargs.get('inv_pk'))
         else:
             tmp_inv = None
@@ -2050,9 +1830,8 @@ class TaskTemplateAddView(LoginRequiredMixin, PermissionRequiredMixin, generic.R
         # return reverse('tasks:tsk_list')
         # return super().get_redirect_url(*args, **kwargs)
 
-########## Task Var views
 
-
+#   Task Var views
 class TaskVarListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
     model = TaskVar
     form_class = TaskVarForm
@@ -2070,14 +1849,6 @@ class TaskVarListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListV
 
     def get_context_data(self, **kwargs):
         # create_task()
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
-        # kwargs['templatecategories'] = TaskVar.objects.all()
         return super(TaskVarListView, self).get_context_data(**kwargs)
 
 
@@ -2107,12 +1878,6 @@ class TaskVarCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Cre
         return redirect_to
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(TaskVarCreateView, self).get_context_data(**kwargs)
 
     def form_valid(self, form):
@@ -2172,13 +1937,6 @@ class TaskVarDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.Det
         super(TaskVarDetailView, self).__init__(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(TaskVarDetailView, self).get_context_data(**kwargs)
 
     def dispatch(self, request, *args, **kwargs):
@@ -2220,12 +1978,6 @@ class TaskVarUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Upd
         return redirect_to
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(TaskVarUpdateView, self).get_context_data(**kwargs)
 
     def dispatch(self, request, *args, **kwargs):
@@ -2279,12 +2031,6 @@ class TaskVarRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generic.Del
         return redirect_to
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(TaskVarRemoveView, self).get_context_data(**kwargs)
 
     def dispatch(self, request, *args, **kwargs):
@@ -2314,13 +2060,7 @@ class PlaybookListView(LoginRequiredMixin, PermissionRequiredMixin, generic.List
         super(PlaybookListView, self).__init__(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
         kwargs['playbooktmp'] = PlaybookTemplate.objects.filter(enabled=True)
-        # check remaining session time
         return super(PlaybookListView, self).get_context_data(**kwargs)
 
 
@@ -2363,7 +2103,7 @@ class PlaybookCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Re
         else:
             tmp_user = None
         inv_obj = self.kwargs.get('inv_pk')
-        if inv_obj!=None and inv_obj!='0':
+        if inv_obj != None and inv_obj != '0':
             tmp_inv = Inv.objects.get(pk=inv_pk)
         else:
             tmp_inv = None
@@ -2377,53 +2117,6 @@ class PlaybookCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Re
             pmodified_by=str(self.request.user),
             pcreated_by=str(self.request.user)
         )
-
-# REMOVED
-#         playbook_instance = Playbook.objects.create(
-#             name=tmp_obj.name,
-#             version=tmp_obj.version,
-#             user=tmp_user,
-#             inv=tmp_inv,
-#             description=str(tmp_obj.description),
-#             modified_by=str(self.request.user),
-#             created_by=str(self.request.user),
-#         )
-#         item_mapping=dict()
-#         for tmp_item in tmp_obj.playbooktemplateitem_playbooktemplate.all().order_by('itemorder'):
-#             tmp_to_copy = TaskTemplate.objects.get(pk=tmp_item.acttask.pk)
-            ## if the playbooktemplateitem refers to a previous item, we need to
-            ## find the pk of the newly created previous item matching the previous reference
-            # if tmp_item.prevtask:
-            #     tmp_item_prevtaskpk = TaskTemplate.objects.get(pk=tmp_item.prevtask.pk).pk
-                ## print(str(tmp_item.pk)+"->"+str(tmp_item_prevtaskpk))
-                # tmp_item_prevtask = Task.objects.get(pk=item_mapping[tmp_item_prevtaskpk])
-                ## print(tmp_item_prevtask)
-            # else:
-            #     tmp_item_prevtask = None
-            ## if tmp_item.prevtask:
-            ##     tmp_item_prevtask=TaskTemplate.objects.get(pk=tmp_item.prevtask.pk)
-            ## else:
-            ##     tmp_item_prevtask = None
-            ## tmp_item_prevtask = None
-            # new_task = add_task_from_template(
-            #     atitle=tmp_to_copy.title,
-            #     astatus=tmp_to_copy.status,
-            #     aplaybook=playbook_instance,
-            #     auser=tmp_to_copy.user,
-            #     ainv=tmp_inv,
-            #     aaction=tmp_to_copy.action,
-            #     aactiontarget=tmp_item_prevtask,
-            #     acategory=tmp_to_copy.category,
-            #     apriority=tmp_to_copy.priority,
-            #     atype=tmp_to_copy.type,
-            #     asummary=tmp_to_copy.summary,
-            #     adescription=tmp_to_copy.description,
-            #     amodified_by=str(self.request.user),
-            #     acreated_by=str(self.request.user)
-            # )
-            ## print(str(new_task)+"->->"+str(tmp_item_prevtask))
-            ##  here I need to map the tampate pks to the new pks so I can assign the proper actions
-            # item_mapping.update({tmp_item.pk: new_task.pk})
         # Checks pass, let http method handlers process the request
         return super(PlaybookCreateView, self).dispatch(request, *args, **kwargs)
 
@@ -2448,12 +2141,6 @@ class PlaybookDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.De
         super(PlaybookDetailView, self).__init__(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(PlaybookDetailView, self).get_context_data(**kwargs)
 
     def dispatch(self, request, *args, **kwargs):
@@ -2494,12 +2181,6 @@ class PlaybookUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Up
         return redirect_to
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(PlaybookUpdateView, self).get_context_data(**kwargs)
 
     def dispatch(self, request, *args, **kwargs):
@@ -2554,12 +2235,6 @@ class PlaybookRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generic.De
         return redirect_to
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(PlaybookRemoveView, self).get_context_data(**kwargs)
 
     def dispatch(self, request, *args, **kwargs):
@@ -2589,12 +2264,6 @@ class PlaybookTemplateListView(LoginRequiredMixin, PermissionRequiredMixin, gene
         super(PlaybookTemplateListView, self).__init__(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(PlaybookTemplateListView, self).get_context_data(**kwargs)
 
 
@@ -2626,12 +2295,6 @@ class PlaybookTemplateCreateView(LoginRequiredMixin, PermissionRequiredMixin, ge
         return redirect_to
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(PlaybookTemplateCreateView, self).get_context_data(**kwargs)
 
     def form_valid(self, form):
@@ -2678,12 +2341,6 @@ class PlaybookTemplateDetailView(LoginRequiredMixin, PermissionRequiredMixin, ge
         super(PlaybookTemplateDetailView, self).__init__(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(PlaybookTemplateDetailView, self).get_context_data(**kwargs)
 
     def dispatch(self, request, *args, **kwargs):
@@ -2725,13 +2382,6 @@ class PlaybookTemplateUpdateView(LoginRequiredMixin, PermissionRequiredMixin, ge
         return redirect_to
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(PlaybookTemplateUpdateView, self).get_context_data(**kwargs)
 
     def dispatch(self, request, *args, **kwargs):
@@ -2786,13 +2436,6 @@ class PlaybookTemplateRemoveView(LoginRequiredMixin, PermissionRequiredMixin, ge
         return redirect_to
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(PlaybookTemplateRemoveView, self).get_context_data(**kwargs)
 
     def dispatch(self, request, *args, **kwargs):
@@ -2824,13 +2467,6 @@ class PlaybookTemplateItemListView(LoginRequiredMixin, PermissionRequiredMixin, 
 
     def get_context_data(self, **kwargs):
         # create_task()
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         # kwargs['templatecategories'] = TaskVar.objects.all()
         return super(PlaybookTemplateItemListView, self).get_context_data(**kwargs)
 
@@ -2861,14 +2497,6 @@ class PlaybookTemplateItemCreateView(LoginRequiredMixin, PermissionRequiredMixin
         return redirect_to
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
-
         return super(PlaybookTemplateItemCreateView, self).get_context_data(**kwargs)
 
     def form_valid(self, form):
@@ -2922,13 +2550,6 @@ class PlaybookTemplateItemDetailView(LoginRequiredMixin, PermissionRequiredMixin
         super(PlaybookTemplateItemDetailView, self).__init__(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(PlaybookTemplateItemDetailView, self).get_context_data(**kwargs)
 
     def dispatch(self, request, *args, **kwargs):
@@ -2970,13 +2591,6 @@ class PlaybookTemplateItemUpdateView(LoginRequiredMixin, PermissionRequiredMixin
         return redirect_to
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(PlaybookTemplateItemUpdateView, self).get_context_data(**kwargs)
 
     def dispatch(self, request, *args, **kwargs):
@@ -3038,22 +2652,23 @@ class PlaybookTemplateItemRemoveView(LoginRequiredMixin, PermissionRequiredMixin
         return redirect_to
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(PlaybookTemplateItemRemoveView, self).get_context_data(**kwargs)
 
     def dispatch(self, request, *args, **kwargs):
+        curr_pk = self.kwargs.get('pk')
         if not request.user.is_authenticated:
             # This will redirect to the login view
             return self.handle_no_permission()
         elif not self.request.user.has_perm('tasks.delete_playbooktemplateitem'):
             messages.error(self.request, "No permission to delete a record !!!")
-            return redirect('tasks:playittmp_detail', pk=self.kwargs.get('pk'))
+            return redirect('tasks:playittmp_detail', pk=curr_pk)
+        elif curr_pk:
+            from tasks.models import playbooktemplateitem_check_delete_condition
+            outmsgitems = playbooktemplateitem_check_delete_condition(curr_pk)
+            outmsg = "The Task is referenced from other tasks as inputs, Task(s): %s"%(outmsgitems)
+            messages.error(self.request, outmsg)
+            return redirect('tasks:playittmp_detail', pk=curr_pk)
+
         # Checks pass, let http method handlers process the request
         return super(PlaybookTemplateItemRemoveView, self).dispatch(request, *args, **kwargs)
 
@@ -3198,6 +2813,7 @@ class TaskOpenView(LoginRequiredMixin, PermissionRequiredMixin, generic.Redirect
         # return reverse('tasks:tsk_list')
         # return super().get_redirect_url(*args, **kwargs)
 
+
 # Create your views here.
 # #############################################################################3
 # Investigation related views
@@ -3217,13 +2833,6 @@ class EvidenceListView(LoginRequiredMixin, PermissionRequiredMixin, generic.List
         super(EvidenceListView, self).__init__(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         kwargs['actions'] = Action.objects.filter(enabled=True).order_by('title')
         return super(EvidenceListView, self).get_context_data(**kwargs)
 
@@ -3257,13 +2866,6 @@ class EvidenceCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Cr
         return redirect_to
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(EvidenceCreateView, self).get_context_data(**kwargs)
 
     def form_valid(self, form):
@@ -3330,14 +2932,7 @@ class EvidenceDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.De
         super(EvidenceDetailView, self).__init__(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
         kwargs['actions'] = Action.objects.filter(enabled=True).order_by('title')
-        # check remaining session time
         return super(EvidenceDetailView, self).get_context_data(**kwargs)
 
     def dispatch(self, request, *args, **kwargs):
@@ -3379,13 +2974,6 @@ class EvidenceUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Up
         return redirect_to
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(EvidenceUpdateView, self).get_context_data(**kwargs)
 
     def dispatch(self, request, *args, **kwargs):
@@ -3471,13 +3059,6 @@ class EvidenceRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generic.De
         return redirect_to
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(EvidenceRemoveView, self).get_context_data(**kwargs)
 
     def dispatch(self, request, *args, **kwargs):
@@ -3522,13 +3103,6 @@ class EvidenceAttrListView(LoginRequiredMixin, PermissionRequiredMixin, generic.
         super(EvidenceAttrListView, self).__init__(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         kwargs['actions'] = Action.objects.filter(enabled=True).order_by('title')
         return super(EvidenceAttrListView, self).get_context_data(**kwargs)
 
@@ -3562,13 +3136,6 @@ class EvidenceAttrCreateView(LoginRequiredMixin, PermissionRequiredMixin, generi
         return redirect_to
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(EvidenceAttrCreateView, self).get_context_data(**kwargs)
 
     def form_valid(self, form):
@@ -3620,14 +3187,7 @@ class EvidenceAttrDetailView(LoginRequiredMixin, PermissionRequiredMixin, generi
         super(EvidenceAttrDetailView, self).__init__(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
         kwargs['actions'] = Action.objects.filter(enabled=True).order_by('title')
-        # check remaining session time
         return super(EvidenceAttrDetailView, self).get_context_data(**kwargs)
 
     def dispatch(self, request, *args, **kwargs):
@@ -3669,13 +3229,6 @@ class EvidenceAttrUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generi
         return redirect_to
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(EvidenceAttrUpdateView, self).get_context_data(**kwargs)
 
     def dispatch(self, request, *args, **kwargs):
@@ -3746,13 +3299,6 @@ class EvidenceAttrRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generi
         return redirect_to
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
         return super(EvidenceAttrRemoveView, self).get_context_data(**kwargs)
 
     def dispatch(self, request, *args, **kwargs):

@@ -9,6 +9,7 @@
 # Revision History  : v1
 # Date        Author      Ref    Description
 # 2019.07.29  Lendvay     1      Initial file
+# 2019.09.06  Lendvay     2      Added session security
 # **********************************************************************;
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import (
@@ -19,8 +20,8 @@ from django.contrib.auth.mixins import (
 from django.utils.timezone import timedelta
 from invs.models import Inv
 from tasks.models import Task
-from django.contrib.sessions.models import Session
-from datetime import datetime, timezone
+# from django.contrib.sessions.models import Session
+# from datetime import datetime, timezone
 from django.utils.timezone import now as timezone_now
 from django.db.models import Count, Avg, Min, Max
 from bCIRT.custom_variables import LOGSEPARATOR, LOGLEVEL
@@ -77,13 +78,6 @@ class ReportsDashboardPage(LoginRequiredMixin, PermissionRequiredMixin, Template
         super(ReportsDashboardPage, self).__init__(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        # check remaining session time
-        session_key = self.request.COOKIES["sessionid"]
-        session = Session.objects.get(session_key=session_key)
-        sessiontimeout = session.expire_date
-        servertime = datetime.now(timezone.utc)
-        # check remaining session time
-
         kwargs['user'] = self.request.user
         # Closed investigations
 
