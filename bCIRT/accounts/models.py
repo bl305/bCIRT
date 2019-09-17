@@ -17,6 +17,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_logged_in, user_logged_out, user_login_failed
 from django.dispatch import receiver
 import logging
+logger = logging.getLogger('log_file_verbose')
 # from django.utils.timezone import now as timezone_now
 
 
@@ -58,6 +59,11 @@ def user_logged_in_callback(sender, request, user, **kwargs):
                                  username=user.username,
                                  session_id=request.session.session_key
                                  )
+        logger.info('login success {user} {ip}'.format(
+            user=user,
+            ip=ip
+        ))
+
     except Exception:
         # log the error
         error_log.error("log_user_logged_in request: %s, error: %s" % (request, Exception))
@@ -75,6 +81,11 @@ def user_logged_out_callback(sender, request, user, **kwargs):
                                  username=user.username,
                                  session_id=request.session.session_key
                                  )
+        logger.info('logout success {user} {ip}'.format(
+            user=user,
+            ip=ip
+        ))
+
     except Exception:
         # log the error
         error_log.error("log_user_logged_out request: %s, error: %s" % (request, Exception))
@@ -95,3 +106,45 @@ def user_login_failed_callback(sender, credentials, **kwargs):
                              action='fail',
                              username=credentials.get('username', None)
                              )
+    logger.warning('login failed {credentials}'.format(
+        credentials=credentials['username'],
+    ))
+
+# FILE SYSTEM LOGGING
+#  LOGGING
+# import logging
+# logger = logging.getLogger('log_file_verbose')
+
+# from django.contrib.auth.signals import user_logged_in, user_logged_out, user_login_failed
+# #from django.dispatch import receiver
+#
+#
+# @receiver(user_logged_in)
+# def user_logged_in_callback(sender, request, user, **kwargs):
+#     # to cover more complex cases:
+#     # http://stackoverflow.com/questions/4581789/how-do-i-get-user-ip-address-in-django
+#     ip = request.META.get('REMOTE_ADDR')
+#
+#     logger.info('login success {user} {ip}'.format(
+#         user=user,
+#         ip=ip
+#     ))
+#
+# @receiver(user_logged_out)
+# def user_logged_out_callback(sender, request, user, **kwargs):
+#     ip = request.META.get('REMOTE_ADDR')
+#
+#     logger.info('logout success {user} {ip}'.format(
+#         user=user,
+#         ip=ip
+#     ))
+#
+# @receiver(user_login_failed)
+# def user_login_failed_callback(sender, credentials, **kwargs):
+#
+#     logger.warning('login failed {credentials}'.format(
+#         credentials=credentials['username'],
+#     ))
+
+
+

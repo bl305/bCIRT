@@ -58,10 +58,11 @@ class StringParser():
         self.extract_ip()
 
     def check_malicious(self, str1):
-        ipatternU = re.compile(r'\'Malicious\':\W\'Unknown\'')
-        ipatternC = re.compile(r'\'Malicious\':\W\'Clean\'')
-        ipatternS = re.compile(r'\'Malicious\':\W\'Suspicious\'')
-        ipatternM = re.compile(r'\'Malicious\':\W\'Malicious\'')
+        str1 = str1.lower()
+        ipatternU = re.compile(r'\'malicious\':\W+\'unknown\'')
+        ipatternC = re.compile(r'\'malicious\':\W+\'clean\'')
+        ipatternS = re.compile(r'\'malicious\':\W+\'suspicious\'')
+        ipatternM = re.compile(r'\'malicious\':\W*\'malicious\'')
         if bool(re.search(ipatternU, str1)):
             imatches = 'Unknown'
         elif bool(re.search(ipatternC, str1)):

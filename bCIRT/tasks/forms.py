@@ -593,7 +593,7 @@ class TaskTemplateForm(forms.ModelForm):
             current_pk = kwargs.get('instance').pk
             self.fields['actiontarget'].queryset = TaskTemplate.objects.all().exclude(pk=current_pk)
         # define some defaults
-        self.fields['status'].initial = 1
+        self.fields['status'].initial = 3
         self.fields['user'].initial = None
         self.fields['priority'].initial = 1
         self.fields['category'].initial = 1
@@ -772,6 +772,7 @@ class TaskVarForm(forms.ModelForm):
     user = forms.ModelChoiceField(
         label='Owner:',
         queryset=User.objects.all(),
+        required=False,
         empty_label="--Select--",
         widget=forms.Select(
             attrs={

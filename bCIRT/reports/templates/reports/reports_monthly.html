@@ -1,0 +1,123 @@
+{% extends "reports/reports_base.html" %}
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : reports/reports_dashboard.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.09.09
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.09.09  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+
+{% block prereports %}
+<div class="container">
+	<div class="col-md-12">
+		<div class="content">
+			<h2>Monthly Reports</h2>
+		</div>
+	</div>
+{% endblock %}
+{% block reports_content %}
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-md-12">
+			<div class="well">
+				<div class="container" align="left">
+					<embed type="image/svg+xml" src="{{graph_data_invclosed|safe}}" style='max-width:90%;max-height:600px'/>
+				</div>
+				<div>
+					<table class="table">
+						<thead>
+							<tr>
+								<th scope="col">Month</th>
+								<th scope="col">Closed Investigations</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for line in graph_table_invclosed %}
+								<tr>
+									<td>{{ line.0 }}</td>
+									<td>{{ line.1 }}</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+	<!--<div>-->
+	<!--	<embed type="image/svg+xml" src="/media/test.svg" width="90%"/>-->
+	<!--</div>-->
+			</div>
+		</div>
+	</div>
+<hr class="thick">
+		<div class="row">
+		<div class="col-md-12">
+			<div class="well">
+				<div class="container" align="left">
+					<embed type="image/svg+xml" src="{{graph_data_attackvectorclosed|safe}}" style='max-width:90%;max-height:600px'/>
+				</div>
+				<div>
+					<table class="table">
+						<thead>
+							<tr>
+								<th scope="col">Month</th>
+								<th scope="col">Attackvectors</th>
+								<th scope="col">Count</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for line in graph_table_attackvectorclosed %}
+								<tr>
+									<td>{{ line.0 }}</td>
+									<td>{{ line.1 }}</td>
+									<td>{{ line.2 }}</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+	<!--<div>-->
+	<!--	<embed type="image/svg+xml" src="/media/test.svg" width="90%"/>-->
+	<!--</div>-->
+			</div>
+		</div>
+	</div>
+<hr class="thick">
+	<div class="row">
+		<div class="col-md-12">
+			<div class="well">
+				<div class="container" align="left">
+					<embed type="image/svg+xml" src="{{graph_data_attackvectorphishingmalware|safe}}" style='max-width:90%;max-height:600px'/>
+				</div>
+				<div>
+					<table class="table">
+						<thead>
+							<tr>
+								<th scope="col">Month</th>
+								<th scope="col">Phishing Malware</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for line in graph_table_attackvectorphishingmalware %}
+								<tr>
+									<td>{{ line.0 }}</td>
+									<td>{{ line.1 }}</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+	<!--<div>-->
+	<!--	<embed type="image/svg+xml" src="/media/test.svg" width="90%"/>-->
+	<!--</div>-->
+			</div>
+		</div>
+	</div>
+<hr class="thick">
+</div>
+{% endblock reports_content %}
+</div>

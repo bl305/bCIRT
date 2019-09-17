@@ -20,4 +20,6 @@ urlpatterns = [
     url(r"^$", views.ReportsPage.as_view(), name='rep_base'),
 
     url(r"dashboard$", views.ReportsDashboardPage.as_view(), name='rep_dashboard'),
+    # url(r"monthly$", views.monthly_closed_invs, name='rep_dashboardmonthly'),
+    url(r"monthly$", views.ReportsDashboardMonthlyPageMemory.as_view(), name='rep_dashboardmonthly'),
 ]

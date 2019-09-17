@@ -22,14 +22,14 @@ from invs.models import Inv
 from tinymce.models import HTMLField
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
-from datetime import datetime
+# from datetime import datetime
 from django.dispatch import receiver
 from stat import S_IREAD, S_IRGRP, S_IROTH, S_IWUSR, S_IWGRP
 import ipaddress
 import re
 import pydot
-import pathlib
-from bCIRT.settings import PROJECT_ROOT
+# import pathlib
+# from bCIRT.settings import PROJECT_ROOT
 from django.utils.timezone import now as timezone_now
 import random
 import string
@@ -139,7 +139,8 @@ class MitreAttck_Tactics(models.Model):
 
 class MitreAttck_Techniques(models.Model):
     objects = models.Manager()
-    matacref = models.ForeignKey(MitreAttck_Tactics, on_delete=models.SET_DEFAULT, default=None, related_name="matec_matac")
+    matacref = models.ForeignKey(MitreAttck_Tactics, on_delete=models.SET_DEFAULT, default=None,
+                                 related_name="matec_matac")
     matecid = models.CharField(max_length=6, blank=False, null=False)
     name = models.CharField(max_length=25, blank=False, null=False)
     enabled = models.BooleanField(default=True)
@@ -331,7 +332,8 @@ def new_playbook(pplaybooktemplate, pname, pversion, puser, pinv, pdescription, 
             atitle=tmp_to_copy.title,
             astatus=tmp_to_copy.status,
             aplaybook=playbook_obj,
-            auser=tmp_to_copy.user,
+            # auser=tmp_to_copy.user,
+            auser=puser,
             ainv=pinv,
             aaction=tmp_to_copy.action,
             aactiontarget=tmp_item_prevtask,
@@ -343,6 +345,16 @@ def new_playbook(pplaybooktemplate, pname, pversion, puser, pinv, pdescription, 
             amodified_by=str(puser),
             acreated_by=str(puser)
         )
+
+        if TaskVar.objects.filter(tasktemplate=tmp_to_copy.pk):
+            taskvars = TaskVar.objects.filter(tasktemplate=tmp_to_copy.pk)
+            for taskvaritem in taskvars:
+                # clone taskvar item
+                cloneobj = taskvaritem
+                cloneobj.pk = None
+                cloneobj.tasktemplate = None
+                cloneobj.task = new_task
+                cloneobj.save()
         # print(str(new_task)+"->->"+str(tmp_item_prevtask))
         #  here I need to map the tempate pks to the new pks so I can assign the proper actions
         item_mapping.update({tmp_item.pk: new_task.pk})
@@ -437,7 +449,8 @@ class Task(models.Model):
                                 taskvar_obj = TaskVar.objects.get(task=sourcetask, name='ActionTarget', category=2)
                                 taskvar_value = taskvar_obj.value
                                 # print(taskvar_value)
-                                if taskvar_value == 'first' or taskvar_value == "" and Task.objects.filter(pk=evid.first().pk).exists():
+                                if taskvar_value == 'first' or taskvar_value == "" and \
+                                        Task.objects.filter(pk=evid.first().pk).exists():
                                     evidpk = evid.first().pk
                                 elif taskvar_value == 'last':
                                     evidpk = evid.last().pk
@@ -461,7 +474,8 @@ class Task(models.Model):
                                 evidattrs = None
                                 if curraction.scriptinputattrtypeall and curraction.scriptinput.name == 'Attribute':
                                     evidattrs = evidobj.evattr_evidence.all()
-                                elif not curraction.scriptinputattrtypeall and curraction.scriptinput.name == 'Attribute':
+                                elif not curraction.scriptinputattrtypeall and \
+                                        curraction.scriptinput.name == 'Attribute':
                                     filterforpk = curraction.scriptinputattrtype
                                     evidattrs = evidobj.evattr_evidence.filter(evattrformat=filterforpk)
                                 if evidattrs:
@@ -634,10 +648,10 @@ class Evidence(models.Model):
     created_by = models.CharField(max_length=20, default="unknown")
     modified_at = models.DateTimeField(auto_now=True)
     modified_by = models.CharField(max_length=20, default="unknown")
-    evidenceformat = models.ForeignKey(EvidenceFormat, on_delete=models.SET_DEFAULT, default=1, null=False, blank=False,
-                                       related_name="evidence_evidenceformat")
-    mitretactic = models.ForeignKey(MitreAttck_Tactics, on_delete=models.SET_DEFAULT, default=1, null=False, blank=False,
-                                       related_name="evidence_mitretactic")
+    evidenceformat = models.ForeignKey(EvidenceFormat, on_delete=models.SET_DEFAULT, default=1, null=False,
+                                       blank=False, related_name="evidence_evidenceformat")
+    mitretactic = models.ForeignKey(MitreAttck_Tactics, on_delete=models.SET_DEFAULT, default=1, null=False,
+                                    blank=False, related_name="evidence_mitretactic")
 
     description = HTMLField()
     fileName = models.CharField(max_length=255, default="", null=True, blank=True)
@@ -648,7 +662,7 @@ class Evidence(models.Model):
     #        ordering = ['-id']
 
     class Meta:
-      ordering = ['id']
+        ordering = ['id']
 
     def __str__(self):
         # return self.description
@@ -679,9 +693,11 @@ class Evidence(models.Model):
                 self.fileRef = file_to_save
             # kwargs.pop('force_insert')
         if self.inv:
-            Inv.objects.filter(pk=self.inv.pk).update(modified_at=timezone_now(), modified_by=self.modified_by)
+            Inv.objects.filter(pk=self.inv.pk).\
+                update(modified_at=timezone_now(), modified_by=self.modified_by)
         if self.task:
-            Task.objects.filter(pk=self.task.pk).update(modified_at=timezone_now(), modified_by=self.modified_by)
+            Task.objects.filter(pk=self.task.pk).\
+                update(modified_at=timezone_now(), modified_by=self.modified_by)
         super(Evidence, self).save(*args, **kwargs)
 
     def clean(self):
@@ -760,6 +776,10 @@ class EvidenceAttr(models.Model):
             })
 
     def save(self, *args, **kwargs):
+        # if the attribute is malicious, make the attribute an observable
+        if self.attr_reputation:
+            if self.attr_reputation.name == 'Suspicious' or self.attr_reputation.name == 'Malicious':
+                self.observable = True
         if self.ev:
             Evidence.objects.filter(pk=self.ev.pk).update(modified_at=timezone_now(), modified_by=self.modified_by)
             if Evidence.objects.get(pk=self.ev.pk).task:
@@ -1161,6 +1181,7 @@ class ActionGroupMember(models.Model):
                                  related_name="actiongroupmember_action")
     actiongroupid = models.ForeignKey(ActionGroup, on_delete=models.CASCADE, default=None, blank=True, null=True,
                                       related_name="actiongroupmember_actiongroup")
+
     def __str__(self):
         return str(self.actionid)
 
@@ -1255,8 +1276,25 @@ class TaskVar(models.Model):
                 (self.task is not None and self.tasktemplate is not None):
             raise ValidationError(_('You must select either a Task or a Task Template. Only one of them!'))
         super(TaskVar, self).clean()
-        
-        
+
+
+def add_taskvar(acategory, atype, atask, atasktemplate, aname, avalue, adescription,
+                amodified_by, acreated_by, arequired=True, aenabled=True,):
+    obj = TaskVar.objects.create(
+        category=acategory,
+        type=atype,
+        task=atask,
+        tasktemplate=atasktemplate,
+        name=aname,
+        value=avalue,
+        description=adescription,
+        modified_by=amodified_by,
+        created_by=acreated_by,
+        required=arequired,
+        enabled=aenabled,
+    )
+
+
 class PlaybookTemplate(models.Model):
     objects = models.Manager()
     name = models.CharField(max_length=50, default="", blank=False, null=False)
@@ -1365,6 +1403,7 @@ class PlaybookTemplateItem(models.Model):
                 raise ValidationError(_('Previous Task ID cannot be lower than the Actual Task ID.'))
         # pass
 
+
 # #### PROCEDURES
 def playbooktemplateitem_check_delete_condition(ptmpitem_pk):
     reftaskout = list()
@@ -1383,7 +1422,8 @@ def generate_graph_PlaybookTemplate(sender, instance, **kwargs):
     Generate playbooktemplate graph
     """
     curr_pk = instance.pk
-    graphfilecontents = "digraph demo1 {\nsubgraph cluster_p {\nlabel = \"PlaybookTemplate #"+str(curr_pk)+" - "+instance.name+"\"; \n" \
+    graphfilecontents = "digraph demo1 {\nsubgraph cluster_p {\nlabel = \"PlaybookTemplate #" + str(curr_pk) + " - " + \
+                        instance.name+"\"; \n" \
                         "node [shape=record fontname=Arial];\nStart [shape=circle]\n"
     # ptmpitem_related_obj = PlaybookTemplateItem.objects.filter(playbooktemplateid=instance.pk)
     ptmpitem_related_obj =  instance.playbooktemplateitem_playbooktemplate.all()
@@ -1466,6 +1506,7 @@ def add_task_from_template(atitle, astatus, aplaybook, auser, ainv, aaction, aac
         modified_by=amodified_by,
         created_by=acreated_by,
     )
+
     return obj
 
 
@@ -1607,6 +1648,18 @@ def auto_make_readonly(sender, instance, **kwargs):
             #  This makes the files readonly
             os.chmod(instance.fileRef.path, S_IREAD | S_IRGRP | S_IROTH)
 
+            # save filename
+            add_evattr(
+                auser=instance.user,
+                aev=Evidence.objects.get(pk=instance.pk),
+                aevattrvalue=instance.fileName,
+                aevattrformat=EvidenceAttrFormat.objects.get(pk=8),
+                amodified_by=instance.user.username,
+                acreated_by=instance.user.username,
+                aattr_automatic=True,
+                aattr_reputation=None,
+                aforce=False
+            )
             # this one calculates the hash for the file
             res_md5 = FileHashCalc().md5sum(instance.fileRef.path)
             add_evattr(
@@ -2005,6 +2058,7 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
         )
         # Add an attribute with reputation
         if ismalicious:
+            setobservable = False
             if EvReputation.objects.get(name=ismalicious):
                 attr_rep = EvReputation.objects.get(name=ismalicious)
             else:
@@ -2127,8 +2181,8 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
                                               ActionQStatus.objects.get(name="Started"), actuser)
                 # create the actionQ item
                 actionq_stopid = new_actionq(actuser, action_obj, task_obj, inv_obj, oldev_obj, actionq_startid,
-                                             action_obj.title, scripttype, rescommand, argument_cleartext, argumentdynamic,
-                                             reserror, resstatus, resoutput, respid,
+                                             action_obj.title, scripttype, rescommand, argument_cleartext,
+                                             argumentdynamic, reserror, resstatus, resoutput, respid,
                                              ActionQStatus.objects.get(name="Finished"), actuser)
                 # update the actionQ with the parent value
                 ActionQ.objects.filter(pk=actionq_startid.pk).update(parent=actionq_stopid)
@@ -2353,3 +2407,5 @@ class FileHashCalc():
 #     with open(ppath, 'wb+') as destination:
 #         for chunk in pfile.chunks():
 #             destination.write(chunk)
+
+

@@ -21,32 +21,6 @@
                 <td>
                     {{attr.pk}}
                 </td>
-                <td>
-                    <a class="badge" href="#item-inve{{ invevidence.pk }}">
-                        {{invevidence.pk}}
-                    </a>
-                </td>
-              <td>
-                <div class="pull-left">
-                        <a href="{% url 'tasks:evattr_edit' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}"
-                            class="btn btn-default btn-xs">
-                            <span class="glyphicon glyphicon-pencil" data-toggle="tooltip" data-placement="top" title="Edit item">
-                            </span>
-                        </a>
-                        <a href="{% url 'tasks:evattr_observabletoggle' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ invevidence.pk }}"
-                            class="btn btn-default btn-xs">
-                        {% if attr.observable %}
-                            <span class="glyphicon glyphicon-eye-open" data-toggle="tooltip" data-placement="top" title="Toggle Observable">
-                            </span>
-                        {% else %}
-                            <span class="glyphicon glyphicon-ban-circle" data-toggle="tooltip" data-placement="top" title="Toggle Observable">
-                            </span>
-                        {% endif %}
-                        </a>
-
-                </div>
-              </td>
-              <td>{{ attr.evattrformat }}</td>
               <td>
                     {% if attr.attr_reputation.pk == 1 %}
                         <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-placement="top" title="Unknown">
@@ -69,6 +43,8 @@
                     {% endif %}
                     {{ attr.attr_reputation }}
               </td>
+              <td>{{ attr.evattrformat }}</td>
+
                 <td style="max-width: 800px;">
                     <a class="" href="{% url 'tasks:evattr_detail' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}"
                        style="max-width: 800px;overflow: auto;text-overflow: word-wrap;overflow-wrap: break-word;"
@@ -76,6 +52,36 @@
                     {{ attr.evattrvalue }}
                     </a>
                 </td>
+
+                <td>
+                    <a class="badge" href="#item-inve{{ invevidence.pk }}">
+                        {{invevidence.pk}}
+                    </a>
+                </td>
+
+              <td>
+                <div class="pull-left">
+                        <a href="{% url 'tasks:evattr_edit' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}"
+                            class="btn btn-default btn-xs">
+                            <span class="glyphicon glyphicon-pencil" data-toggle="tooltip" data-placement="top" title="Edit item">
+                            </span>
+                        </a>
+                        <a href="{% url 'tasks:evattr_observabletoggle' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ invevidence.pk }}"
+                            class="btn btn-default btn-xs">
+                        {% if attr.observable %}
+                            <span class="glyphicon glyphicon-eye-open" data-toggle="tooltip" data-placement="top" title="Toggle Observable">
+                            </span>
+                        {% else %}
+                            <span class="glyphicon glyphicon-ban-circle" data-toggle="tooltip" data-placement="top" title="Toggle Observable">
+                            </span>
+                        {% endif %}
+                        </a>
+
+                </div>
+              </td>
+
+
+
             </tr>
         {% endif %}
     {% endfor %}

@@ -470,7 +470,9 @@ class ProfileCreateRedirectView(LoginRequiredMixin, PermissionRequiredMixin, gen
         invpk = int(self.kwargs.get('inv_pk'))
         invobj = Inv.objects.get(pk=invpk)
         evattrpk = int(self.kwargs.get('evattr_pk'))
-        evattr_obj = EvidenceAttr.objects.get(pk=evattrpk)
+        if evattrpk:
+            evattr_obj = EvidenceAttr.objects.get(pk=evattrpk)
+
         evpk = int(self.kwargs.get('ev_pk'))
         # print("invpk:%s"%(invpk))
         # print("invobj:%s" % (invobj))
