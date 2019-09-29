@@ -12,12 +12,24 @@
 # 2019.08.26  Lendvay     2      Rename file
 # **********************************************************************;
 -->
-{% if inv.invid %}
+{% if inv.pk %}
     <tr>
-        <td><strong>Investigation ID</strong><br> {{ inv.id }}-{{ inv.invid }} </td>
+        <td><strong>Investigation</strong><br>
+            {% if inv.invid %}
+                {{ inv.invid }}
+            {% else %}
+                -
+            {% endif %}
+        </td>
         <td><strong>Severity</strong><br> {{ inv.severity }} </td>
         <td><strong>Priority</strong><br> {{ inv.priority }} </td>
-        <td><strong>Parent</strong><br> {{ inv.parent }} </td>
+        <td><strong>Parent</strong><br>
+            {% if inv.parent %}
+                {{ inv.parent }}
+            {% else %}
+            -
+            {% endif %}
+        </td>
         <td><strong>Status</strong><br> {{ inv.status }} </td>
         <td><strong>Assigned to</strong><br> {{ inv.user }} </td>
         <td>
@@ -32,7 +44,7 @@
     <tr>
         <td colspan="2"><strong>Phase</strong><br> {{ inv.phase }} </td>
         <td colspan="2"><strong>Category</strong><br> {{ inv.category }} </td>
-        <td colspan="1"><strong>Monetary Loss</strong><br> {{ inv.monetaryloss }} {{ inv.losscurrency }} </td>
+        <td colspan="1"><strong>Potential Loss</strong><br> {{ inv.potentialloss }} {{ inv.losscurrency }} </td>
         <td><strong>Investigation start</strong><br> {{ inv.starttime|date:"Y/m/d H:i:s" }} </td>
         <td><strong>Investigation end</strong><br>
             {% if inv.endtime %}
@@ -43,8 +55,20 @@
         </td>
     </tr>
     <tr>
-        <td><strong>Reference</strong><br> {{ inv.refid }} </td>
-        <td colspan="1"></td>
+        <td><strong>Ticket</strong><br>
+            {% if inv.ticketid %}
+                {{ inv.ticketid }}
+            {% else %}
+                -
+            {% endif%}
+        </td>
+        <td><strong>Reference</strong><br>
+            {% if inv.refid %}
+                {{ inv.refid }}
+            {% else %}
+                -
+            {% endif%}
+        </td>
         <td><strong>Attack Vector</strong><br> {{ inv.attackvector }} </td>
         <td colspan="1"></td>
         <td><strong>Victim Count</strong><br> {{ inv.numofvictims }} </td>
@@ -52,8 +76,14 @@
         <td><strong>Modified by</strong><br> {{ inv.modified_by }} </td>
     </tr>
     <tr>
-        <td colspan="4"><strong>Comment</strong><br> {{ inv.comment }} </td>
-        <td colspan="1"></td>
+        <td colspan="4"><strong>Comment</strong><br>
+            {% if inv.comment %}
+                {{ inv.comment }}
+            {% else %}
+                -
+            {% endif%}
+        </td>
+        <td colspan="1"><strong>Monetary Loss</strong><br> {{ inv.monetaryloss }} {{ inv.losscurrency }} </td>
         <td><strong>Created on</strong><br> {{ inv.created_at|date:"Y/m/d H:i:s" }} </td>
         <td><strong>Created by</strong><br> {{ inv.created_by }} </td>
     </tr>

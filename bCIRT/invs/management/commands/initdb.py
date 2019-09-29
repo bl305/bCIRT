@@ -567,6 +567,11 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
                 "enabled": "1",
                 "description": "Social Engineering other than phishing"
             },
+            {
+                "name": "False Positive",
+                "enabled": "1",
+                "description": "False positive, not a security incident"
+            },
         ]
         try:
             self.stdout.write("Initiating InvAttackVecotr")

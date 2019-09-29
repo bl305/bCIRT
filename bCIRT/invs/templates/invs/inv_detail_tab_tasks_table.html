@@ -105,18 +105,24 @@
                         </td>
                         <td>
                             <li class="dropdown">
+                                {% if task.status.name == "Completed" or task.status.name == "Skipped" %}
+                                <button class="btn btn-success btn-xs dropdown-toggle" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
+                                    {{ task.status }}
+                                    <span class="caret"></span>
+                                </button>
+                                {% else %}
                                 <button class="btn btn-default btn-xs dropdown-toggle" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
                                     {{ task.status }}
                                     <span class="caret"></span>
                                 </button>
+
+                                {% endif %}
                                 {% if task.inv.status.name != "Closed" %}
                                     <ul class="dropdown-menu" role="menu">
                                         <li>
                                               <a href="{% url 'tasks:tsk_open' pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
                                                   class="btn btn-default btn-xs">
                                                   Open
-                                                  <span class="glyphicon glyphicon-plus" data-toggle="tooltip" data-placement="top" title="Edit item">
-                                              </span>
                                               </a>
                                         </li>
                                         <li>&nbsp;</li>
@@ -124,18 +130,44 @@
                                               <a href="{% url 'tasks:tsk_assign' pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
                                                   class="btn btn-default btn-xs">
                                                   Assign
-                                                  <span class="glyphicon glyphicon-plus" data-toggle="tooltip" data-placement="top" title="Edit item">
-                                              </span>
                                               </a>
                                         </li>
+                                        <li>&nbsp;</li>
+                                        <li>
+                                              <a href="{% url 'tasks:tsk_skip' pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                                  class="btn btn-default btn-xs">
+                                                  Skip
+                                              </a>
+                                        </li>
+                                        {% if task.status.name != 'Completed' %}
+                                        {% if task.evidence_task.all %}
                                         <li>&nbsp;</li>
                                         <li>
                                             <a href="{% url 'tasks:tsk_close' pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
                                                 class="btn btn-default btn-xs">
                                                 Complete
-                                                <span class="glyphicon glyphicon-eye-open" data-toggle="tooltip" data-placement="top" title="Open item"></span>
                                             </a>
                                         </li>
+                                        {% else %}
+                                        <li>&nbsp;</li>
+                                            <li>
+                                                {% if task.inv %}
+                                                <a href="{% url 'tasks:ev_create' inv_pk=task.inv.pk task_pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                                   class="btn btn-default btn-xs">
+                                                    New Evidence
+                                                    <span class="glyphicon glyphicon-plus"></span>
+                                                </a>
+                                                {% else %}
+                                                <a href="{% url 'tasks:ev_create' inv_pk=0 task_pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                                   class="btn btn-default btn-xs">
+                                                    New Evidence
+                                                    <span class="glyphicon glyphicon-plus"></span>
+                                                </a>
+                                                {% endif %}
+                                            </li>
+
+                                            {% endif %}
+                                            {% endif %}
                                     </ul>
                                 {% endif %}
                             </li> <!-- .dropdown -->

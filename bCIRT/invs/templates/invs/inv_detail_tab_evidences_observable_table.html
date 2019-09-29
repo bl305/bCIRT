@@ -52,7 +52,9 @@
                     {{ attr.evattrvalue }}
                     </a>
                 </td>
-
+                <td>
+                    {{ inv.modified_at|date:"Y/m/d H:i:s" }}
+                </td>
                 <td>
                     <a class="badge" href="#item-inve{{ invevidence.pk }}">
                         {{invevidence.pk}}

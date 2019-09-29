@@ -1,0 +1,450 @@
+{% extends "reports/reports_base.html" %}
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : reports/reports_dashboard.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.09.09
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.09.09  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+{% load static %}
+{% block prereports %}
+<div class="container">
+	<div class="col-md-12">
+		<div class="content">
+			<h2>Custom Reports</h2> Current filter: {{ searchstarttime|date:"Y/m/d H:i:s e" }} - {{ searchendtime|date:"Y/m/d H:i:s e" }}<br>
+		</div>
+	</div>
+{% endblock %}
+{% block reports_content %}
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-md-12">
+			<div class="well">
+                <form method="POST">
+
+                {% csrf_token %}
+
+                {% for field in form %}
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <span class="text-danger small">{{ field.errors }}</span>
+                        </div>
+                        <label class="control-label col-sm-2" for="Inv_id">{{ field.label_tag }}</label>
+                        <div class="col-sm-10">
+                        {% if field %}
+                            <script type="text/javascript" src="{% static 'bCIRT/timepicker/lib/bootstrap-datepicker.js' %}"></script>
+                            <link rel="stylesheet" type="text/css" href="{% static 'bCIRT//timepicker/lib/bootstrap-datepicker.css' %}" />
+                            {{ field }}
+                            <script>
+                                $(function() {
+                                    $('#{{ field.auto_id }}_0').datepicker({
+                                        calendarWeeks: true,
+                                        clearBtn: true,
+                                        todayHighlight: true,
+                                        showButtonPanel: true,
+                                        changeMonth: true,
+                                        changeYear: true,
+                                        showWeek: true,
+                                        firstDay: 1
+                                        });
+                                });
+                            </script>
+
+                        {% else %}
+                            {{ field }}
+                        {% endif %}
+                        </div>
+                    </div>
+
+                {% endfor %}
+                <button type="submit">Generate</button>
+                </form>
+			</div>
+		</div>
+	</div>
+<hr class="thick">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="well">
+                <p><strong>Phishing Stats Custom</strong></p>
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Potential Loss</th>
+                            <th>Monetary Loss</th>
+                            <th>Currency</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for phish_item in phish_closed_stats %}
+                        <tr data-toggle="collapse" data-target="#myphishs{{inv_closed.pk}}" class="accordion-toggle">
+                            <td>
+                                {{ phish_item.pk }}
+                            </td>
+                            <td>
+                                {{ phish_item.potential }}
+                            </td>
+                            <td>
+                                {{ phish_item.monetary }}
+                            </td>
+                            <td>
+                                {{ phish_item.losscurrency__currencyshortname }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="well">
+                <p><strong>Attackvector Stats Custom</strong></p>
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>Attackvector</th>
+                            <th>Potential Loss</th>
+                            <th>Monetary Loss</th>
+                            <th>Currency</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for attackvector_item in attackvector_stats %}
+                        <tr data-toggle="collapse" data-target="#myphishs{{attackvector_item.pk}}" class="accordion-toggle">
+                            <td>
+                                {{ attackvector_item.attackvector__name }}
+                            </td>
+                            <td>
+                                {{ attackvector_item.potential }}
+                            </td>
+                            <td>
+                                {{ attackvector_item.monetary }}
+                            </td>
+                            <td>
+                                {{ attackvector_item.losscurrency__currencyshortname }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="well">
+                <p><strong>Investigations by Status Custom</strong></p>
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for inv_closed in invs_closed %}
+                        <tr data-toggle="collapse" data-target="#myinvs{{inv_closed.pk}}" class="accordion-toggle">
+                            <td>
+                                {{ inv_closed.status__name }}
+                            </td>
+                            <td>
+                                {{ inv_closed.status__count }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+			</div>
+		</div>
+	</div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="well">
+                <p><strong>Investigations Duration</strong></p>
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>Minimum</th>
+							<th>Average</th>
+							<th>Maximum</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-toggle="collapse" data-target="#myinvs{{inv_closed_stats.pk}}" class="accordion-toggle">
+                            <td>
+								{{ invs_closed_stats_min }}
+							</td>
+							<td>
+								{{ invs_closed_stats_avg }}
+							</td>
+							<td>
+								{{ invs_closed_stats_max }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+			</div>
+		</div>
+	</div>
+	<hr class="thick">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="well">
+				<p><strong>Tasks per Investigation All</strong></p>
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>Minimum</th>
+							<th>Average</th>
+							<th>Maximum</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-toggle="collapse" data-target="#mytasks{{inv_closed_tasks.pk}}" class="accordion-toggle">
+                            <td>
+								{{ invs_closed_tasks_min }}
+							</td>
+							<td>
+								{{ invs_closed_tasks_avg }}
+							</td>
+							<td>
+								{{ invs_closed_tasks_max }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+			</div>
+		</div>
+        <div class="col-md-4">
+            <div class="well">
+				<p><strong>Tasks Manual per Investigation </strong></p>
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>Minimum</th>
+							<th>Average</th>
+							<th>Maximum</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-toggle="collapse" data-target="#mytasks{{inv_closed_tasks_manual.pk}}" class="accordion-toggle">
+                            <td>
+								{{ invs_closed_tasks_manual_min }}
+							</td>
+							<td>
+								{{ invs_closed_tasks_manual_avg }}
+							</td>
+							<td>
+								{{ invs_closed_tasks_manual_max }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+			</div>
+		</div>
+        <div class="col-md-4">
+            <div class="well">
+				<p><strong>Tasks Auto per Investigation </strong></p>
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>Minimum</th>
+							<th>Average</th>
+							<th>Maximum</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-toggle="collapse" data-target="#mytasks{{inv_closed_tasks_auto.pk}}" class="accordion-toggle">
+                            <td>
+								{{ invs_closed_tasks_auto_min }}
+							</td>
+							<td>
+								{{ invs_closed_tasks_auto_avg }}
+							</td>
+							<td>
+								{{ invs_closed_tasks_auto_max }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+			</div>
+		</div>
+	</div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="well">
+                <p><strong>Tasks by Status All</strong></p>
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for task_closed in tasks_closed %}
+                        <tr data-toggle="collapse" data-target="#mytasks{{task_closed.pk}}" class="accordion-toggle">
+                            <td>
+                                {{ task_closed.status__name }}
+                            </td>
+                            <td>
+                                {{ task_closed.status__count }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+			</div>
+		</div>
+	</div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="well">
+                <p><strong>Tasks Duration All</strong></p>
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>Minimum</th>
+							<th>Average</th>
+							<th>Maximum</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-toggle="collapse" data-target="#mytasks{{task_closed_stats.pk}}" class="accordion-toggle">
+                            <td>
+								{{ tasks_closed_stats_min }}
+							</td>
+							<td>
+								{{ tasks_closed_stats_avg }}
+							</td>
+							<td>
+								{{ tasks_closed_stats_max }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+			</div>
+		</div>
+        <div class="col-md-6">
+            <div class="well">
+                <p><strong>Tasks Duration Manual</strong></p>
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>Minimum</th>
+							<th>Average</th>
+							<th>Maximum</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-toggle="collapse" data-target="#mytasks{{task_manual_closed_stats.pk}}" class="accordion-toggle">
+                            <td>
+								{{ tasks_manual_closed_stats_min }}
+							</td>
+							<td>
+								{{ tasks_manual_closed_stats_avg }}
+							</td>
+							<td>
+								{{ tasks_manual_closed_stats_max }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+			</div>
+		</div>
+	</div>
+	<hr class="thick">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="well">
+                <p><strong>Attack Vectors All</strong></p>
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for inv_closed_attackvector in invs_closed_attackvector %}
+                        <tr data-toggle="collapse" data-target="#myinvs{{inv_closed_attackvector.pk}}" class="accordion-toggle">
+                            <td>
+                                {{ inv_closed_attackvector.attackvector__name }}
+                            </td>
+                            <td>
+                                {{ inv_closed_attackvector.attackvector__count }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+			</div>
+		</div>
+        <div class="col-md-6">
+            <div class="well">
+                <p><strong>Attack Vectors Victims</strong></p>
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>Attack Vector</th>
+                            <th>Victims</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for inv_closed_attackvector_victims in invs_closed_attackvector_victims %}
+                        <tr data-toggle="collapse" data-target="#myinvs{{inv_closed_attackvector_victims.pk}}" class="accordion-toggle">
+                            <td>
+                                {{ inv_closed_attackvector_victims.attackvector__name }}
+                            </td>
+                            <td>
+                                {{ inv_closed_attackvector_victims.numofvictims__sum }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+			</div>
+		</div>
+	</div>
+    <hr class="thick">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="well">
+                <p><strong>Tasks by title All</strong></p>
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for task_closed_title in tasks_closed_title %}
+                        <tr data-toggle="collapse" data-target="#mytasks{{task_closed_title.pk}}" class="accordion-toggle">
+                            <td>
+                                {{ task_closed_title.title }}
+                            </td>
+                            <td>
+                                {{ task_closed_title.title__count }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+			</div>
+		</div>
+	</div>
+<hr class="thick">
+</div>
+{% endblock reports_content %}
+</div>

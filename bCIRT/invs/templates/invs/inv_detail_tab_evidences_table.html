@@ -320,16 +320,16 @@
 
                                     </td>
                                     <td>
-<a href="{% url 'tasks:evattr_observabletoggle' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ invevidence.pk }}"
-    class="btn btn-default btn-xs">
-{% if attr.observable %}
-    <span class="glyphicon glyphicon-eye-open" data-toggle="tooltip" data-placement="top" title="Toggle Observable">
-    </span>
-{% else %}
-    <span class="glyphicon glyphicon-ban-circle" data-toggle="tooltip" data-placement="top" title="Toggle Observable">
-    </span>
-{% endif %}
-</a>
+                                        <a href="{% url 'tasks:evattr_observabletoggle' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ invevidence.pk }}"
+                                            class="btn btn-default btn-xs">
+                                        {% if attr.observable %}
+                                            <span class="glyphicon glyphicon-eye-open" data-toggle="tooltip" data-placement="top" title="Toggle Observable">
+                                            </span>
+                                        {% else %}
+                                            <span class="glyphicon glyphicon-ban-circle" data-toggle="tooltip" data-placement="top" title="Toggle Observable">
+                                            </span>
+                                        {% endif %}
+                                        </a>
 
                                         <a class="" href="{% url 'tasks:evattr_detail' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ invevidence.pk }}"
                                         style="max-width: 1100px;overflow: auto;text-overflow: word-wrap;overflow-wrap: break-word;">

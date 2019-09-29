@@ -35,6 +35,10 @@ class InvForm(forms.ModelForm):
 
         super(InvForm, self).__init__(*args, **kwargs)
         logger.info("InvForm - "+str(user))
+
+        if kwargs.get('instance'):
+            current_pk = kwargs.get('instance').pk
+            self.fields['parent'].queryset = Inv.objects.all().exclude(pk=current_pk)
         self.fields['user'].initial = user
         self.fields['status'].initial = 3
         self.fields['phase'].initial = 1
@@ -76,8 +80,9 @@ class InvForm(forms.ModelForm):
 
     parent = forms.ModelChoiceField(
         label='Parent',
-        queryset=Inv.objects.all(),
         empty_label="--Select--",
+        # queryset overwritten above
+        queryset=Inv.objects.all(),
         required=False,
         widget=forms.Select(
             attrs={
@@ -215,6 +220,7 @@ class InvForm(forms.ModelForm):
     class Meta:
         model = Inv
         fields = ('invid',
+                  'ticketid',
                   'refid',
                   'status',
                   'priority',
@@ -228,24 +234,33 @@ class InvForm(forms.ModelForm):
                   'attackvector',
                   'comment',
                   'numofvictims',
+                  'potentialloss',
                   'monetaryloss',
                   'losscurrency',
                   'starttime',
                   'endtime',
                   'processimprovement')
         labels = {
-            'invid': "Investigation ID*",
+            'invid': "Investigation",
+            'ticketid': "Ticket#",
             'refid': "Reference",
             'user': "Assigned to",
             'description': 'Incident Description*',
             'summary': "Executive Summary",
             'comment': "Attack Comment",
-            'losscurrency': "Monetary Loss",
+            'potentialloss': "Potential Loss",
+            'monetaryloss': "Monetary Loss",
+            'losscurrency': "Currency",
             'numofvictims': "Victim Count:",
             'processimprovement': "Process Improvement"
         }
         widgets = {
             'invid': forms.TextInput(attrs={
+                'size': 20,
+                'style': 'width:50%;',
+                'class': 'form-control'}
+            ),
+            'ticketid': forms.TextInput(attrs={
                 'size': 20,
                 'style': 'width:50%;',
                 'class': 'form-control'}
@@ -287,19 +302,44 @@ class InvForm(forms.ModelForm):
 
 
 class InvSuspiciousEmailForm(forms.Form):
-    description = forms.CharField(
-        label='Investigation Description',
-        max_length=50,
+    invid = forms.CharField(
+        label='Investigation',
+        max_length=20,
+        required=False,
         widget=forms.Textarea(attrs={
                 'rows': '1',
                 'cols': '48',
                 'style': 'resize:none;width:90%',
                 'class': 'form-control',
+                'placeholder': 'Phishing',
                 }
             )
     )
+    description = forms.CharField(
+        label='Investigation Description',
+        max_length=50,
+        required=False,
+        widget=forms.Textarea(attrs={
+                'rows': '1',
+                'cols': '48',
+                'style': 'resize:none;width:90%',
+                'class': 'form-control',
+                'placeholder': 'Phishing',
+                }
+            )
+    )
+    ticket = forms.CharField(
+        label='Ticket',
+        max_length=50,
+        widget=forms.TextInput(attrs={
+            'size': 20,
+            'style': 'width:50%;',
+            'class': 'form-control'}
+        )
+    )
     reference = forms.CharField(
         label='Reference',
+        required=False,
         max_length=50,
         widget=forms.TextInput(attrs={
             'size': 20,

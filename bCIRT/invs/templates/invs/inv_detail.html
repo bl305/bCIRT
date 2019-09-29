@@ -13,7 +13,7 @@
 # 2019.09.05  Lendvay     2      Minor fixes for opening evidences as default
 # **********************************************************************;
 -->
-{% block ptitle %}Investigations {{ inv.id }}-{{ inv.invid }} {% endblock %}
+{% block ptitle %}Investigation #{{ inv.id }} - {{ inv.invid }} {% endblock %}
 
 {% block invslist_active %}active{% endblock invslist_active%}
 
@@ -138,7 +138,7 @@ mybuttonbottom = document.getElementById("myBtnBottom");
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link text-danger" href="#tabs-4">
-                                    <span><strong>Tasks({{ inv.task_inv.all.count }})</strong></span>
+                                    <span><strong>Tasks({{ inv.task_inv.all.count }}/{{inv.opentasklistprint}})</strong></span>
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -148,7 +148,7 @@ mybuttonbottom = document.getElementById("myBtnBottom");
                             </li>
                             <li>
                                 <span class="navbar-text" style="color: black;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                    <strong>Investigation: {{ inv.id }}-{{ inv.invid }}</strong>
+                                    <strong>Investigation: #{{ inv.id }} - {{ inv.invid }}</strong>
                                 </span>
                             </li>
                         </ul>

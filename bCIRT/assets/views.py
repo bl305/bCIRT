@@ -12,7 +12,7 @@
 # 2019.09.06  Lendvay     2      Added session security
 # **********************************************************************;
 # from django.shortcuts import render
-from .models import Host, Profile, new_profile
+from .models import Host, Profile, new_profile, new_create_profile_from_evattrs
 from .forms import HostForm, ProfileForm
 from tasks.models import EvidenceAttr
 from invs.models import Inv
@@ -466,71 +466,11 @@ class ProfileCreateRedirectView(LoginRequiredMixin, PermissionRequiredMixin, gen
         elif not self.request.user.has_perm('assets.change_profile'):
             messages.error(self.request, "No permission to change a record !!!")
             return redirect('assets:profile_list')
-        # Creating a new profile based on the attribute calling this function
-        invpk = int(self.kwargs.get('inv_pk'))
-        invobj = Inv.objects.get(pk=invpk)
-        evattrpk = int(self.kwargs.get('evattr_pk'))
-        if evattrpk:
-            evattr_obj = EvidenceAttr.objects.get(pk=evattrpk)
-
-        evpk = int(self.kwargs.get('ev_pk'))
-        # print("invpk:%s"%(invpk))
-        # print("invobj:%s" % (invobj))
-        # print("evattrpk:%s" % (evattrpk))
-        # print("evattrobj:%s" % (evattr_obj))
-        # print("evpk:%s" % (evpk))
-        attrpklist = list()
-        # if ev_pk=0, it is only one attribute to deal with
-        if evpk == 0:
-            attrpklist.append(evattr_obj)
-            # print("attrpklist:%s" % (attrpklist))
-        else:
-            attributes = EvidenceAttr.objects.filter(ev__pk=evpk)
-            # print("Attributes:%s"%(attributes))
-            if attributes:
-                for attritem in attributes:
-                    attrpklist.append(attritem)
-        # print("Attrpklist:%s"%(attrpklist))
-        # print(type(attrpklist))
-        for evattrobj in attrpklist:
-            # find attributes and run the commands on them
-            # if ev_pk is not 0, then we need to run it on all evidence attributes
-            # evattrobj = EvidenceAttr.objects.get(pk=evattrpk)
-            evattrtype = evattrobj.evattrformat.name
-            ausername = None
-            auserid = None
-            aemail = None
-            ahostname = None
-            aip = None
-            if evattrtype == "UserName":
-                ausername = evattrobj.evattrvalue
-            elif evattrtype == "UserID":
-                auserid = evattrobj.evattrvalue
-            elif evattrtype == "Email":
-                aemail = evattrobj.evattrvalue
-            elif evattrtype == "HostName":
-                ahostname = evattrobj.evattrvalue
-            elif evattrtype == "IPv4" or evattrtype == "IPv6":
-                aip = evattrobj.evattrvalue
-            else:
-                pass
-
-            # evattrvalue = evattrobj.evattrvalue
-            new_profile(
-                pinv=invobj,
-                pusername=ausername,
-                puserid=auserid,
-                pemail=aemail,
-                phost=ahostname,
-                pip=aip,
-                plocation=None,
-                pdepartment=None,
-                plocation_contact=None,
-                pcreated_by=self.request.user.get_username(),
-                pmodified_by=self.request.user.get_username(),
-                pdescription="",
-            )
-
+        ainv_pk = int(self.kwargs.get('inv_pk'))
+        aevattr_pk = int(self.kwargs.get('evattr_pk'))
+        aev_pk = int(self.kwargs.get('ev_pk'))
+        ausername = self.request.user.get_username()
+        new_create_profile_from_evattrs(pinv_pk=ainv_pk, pevattr_pk=aevattr_pk, pev_pk=aev_pk, pusername=ausername)
         return super(ProfileCreateRedirectView, self).dispatch(request, *args, **kwargs)
 
     def get_redirect_url(self, *args, **kwargs):

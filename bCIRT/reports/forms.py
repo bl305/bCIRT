@@ -14,5 +14,50 @@ from django import forms
 # Get the user so we can use this
 from django.contrib.auth import get_user_model
 import logging
+
+from django.forms.widgets import SplitDateTimeWidget  # , ClearableFileInput
+
 logger = logging.getLogger('log_file_verbose')
 User = get_user_model()
+
+class CustomReportForm(forms.Form):
+    # enddate = forms.DateField(
+    #     input_formats=['%d/%m/%Y %H:%M'],
+    #     label='End',
+    #     widget=forms.SelectDateWidget
+    # )
+    # holiday = forms.DateField(widget=forms.TextInput(attrs=
+    # {
+    #     'class': 'datepicker'
+    # }))
+
+    starttime = forms.SplitDateTimeField(
+        required=False,
+        label='StartTime',
+        input_date_formats=['%m/%d/%Y'],
+        input_time_formats=['%H:%M'],
+        widget=SplitDateTimeWidget(
+            date_format='%m/%d/%Y',
+            time_format='%H:%M',
+            attrs={
+                'class': 'form-control',
+                'style': 'width:100px',
+            }
+        )
+    )
+    endtime = forms.SplitDateTimeField(
+        required=False,
+        label='Endtime',
+        input_date_formats=['%m/%d/%Y'],
+        input_time_formats=['%H:%M'],
+        widget=SplitDateTimeWidget(
+            date_format='%m/%d/%Y',
+            time_format='%H:%M',
+            attrs={
+                'class': 'form-control',
+                'style': 'width:100px',
+            }
+        )
+    )
+    #     name = forms.CharField()
+    #     message = forms.CharField(widget=forms.Textarea)

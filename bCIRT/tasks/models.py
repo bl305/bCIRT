@@ -28,6 +28,8 @@ from stat import S_IREAD, S_IRGRP, S_IROTH, S_IWUSR, S_IWGRP
 import ipaddress
 import re
 import pydot
+from tasks.scripts.String_Parser import StringParser
+
 # import pathlib
 # from bCIRT.settings import PROJECT_ROOT
 from django.utils.timezone import now as timezone_now
@@ -309,7 +311,7 @@ def new_playbook(pplaybooktemplate, pname, pversion, puser, pinv, pdescription, 
         # find the pk of the newly created previous item matching the previous reference
         if tmp_item.prevtask:
             # logger.info("11 IF tmp_item.prevtask:%s" % (tmp_item.prevtask))
-            # logger.info("XXX:%s" % (tmp_item.prevtask.pk))
+            # logger.info("X:%s" % (tmp_item.prevtask.pk))
             # tmp_item_prevtaskpk = TaskTemplate.objects.get(pk=tmp_item.prevtask.pk).pk
             tmp_item_prevtaskpk = PlaybookTemplateItem.objects.get(pk=tmp_item.prevtask.pk).pk
             # logger.info("12 IF tmp_item_prevtaskpk:%s" % (tmp_item_prevtaskpk))
@@ -422,6 +424,9 @@ class Task(models.Model):
         #  this is to check if the status record has been changed or not
         if self.status != self.__original_status:
             if self.status.name == "Completed":
+                if not self.evidence_task.all() and self.type == 2:
+                    raise ValidationError(_('You must create an evidence to be able to close.'))
+
                 # if status changed do something here
                 # check for tasks which are target of any action and are automatic tasks (type=1) and not closed
                 # exclude tasks that are already completed (pk=2,4)
@@ -598,9 +603,6 @@ class Task(models.Model):
             retval = None
         return retval
 
-    def clean(self):
-        pass
-
 
 def task_close(ptaskpk, ptaskmoduser):
     if Task.objects.filter(pk=ptaskpk).exists():
@@ -698,6 +700,40 @@ class Evidence(models.Model):
         if self.task:
             Task.objects.filter(pk=self.task.pk).\
                 update(modified_at=timezone_now(), modified_by=self.modified_by)
+
+        # checking for maliciousness and setting the attributes accordingly
+        if self.description:
+            ismalicious = StringParser().check_malicious(self.description)
+
+            if ismalicious:
+                setobservable = False
+                if EvReputation.objects.get(name=ismalicious):
+                    attr_rep = EvReputation.objects.get(name=ismalicious)
+                else:
+                    attr_rep = None
+                # if self.pk:
+                #     ev_obj = Evidence.objects.get(pk=self.pk)
+                #     evidattr = add_evattr(
+                #         auser=self.user,
+                #         aev=ev_obj,
+                #         aevattrvalue=ismalicious,
+                #         aevattrformat=EvidenceAttrFormat.objects.get(name='Reputation'),
+                #         amodified_by=str(self.user),
+                #         acreated_by=str(self.user),
+                #         aattr_reputation=attr_rep,
+                #         aforce=False
+                #     )
+                # Creating a clone for the attribute item inspected
+                if self.parentattr:
+                    if self.parentattr:
+                        # cloneevidattr = EvidenceAttr.objects.get(pk=self.parentattr.pk)
+                        cloneevidattr = self.parentattr
+                        cloneevidattr.attr_reputation = attr_rep
+                        if cloneevidattr.attr_reputation.name == 'Suspicious' \
+                                or cloneevidattr.attr_reputation.name == 'Malicious':
+                            cloneevidattr.observable = True
+                        cloneevidattr.pk = None
+                        newclone = cloneevidattr.save()
         super(Evidence, self).save(*args, **kwargs)
 
     def clean(self):
@@ -711,6 +747,9 @@ class Evidence(models.Model):
             if Inv.objects.get(pk=self.inv.pk).status.name == "Closed" or \
                 Inv.objects.get(pk=self.inv.pk).status.name == "Archived":
                 raise ValidationError(_('Investigation cannot be closed!'))
+
+
+
 
         super(Evidence, self).clean()
 
@@ -778,7 +817,7 @@ class EvidenceAttr(models.Model):
     def save(self, *args, **kwargs):
         # if the attribute is malicious, make the attribute an observable
         if self.attr_reputation:
-            if self.attr_reputation.name == 'Suspicious' or self.attr_reputation.name == 'Malicious':
+            if self.evattrformat.name != 'Reputation' and (self.attr_reputation.name == 'Suspicious' or self.attr_reputation.name == 'Malicious'):
                 self.observable = True
         if self.ev:
             Evidence.objects.filter(pk=self.ev.pk).update(modified_at=timezone_now(), modified_by=self.modified_by)
@@ -793,6 +832,14 @@ class EvidenceAttr(models.Model):
     def clean(self):
         # if self.inv is None and self.task is None:
         #     raise ValidationError(_('You must select an Investigation or a Task.'))
+        # if self.ev.task and Task.objects.filter(pk=self.ev.task.pk).exists:
+        #     if Task.objects.get(pk=self.ev.task.pk).status.name == "Completed" or \
+        #          Task.objects.get(pk=self.ev.task.pk).status.name == "Skipped":
+        #         raise ValidationError(_('Task cannot be closed!'))
+        if self.ev.inv and Inv.objects.filter(pk=self.ev.inv.pk).exists():
+            if Inv.objects.get(pk=self.ev.inv.pk).status.name == "Closed" or \
+                Inv.objects.get(pk=self.ev.inv.pk).status.name == "Archived":
+                raise ValidationError(_('Investigation cannot be closed!'))
         pass
 
 def evidenceattrobservabletoggle(pattrpk):
@@ -1649,17 +1696,31 @@ def auto_make_readonly(sender, instance, **kwargs):
             os.chmod(instance.fileRef.path, S_IREAD | S_IRGRP | S_IROTH)
 
             # save filename
-            add_evattr(
-                auser=instance.user,
-                aev=Evidence.objects.get(pk=instance.pk),
-                aevattrvalue=instance.fileName,
-                aevattrformat=EvidenceAttrFormat.objects.get(pk=8),
-                amodified_by=instance.user.username,
-                acreated_by=instance.user.username,
-                aattr_automatic=True,
-                aattr_reputation=None,
-                aforce=False
-            )
+            # add_evattr(
+            #     auser=instance.user,
+            #     aev=Evidence.objects.get(pk=instance.pk),
+                # aevattrvalue=instance.fileName,
+                # aevattrformat=EvidenceAttrFormat.objects.get(pk=8),
+                # amodified_by=instance.user.username,
+                # acreated_by=instance.user.username,
+                # aattr_automatic=True,
+                # aattr_reputation=None,
+                # aforce=False
+            # )
+
+            # add filename
+            if instance.fileName:
+                add_evattr(
+                    auser=instance.user,
+                    aev=Evidence.objects.get(pk=instance.pk),
+                    aevattrvalue=instance.fileName,
+                    aevattrformat=EvidenceAttrFormat.objects.get(pk=8),
+                    amodified_by=instance.user.username,
+                    acreated_by=instance.user.username,
+                    aattr_automatic=True,
+                    aattr_reputation=None,
+                    aforce=False
+                )
             # this one calculates the hash for the file
             res_md5 = FileHashCalc().md5sum(instance.fileRef.path)
             add_evattr(
@@ -1709,6 +1770,7 @@ def auto_make_readonly(sender, instance, **kwargs):
                 aattr_reputation=None,
                 aforce=False
             )
+
 
 @receiver(models.signals.pre_save, sender=Evidence)
 def auto_delete_file_on_change(sender, instance, **kwargs):
@@ -1918,9 +1980,7 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
                 # this means the output is a file
                 # generate a random folder with some prefix:
                 myprefix = "EV-" + str(ev_pk) + "-"
-                # print("XXXXX:%s"%(myprefix))
                 myouttempdir = tempfile.TemporaryDirectory(prefix=myprefix)
-                # print("YYYYY:%s"%(myouttempdir))
                 #  make the tempdir the temp root
                 tempfile.tempdir = myouttempdir.name
                 # with tempfile.TemporaryDirectory() as directory:
@@ -2001,8 +2061,8 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
                 # attribute input
                 # EvidenceAttr.objects.filter(pk=evattr_pk).update(attr_reputation = EvReputation.objects.get(pk=1))
                 pass
-        if action_obj.automationid.code == "StringParser.extract_ipv4":
-            print("xxxx")
+        # if action_obj.automationid.code == "StringParser.extract_ipv4":
+        #     pass
 
         results = {"command": str(cmd), "status": "1", "error": "0", "output": afuncoutput, "pid": 1}
         # if True: # SUCCESS

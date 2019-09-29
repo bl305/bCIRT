@@ -18,10 +18,13 @@ from .models import Inv
 from .models import Evidence, EvidenceAttr  #  , EvidenceAttrFormat, EvidenceFormat
 from .models import add_task_from_template, run_action, evidenceattrobservabletoggle
 from .models import Action, ActionQ, ActionGroup, ActionGroupMember, Automation
+from tasks.models import playbooktemplateitem_check_delete_condition
 from .forms import TaskForm, TaskTemplateForm, TaskVarForm
 from .forms import ActionForm, ActionGroupForm, ActionGroupMemberForm, AutomationForm
 from .forms import EvidenceAttrForm, EvidenceForm
 from .forms import PlaybookForm, PlaybookTemplateForm, PlaybookTemplateItemForm
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 from django.shortcuts import redirect, reverse
 from django.contrib import messages
 from django.contrib.auth.mixins import (
@@ -364,6 +367,7 @@ class AutomationListView(LoginRequiredMixin, PermissionRequiredMixin, generic.Li
         return super(AutomationListView, self).get_context_data(**kwargs)
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class AutomationCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
     #  fields = ("inv", "user", "description", "fileRef")
     model = Automation
@@ -451,6 +455,7 @@ class AutomationDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.
         return super(AutomationDetailView, self).dispatch(request, *args, **kwargs)
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class AutomationUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
     login_url = '/'
     # redirect_field_name = 'tasks/evidence_detail.html'
@@ -568,6 +573,7 @@ class ActionListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListVi
         return super(ActionListView, self).get_context_data(**kwargs)
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class ActionCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
     #  fields = ("inv", "user", "description", "fileRef")
     model = Action
@@ -655,6 +661,7 @@ class ActionDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.Deta
         return super(ActionDetailView, self).dispatch(request, *args, **kwargs)
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class ActionUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
     login_url = '/'
     # redirect_field_name = 'tasks/evidence_detail.html'
@@ -1311,6 +1318,7 @@ class TaskListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView
         return super(TaskListView, self).get_context_data(**kwargs)
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class TaskCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
     model = Task
     form_class = TaskForm
@@ -1403,6 +1411,7 @@ class TaskDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.Detail
         return super(TaskDetailView, self).dispatch(request, *args, **kwargs)
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class TaskUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
     login_url = '/'
     redirect_field_name = 'tasks/task_detail.html'
@@ -2663,11 +2672,11 @@ class PlaybookTemplateItemRemoveView(LoginRequiredMixin, PermissionRequiredMixin
             messages.error(self.request, "No permission to delete a record !!!")
             return redirect('tasks:playittmp_detail', pk=curr_pk)
         elif curr_pk:
-            from tasks.models import playbooktemplateitem_check_delete_condition
             outmsgitems = playbooktemplateitem_check_delete_condition(curr_pk)
-            outmsg = "The Task is referenced from other tasks as inputs, Task(s): %s"%(outmsgitems)
-            messages.error(self.request, outmsg)
-            return redirect('tasks:playittmp_detail', pk=curr_pk)
+            if len(outmsgitems) != 0:
+                outmsg = "The Task is referenced from other tasks as inputs, Task(s): %s"%(outmsgitems)
+                messages.error(self.request, outmsg)
+                return redirect('tasks:playittmp_remove', pk=curr_pk)
 
         # Checks pass, let http method handlers process the request
         return super(PlaybookTemplateItemRemoveView, self).dispatch(request, *args, **kwargs)
@@ -2813,6 +2822,49 @@ class TaskOpenView(LoginRequiredMixin, PermissionRequiredMixin, generic.Redirect
         # return reverse('tasks:tsk_list')
         # return super().get_redirect_url(*args, **kwargs)
 
+class TaskSkipView(LoginRequiredMixin, PermissionRequiredMixin, generic.RedirectView):
+
+    # model = TaskTemplate
+    permission_required = ('tasks.view_task', 'tasks.change_task')
+    # url = reverse_lazy('tasks:ev_list')
+    success_url = 'tasks:tsk_list'
+
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
+            logger.info(logmsg)
+        super(TaskSkipView, self).__init__(*args, **kwargs)
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            # This will redirect to the login view
+            return self.handle_no_permission()
+        elif not self.request.user.has_perm('tasks.change_task'):
+            messages.error(self.request, "No permission to change a record !!!")
+            return redirect('tasks:tsk_list')
+        task_pk = self.kwargs.get('pk')
+        # Checks pass, let http method handlers process the request
+        # Task.objects.filter(pk=task_pk).update(status=1)
+        task_obj = Task.objects.get(pk=task_pk)
+        task_obj.status = TaskStatus.objects.get(pk=4)
+        task_obj.save()
+
+        # return redirect(self.success_url)
+        return super(TaskSkipView, self).dispatch(request, *args, **kwargs)
+
+    def get_redirect_url(self, *args, **kwargs):
+        if 'next1' in self.request.GET:
+            redirect_to = self.request.GET['next1']
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
+                return reverse(self.success_url)
+        else:
+            return reverse(self.success_url)
+        return redirect_to
+
 
 # Create your views here.
 # #############################################################################3
@@ -2836,7 +2888,7 @@ class EvidenceListView(LoginRequiredMixin, PermissionRequiredMixin, generic.List
         kwargs['actions'] = Action.objects.filter(enabled=True).order_by('title')
         return super(EvidenceListView, self).get_context_data(**kwargs)
 
-
+@method_decorator(csrf_exempt, name='dispatch')
 class EvidenceCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
     #fields = ("inv", "user", "description", "fileRef")
     model = Evidence
@@ -2858,7 +2910,10 @@ class EvidenceCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Cr
 
     def get_success_url(self):
         if 'next1' in self.request.GET:
-            redirect_to = self.request.GET['next1']
+            if '/invs/detail/' in self.request.GET['next1']:
+                redirect_to = self.request.GET['next1'] + "#thebottom"
+            else:
+                redirect_to = self.request.GET['next1']
             if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
                 return reverse(self.success_url)
         else:
@@ -2946,6 +3001,7 @@ class EvidenceDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.De
         return super(EvidenceDetailView, self).dispatch(request, *args, **kwargs)
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class EvidenceUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
     login_url = '/'
     # redirect_field_name = 'tasks/evidence_detail.html'

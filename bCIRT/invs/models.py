@@ -147,8 +147,9 @@ class Inv(models.Model):
                              related_name="inv_users")
     parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True,
                                related_name="inv_parent")
-    invid = models.CharField(max_length=20, default="", null=False, blank=False)
+    invid = models.CharField(max_length=20, default="", null=True, blank=True)
     refid = models.CharField(max_length=20, default="", null=True, blank=True)
+    ticketid = models.CharField(max_length=20, default="", null=True, blank=True)
     status = models.ForeignKey(InvStatus, on_delete=models.SET_DEFAULT, default="1",
                                related_name="inv_status")
     phase = models.ForeignKey(InvPhase, on_delete=models.SET_DEFAULT, default="1",
@@ -176,6 +177,7 @@ class Inv(models.Model):
     modified_at = models.DateTimeField(auto_now=True)
     modified_by = models.CharField(max_length=20, default="unknown")
 
+    potentialloss = models.PositiveIntegerField(default=0, blank=False, null=False)
     monetaryloss = models.PositiveIntegerField(default=0, blank=False, null=False)
     losscurrency = models.ForeignKey(CurrencyType, on_delete=models.SET_DEFAULT, default="1",
                                      related_name="inv_currencytype", blank=True, null=False)
@@ -191,7 +193,11 @@ class Inv(models.Model):
         ordering = ['-id']
 
     def __str__(self):
-        return self.invid
+        if self.ticketid:
+            outstr = "%s-%s-%s-%s"%(self.pk, self.attackvector.name, self.ticketid, str(self.user)[0:2])
+        else:
+            outstr = "%s-%s-%s" % (self.pk, self.attackvector.name, str(self.user)[0:2])
+        return outstr
 
     # def save(self, *args, **kwargs):
     def save(self, force_insert=False, force_update=False, *args, **kwargs):
@@ -207,6 +213,7 @@ class Inv(models.Model):
             if self.endtime is None:
                 # self.endtime = datetime.now()
                 self.endtime = timezone_now()
+            self.phase = InvPhase.objects.get(pk=4)
         #  if start time is not set, set it to the investigation creation date
         if self.starttime is None:
             self.starttime = timezone_now()
@@ -238,6 +245,10 @@ class Inv(models.Model):
             retval = "-"
         return retval
 
+    def opentasklistprint(self):
+        retval = self.task_inv.exclude(status__name='Completed').exclude(status__name='Skipped').count()
+        return retval
+
     def get_absolute_url(self):
         return reverse(
             "invs:inv_detail",
@@ -247,8 +258,9 @@ class Inv(models.Model):
             })
 
     def clean(self):
-        if self.invid == '':
-            raise ValidationError(_('You must enter an Investigation ID.'))
+        # if self.invid == '':
+            # raise ValidationError(_('You must enter an Investigation ID.'))
+            # self.invid = self.attackvector.name
         if self.status.name == "Closed":
             # check if the numofvictims is defined
             if self.numofvictims is None:
@@ -275,8 +287,8 @@ class Inv(models.Model):
         super(Inv, self).clean()
 
 
-def new_inv(pinvid, pstatus, ppriority, pdescription, pphase, pseverity, pcategory, pattackvector,
-            puser="action", pparent=None, prefid=None, psummary=None, pcomment=None, pstarttime=None, pendtime=None,
+def new_inv(pstatus, ppriority, pdescription, pphase, pseverity, pcategory, pattackvector,pinvid=None,
+            puser="action", pticketid=None, pparent=None, prefid=None, psummary=None, pcomment=None, pstarttime=None, pendtime=None,
             pinvduration=None, pcreated_at=None, pcreated_by=None, pmodified_at=None, pmodified_by=None,
             pmonetaryloss=None, plosscurrency=None, pnumofvictims=None
             ):
@@ -284,6 +296,7 @@ def new_inv(pinvid, pstatus, ppriority, pdescription, pphase, pseverity, pcatego
                                 user=puser,
                                 parent=pparent,
                                 invid=pinvid,
+                                ticketid=pticketid,
                                 refid=prefid,
                                 status=pstatus,
                                 phase=pphase,

@@ -75,6 +75,7 @@ urlpatterns = [
     url(r'^remove/(?P<pk>\d+)/$', views.TaskRemoveView.as_view(), name='tsk_remove'),
     url(r'^open/(?P<pk>\d+)/$', views.TaskOpenView.as_view(), name='tsk_open'),
     url(r'^assign/(?P<pk>\d+)/$', views.TaskAssignView.as_view(), name='tsk_assign'),
+    url(r'^skip/(?P<pk>\d+)/$', views.TaskSkipView.as_view(), name='tsk_skip'),
     url(r'^close/(?P<pk>\d+)/$', views.TaskCloseView.as_view(), name='tsk_close'),
 
     url(r"^tmp$", views.TaskTemplateListView.as_view(), name="tmp_list"),

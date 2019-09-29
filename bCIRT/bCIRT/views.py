@@ -36,12 +36,21 @@ class HomePage(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
         kwargs['invs'] = Inv.objects.filter(user=self.request.user, status=3)
         kwargs['uinvs'] = Inv.objects.exclude(status=3).exclude(status=2)
         kwargs['oinvs'] = Inv.objects.filter(status=3).exclude(user=self.request.user)
-        kwargs['tasks'] = Task.objects.filter(user=self.request.user).exclude(status=2).exclude(type=1)
-        kwargs['utasks'] = Task.objects.filter(status=1).exclude(type=1)
-        kwargs['otasks'] = Task.objects.exclude(user=self.request.user).exclude(status=2).exclude(type=1)
-        kwargs['rtasks'] = Task.objects.filter(user=self.request.user).\
-                               exclude(status=1).\
-                               exclude(status=3).\
-                               exclude(status=5).\
-                               order_by('-modified_at')[:5]
+        kwargs['tasks'] = Task.objects.filter(user=self.request.user)\
+            .exclude(status=2)\
+            .exclude(type=1)\
+            .exclude(status=4)
+        kwargs['utasks'] = Task.objects.filter(status=1)\
+            .exclude(type=1)\
+            .exclude(status=4)
+        kwargs['otasks'] = Task.objects.exclude(user=self.request.user)\
+            .exclude(status=2)\
+            .exclude(type=1)\
+            .exclude(status=4)
+        kwargs['rtasks'] = Task.objects.filter(user=self.request.user)\
+            .exclude(status=1)\
+            .exclude(status=3)\
+            .exclude(status=5)\
+            .order_by('-modified_at')[:5]
+
         return super(HomePage, self).get_context_data(**kwargs)

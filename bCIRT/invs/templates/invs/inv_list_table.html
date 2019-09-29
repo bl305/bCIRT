@@ -16,7 +16,7 @@
                 <tr>
                     <td>
                         <a class="badge" href="{% url 'invs:inv_detail' pk=inv.pk %}?next1={{ request.get_full_path|urlencode }}">
-                            {{ inv.id }}-{{ inv.invid }}
+                            {{ inv.id }}
                         </a>
                     </td>
                     <td>
@@ -26,6 +26,9 @@
                         {{ inv.priority }}
                     </td>
                     <td>
+                        {{ inv.ticketid }}
+                    </td>
+                    <td>
                         {{ inv.refid }}
                     </td>
                     <td>
@@ -33,6 +36,9 @@
                             {{ inv.description_html|safe }}
 
                         </div>
+                    </td>
+                    <td>
+                        {{ inv.invid }}
                     </td>
                     <td>
                         {% if inv.parent %}
@@ -73,6 +79,6 @@
 {% endfor %}
 {% else %}
           <tr>
-            <td colspan="12" class="text-center bg-warning">No Investigation</td>
+            <td colspan="14" class="text-center bg-warning">No Investigation</td>
           </tr>
 {% endif %}

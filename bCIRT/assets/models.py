@@ -16,6 +16,7 @@ from django.urls import reverse
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from invs.models import Inv
+from tasks.models import EvidenceAttr
 # HTML renderer
 import misaka
 # Get the user so we can use this
@@ -166,3 +167,59 @@ def new_profile(pinv, pusername=None, puserid=None, pemail=None, phost=None, pip
         description=pdescription,
     )
     return newprofile
+
+def new_create_profile_from_evattrs(pinv_pk, pevattr_pk, pev_pk, pusername):
+    # Creating a new profile based on the attribute calling this function
+    invpk = pinv_pk
+    invobj = Inv.objects.get(pk=invpk)
+    evattrpk = pevattr_pk
+    if evattrpk:
+        evattr_obj = EvidenceAttr.objects.get(pk=evattrpk)
+
+    evpk = pev_pk
+    attrpklist = list()
+    if evpk == 0:
+        attrpklist.append(evattr_obj)
+    else:
+        attributes = EvidenceAttr.objects.filter(ev__pk=evpk)
+        if attributes:
+            for attritem in attributes:
+                attrpklist.append(attritem)
+    for evattrobj in attrpklist:
+        # find attributes and run the commands on them
+        # if ev_pk is not 0, then we need to run it on all evidence attributes
+        # evattrobj = EvidenceAttr.objects.get(pk=evattrpk)
+        evattrtype = evattrobj.evattrformat.name
+        ausername = None
+        auserid = None
+        aemail = None
+        ahostname = None
+        aip = None
+        if evattrtype == "UserName":
+            ausername = evattrobj.evattrvalue
+        elif evattrtype == "UserID":
+            auserid = evattrobj.evattrvalue
+        elif evattrtype == "Email":
+            aemail = evattrobj.evattrvalue
+        elif evattrtype == "HostName":
+            ahostname = evattrobj.evattrvalue
+        elif evattrtype == "IPv4" or evattrtype == "IPv6":
+            aip = evattrobj.evattrvalue
+        else:
+            pass
+
+        # evattrvalue = evattrobj.evattrvalue
+        new_profile(
+            pinv=invobj,
+            pusername=ausername,
+            puserid=auserid,
+            pemail=aemail,
+            phost=ahostname,
+            pip=aip,
+            plocation=None,
+            pdepartment=None,
+            plocation_contact=None,
+            pcreated_by=pusername,
+            pmodified_by=pusername,
+            pdescription="",
+        )

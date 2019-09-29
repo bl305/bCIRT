@@ -333,13 +333,21 @@ class TaskForm(forms.ModelForm):
         logger.info("TaskForm - "+str(user))
         self.fields['inv'].initial = inv_pk
         if kwargs.get('instance'):
-            current_pk = kwargs.get('instance').pk
-            self.fields['parent'].queryset = Task.objects.all().exclude(pk=current_pk)
-            self.fields['inputfrom'].queryset = Task.objects.all().exclude(pk=current_pk)
-            # The actiontarget can be the task itself also, so no need to exclude
-            # self.fields['actiontarget'].queryset = Task.objects.all().exclude(pk=current_pk)
-        # else:
-        #     current_pk = 0
+            curr_obj = kwargs.get('instance')
+            current_pk = curr_obj.pk
+            if inv_pk:
+                inv_obj = Inv.objects.get(pk=inv_pk)
+            else:
+                inv_obj = curr_obj.inv
+            self.fields['parent'].queryset = inv_obj.task_inv.exclude(pk=current_pk)
+            self.fields['inputfrom'].queryset = inv_obj.task_inv.exclude(pk=current_pk)
+        elif inv_pk:
+            inv_obj = Inv.objects.get(pk=inv_pk)
+            self.fields['parent'].queryset = inv_obj.task_inv.all()
+            self.fields['inputfrom'].queryset = inv_obj.task_inv.all()
+        else:
+            self.fields['parent'].queryset = Task.objects.filter(pk=0)
+            self.fields['inputfrom'].queryset = Task.objects.filter(pk=0)
         self.fields['user'].initial = user
         self.fields['status'].initial = 3
         self.fields['priority'].initial = 1
@@ -1401,6 +1409,27 @@ class EvidenceForm(forms.ModelForm):
 
         self.fields['inv'].initial = inv_pk
         self.fields['task'].initial = task_pk
+
+###############
+        if kwargs.get('instance'):
+            logger.info("AAA")
+            curr_obj = kwargs.get('instance')
+            current_pk = curr_obj.pk
+            if inv_pk:
+                inv_obj = Inv.objects.get(pk=inv_pk)
+            else:
+                inv_obj = curr_obj.inv
+            self.fields['task'].queryset = inv_obj.task_inv.exclude(pk=current_pk)
+        elif inv_pk == '0':
+            self.fields['task'].queryset = Task.objects.all()
+        else:
+            inv_obj = Inv.objects.get(pk=inv_pk)
+            self.fields['task'].queryset = inv_obj.task_inv.all()
+        #     self.fields['task'].queryset = Task.objects.all()
+
+###############
+
+
         if EvidenceFormat.objects.get(pk=2):
             self.fields['evidenceformat'].initial = EvidenceFormat.objects.get(pk=2)
         # if kwargs.get('instance'):

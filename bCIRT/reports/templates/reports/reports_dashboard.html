@@ -26,6 +26,108 @@
     <div class="row">
         <div class="col-md-4">
             <div class="well">
+                <p><strong>Phishing Stats All</strong></p>
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Potential Loss</th>
+                            <th>Monetary Loss</th>
+                            <th>Currency</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for phish_item in phish_closed_stats %}
+                        <tr data-toggle="collapse" data-target="#myphishs{{inv_closed.pk}}" class="accordion-toggle">
+                            <td>
+                                {{ phish_item.pk }}
+                            </td>
+                            <td>
+                                {{ phish_item.potential }}
+                            </td>
+                            <td>
+                                {{ phish_item.monetary }}
+                            </td>
+                            <td>
+                                {{ phish_item.losscurrency__currencyshortname }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="well">
+                <p><strong>Phishing Stats Last 30 days</strong></p>
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Potential Loss</th>
+                            <th>Monetary Loss</th>
+                            <th>Currency</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for phish_item in phish_closed_stats_30 %}
+                        <tr data-toggle="collapse" data-target="#myphishs{{inv_closed.pk}}" class="accordion-toggle">
+                            <td>
+                                {{ phish_item.pk }}
+                            </td>
+                            <td>
+                                {{ phish_item.potential }}
+                            </td>
+                            <td>
+                                {{ phish_item.monetary }}
+                            </td>
+                            <td>
+                                {{ phish_item.losscurrency__currencyshortname }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="well">
+                <p><strong>Phishing Stats Last 90 days</strong></p>
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Potential Loss</th>
+                            <th>Monetary Loss</th>
+                            <th>Currency</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for phish_item in phish_closed_stats_90 %}
+                        <tr data-toggle="collapse" data-target="#myphishs{{inv_closed.pk}}" class="accordion-toggle">
+                            <td>
+                                {{ phish_item.pk }}
+                            </td>
+                            <td>
+                                {{ phish_item.potential }}
+                            </td>
+                            <td>
+                                {{ phish_item.monetary }}
+                            </td>
+                            <td>
+                                {{ phish_item.losscurrency__currencyshortname }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="well">
                 <p><strong>Investigations by Status All</strong></p>
                 <table class="table table-condensed" style="border-collapse:collapse;">
                     <thead>

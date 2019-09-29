@@ -11,7 +11,7 @@
 # 2019.07.29  Lendvay     1      Initial file
 # 2019.09.06  Lendvay     2      Added session security
 # **********************************************************************;
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, View
 from django.contrib.auth.mixins import (
     LoginRequiredMixin,
     PermissionRequiredMixin,
@@ -20,7 +20,17 @@ from django.contrib.auth.mixins import (
 from django.utils.timezone import timedelta
 from invs.models import Inv
 from tasks.models import Task
+from reports.forms import CustomReportForm
+from bCIRT.settings import ALLOWED_HOSTS
+from django.views.generic.edit import FormView
+from django.urls import reverse_lazy
+from pytz import timezone
+from datetime import datetime
+
 import pygal
+from django.shortcuts import redirect, reverse    # ,render, get_object_or_404
+from django.contrib import messages
+from django.utils.http import is_safe_url
 # from django.contrib.sessions.models import Session
 # from datetime import datetime, timezone
 from django.db.models.functions import Concat
@@ -28,7 +38,7 @@ from django.db.models import CharField #  , Value as V
 from django.db.models.functions.datetime import Extract
 
 from django.utils.timezone import now as timezone_now
-from django.db.models import Count, Avg, Min, Max
+from django.db.models import Count, Avg, Min, Max, Sum, F
 from bCIRT.custom_variables import LOGSEPARATOR, LOGLEVEL
 from django.shortcuts import render
 import pygal
@@ -72,6 +82,158 @@ class ReportsPage(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
             logger.info(logmsg)
         super(ReportsPage, self).__init__(*args, **kwargs)
 
+class Get_Report():
+    def __init__(self, astart=None, aend=None):
+        self.astart = astart
+        if astart is None:
+            self.astart = timezone_now() - timedelta(days=30)
+        self.aend = aend
+        if aend is None:
+            self.aend = timezone_now()
+
+    def invs_closed(self):
+        retval = Inv.objects.filter(created_at__gte=self.astart)\
+            .filter(created_at__lte=self.aend)\
+            .values('status__name')\
+            .annotate(Count('status'))\
+            .order_by('status__name')
+        return retval
+
+    def invduration(self):
+        invduration_values = Inv.objects.filter(created_at__gte=self.astart)\
+            .filter(created_at__lte=self.aend)\
+            .filter(status=2) \
+            .aggregate(Min('invduration'), Max('invduration'), Avg('invduration'))
+        invs_closed_stats_min = durationprint(invduration_values['invduration__min'])
+        invs_closed_stats_avg = durationprint(invduration_values['invduration__avg'])
+        invs_closed_stats_max = durationprint(invduration_values['invduration__max'])
+        retval = {'min': invs_closed_stats_min,
+                  'max': invs_closed_stats_max,
+                  'avg': invs_closed_stats_avg}
+        return retval
+
+    def invs_closed_tasks(self, atype=None):
+        if atype == "Manual":
+            inv_closed_tasks = Inv.objects.filter(created_at__gte=self.astart) \
+                .filter(created_at__lte=self.aend) \
+                .filter(task_inv__type=2) \
+                .values('pk') \
+                .annotate(Count('task_inv')) \
+                .order_by('pk') \
+                .aggregate(Min('task_inv__count'), Avg('task_inv__count'), Max('task_inv__count'))
+        elif atype == "Auto":
+            inv_closed_tasks = Inv.objects.filter(created_at__gte=self.astart) \
+                .filter(created_at__lte=self.aend) \
+                .filter(task_inv__type=1) \
+                .values('pk') \
+                .annotate(Count('task_inv')) \
+                .order_by('pk') \
+                .aggregate(Min('task_inv__count'), Avg('task_inv__count'), Max('task_inv__count'))
+        else:
+            inv_closed_tasks = Inv.objects.filter(created_at__gte=self.astart)\
+                .filter(created_at__lte=self.aend)\
+                .values('pk') \
+                .annotate(Count('task_inv')) \
+                .order_by('pk') \
+                .aggregate(Min('task_inv__count'), Avg('task_inv__count'), Max('task_inv__count'))
+
+        if inv_closed_tasks['task_inv__count__min']:
+            min = int(inv_closed_tasks['task_inv__count__min'])
+        else:
+            min = 0
+        if inv_closed_tasks['task_inv__count__avg']:
+            avg = round(inv_closed_tasks['task_inv__count__avg'])
+        else:
+            avg = 0
+        if inv_closed_tasks['task_inv__count__max']:
+            max = int(inv_closed_tasks['task_inv__count__max'])
+        else:
+            max = 0
+        retval = {'min': min,
+                  'max': max,
+                  'avg': avg}
+        return retval
+
+    def tasks_closed(self):
+        retval = Task.objects.filter(created_at__gte=self.astart)\
+            .filter(created_at__lte=self.aend)\
+            .values('status__name')\
+            .annotate(Count('status'))\
+            .order_by('status__name')
+        return retval
+
+    def taskduration(self, atype=None):
+        if atype == "Manual":
+            taskduration_values = Task.objects.filter(created_at__gte=self.astart)\
+                .filter(created_at__lte=self.aend)\
+                .filter(type__name='Manual') \
+                .filter(status=2) \
+                .aggregate(Min('taskduration'), Max('taskduration'), Avg('taskduration'))
+        elif atype == "Auto":
+            taskduration_values = Task.objects.filter(created_at__gte=self.astart)\
+                .filter(created_at__lte=self.aend)\
+                .filter(type__name='Auto') \
+                .filter(status=2) \
+                .aggregate(Min('taskduration'), Max('taskduration'), Avg('taskduration'))
+        else:
+            taskduration_values = Task.objects.filter(created_at__gte=self.astart)\
+                .filter(created_at__lte=self.aend)\
+                .filter(status=2) \
+                .aggregate(Min('taskduration'), Max('taskduration'), Avg('taskduration'))
+
+        tasks_closed_stats_min = durationprint(taskduration_values['taskduration__min'])
+        tasks_closed_stats_avg = durationprint(taskduration_values['taskduration__avg'])
+        tasks_closed_stats_max = durationprint(taskduration_values['taskduration__max'])
+        retval = {'min': tasks_closed_stats_min,
+                  'max': tasks_closed_stats_max,
+                  'avg': tasks_closed_stats_avg}
+        return retval
+
+    def attackvector(self):
+        retval = Inv.objects.filter(created_at__gte=self.astart)\
+            .filter(created_at__lte=self.aend)\
+            .filter(status=2)\
+            .values('attackvector__name')\
+            .annotate(Count('attackvector'))\
+            .order_by('attackvector__name')
+        return retval
+
+    def attackvector_victims(self):
+        retval = Inv.objects.filter(created_at__gte=self.astart)\
+            .filter(created_at__lte=self.aend)\
+            .filter(status=2)\
+            .values('attackvector__name')\
+            .annotate(Sum('numofvictims'))\
+            .order_by('attackvector__name')
+        return retval
+
+    def attackvector_stats(self):
+        retval = Inv.objects.filter(created_at__gte=self.astart)\
+            .filter(created_at__lte=self.aend)\
+            .filter(status=2) \
+            .values('attackvector__name','losscurrency__currencyshortname')\
+            .annotate(potential=Sum('potentialloss'), monetary=Sum('monetaryloss'))\
+            .order_by('attackvector__name') \
+            .filter(Q(potential__gt=0) | Q(monetary__gt=0))
+        return retval
+
+    def phishing_stats(self):
+        retval = Inv.objects.filter(created_at__gte=self.astart)\
+            .filter(created_at__lte=self.aend)\
+            .filter(status=2) \
+            .filter(attackvector__name='Phishing') \
+            .values('pk','losscurrency__currencyshortname')\
+            .annotate(potential=Sum('potentialloss'), monetary=Sum('monetaryloss'))\
+            .filter(Q(potential__gt=0) | Q(monetary__gt=0))
+        return retval
+
+    def tasks_closed_title(self):
+        retval = Task.objects.filter(created_at__gte=self.astart)\
+            .filter(created_at__lte=self.aend)\
+            .values('title')\
+            .annotate(Count('title'))\
+            .order_by('-title__count')
+        return retval
 
 class ReportsDashboardPage(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
     template_name = 'reports/reports_dashboard.html'
@@ -285,6 +447,29 @@ class ReportsDashboardPage(LoginRequiredMixin, PermissionRequiredMixin, Template
             .annotate(Count('attackvector'))\
             .order_by('attackvector__name')
 
+        kwargs['phish_closed_stats'] = Inv.objects.all() \
+            .filter(status=2) \
+            .filter(attackvector__name='Phishing') \
+            .values('pk','losscurrency__currencyshortname')\
+            .annotate(potential=Sum('potentialloss'), monetary=Sum('monetaryloss'))\
+            .filter(Q(potential__gt=0) | Q(monetary__gt=0))
+
+        kwargs['phish_closed_stats_30'] = Inv.objects.all() \
+            .filter(created_at__gt=timezone_now()-timedelta(days=30)) \
+            .filter(status=2) \
+            .filter(attackvector__name='Phishing') \
+            .values('pk', 'losscurrency__currencyshortname') \
+            .annotate(potential=Sum('potentialloss'), monetary=Sum('monetaryloss')) \
+            .filter(Q(potential__gt=0) | Q(monetary__gt=0))
+
+        kwargs['phish_closed_stats_90'] = Inv.objects.all() \
+            .filter(created_at__gt=timezone_now()-timedelta(days=90)) \
+            .filter(status=2) \
+            .filter(attackvector__name='Phishing') \
+            .values('pk', 'losscurrency__currencyshortname') \
+            .annotate(potential=Sum('potentialloss'), monetary=Sum('monetaryloss')) \
+            .filter(Q(potential__gt=0) | Q(monetary__gt=0))
+
         return super(ReportsDashboardPage, self).get_context_data(**kwargs)
 
 
@@ -440,3 +625,180 @@ def reports_dashboard_monthly_invsattackvector_phishingmalware():
 
     return {'graph_data_attackvectorphishingmalware': countofmalicious_data,
             'graph_table_attackvectorphishingmalware': countofmalicioustable}
+
+class ReportsDashboardCustom(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
+    template_name = 'reports/reports_custom.html'
+    permission_required = ('invs.view_inv', 'tasks.view_task')
+    form_class = CustomReportForm
+    initial = {'key': 'value'}
+    success_url = reverse_lazy('reports:rep_dashboardcustom')
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
+            logger.info(logmsg)
+        super(ReportsDashboardCustom, self).__init__(*args, **kwargs)
+
+    def get_initial(self):
+        initial = super(ReportsDashboardCustom, self).get_initial()
+        if self.request.user.is_authenticated:
+            initial.update({'name': self.request.user.get_full_name()})
+        return initial
+
+    def get(self, request, *args, **kwargs):
+        form = CustomReportForm()
+        context = {'form': form}
+        return render(request, 'reports/reports_custom.html', context)
+
+    def post(self, request, *args, **kwargs):
+        form = CustomReportForm(data=request.POST)
+        pickerformat = "%m/%d/%Y %H:%M"
+        # dateformat = "%Y-%m-%d %H:%M"
+        # datetimenowformat = "%m/%d/%Y %H:%M"
+        # newformat = "%Y-%m-%d %H:%M%z"
+        if form.is_valid():
+            # self.send_mail(form.cleaned_data)
+            utc=timezone("UTC")
+            searchstarttime=None
+            searchendtime = None
+            if form.data:
+                datatmp = form.data
+                if datatmp['starttime_0'] == '':
+                    rawstarttime = datetime.now()-timedelta(days=25000)
+                    # datastarttime = datetime.strftime(rawstarttime,newformat)
+                    starttime = utc.localize(rawstarttime)
+                    searchstarttime=starttime
+                else:
+                    datastarttime = datatmp['starttime_0']+" "+datatmp['starttime_1']
+                    starttime=datetime.strptime((datastarttime), pickerformat)
+                    starttime = utc.localize(starttime)
+                    searchstarttime = starttime
+                if datatmp['endtime_0'] == '':
+                    rawendtime = datetime.now()
+                    # dataendtime = datetime.strftime(rawendtime,newformat)
+                    endtime = utc.localize(rawendtime)
+                    searchendtime=endtime
+                else:
+                    dataendtime = datatmp['endtime_0']+" "+datatmp['endtime_1']
+                    endtime=datetime.strptime((dataendtime), pickerformat)
+                    endtime = utc.localize(endtime)
+                    searchendtime = endtime
+
+                form = CustomReportForm()
+                last0days = datetime.now()
+                last30days = datetime.now()-timedelta(days=30)
+                last90days = datetime.now()-timedelta(days=90)
+                invs_closed = Get_Report(searchstarttime, searchendtime).invs_closed()
+                invs_closed_stats = Get_Report(searchstarttime, searchendtime).invduration()
+                invs_closed_stats_min = invs_closed_stats['min']
+                invs_closed_stats_max = invs_closed_stats['max']
+                invs_closed_stats_avg = invs_closed_stats['avg']
+                invs_closed_tasks = Get_Report(searchstarttime, searchendtime).invs_closed_tasks()
+                invs_closed_tasks_min = invs_closed_tasks['min']
+                invs_closed_tasks_max = invs_closed_tasks['max']
+                invs_closed_tasks_avg = invs_closed_tasks['avg']
+                invs_closed_tasks_manual = Get_Report(searchstarttime, searchendtime).invs_closed_tasks(atype="Manual")
+                invs_closed_tasks_manual_min = invs_closed_tasks_manual['min']
+                invs_closed_tasks_manual_max = invs_closed_tasks_manual['max']
+                invs_closed_tasks_manual_avg = invs_closed_tasks_manual['avg']
+                invs_closed_tasks_auto = Get_Report(searchstarttime, searchendtime).invs_closed_tasks(atype="Auto")
+                invs_closed_tasks_auto_min = invs_closed_tasks_auto['min']
+                invs_closed_tasks_auto_max = invs_closed_tasks_auto['max']
+                invs_closed_tasks_auto_avg = invs_closed_tasks_auto['avg']
+                tasks_closed = Get_Report(searchstarttime, searchendtime).tasks_closed()
+                tasks_closed_stats = Get_Report(searchstarttime, searchendtime).taskduration()
+                tasks_closed_stats_min = tasks_closed_stats['min']
+                tasks_closed_stats_max = tasks_closed_stats['max']
+                tasks_closed_stats_avg = tasks_closed_stats['avg']
+                tasks_manual_closed_stats = Get_Report(searchstarttime, searchendtime).taskduration(atype="Manual")
+                tasks_manual_closed_stats_min = tasks_manual_closed_stats['min']
+                tasks_manual_closed_stats_max = tasks_manual_closed_stats['max']
+                tasks_manual_closed_stats_avg = tasks_manual_closed_stats['avg']
+                invs_closed_attackvector = Get_Report(searchstarttime, searchendtime).attackvector()
+                invs_closed_attackvector_victims = Get_Report(searchstarttime, searchendtime).attackvector_victims()
+                phish_closed_stats = Get_Report(searchstarttime, searchendtime).phishing_stats()
+                attackvector_stats = Get_Report(searchstarttime, searchendtime).attackvector_stats()
+                tasks_closed_title = Get_Report(searchstarttime, searchendtime).tasks_closed_title()
+                #xxx
+
+
+                context = {'form': form,
+                           'starttime': starttime,
+                           'endtime': endtime,
+                           'searchstarttime': searchstarttime,
+                           'searchendtime': searchendtime,
+                           'invs_closed': invs_closed,
+                           'invs_closed_stats_min': invs_closed_stats_min,
+                           'invs_closed_stats_max': invs_closed_stats_max,
+                           'invs_closed_stats_avg': invs_closed_stats_avg,
+                           'invs_closed_tasks_min': invs_closed_tasks_min,
+                           'invs_closed_tasks_max': invs_closed_tasks_max,
+                           'invs_closed_tasks_avg': invs_closed_tasks_avg,
+                           'invs_closed_tasks_manual_min': invs_closed_tasks_manual_min,
+                           'invs_closed_tasks_manual_max': invs_closed_tasks_manual_max,
+                           'invs_closed_tasks_manual_avg': invs_closed_tasks_manual_avg,
+                           'invs_closed_tasks_auto_min': invs_closed_tasks_auto_min,
+                           'invs_closed_tasks_auto_max': invs_closed_tasks_auto_max,
+                           'invs_closed_tasks_auto_avg': invs_closed_tasks_auto_avg,
+                           'tasks_closed': tasks_closed,
+                           'tasks_closed_stats_min': tasks_closed_stats_min,
+                           'tasks_closed_stats_max': tasks_closed_stats_max,
+                           'tasks_closed_stats_avg': tasks_closed_stats_avg,
+                           'tasks_manual_closed_stats_min': tasks_manual_closed_stats_min,
+                           'tasks_manual_closed_stats_max': tasks_manual_closed_stats_max,
+                           'tasks_manual_closed_stats_avg': tasks_manual_closed_stats_avg,
+                           'invs_closed_attackvector': invs_closed_attackvector,
+                           'invs_closed_attackvector_victims': invs_closed_attackvector_victims,
+                           'phish_closed_stats': phish_closed_stats,
+                           'attackvector_stats': attackvector_stats,
+                           'tasks_closed_title': tasks_closed_title,
+                           }
+            else:
+                context = {'':''}
+            return render(request, 'reports/reports_custom.html', context)
+        return render(request, 'reports/reports_custom.html', {'form': form})
+
+    def get_success_url(self):
+        if 'next1' in self.request.GET:
+            redirect_to = self.request.GET['next1']
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
+                return reverse(self.success_url)
+        else:
+            return reverse(self.success_url)
+        return redirect_to
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        # context = super(ReportsDashboardCustom, self).get_context_data(**kwargs)
+        kwargs['user'] = self.request.user
+
+        return super(ReportsDashboardCustom, self).get_context_data(**kwargs)
+
+    def form_valid(self, form):
+        cleandata = form.cleaned_data
+        return super(ReportsDashboardCustom, self).form_valid(form)
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            # This will redirect to the login view
+            return self.handle_no_permission()
+        elif not self.request.user.has_perm('invs.add_inv'):
+            messages.error(self.request, "No permission to add a record !!!")
+            return redirect('invs:inv_list')
+        else:
+            pass
+        # Checks pass, let http method handlers process the request
+        return super(ReportsDashboardCustom, self).dispatch(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        """This method is what injects forms with their keyword
+            arguments."""
+        # grab the current set of form #kwargs
+        kwargs = super(ReportsDashboardCustom, self).get_form_kwargs()
+        # Update the kwargs with the user_id
+        # kwargs['inv_pk'] = self.kwargs.get('inv_pk')
+        kwargs['user'] = self.request.user
+        return kwargs

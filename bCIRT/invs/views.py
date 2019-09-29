@@ -21,7 +21,8 @@ import tempfile
 from zipfile import ZipFile
 from bCIRT.settings import MEDIA_ROOT
 from shutil import copyfile
-
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 # to manage manual uploads
 # from os import path
 # from bCIRT.custom_variables import MYMEDIA_ROOT
@@ -441,13 +442,20 @@ class InvSuspiciousEmailCreateView(LoginRequiredMixin, PermissionRequiredMixin, 
         cleandata = form.cleaned_data
         auser = self.request.user.get_username()
         auser_obj = self.request.user
+        cinvid = cleandata['invid']
+        if cinvid is None or cinvid == "":
+            cinvid = 'Phishing'
         cdescription = cleandata['description']
+        if cdescription is None or cdescription == "":
+            cdescription = 'Phishing'
+        cticket = cleandata['ticket']
         creference = cleandata['reference']
         cfileref = cleandata['fileRef']
-
         inv_obj = new_inv(puser=auser_obj,
                           pparent=None,
-                          pinvid="Suspicious Email",
+                          # pinvid="Suspicious Email",
+                          pinvid=cinvid,
+                          pticketid=cticket,
                           prefid=creference,
                           pstatus=InvStatus.objects.get(name="Assigned"),
                           pphase=InvPhase.objects.get(pk=2),
@@ -607,7 +615,7 @@ class InvSuspiciousEmailCreateView(LoginRequiredMixin, PermissionRequiredMixin, 
                             first_task = playbook_obj.task_playbook.last()
                         # add evidence to the first task
                         filetouploadpath = os.path.join(destoutdirpath, target.name)
-                        print("filetouploadpath:%s" % (filetouploadpath))
+                        # print("filetouploadpath:%s" % (filetouploadpath))
                         filetoupload = open(filetouploadpath)
 
                         evidence_obj = new_evidence(

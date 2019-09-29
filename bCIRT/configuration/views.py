@@ -16,6 +16,8 @@ from django.contrib.auth.mixins import (
     LoginRequiredMixin,
     PermissionRequiredMixin,
 )
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 from .models import UpdatePackage, ConnectionItem, ConnectionItemField
 from django.views import generic
 from django.utils.http import is_safe_url
@@ -93,6 +95,7 @@ class UpdatePackageListView(LoginRequiredMixin, PermissionRequiredMixin, ListVie
         return super(UpdatePackageListView, self).get_context_data(**kwargs)
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class UpdatePackageCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     model = UpdatePackage
     form_class = UpdatePackageForm
@@ -180,6 +183,7 @@ class UpdatePackageDetailView(LoginRequiredMixin, PermissionRequiredMixin, Detai
         return super(UpdatePackageDetailView, self).dispatch(request, *args, **kwargs)
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class UpdatePackageUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     login_url = '/'
     form_class = UpdatePackageForm

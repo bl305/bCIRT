@@ -88,6 +88,9 @@
                         {% endif %}
                     </td>
                     <td>
+                        {{ evidenceattr.attr_reputation }}
+                    </td>
+                    <td>
 <div style="max-width: 637px;overflow: auto;text-overflow: word-wrap;overflow-wrap: break-word;">
                         {{ evidenceattr.evattrvalue }}
 </div>
@@ -111,6 +114,6 @@
 {% endfor %}
 {% else %}
           <tr>
-            <td colspan="9" class="text-center bg-warning">No Evidences</td>
+            <td colspan="10" class="text-center bg-warning">No Evidences</td>
           </tr>
 {% endif %}
