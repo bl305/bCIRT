@@ -1,0 +1,45 @@
+{% extends "tasks/task_base.html" %}
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : tasks/task_template.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.10.16
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.10.16  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+{% block taskslist_active %}active{% endblock taskslist_active%}
+
+{% block pretasks %}
+    {% block task_alert %}{% endblock task_alert %}
+{% endblock %}
+
+{% block tasks_content %}
+
+    <div class="row w-100">
+        <div class="col-sm-12">
+            <div class="card card-primary w-100">
+                <div class="card-header text-primary">
+                    <div class="row w-100">
+                        <div class="card-title w-100">
+                            <div class="container mw-100 d-inline-flex justify-content-start flex-row align-items-center align-content-center flex-nowrap">
+                                    {% block task_buttons %}{% endblock task_buttons %}
+                                <div class="container d-inline-flex flex-row align-items-center justify-content-center align-content-center flex-nowrap">
+                                    <p class="h4">&nbsp;{% block task_title %}{% endblock task_title %}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body inv-card-body">
+                    {% block task_body %}{% endblock task_body %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock tasks_content %}

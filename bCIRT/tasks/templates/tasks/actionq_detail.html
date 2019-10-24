@@ -1,4 +1,4 @@
-{% extends "tasks/action_base.html" %}
+{% extends "tasks/action_template.html" %}
 <!--
 # **********************************************************************;
 # Project           : bCIRT
@@ -12,44 +12,25 @@
 # 2019.07.29  Lendvay     1      Initial file
 # **********************************************************************;
 -->
+{% block action_alert %}
+{% endblock action_alert %}
 
-{% block actionslist_active %}active{% endblock actionslist_active %}
+{% block action_buttons %}
+{% endblock action_buttons %}
 
-{% block preactions %}
-		{% if user.is_authenticated %}
+{% block action_title %}
+                        &nbsp;Action Results
+{% endblock action_title %}
 
-	    {% endif %}
-{% endblock %}
-
-{% block actions_content %}
-
-    <div class="row">
-        <!-- Left Investigation Info -->
-        <div class="col-sm-12 col-md-12">
-            <div class="panel panel-primary">
-                <header class = "panel-heading">
-                    <div class="panel-title text-center">
-                        <div class="btn-group inline pull-left">
-                        </div>
-                        <strong>&nbsp;Action Results</strong>
-                        <div class="btn-group inline ">
-                        </div>
-                    </div>
-                </header>
-                <div class="panel-body inv-panel-body" id="xxx">
-                    <table class="table" id="investigations-invh">
+{% block action_body %}
+                    <table class="table table-sm" id="investigations-invh">
                         <tbody>
                             {% include 'tasks/actionq_detail_table.html' %}
                         </tbody>
                     </table>
-                        <a href="javascript:history.go(-1)" class="btn btn-primary pull-right">
-                            <span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>
+                        <a href="javascript:history.go(-1)"
+                           class="btn btn-primary btn-sm">
+                            <span class="fas fa-arrow-left" aria-hidden="true"></span>
                             <span>Back</span>
                         </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-{% endblock %}
+{% endblock action_body %}

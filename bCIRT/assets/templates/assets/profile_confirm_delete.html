@@ -1,4 +1,4 @@
-{% extends "assets/asset_base.html" %}
+{% extends "assets/asset_template.html" %}
 <!--
 # **********************************************************************;
 # Project           : bCIRT
@@ -12,7 +12,7 @@
 # 2019.07.29  Lendvay     1      Initial file
 # **********************************************************************;
 -->
-{% block assets_content %}
+{% block asset_alert %}
 <div class="container-fluid investigations-container">
     <div>
         <form action="" method="post">
@@ -26,16 +26,17 @@
             </div>
         </form>
     </div>
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="panel panel-primary">
-                <div class = "panel-heading">
-                    <div class="panel-title text-center" >
-                        <strong> Delete Profile # {{ profile.pk }}</strong>
-                    </div>
-                </div>
-                <div class="panel-body inv-panel-body">
-                    <table class="table table-hover table-striped table-condensed" id="investigations-inve">
+{% endblock asset_alert %}
+
+{% block asset_buttons %}
+{% endblock asset_buttons %}
+
+{% block asset_title %}
+                        Delete Profile # {{ profile.pk }}
+{% endblock asset_title %}
+
+{% block asset_body %}
+                    <table class="table table-sm table-hover table-striped table-condensed" id="investigations-inve">
                         <thead>
                             <tr class="mylist-header">
                                 <th>ProfileID</th>
@@ -60,10 +61,4 @@
                         </tbody>
                     </table>
                 </div>
-            </div>
-       </div>
-    </div>
-</div>
-
-
-{% endblock assets_content %}
+{% endblock asset_body %}

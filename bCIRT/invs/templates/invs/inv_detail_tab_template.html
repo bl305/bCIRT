@@ -1,0 +1,32 @@
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : inv/inv_detail_tab_template.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.10.16
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.10.16  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+    <div class="row w-100">
+        <div class="card card-primary w-100">
+            <div class="card-header text-primary">
+                <div class="row w-100">
+                    <div class="card-title w-100">
+                        <div class="container mw-100 d-inline-flex justify-content-start flex-row align-items-center align-content-center flex-nowrap">
+                            {% block inv_buttons %}{% endblock inv_buttons %}
+                            <div class="container d-inline-flex flex-row align-items-center justify-content-center align-content-center flex-nowrap">
+                                <p class="h4">&nbsp;{% block inv_title %}{% endblock inv_title %}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body inv-card-body">
+                    {% block inv_body %}{% endblock inv_body %}
+            </div>
+        </div>
+    </div>

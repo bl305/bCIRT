@@ -11,6 +11,7 @@
 # 2019.07.29  Lendvay     1      Initial file
 # **********************************************************************;
 from django import forms
+from invs.widgets import JQueryDateTimePickerInput
 # Get the user so we can use this
 from django.contrib.auth import get_user_model
 import logging
@@ -31,33 +32,55 @@ class CustomReportForm(forms.Form):
     #     'class': 'datepicker'
     # }))
 
-    starttime = forms.SplitDateTimeField(
+    # starttime = forms.SplitDateTimeField(
+    #     required=False,
+    #     label='StartTime',
+    #     input_date_formats=['%m/%d/%Y'],
+    #     input_time_formats=['%H:%M'],
+    #     widget=SplitDateTimeWidget(
+    #         date_format='%m/%d/%Y',
+    #         time_format='%H:%M',
+    #         attrs={
+    #             'class': 'form-control',
+    #             'style': 'width:100px',
+    #         }
+    #     )
+    # )
+    starttime = forms.DateTimeField(
+        input_formats=['%Y-%m-%d %H:%M:%S'],
         required=False,
-        label='StartTime',
-        input_date_formats=['%m/%d/%Y'],
-        input_time_formats=['%H:%M'],
-        widget=SplitDateTimeWidget(
-            date_format='%m/%d/%Y',
-            time_format='%H:%M',
-            attrs={
+        widget=JQueryDateTimePickerInput(
+            attrs = {
                 'class': 'form-control',
-                'style': 'width:100px',
+                'style': 'width:200px',
             }
         )
     )
-    endtime = forms.SplitDateTimeField(
+
+    # endtime = forms.SplitDateTimeField(
+    #     required=False,
+    #     label='Endtime',
+    #     input_date_formats=['%m/%d/%Y'],
+    #     input_time_formats=['%H:%M'],
+    #     widget=SplitDateTimeWidget(
+    #         date_format='%m/%d/%Y',
+    #         time_format='%H:%M',
+    #         attrs={
+    #             'class': 'form-control',
+    #             'style': 'width:100px',
+    #         }
+    #     )
+    # )
+    endtime = forms.DateTimeField(
+        input_formats=['%Y-%m-%d %H:%M:%S'],
         required=False,
-        label='Endtime',
-        input_date_formats=['%m/%d/%Y'],
-        input_time_formats=['%H:%M'],
-        widget=SplitDateTimeWidget(
-            date_format='%m/%d/%Y',
-            time_format='%H:%M',
-            attrs={
+        widget=JQueryDateTimePickerInput(
+            attrs = {
                 'class': 'form-control',
-                'style': 'width:100px',
+                'style': 'width:200px',
             }
         )
     )
+
     #     name = forms.CharField()
     #     message = forms.CharField(widget=forms.Textarea)

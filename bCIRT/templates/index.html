@@ -14,359 +14,385 @@
 -->
 
 {% block content %}
+        <div class="container mw-100 small">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card bg-light mb-3">
+                        <div class="card-header">My Investigations ({{ invs.count }})</div>
+                            <div class="card-body">
+                                <table class="table table-sm table-condensed fittable" style="border-collapse:collapse;">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Attack vector</th>
+                                            <th>Ticket</th>
+                                            <th>Status</th>
+                                            <th>Modified</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for inv in invs %}
+                                        <tr data-toggle="collapse" data-target="#myinvs{{inv.pk}}" class="accordion-toggle">
+                                            <td>
+                                                <a href="{% url 'invs:inv_detail' pk=inv.pk %}"><h6><span class="badge badge-pill badge-secondary">{{inv.id}}</span></h6></a>
+                                            </td>
+                                            <td>
+                                                {{ inv.attackvector.name }}
+                                            </td>
+                                            <td>
+                                                {{ inv.ticketid }}
+                                            </td>
+                                            <td>
+                                                {{ inv.status }}
+                                            </td>
+                                            <td>
+                                                {{ inv.modified_at|date:"Y/m/d H:i:s" }}
+                                            </td>
+                                        </tr>
+                                        <tr >
+                                            <td colspan="5" class="hiddenRow">
+                                                <div class="accordian-body collapse" id="myinvs{{inv.pk}}">
+                                                    <div class="invdescription2" style="max-width:25vw">
+                                                    {{ inv.description }}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-light mb-3">
+                        <div class="card-header">My Manual Tasks ({{ tasks.count }})</div>
+                        <div class="card-body">
+                            <table class="table table-sm table-condensed fittable" style="border-collapse:collapse;">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Ticket</th>
+                                        <th>Title</th>
+                                        <th>Modified</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for task in tasks %}
+                                    <tr data-toggle="collapse" data-target="#mytasks{{task.pk}}" class="accordion-toggle">
+                                        <td>
+                                            <a href="{% url 'tasks:tsk_detail' pk=task.pk %}"><h6><span class="badge badge-pill badge-secondary">{{ task.pk }}</span></h6></a>
+                                        </td>
+                                        <td>
+                                            {{ task.inv.ticketid }}
+                                        </td>
+                                        <td>
+                                            {{ task.title }}
+                                        </td>
+                                        <td>
+                                            {{ task.modified_at|date:"Y/m/d H:i:s" }}
+                                        </td>
+                                    </tr>
+                                    <tr >
+                                        <td colspan="3" class="hiddenRow">
+                                            <div class="accordian-body collapse" id="mytasks{{task.pk}}">
+                                                <div class="invdescription2" style="max-width:25vw">
+                                                {{ task.title }}
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-light mb-3">
+                        <div class="card-header">Recently Closed tasks</div>
+                        <div class="card-body">
+                            <table class="table table-sm table-condensed fittable" style="border-collapse:collapse;">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Ticket</th>
+                                        <th>Title</th>
+                                        <th>Modified</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for task in rtasks %}
+                                    <tr data-toggle="collapse" data-target="#mytasks{{task.pk}}" class="accordion-toggle">
+                                        <td>
+                                            <a href="{% url 'tasks:tsk_detail' pk=task.pk %}"><h6><span class="badge badge-pill badge-secondary">{{ task.pk }}</span></h6></a>
+                                        </td>
+                                        <td>
+                                            {{ task.inv.ticketid }}
+                                        </td>
+                                        <td>
+                                            {{ task.title }}
+                                        </td>
+                                        <td>
+                                            {{ task.modified_at|date:"Y/m/d H:i:s" }}
+                                        </td>
+                                    </tr>
+                                    <tr >
+                                        <td colspan="3" class="hiddenRow">
+                                            <div class="accordian-body collapse" id="myrtasks{{task.pk}}">
+                                                <div class="invdescription2" style="max-width:25vw">
+                                                {{ task.title }}
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+<!--            ROW 2-->
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card bg-light mb-3">
+                        <div class="card-header">Unassigned Investigations ({{ uinvs.count }})</div>
+                        <div class="card-body">
+                            <table class="table table-sm table-condensed fittable" style="border-collapse:collapse;">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Attack vector</th>
+                                        <th>Ticket</th>
+                                        <th>Status</th>
+                                        <th>Modified</th>
+                                        <th>Assign</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for uinv in uinvs %}
+                                    <tr data-toggle="collapse" data-target="#myuinvs{{uinv.pk}}" class="accordion-toggle">
+                                        <td>
+                                            <a href="{% url 'invs:inv_detail' pk=uinv.pk %}"><h6><span class="badge badge-pill badge-secondary">{{uinv.id}}-{{ uinv.invid }}</span></h6></a>
+                                        </td>
+                                        <td>
+                                            {{ uinv.attackvector.name }}
+                                        </td>
+                                        <td>
+                                            {{ uinv.ticketid }}
+                                        </td>
+                                        <td>
+                                            {{ uinv.status }}
+                                        </td>
+                                        <td>
+                                            {{ uinv.modified_at|date:"Y/m/d H:i:s" }}
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'invs:inv_assign' pk=uinv.pk %}?next1={{ request.get_full_path|urlencode }}" title="Assign"
+                                               class="btn btn-outline-primary btn-sm">
+                                                <span class="icon-label">Assign</span>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <tr >
+                                        <td colspan="6" class="hiddenRow">
+                                            <div class="accordian-body collapse" id="myuinvs{{uinv.pk}}">
+                                                <div class="invdescription2" style="max-width:25vw">
+                                                {{ uinv.description }}
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-light mb-3">
+                        <div class="card-header">Unassigned Manual Tasks ({{ utasks.count }})</div>
+                        <div class="card-body">
+                            <table class="table table-sm table-condensed fittable" style="border-collapse:collapse;">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Title</th>
+                                        <th>Modified</th>
+                                        <th>Assign</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for utask in utasks %}
+                                    <tr data-toggle="collapse" data-target="#myutasks{{utask.pk}}" class="accordion-toggle">
+                                        <td>
+                                            <a href="{% url 'tasks:tsk_detail' pk=utask.pk %}"><h6><span class="badge badge-pill badge-secondary">{{ utask.pk }}</span></h6></a>
+                                        </td>
+                                        <td>
+                                            {{ utask.title }}
+                                        </td>
+                                        <td>
+                                            {{ utask.modified_at|date:"Y/m/d H:i:s" }}
+                                        </td>
+                                        <td>
 
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md-4">
-            <div class="well">
-                <p><strong>My Investigations ({{ invs.count }})</strong></p>
-                <table class="table table-condensed" style="border-collapse:collapse;">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Attackvector</th>
-                            <th>Ticket</th>
-                            <th>Status</th>
-                            <th>Modified</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for inv in invs %}
-                        <tr data-toggle="collapse" data-target="#myinvs{{inv.pk}}" class="accordion-toggle">
-                            <td>
-                                <a class="badge" href="{% url 'invs:inv_detail' pk=inv.pk %}">{{inv.id}}</a>
-                            </td>
-                            <td>
-                                {{ inv.attackvector.name }}
-                            </td>
-                            <td>
-                                {{ inv.ticketid }}
-                            </td>
-                            <td>
-                                {{ inv.status }}
-                            </td>
-                            <td>
-                                {{ inv.modified_at|date:"Y/m/d H:i:s" }}
-                            </td>
-                        </tr>
-                        <tr >
-                            <td colspan="5" class="hiddenRow">
-                                <div class="accordian-body collapse" id="myinvs{{inv.pk}}">
-                                    <div class="invdescription2" style="max-width:25vw">
-                                    {{ inv.description }}
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="well">
-                <p><strong>My Manual Tasks ({{ tasks.count }})</strong></p>
-                <table class="table table-condensed" style="border-collapse:collapse;">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Ticket</th>
-                            <th>Title</th>
-                            <th>Modified</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for task in tasks %}
-                        <tr data-toggle="collapse" data-target="#mytasks{{task.pk}}" class="accordion-toggle">
-                            <td>
-                                <a class="badge" href="{% url 'tasks:tsk_detail' pk=task.pk %}">{{ task.pk }}</a>
-                            </td>
-                            <td>
-                                {{ task.inv.ticketid }}
-                            </td>
-                            <td>
-                                {{ task.title }}
-                            </td>
-                            <td>
-                                {{ task.modified_at|date:"Y/m/d H:i:s" }}
-                            </td>
-                        </tr>
-                        <tr >
-                            <td colspan="3" class="hiddenRow">
-                                <div class="accordian-body collapse" id="mytasks{{task.pk}}">
-                                    <div class="invdescription2" style="max-width:25vw">
-                                    {{ task.title }}
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="well">
-                <p><strong>Recently Closed Tasks</strong></p>
-                <table class="table table-condensed" style="border-collapse:collapse;">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Ticket</th>
-                            <th>Title</th>
-                            <th>Modified</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for task in rtasks %}
-                        <tr data-toggle="collapse" data-target="#mytasks{{task.pk}}" class="accordion-toggle">
-                            <td>
-                                <a class="badge" href="{% url 'tasks:tsk_detail' pk=task.pk %}">{{ task.pk }}</a>
-                            </td>
-                            <td>
-                                {{ task.inv.ticketid }}
-                            </td>
-                            <td>
-                                {{ task.title }}
-                            </td>
-                            <td>
-                                {{ task.modified_at|date:"Y/m/d H:i:s" }}
-                            </td>
-                        </tr>
-                        <tr >
-                            <td colspan="3" class="hiddenRow">
-                                <div class="accordian-body collapse" id="myrtasks{{task.pk}}">
-                                    <div class="invdescription2" style="max-width:25vw">
-                                    {{ task.title }}
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-4">
-            <div class="well">
-                <p><strong>Unassigned Investigations ({{ uinvs.count }})</strong></p>
-                <table class="table table-condensed" style="border-collapse:collapse;">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Attackvector</th>
-                            <th>Ticket</th>
-                            <th>Status</th>
-                            <th>Modified</th>
-                            <th>Assign</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for uinv in uinvs %}
-                        <tr data-toggle="collapse" data-target="#myuinvs{{uinv.pk}}" class="accordion-toggle">
-                            <td>
-                                <a class="badge" href="{% url 'invs:inv_detail' pk=uinv.pk %}">{{uinv.id}}-{{ uinv.invid }}</a>
-                            </td>
-                            <td>
-                                {{ uinv.attackvector.name }}
-                            </td>
-                            <td>
-                                {{ uinv.ticketid }}
-                            </td>
-                            <td>
-                                {{ uinv.status }}
-                            </td>
-                            <td>
-                                {{ uinv.modified_at|date:"Y/m/d H:i:s" }}
-                            </td>
-                            <td>
-                                <a href="{% url 'invs:inv_assign' pk=uinv.pk %}?next1={{ request.get_full_path|urlencode }}" title="assign"
-                                   class="btn btn-default btn-xs">
-                                    <span class="icon-label">Assign</span>
-                                </a>
-                            </td>
-                        </tr>
-                        <tr >
-                            <td colspan="6" class="hiddenRow">
-                                <div class="accordian-body collapse" id="myuinvs{{uinv.pk}}">
-                                    <div class="invdescription2" style="max-width:25vw">
-                                    {{ uinv.description }}
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="well">
-                <p><strong>Unassigned Manual Tasks ({{ utasks.count }})</strong></p>
-                <table class="table table-condensed" style="border-collapse:collapse;">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Title</th>
-                            <th>Modified</th>
-                            <th>Assign</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for utask in utasks %}
-                        <tr data-toggle="collapse" data-target="#myutasks{{utask.pk}}" class="accordion-toggle">
-                            <td>
-                                <a class="badge" href="{% url 'tasks:tsk_detail' pk=utask.pk %}">{{ utask.pk }}</a>
-                            </td>
-                            <td>
-                                {{ utask.title }}
-                            </td>
-                            <td>
-                                {{ utask.modified_at|date:"Y/m/d H:i:s" }}
-                            </td>
-                            <td>
-                                <a href="{% url 'tasks:tsk_assign' pk=utask.pk %}?next1={{ request.get_full_path|urlencode }}" title="assign"
-                                   class="btn btn-default btn-xs">
-                                    <span class="icon-label">Assign</span>
-                                </a>
-                            </td>
-                        </tr>
-                        <tr >
-                            <td colspan="4" class="hiddenRow">
-                                <div class="accordian-body collapse" id="myutasks{{utask.pk}}">
-                                    <div class="invdescription2" style="max-width:25vw">
-                                    {{ utask.title }}
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="well">
-                <p><strong>TBD</strong></p>
-            </div>		</div>
-    </div>
-    <div class="row">
-        <div class="col-md-4">
-            <div class="well">
-                <p><strong>Other Investigations ({{ oinvs.count }})</strong></p>
-                <table class="table table-condensed" style="border-collapse:collapse;">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Attackvector</th>
-                            <th>Ticket</th>
-                            <th>Status</th>
-                            <th>Owner</th>
-                            <th>Modified</th>
-                            <th>Assign</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for oinv in oinvs %}
-                        <tr data-toggle="collapse" data-target="#myoinvs{{oinv.pk}}" class="accordion-toggle">
-                            <td>
-                                <a class="badge" href="{% url 'invs:inv_detail' pk=oinv.pk %}">{{ oinv.id }}</a>
-                            </td>
-                            <td>
-                                {{ oinv.attackvector.name }}
-                            </td>
-                            <td>
-                                {{ oinv.ticketid }}
-                            </td>
-                            <td>
-                                {{ oinv.status }}
-                            </td>
-                            <td>
-                                {% if oinv.user %}
-                                    {{ oinv.user }}
-                                {% else %}
-                                    -
-                                {% endif %}
-                            </td>
-                            <td>
-                                {{ oinv.modified_at|date:"Y/m/d H:i:s" }}
-                            </td>
-                            <td>
-                                <a href="{% url 'invs:inv_assign' pk=oinv.pk %}?next1={{ request.get_full_path|urlencode }}" title="assign"
-                                   class="btn btn-default btn-xs">
-                                    <span class="icon-label">Assign</span>
-                                </a>
-                            </td>
+                                            <a href="{% url 'tasks:tsk_assign' pk=utask.pk %}?next1={{ request.get_full_path|urlencode }}" title="Assign"
+                                               class="btn btn-outline-primary btn-sm">
+                                                <span class="icon-label">Assign</span>
+                                            </a>
 
-                        </tr>
-                        <tr >
-                            <td colspan="7" class="hiddenRow">
-                                <div class="accordian-body collapse" id="myoinvs{{oinv.pk}}">
-                                    <div class="invdescription2" style="max-width:25vw">
-                                    {{ oinv.description }}
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                                        </td>
+                                    </tr>
+                                    <tr >
+                                        <td colspan="4" class="hiddenRow">
+                                            <div class="accordian-body collapse" id="myutasks{{utask.pk}}">
+                                                <div class="invdescription2" style="max-width:25vw">
+                                                {{ utask.title }}
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>                            
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-light mb-3">
+                        <div class="card-header">TBD</div>
+                        <div class="card-body">
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="col-md-4">
-            <div class="well">
-                <p><strong>Other Manual Tasks ({{ otasks.count }})</strong></p>
-                <table class="table table-condensed" style="border-collapse:collapse;">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Owner</th>
-                            <th>Title</th>
-                            <th>Modified</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for otask in otasks %}
-                        <tr data-toggle="collapse" data-target="#myotasks{{otask.pk}}" class="accordion-toggle">
-                            <td>
-                                <a class="badge" href="{% url 'tasks:tsk_detail' pk=otask.pk %}">{{ otask.pk }}</a>
-                            </td>
-                            <td>
-                                {% if otask.user %}
-                                    {{ otask.user }}
-                                {% else %}
-                                    -
-                                {% endif %}
-                            </td>
-                            <td>
-                                {{ otask.title }}
-                            </td>
-                            <td>
-                                {{ otask.modified_at|date:"Y/m/d H:i:s" }}
-                            </td>
-                        </tr>
-                        <tr >
-                            <td colspan="3" class="hiddenRow">
-                                <div class="accordian-body collapse" id="myotasks{{otask.pk}}">
-                                    <div class="invdescription2" style="max-width:25vw">
-                                    {{ otask.title }}
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card bg-light mb-3">
+                        <div class="card-header">Other Investigations ({{ oinvs.count }})</div>
+                        <div class="card-body">
+                        <table class="table table-sm table-condensed fittable" style="border-collapse:collapse;">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Attack vector</th>
+                                    <th>Ticket</th>
+                                    <th>Status</th>
+                                    <th>Owner</th>
+                                    <th>Modified</th>
+                                    <th>Assign</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for oinv in oinvs %}
+                                <tr data-toggle="collapse" data-target="#myoinvs{{oinv.pk}}" class="accordion-toggle">
+                                    <td>
+                                        <a href="{% url 'invs:inv_detail' pk=oinv.pk %}"><h6><span class="badge badge-pill badge-secondary">{{ oinv.id }}</span></h6></a>
+                                    </td>
+                                    <td>
+                                        {{ oinv.attackvector.name }}
+                                    </td>
+                                    <td>
+                                        {{ oinv.ticketid }}
+                                    </td>
+                                    <td>
+                                        {{ oinv.status }}
+                                    </td>
+                                    <td>
+                                        {% if oinv.user %}
+                                            {{ oinv.user }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {{ oinv.modified_at|date:"Y/m/d H:i:s" }}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'invs:inv_assign' pk=oinv.pk %}?next1={{ request.get_full_path|urlencode }}" title="Assign"
+                                           class="btn btn-outline-primary btn-sm">
+                                            <span class="icon-label">Assign</span>
+                                        </a>
+                                    </td>
+        
+                                </tr>
+                                <tr >
+                                    <td colspan="7" class="hiddenRow">
+                                        <div class="accordian-body collapse" id="myoinvs{{oinv.pk}}">
+                                            <div class="invdescription2" style="max-width:25vw">
+                                            {{ oinv.description }}
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>                            
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-light mb-3">
+                        <div class="card-header">Other Manual Tasks ({{ otasks.count }})</div>
+                        <div class="card-body">
+                            <table class="table table-sm table-condensed fittable" style="border-collapse:collapse;">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Owner</th>
+                                        <th>Title</th>
+                                        <th>Modified</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for otask in otasks %}
+                                    <tr data-toggle="collapse" data-target="#myotasks{{otask.pk}}" class="accordion-toggle">
+                                        <td>
+                                            <a href="{% url 'tasks:tsk_detail' pk=otask.pk %}"><h6><span class="badge badge-pill badge-secondary">{{ otask.pk }}</span></h6></a>
+                                        </td>
+                                        <td>
+                                            {% if otask.user %}
+                                                {{ otask.user }}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {{ otask.title }}
+                                        </td>
+                                        <td>
+                                            {{ otask.modified_at|date:"Y/m/d H:i:s" }}
+                                        </td>
+                                    </tr>
+                                    <tr >
+                                        <td colspan="3" class="hiddenRow">
+                                            <div class="accordian-body collapse" id="myotasks{{otask.pk}}">
+                                                <div class="invdescription2" style="max-width:25vw">
+                                                {{ otask.title }}
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>                            
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-light mb-3">
+                        <div class="card-header">TBD</div>
+                        <div class="card-body">
+                        </div>
+                    </div>
+                </div>
             </div>
+
+
+
+
         </div>
-        <div class="col-md-4">
-            <div class="well">
-                <p><strong>TBD</strong></p>
-            </div>
-        </div>
-    </div>
-</div>
+
 
 {% endblock %}

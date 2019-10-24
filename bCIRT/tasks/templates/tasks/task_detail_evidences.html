@@ -1,0 +1,47 @@
+{% extends "tasks/task_template_nonav.html" %}
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : tasks/task_detail_evidences.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.10.19
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.10.19  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+
+{% block task_alert %}
+
+{% endblock task_alert %}
+
+{% block task_buttons %}
+{% endblock task_buttons %}
+
+{% block task_title %}
+                                Evidences |  {{ task.evidence_task.count }} item{{ task.evidence_task.count|pluralize }} | {{ user }} at {% now "Y/m/d H:i:s" %} (UTC)
+{% endblock task_title %}
+
+{% block task_body %}
+                        <table class="table table-sm table-hover table-striped table-condensed" id="investigations-inve"
+                        >
+                            <thead>
+                                <tr class="mylist-header">
+                                    <th>EvidenceID</th>
+                                    <th>Created on</th>
+                                    <th>Created by</th>
+                                    <th>Modified on</th>
+                                    <th>Modified by</th>
+                                    <th>Attachment</th>
+                                    <th>Source</th>
+                                    <th>Attribute</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% include 'tasks/task_detail_evidence_table.html' %}
+                            </tbody>
+                        </table>
+
+{% endblock task_body %}

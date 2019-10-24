@@ -1,4 +1,4 @@
-{% extends "configuration/configuration_base.html" %}
+{% extends "configuration/configuration_template.html" %}
 <!--
 # **********************************************************************;
 # Project           : bCIRT
@@ -13,20 +13,17 @@
 # **********************************************************************;
 -->
 
-{% block preconfiguration %}
-<div class="container">
-	<div class="col-md-12">
-		<div class="content">
-			<h2>Logging settings</h2>
-			<p>Welcome to the Logging Page!</p>
-		</div>
-	</div>
-{% endblock %}
-{% block configuration_content %}
-	<div class="col-md-12">
-		<div class="list-group">
-			Contents
-		</div>
-	</div>
-</div>
-{% endblock %}
+{% block configuration_alert %}
+{% endblock configuration_alert %}
+
+{% block configuration_buttons %}
+{% endblock configuration_buttons %}
+
+{% block configuration_title %}
+			Logging settings
+{% endblock configuration_title %}
+
+{% block configuration_body %}
+			Welcome to the Logging Page!
+{% endblock configuration_body %}
+

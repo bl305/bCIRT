@@ -19,10 +19,11 @@
 
 {% block preinvs %}
 
-{% endblock %}
+{% endblock preinvs %}
 
 {% block invs_content %}
   <!--<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>-->
+
 
 
   <script>
@@ -42,6 +43,7 @@
         try {
             // getter: Fetch previous value
             oldIndex = dataStore.getItem(index);
+//                alert("tabs-"+oldIndex);
         } catch(e) {}
 
         $( "#tabs" ).tabs({
@@ -49,18 +51,23 @@
             activate: function(event, ui) {
                 //  Get future value
                 var newIndex = ui.newTab.parent().children().index(ui.newTab);
+//                alert("tabs-"+newIndex);
                 //  Set future value
                 try {
                     dataStore.setItem( index, newIndex );
                 } catch(e) {}
+
             }
         });
+
     });
+
+      $( function() {
+        $("#tabs-1").live('click', function() {
+            alert("test");
+        });
+        });
   </script>
-
-
-     <div class="container-fluid">
-            <div class="row">
 
 
 
@@ -107,8 +114,8 @@
 }
 </style>
 
-<button onclick="topFunction()" id="myBtnTop" title="Go to top"><span class="glyphicon glyphicon-arrow-up"></span></button>
-<button onclick="bottomFunction()" id="myBtnBottom" title="Go to bottom"><span class="glyphicon glyphicon-arrow-down"></span></button>
+<button onclick="topFunction()" id="myBtnTop" title="Go to top"><i class="fas fa-arrow-up"></i></button>
+<button onclick="bottomFunction()" id="myBtnBottom" title="Go to bottom"><i class="fas fa-arrow-down"></i></button>
 
 <script>
 //Get the button:
@@ -116,64 +123,62 @@ mybuttontop = document.getElementById("myBtnTop");
 mybuttonbottom = document.getElementById("myBtnBottom");
 </script>
 
-
-
-
-                    <div id="tabs">
-                        <ul class="nav navbar-nav" >
-                            <li>
-                                <a class="nav-link text-danger" href="#tabs-1">
-                                    <span><strong>Details</strong></span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-danger" href="#tabs-2">
-                                    <span><strong>Profiles({{ inv.profile_inv.all.count }})</strong></span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-danger" href="#tabs-3">
-                                    <span><strong>Playbooks({{ inv.playbook_inv.all.count }})</strong></span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-danger" href="#tabs-4">
-                                    <span><strong>Tasks({{ inv.task_inv.all.count }}/{{inv.opentasklistprint}})</strong></span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-danger" href="#tabs-5">
-                                    <span><strong>Evidences({{ inv.evidence_inv.count }})</strong></span>
-                                </a>
-                            </li>
-                            <li>
-                                <span class="navbar-text" style="color: black;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                    <strong>Investigation: #{{ inv.id }} - {{ inv.invid }}</strong>
-                                </span>
-                            </li>
-                        </ul>
-
-                          <div id="tabs-1">
-                            {% include 'invs/inv_detail_tab_detail.html' %}
-                            {% include 'invs/inv_detail_tab_investigations.html' %}
-                          </div>
-                          <div id="tabs-2">
-                            {% include 'invs/inv_detail_tab_profile.html' %}
-                          </div>
-                          <div id="tabs-3">
-                              {% include 'invs/inv_detail_tab_playbooks.html' %}
-                          </div>
-                          <div id="tabs-4">
-                            {% include 'invs/inv_detail_tab_tasks.html' %}
-                          </div>
-                          <div id="tabs-5">
-                            {% include 'invs/inv_detail_tab_evidences.html' %}
-                          </div>
-                    </div>
-
-
+<div class="row w-100">
+    <div class="col-sm-12 mw-100">
+        <div align="center">
+            <div id="tabs">
+                <ul class="nav nav-pills">
+                    <li class="nav-item">
+                        <a class="nav-link btn-outline-secondary" href="#tabs-1" data-toggle="tab">
+                            <span><strong>Details</strong></span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link  btn-outline-secondary" href="#tabs-2" data-toggle="tab">
+                            <span><strong>Profiles({{ inv.profile_inv.all.count }})</strong></span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn-outline-secondary" href="#tabs-3" data-toggle="tab">
+                            <span><strong>Playbooks({{ inv.playbook_inv.all.count }})</strong></span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn-outline-secondary" href="#tabs-4" data-toggle="tab">
+                            <span><strong>Tasks({{ inv.task_inv.all.count }}/{{inv.opentasklistprint}})</strong></span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn-outline-secondary" href="#tabs-5" data-toggle="tab">
+                            <span><strong>Evidences({{ inv.evidence_inv.count }})</strong></span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <span>Investigation: #{{ inv.id }} - {{ inv.invid }}</span>
+                    </li>
+                </ul>
+    <div class="tab-content mt-3">
+                  <div id="tabs-1" class="tab-pane" role="tabpanel">
+                    {% include 'invs/inv_detail_tab_detail.html' %}
+                    {% include 'invs/inv_detail_tab_relatedinv.html' %}
+                  </div>
+                  <div id="tabs-2" class="tab-pane" role="tabpanel">
+                    {% include 'invs/inv_detail_tab_profile.html' %}
+                  </div>
+                  <div id="tabs-3" class="tab-pane" role="tabpanel">
+                      {% include 'invs/inv_detail_tab_playbooks.html' %}
+                  </div>
+                  <div id="tabs-4" class="tab-pane" role="tabpanel">
+                    {% include 'invs/inv_detail_tab_tasks.html' %}
+                  </div>
+                  <div id="tabs-5" class="tab-pane" role="tabpanel">
+                    {% include 'invs/inv_detail_tab_evidences.html' %}
+                  </div>
+    </div>
             </div>
-     </div>
+        </div>
+    </div>
+</div>
 
 
 <!--<div class="container-fluid investigations-container">-->

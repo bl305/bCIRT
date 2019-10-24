@@ -15,19 +15,21 @@
 
         <!-- Right Investigation Info -->
         <div class="col-sm-12 col-md-12">
-            <div class="panel panel-primary">
-                <div class = "panel-heading">
-                    <div class="panel-title text-center">
-                         <strong>&nbsp;Related Investigations </strong>
+            <div class="card card-primary w-100">
+                <div class="card-header mycardheader">
+                    <div class="card-title h-100">
+                        <div class="row align-items-center justify-content-center h-100">
+                            <p class="h4">&nbsp;Related Investigations</p>
+                        </div>
                     </div>
                 </div>
-                <div class="panel-body">
+                <div class="card-body inv-card-body">
 
                     {% if error_message %}
                         <p><strong>{{ error_message }}</strong></p>
                     {% endif %}
 
-                    <table class="table table-hover">
+                    <table class="table table-sm table-hover">
                         <thead>
                         <tr>
                             <th>IncID</th>
@@ -41,8 +43,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                            {% include 'invs/inv_detail_relatedinv_table.html' %}
-
+                            {% include 'invs/inv_detail_tab_relatedinv_table.html' %}
                         </tbody>
                     </table>
 

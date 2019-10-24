@@ -1,0 +1,45 @@
+{% extends "tasks/task_template_nonav.html" %}
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : tasks/playbooktemplate_detail_main.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.10.19
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.10.19  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+
+{% block task_alert %}
+{% endblock task_alert %}
+
+{% block task_buttons %}
+{% endblock task_buttons %}
+
+{% block task_title %}
+                            Playbook Template # {{ playbooktemplate.pk }} | {{ playbooktemplate.name }} | {{ user }} at {% now "Y/m/d H:i:s" %} (UTC)
+{% endblock task_title %}
+
+{% block task_body %}
+                        <table class="table table-sm table-hover table-striped table-condensed" id="investigations-inve">
+                            <thead>
+                                <tr class="mylist-header">
+                                    <th>ID</th>
+                                    <th>Playbook Template</th>
+                                    <th>Owner</th>
+                                    <th>Version</th>
+                                    <th>Created on</th>
+                                    <th>Created by</th>
+                                    <th>Modified on</th>
+                                    <th>Modified by</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% include "tasks/playbooktemplate_detail_table.html" %}
+                            </tbody>
+                        </table>
+{% endblock task_body %}

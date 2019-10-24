@@ -1,0 +1,106 @@
+{% extends "tasks/task_template_nonav.html" %}
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : tasks/task_detail_main.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.10.20
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.10.19  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+
+{% block task_alert %}
+
+{% endblock task_alert %}
+
+{% block task_buttons %}
+                            {% if user.is_authenticated %}
+                                <div class="dropdown">
+                                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle" onclick="filterFunctionTaskTemplate()" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
+                                        Actions
+                                        <span class="caret"></span>
+                                    </button>
+
+                                <ul class="dropdown-menu" role="menu">
+                                    {% if task.inv and not task.readonly %}
+                                        <li>
+                                            <a href="{% url 'tasks:tsk_create' inv_pk=task.inv.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                               class="btn btn-secondary btn-sm btn-block text-left">
+                                                <span class="fas fa-plus"></span>
+                                                New Task
+                                            </a>
+                                        </li>
+                                    {% else %}
+                                        <li>
+                                            <a href="{% url 'tasks:tsk_create' inv_pk=0 %}?next1={{ request.get_full_path|urlencode }}"
+                                               class="btn btn-secondary btn-sm btn-block text-left">
+                                                <span class="fas fa-plus"></span>
+                                                New Task
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                    {% if not task.readonly %}
+                                        {% if task.inv %}
+                                            <li>
+                                                <a href="{% url 'tasks:ev_create' inv_pk=task.inv.pk task_pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                                   class="btn btn-secondary btn-sm btn-block text-left">
+                                                    <span class="fas fa-plus"></span>
+                                                    New Evidence
+                                                </a>
+                                            </li>
+                                        {% else %}
+                                            <li>
+                                                <a href="{% url 'tasks:ev_create' inv_pk=0 task_pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                                   class="btn btn-secondary btn-sm btn-block text-left">
+                                                    <span class="fas fa-plus"></span>
+                                                    New Evidence
+                                                </a>
+                                            </li>
+                                        {% endif %}
+                                        <li>
+                                            <a href="{% url 'tasks:tvar_create' task_pk=task.pk tasktmp_pk=0 %}?next1={{ request.get_full_path|urlencode }}"
+                                               class="btn btn-secondary btn-sm btn-block text-left">
+                                              <span class="fas fa-plus"></span>
+                                              New Variable
+                                            </a>
+                                        </li>
+                                    {% endif %}
+
+                                    <li>
+                                        <a href="{% url 'tasks:tsk_edit' pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                          class="btn btn-secondary btn-sm btn-block text-left">
+                                          <span class="fas fa-pen" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
+                                          Edit&nbsp;
+                                        </a>
+                                    </li>
+                                    <li>&nbsp;</li>
+                                    <li>
+                                          <a href="{% url 'tasks:tsk_remove' pk=task.pk %}"
+                                              class="btn btn-secondary btn-sm btn-block text-danger font-weight-bold">
+                                          <span data-toggle="tooltip" data-placement="top" title="Edit item">
+                                              <i class="fas fa-trash-alt"></i>
+                                          </span>
+                                              Delete
+                                          </a>
+                                    </li>
+                                </ul>
+</div>
+                            {% endif %}
+
+{% endblock task_buttons %}
+
+{% block task_title %}
+                                    Task Details | #{{ task.pk }} | {{ user }} at {% now "Y/m/d H:i:s" %} (UTC)
+{% endblock task_title %}
+
+{% block task_body %}
+                    <table class="table table-sm" id="investigations-invh">
+                        <tbody>
+                            {% include 'tasks/task_detail_table.html' %}
+                        </tbody>
+                    </table>
+{% endblock task_body %}

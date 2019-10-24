@@ -26,355 +26,150 @@
     <title>bCIRT | {% block ptitle %}{% endblock %}</title>
 
     <!-- custom css -->
-    <link rel="stylesheet" href="{% static 'bCIRT/css/pre_master_20190905_1.css'%}"/>
+<!--    <link rel="stylesheet" href="{% static 'bCIRT/css/pre_master_20190905_1.css'%}"/>-->
+    <link rel="stylesheet" href="{% static 'bCIRT/css/pre_master_20191003.css'%}"/>
 
     <!-- Custom JavaScript -->
     <script src="{% static 'bCIRT/js/pre_master_20190905_1.js'%}" type="text/javascript" ></script>
 
     <!-- Latest compiled and minified JavaScript jquery FIRST -->
-    <script src="{% static 'bCIRT/jquery-3.2.1/jquery-3.2.1.min.js' %}"></script>
+<!--    <script src="{% static 'bCIRT/jquery-3.2.1/jquery-3.2.1.min.js' %}"></script>-->
+    <script src="{% static 'bCIRT/jquery-3.4.1/jquery-3.4.1.min.js' %}"></script>
 
-    <script src="{% static 'bCIRT/jquery-ui-tabs-1.12.1/jquery-ui.min.js' %}"></script>
+    <script src="{% static 'bCIRT/jquery-ui-1.12.1/jquery-ui.min.js' %}"></script>
+    {% include 'session_security/all.html' %}
 
-    <!-- Compiled and minified CSS Bootstrap3 -->
-    <link rel="stylesheet" type="text/css" href="{% static 'bCIRT/bootstrap-3.3.7/css/bootstrap.min.css' %}" />
+    <!-- Compiled and minified CSS Bootstrap4 -->
+    <link rel="stylesheet" type="text/css" href="{% static 'bCIRT/bootstrap-4.1.3/css/bootstrap.min.css' %}" />
 
-    <!-- Optional theme Bootstrap3 -->
-    <link rel="stylesheet" type="text/css" href="{% static 'bCIRT/bootstrap-3.3.7/css/bootstrap-theme.min.css' %}" />
+<!--    Bootstrap select-->
+    <link rel="stylesheet" type="text/css" href="{% static 'bCIRT/bootstrap-select-1.13.12/css/bootstrap-select.min.css' %}" />
 
     <!--#Bootstrap table-->
-    <link rel="stylesheet" type="text/css" href="{% static 'bCIRT/bootstrap-table-1.13.1/bootstrap-table.min.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'bCIRT/bootstrap-table-1.15.4/bootstrap-table.min.css' %}"/>
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" type="text/css" href="{% static 'bCIRT/fontawesome-free-5.6.3-web/css/all.css' %}"/>
 
-    <!-- custom css -->
-    <link rel="stylesheet" href="{% static 'bCIRT/css/master_20190905_1.css'%}"/>
 
-    <!-- Latest compiled and minified JavaScript Bootstrap3 -->
-    <script src="{% static 'bCIRT/bootstrap-3.3.7/js/bootstrap.min.js' %}"></script>
-{% include 'session_security/all.html' %}
+    <!-- custom css -->
+<!--    <link rel="stylesheet" href="{% static 'bCIRT/css/master_20190905_1.css'%}"/>-->
+
+    <!--xdan datetimepicker - aka jquery datetimepicker-->
+    <link rel="stylesheet" type="text/css" href="{% static 'bCIRT/xdan_datetimepicker/jquery.datetimepicker.min.css' %}"/>
+    <script src="{% static 'bCIRT/xdan_datetimepicker/jquery.datetimepicker.full.min.js' %}"></script>
 
 </head>
 <body>
-    <nav class="navbar navbar-inverse navbar-fixed-top mynav" role="navigation" id="navbar">
-        <div class="container-fluid">
-
-            <!-- Header -->
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data="collapse" data-target="#topNavBar">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand mynav" href="{% url 'home' %}">bCIRT</a>
-            </div>
-
-
-            <!-- Items -->
-            <div class="collapse navbar-collapse" id="topNavBar">
-                <ul class="nav navbar-nav">
-<!--
-Menu - dropdown
--->
-                    <li class="dropdown {% block invs_active %}{% endblock invs_active%}">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                            <span class="glyphicon glyphicon glyphicon-folder-open" aria-hidden="true"></span>&nbsp;
-                            Investigations
-                            <b class="caret"></b>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a href="{% url 'invs:inv_suspiciousemail' %}"><span class="glyphicon glyphicon-plus"></span> SuspiciousEmail</a></li>
-                            <li class="divider"></li>
-                            <li><a href="{% url 'invs:inv_create' %}"><span class="glyphicon glyphicon-plus"></span> New Investigation</a></li>
-                            <li class="divider"></li>
-                            <li><a href="{% url 'invs:inv_list' %}"><span class="glyphicon glyphicon-th-list"></span> Investigations</a></li>
-                        </ul>
+<!--        <nav class="navbar navbar-dark bg-dark fixed-top w-100 navbar-expand p-1">-->
+        <nav class="navbar navbar-dark bg-dark navbar-fixed-top navbar-expand">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <a class="navbar-brand h-100 w-100" href="{% url 'home' %}">bCIRT</a>
+                </div>
+                <ul class="navbar-nav w-100">
+                    <li class="nav-item dropdown {% block invs_active %}{% endblock invs_active%}">
+                        <a class="nav-link dropdown-toggle" href="#" id="dropdownInv" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-folder-open"></i> Investigations</a>
+                        <div class="dropdown-menu" aria-labelledby="dropdowninv">
+                            <a class="dropdown-item" href="{% url 'invs:inv_suspiciousemail' %}"><i class="fas fa-envelope">&nbsp;</i>Suspicious Email</a>
+                            <a class="dropdown-item" href="{% url 'invs:inv_create' %}"><i class="fas fa-folder-plus">&nbsp;</i>New Investigation</a>
+                            <a class="dropdown-item" href="{% url 'invs:inv_list' %}"><i class="fas fa-list-ol">&nbsp;</i>Investigations</a>
+                        </div>
                     </li>
-
-                    <li class="dropdown {% block tasks_active %}{% endblock tasks_active%}">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                            <span class="glyphicon glyphicon glyphicon-edit" aria-hidden="true"></span>&nbsp;
-                            Tasks
-                            <b class="caret"></b>
-                        </a>
-                        <ul class="dropdown-menu">
-                            {% if perms.tasks.add_task %}
-                            <li>
-                                <a href="{% url 'tasks:tsk_create' inv_pk=0 %}"><span class="glyphicon glyphicon-plus"></span>
-                                New Task
-                                </a>
-                            </li>
-                            <li class="divider"></li>
-                            {% endif %}
-                            {% if perms.tasks.add_playbooktemplate %}
-                            <li>
-                                <a href="{% url 'tasks:playtmp_create' %}">
-                                <span class="glyphicon glyphicon-plus"></span>
-                                New Playbook Template
-                                </a>
-                            </li>
-                            <li class="divider"></li>
-                            {% endif %}
-                            {% if perms.tasks.view_tasks %}
-                            <li>
-                                <a href="{% url 'tasks:tsk_list' %}"><span class="glyphicon glyphicon-th-list"></span>
-                                Tasks
-                                </a>
-                            </li>
-                            <li class="divider"></li>
-                            {% endif %}
-                            {% if perms.tasks.view_tasktemplate %}
-                            <li>
-                                <a href="{% url 'tasks:tmp_list' %}"><span class="glyphicon glyphicon-th-list"></span>
-                                Task Templates
-                                </a>
-                            </li>
-                            <li class="divider"></li>
-                            {% endif %}
-                            {% if perms.tasks.view_taskvar %}
-                            <li>
-                                <a href="{% url 'tasks:tvar_list' %}"><span class="glyphicon glyphicon-th-list"></span>
-                                Task Variables
-                                </a>
-                            </li>
-                            <li class="divider"></li>
-                            {% endif %}
-                            {% if perms.tasks.view_playbook %}
-                            <li>
-                                <a href="{% url 'tasks:play_list' %}"><span class="glyphicon glyphicon-th-list"></span>
-                                Playbooks
-                                </a>
-                            </li>
-                            <li class="divider"></li>
-                            {% endif %}
-                            {% if perms.tasks.view_playbooktemplate %}
-                            <li>
-                                <a href="{% url 'tasks:playtmp_list' %}"><span class="glyphicon glyphicon-th-list"></span>
-                                Playbook Templates
-                                </a>
-                            </li>
-                            <li class="divider"></li>
-                            {% endif %}
-                            {% if perms.tasks.view_playbooktemplateitem %}
-                            <li>
-                                <a href="{% url 'tasks:playittmp_list' %}"><span class="glyphicon glyphicon-th-list"></span>
-                                Playbook Template Items
-                                </a>
-                            </li>
-                            {% endif %}
-                        </ul>
+                    <li class="nav-item dropdown {% block tasks_active %}{% endblock tasks_active%}">
+                        <a class="nav-link dropdown-toggle" href="#" id="dropdownTask" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-tasks"></i> Tasks</a>
+                        <div class="dropdown-menu" aria-labelledby="dropdownTask">
+                            <a class="dropdown-item" href="{% url 'tasks:tsk_create' inv_pk=0 %}"><i class="fas fa-plus">&nbsp;</i>New Task</a>
+                            <a class="dropdown-item" href="{% url 'tasks:tsk_list' %}"><i class="fas fa-list"></i>&nbsp;Tasks</a>
+                            <a class="dropdown-item" href="{% url 'tasks:tmp_list' %}"><i class="fas fa-list"></i>&nbsp;Task Templates</a>
+                            <a class="dropdown-item" href="{% url 'tasks:tvar_list' %}"><i class="fas fa-list"></i>&nbsp;Task Variables</a>
+                            <a class="dropdown-item" href="{% url 'tasks:play_list' %}"><i class="fas fa-book"></i>&nbsp;Playbooks</a>
+                            <a class="dropdown-item" href="{% url 'tasks:playtmp_create' %}"><i class="fas fa-plus">&nbsp;</i>New Playbook Template</a>
+                            <a class="dropdown-item" href="{% url 'tasks:playtmp_list' %}"><i class="fas fa-book"></i>&nbsp;Playbook Templates</a>
+                            <a class="dropdown-item" href="{% url 'tasks:playittmp_list' %}"><i class="fas fa-book"></i>&nbsp;Playbook Template Items</a>
+                        </div>
                     </li>
-
-
-                    <li class="dropdown {% block evidences_active %}{% endblock evidences_active%}">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                            <span class="glyphicon glyphicon glyphicon-file" aria-hidden="true"></span>&nbsp;
-                            Evidences
-                            <b class="caret"></b>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <a href="{% url 'tasks:ev_create' inv_pk=0 task_pk=0 %}">
-                                    <span class="glyphicon glyphicon-plus"></span>
-                                    New Evidence
-                                </a>
-                            </li>
-                            <li class="divider"></li>
-                            <li>
-                                <a href="{% url 'tasks:evattr_create' pk=0 %}">
-                                    <span class="glyphicon glyphicon-plus"></span>
-                                    New Attribute
-                                </a>
-                            </li>
-                            <li class="divider"></li>
-                            <li>
-                                <a href="{% url 'tasks:ev_list' %}">
-                                    <span class="glyphicon glyphicon-th-list"></span>
-                                    Evidences
-                                </a>
-                            </li>
-                            <li class="divider"></li>
-                            <li>
-                                <a href="{% url 'tasks:evattr_list' %}">
-                                    <span class="glyphicon glyphicon-th-list"></span>
-                                    Attributes
-                                </a>
-                            </li>
-                        </ul>
+                    <li class="nav-item dropdown {% block evidences_active %}{% endblock evidences_active%}">
+                        <a class="nav-link dropdown-toggle" href="#" id="dropdownEv" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-file"></i> Evidences</a>
+                        <div class="dropdown-menu" aria-labelledby="dropdownEv">
+                            <a class="dropdown-item" href="{% url 'tasks:ev_create' inv_pk=0 task_pk=0 %}"><i class="fas fa-plus">&nbsp;</i>New Evidence</a>
+                            <a class="dropdown-item" href="{% url 'tasks:ev_list' %}"><i class="fas fa-list">&nbsp;</i>Evidences</a>
+                            <a class="dropdown-item" href="{% url 'tasks:evattr_create' pk=0 %}"><i class="fas fa-plus">&nbsp;</i>New Attribute</a>
+                            <a class="dropdown-item" href="{% url 'tasks:evattr_list' %}"><i class="fas fa-list">&nbsp;</i>Attributes</a>
+                        </div>
                     </li>
-
-                    <li class="dropdown {% block actions_active %}{% endblock actions_active%}">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                            <span class="glyphicon glyphicon glyphicon-play-circle" aria-hidden="true"></span>&nbsp;
-                            Actions
-                            <b class="caret"></b>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <a href="{% url 'tasks:act_create' %}">
-                                    <span class="glyphicon glyphicon-plus"></span>
-                                    New Action
-                                </a>
-                            </li>
-                            <li class="divider"></li>
-                            {% if perms.tasks.add_automation %}
-                            <li>
-                                <a href="{% url 'tasks:auto_create' %}">
-                                    <span class="glyphicon glyphicon-plus"></span>
-                                    New Automation
-                                </a>
-                            </li>
-                            <li class="divider"></li>
-                            {% endif %}
-                            <li>
-                                <a href="{% url 'tasks:act_list' %}">
-                                    <span class="glyphicon glyphicon-th-list"></span>
-                                    Actions
-                                </a>
-                            </li>
-                            <li class="divider"></li>
-                            <li>
-                                <a href="{% url 'tasks:actgrp_list' %}">
-                                    <span class="glyphicon glyphicon-th-list"></span>
-                                    ActionGroups
-                                </a>
-                            </li>
-                            <li class="divider"></li>
-                            <li>
-                                <a href="{% url 'tasks:actgrpmem_list' %}">
-                                    <span class="glyphicon glyphicon-th-list"></span>
-                                    ActionGroupMembers
-                                </a>
-                            </li>
-                            <li class="divider"></li>
-                            {% if perms.tasks.view_automation %}
-                            <li>
-                                <a href="{% url 'tasks:auto_list' %}">
-                                    <span class="glyphicon glyphicon-th-list"></span>
-                                    Automations
-                                </a>
-                            </li>
-                            {% endif %}
-                            <li class="divider"></li>
-                        </ul>
+                    <li class="nav-item dropdown {% block actions_active %}{% endblock actions_active%}">
+                        <a class="nav-link dropdown-toggle" href="#" id="dropdownAct" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-play-circle"></i> Actions</a>
+                        <div class="dropdown-menu" aria-labelledby="dropdownAction">
+                            <a class="dropdown-item" href="{% url 'tasks:act_create' %}"><i class="fas fa-plus">&nbsp;</i>New Actione</a>
+                            <a class="dropdown-item" href="{% url 'tasks:act_list' %}"><i class="fas fa-play-circle">&nbsp;</i>Actions</a>
+                            <a class="dropdown-item" href="{% url 'tasks:actgrp_list' %}"><i class="fas fa-play-circle">&nbsp;</i>ActionGroups</a>
+                            <a class="dropdown-item" href="{% url 'tasks:actgrpmem_list' %}"><i class="fas fa-play-circle">&nbsp;</i>ActionGroupMembers</a>
+                            <a class="dropdown-item" href="{% url 'tasks:auto_create' %}"><i class="fas fa-plus">&nbsp;</i>New Automation</a>
+                            <a class="dropdown-item" href="{% url 'tasks:auto_list' %}"><i class="fas fa-chess">&nbsp;</i>Automations</a>
+                        </div>
                     </li>
-
-                    <li class="dropdown {% block assets_active %}{% endblock assets_active%}">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                            <span class="glyphicon glyphicon glyphicon-book" aria-hidden="true"></span>&nbsp;
-                            Assets
-                            <b class="caret"></b>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <a href="{% url 'assets:prof_list' %}">
-                                    <span class="glyphicon glyphicon-th-list"></span>
-                                    Profiles
-                                </a>
-                            </li>
-                            <li class="divider"></li>
-                            <li>
-                                <a href="{% url 'assets:host_list' %}">
-                                    <span class="glyphicon glyphicon-th-list"></span>
-                                    Hosts
-                                </a>
-                            </li>
-                        </ul>
+                    <li class="nav-item dropdown {% block assets_active %}{% endblock assets_active%}">
+                        <a class="nav-link dropdown-toggle" href="#" id="dropdownAss" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-book"></i> Assets</a>
+                        <div class="dropdown-menu" aria-labelledby="dropdownAssets">
+                            <a class="dropdown-item" href="{% url 'assets:prof_list' %}"><i class="fas fa-user">&nbsp;</i>Profiles</a>
+                            <a class="dropdown-item" href="{% url 'assets:host_list' %}"><i class="fas fa-desktop">&nbsp;</i>Hosts</a>
+                        </div>
+                    </li>
+<!--                </ul>
+                <ul class="navbar-nav navbar-right"> -->
+                    <li class="nav-item dropdown {% block reports_active %}{% endblock reports_active%}">
+                        <a class="nav-link dropdown-toggle" href="#" id="dropdownRep" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-chart-bar"></i>&nbsp;Reports</a>
+                        <div class="dropdown-menu" aria-labelledby="dropdownRep">
+                            <a class="dropdown-item" href="{% url 'reports:rep_dashboard' %}"><i class="fas fa-chart-bar">&nbsp;</i>Dashboard</a>
+                        </div>
+                    </li>
+                    <li class="nav-item dropdown navbar-right">
+                        <a class="nav-link dropdown-toggle" href="#" id="dropdownConf" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-cog"></i> Configuration</a>
+                        <div class="dropdown-menu" aria-labelledby="dropdownconf">
+                            <a class="dropdown-item" href="{% url 'configuration:conf_base' %}"><i class="fas fa-cog">&nbsp;</i>All Configuration</a>
+                        </div>
                     </li>
                 </ul>
-
-
-<!--
-Search menu
--->
-                <ul class="nav navbar-nav navbar-right">
-                    <li class="dropdown {% block reports_active %}{% endblock reports_active%}">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                            <span class="glyphicon glyphicon glyphicon-signal" aria-hidden="true"></span>&nbsp;
-                            Reports
-                            <b class="caret"></b>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <a href="{% url 'reports:rep_dashboard' %}">
-                                    <span class="glyphicon glyphicon-signal"></span>
-                                    Dashboard
-                                </a>
-                            </li>
-                            <li class="divider"></li>
-                        </ul>
-                    </li>
-                    <li class="dropdown {% block config_active %}{% endblock config_active%}">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                            <span class="glyphicon glyphicon glyphicon-cog" aria-hidden="true"></span>&nbsp;
-                            Config
-                            <b class="caret"></b>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <a href="{% url 'configuration:conf_base' %}">
-                                    <span class="glyphicon glyphicon-th-list"></span>
-                                    All Configuration
-                                </a>
-                            </li>
-                            <li class="divider"></li>
-                        </ul>
-                    </li>
-
+                <ul class="navbar-nav">
                     {% if user.is_authenticated %}
-                        <li>
-                            <a href="{% url 'accounts:logout' %}?next={{request.path}}">
-                                <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
-                                &nbsp;{{ user.get_username }}
-                            </a>
-                        </li>
-                    {% else %}
-                        <li>
-                            <a href="{% url 'accounts:login'%}?next={{request.path}}">
-                                <span class="glyphicon glyphicon-off" aria-hidden="true"></span>&nbsp;
-                            </a>
-                        </li>
+                    <li class="nav-item dropdown navbar-right">
+                        <a class="nav-link" href="{% url 'accounts:logout' %}?next={{request.path}}" aria-haspopup="true" aria-expanded="false">
+                            <span class="container mw-100 d-inline-flex justify-content-end flex-row align-items-center align-content-center flex-nowrap">
+                                <i class="fas fa-power-off">&nbsp;&nbsp; </i>
+                                {{ user.get_username }}
+                            </span>
+                        </a>
+                    </li>
                     {% endif %}
                 </ul>
             </div>
+        </nav>
+        <!-- /.container -->
+        <div class="container mw-100">
+            <div class="row align-items-center justify-content-center">
+                {% block title %}
+                {% endblock %}
+                {% block content %}
+                {% endblock %}
+</div>
         </div>
-        <!-- Error Message end -->
-        {% if messages %}
-            <div class="row">
-            {% for message in messages %}
-                <div
-                    {% if message.tags %} class="{{ message.tags }} alert alert-danger alert-dismissable fade in" role="alert" {% endif %}>
-                    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-                    <strong>Error! </strong>{{ message }}
-                </div>
-            {% endfor %}
-            </div>
-        {% endif %}
-        <!-- Error Message end -->
-    </nav>
-
-<!--
-Body contents
-    -->
-    <div class="container main" style="min-height:87vh">
-        <div class="row">
-
-            {% block title %}
-            {% endblock %}
-
-            {% block content %}
-            {% endblock %}
-
-        </div>
-    </div>
-    <div class="footer navbar-inverse fixed-bottom">
-        <p>bCIRT {% include 'version.html' %} | Balazs Lendvay</p>
-    </div>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light myfooter fixed-bo">
+            <p class="w-100">bCIRT {% include 'version.html' %} | Balazs Lendvay</p>
+        </nav>
+<div id="thebottom"></div>
 </body>
+    <script src="{% static 'bCIRT/jquery-3.4.1/jquery-3.4.1.slim.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'bCIRT/popper/popper.min.js' %}"></script>
-    <script type="text/javascript" src="{% static 'bCIRT/bootstrap-table-1.13.1/bootstrap-table.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'bCIRT/bootstrap-table-1.15.4/bootstrap-table.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'bCIRT/bootstrap-select-1.13.12/js/bootstrap-select.min.js' %}"></script>
+    <!-- Latest compiled and minified JavaScript Bootstrap3 -->
+    <script src="{% static 'bCIRT/bootstrap-4.1.3/js/bootstrap.min.js' %}"></script>
+
+<!--    Custom css-->
+    <link rel="stylesheet" href="{% static 'bCIRT/css/master_20191003.css'%}"/>
 
   <!-- Custom JavaScript -->
     <script src="{% static 'bCIRT/js/master_20190905_1.js'%}" type="text/javascript" ></script>
+
 </html>

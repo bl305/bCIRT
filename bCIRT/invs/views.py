@@ -232,6 +232,16 @@ class InvDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailV
         kwargs['templatecategories'] = TaskTemplate.objects.filter(enabled=True)
         kwargs['playbooks'] = PlaybookTemplate.objects.filter(enabled=True)
         kwargs['actions'] = Action.objects.filter(enabled=True)
+
+
+        inv_obj = Inv.objects.get(pk=self.kwargs.get('pk'))
+        ev_obj = inv_obj.evidence_inv.all()
+        evattr_set = set()
+        for ev_obj_item in ev_obj:
+            if ev_obj_item.evattr_evidence.all():
+                for evattr_obj in ev_obj_item.evattr_evidence.all():
+                    evattr_set.add(evattr_obj)
+        kwargs['invevidence_evattr_evidence_all'] = evattr_set
         # actiongrmember_file = set()
         # actiongrmember_desc = set()
         # actiongrmember_attr = set()

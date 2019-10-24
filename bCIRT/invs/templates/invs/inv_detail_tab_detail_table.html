@@ -45,10 +45,16 @@
         <td colspan="2"><strong>Phase</strong><br> {{ inv.phase }} </td>
         <td colspan="2"><strong>Category</strong><br> {{ inv.category }} </td>
         <td colspan="1"><strong>Potential Loss</strong><br> {{ inv.potentialloss }} {{ inv.losscurrency }} </td>
-        <td><strong>Investigation start</strong><br> {{ inv.starttime|date:"Y/m/d H:i:s" }} </td>
-        <td><strong>Investigation end</strong><br>
-            {% if inv.endtime %}
-                {{ inv.endtime|date:"Y/m/d H:i:s" }}
+        <td><strong>Incident start</strong><br>
+            {% if inv.incstarttime %}
+                {{ inv.incstarttime|date:"Y/m/d H:i:s" }}
+            {% else %}
+                -
+            {% endif %}
+        </td>
+        <td><strong>Incident end</strong><br>
+            {% if inv.incendtime %}
+                {{ inv.incendtime|date:"Y/m/d H:i:s" }}
             {% else %}
                 -
             {% endif %}
@@ -72,8 +78,14 @@
         <td><strong>Attack Vector</strong><br> {{ inv.attackvector }} </td>
         <td colspan="1"></td>
         <td><strong>Victim Count</strong><br> {{ inv.numofvictims }} </td>
-        <td><strong>Modified on</strong><br> {{ inv.modified_at|date:"Y/m/d H:i:s" }} </td>
-        <td><strong>Modified by</strong><br> {{ inv.modified_by }} </td>
+        <td><strong>Investigation start</strong><br> {{ inv.starttime|date:"Y/m/d H:i:s" }} </td>
+        <td><strong>Investigation end</strong><br>
+            {% if inv.endtime %}
+                {{ inv.endtime|date:"Y/m/d H:i:s" }}
+            {% else %}
+                -
+            {% endif %}
+        </td>
     </tr>
     <tr>
         <td colspan="4"><strong>Comment</strong><br>
@@ -84,26 +96,31 @@
             {% endif%}
         </td>
         <td colspan="1"><strong>Monetary Loss</strong><br> {{ inv.monetaryloss }} {{ inv.losscurrency }} </td>
+        <td><strong>Modified on</strong><br> {{ inv.modified_at|date:"Y/m/d H:i:s" }} </td>
+        <td><strong>Modified by</strong><br> {{ inv.modified_by }} </td>
+    </tr>
+    <tr>
+        <td colspan="5"> </td>
         <td><strong>Created on</strong><br> {{ inv.created_at|date:"Y/m/d H:i:s" }} </td>
         <td><strong>Created by</strong><br> {{ inv.created_by }} </td>
     </tr>
     <tr>
         <td colspan="7">
-            <div class="row">
             <div class="container invdescription">
                 <strong>Incident Description</strong><br>
                 {{ inv.description_html|safe }}
-            </div>
             </div>
         </td>
     </tr>
     <tr>
         <td colspan="7">
-            <div class="row">
-                <div class="container invdescription">
+            <div class="container invdescription">
                 <strong>Executive Summary</strong><br>
-                {{ inv.summary|safe }}
-                </div>
+                {% if inv.summary  %}
+                    {{ inv.summary|safe }}
+                {% else %}
+                    -
+                {% endif %}
             </div>
         </td>
     </tr>

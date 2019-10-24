@@ -1,0 +1,48 @@
+{% extends "tasks/task_template_nonav.html" %}
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : tasks/task_detail_relatedtask.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.10.19
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.10.19  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+
+{% block task_alert %}
+
+{% endblock task_alert %}
+
+{% block task_buttons %}
+{% endblock task_buttons %}
+
+{% block task_title %}
+                        Related Tasks | {{ user }} at {% now "Y/m/d H:i:s" %} (UTC)
+{% endblock task_title %}
+
+{% block task_body %}
+                    {% if error_message %}
+                        <p><strong>{{ error_message }}</strong></p>
+                    {% endif %}
+                    <table class="table table-hover table-sm">
+                        <thead>
+                        <tr>
+                            <th>TaskID</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>Created on</th>
+                            <th>Created by</th>
+                            <th>Modified on</th>
+                            <th>Modified by</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            {% include 'tasks/task_detail_relatedtask_table.html' %}
+                        </tbody>
+                    </table>
+{% endblock task_body %}

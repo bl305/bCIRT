@@ -1,4 +1,4 @@
-{% extends "tasks/task_base.html" %}
+{% extends "tasks/task_template.html" %}
 <!--
 # **********************************************************************;
 # Project           : bCIRT
@@ -12,8 +12,7 @@
 # 2019.07.29  Lendvay     1      Initial file
 # **********************************************************************;
 -->
-
-{% block tasks_content %}
+{% block task_alert %}
 <div class="container-fluid investigations-container">
     <div>
         <form action="" method="post">
@@ -27,25 +26,20 @@
                 </div>
         </form>
     </div>
-    <div class="row">
-        <!-- Left Investigation Info -->
-        <div class="col-sm-12 col-md-12">
-            <div class="panel panel-primary">
-                <header class = "panel-heading">
-                    <div class="panel-title text-center">
-                        <strong>&nbsp;Delete Task Variable | {{ taskvar.pk }}</strong>
-                    </div>
-                </header>
-                <div class="panel-body inv-panel-body" id="xxx">
+{% endblock task_alert %}
+
+{% block task_buttons %}
+{% endblock task_buttons %}
+
+{% block task_title %}
+                        Delete Task Variable | {{ taskvar.pk }}
+{% endblock task_title %}
+
+{% block task_body %}
                     <table class="table" id="investigations-invh">
                         <tbody>
                             {% include 'tasks/taskvar_detail_template.html' %}
                         </tbody>
                     </table>
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-{% endblock tasks_content %}
+{% endblock task_body %}

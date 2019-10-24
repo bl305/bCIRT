@@ -12,85 +12,86 @@
 # 2019.09.05  Lendvay     2      Added observables fields
 # **********************************************************************;
 -->
-{% if inv.evidence_inv %}
+<!-- if inv.evidence_inv %}-->
+<!-- for invevidence in inv.evidence_inv.all %}-->
+{% for attr in invevidence_evattr_evidence_all %}
 
-{% for invevidence in inv.evidence_inv.all %}
-    {% for attr in invevidence.evattr_evidence.all %}
         {% if attr.observable %}
             <tr>
+              <td>
+	                	{% if user.is_authenticated %}
+                        <div class="row container mw-100 d-inline-flex justify-content-between flex-row align-items-center align-content-center flex-nowrap">
+                            <a href="{% url 'tasks:evattr_edit' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}"
+                               class="btn btn-warning btn-xs">
+                                <span class="fa fa-pencil-alt"></span>
+                            </a>
+                            &nbsp;
+                            <a href="{% url 'tasks:evattr_observabletoggle' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ attr.ev.pk }}"
+                                class="btn btn-outline-primary btn-xs">
+                            {% if attr.observable %}
+                                <span class="fa fa-eye-slash"></span>
+                            {% endif %}
+                            </a>
+                            &nbsp;
+                            <a href="{% url 'tasks:evattr_remove' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}"
+                               class="btn btn-danger btn-xs">
+                                <span class="fa fa-trash-alt"></span>
+                            </a>
+
+                        </div>
+                        {% endif %}
+              </td>
+
                 <td>
                     {{attr.pk}}
                 </td>
               <td>
                     {% if attr.attr_reputation.pk == 1 %}
-                        <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-placement="top" title="Unknown">
+                  <span class="fas fa-question-circle" data-toggle="tooltip" data-placement="top" title="Unknown"></span>
                     {% else %}
                         {% if attr.attr_reputation.pk == 2 %}
-                            <span style="color:green;" class="glyphicon glyphicon-ok-sign" data-toggle="tooltip" data-placement="top" title="Clean">
+                            <span class="fas fa-check-circle text-success" data-toggle="tooltip" data-placement="top" title="Clean"></span>
                         {% else %}
                             {% if attr.attr_reputation.pk == 3 %}
-                                <strong>
-                                <span style="color:orange;" class="glyphicon glyphicon-alert" data-toggle="tooltip" data-placement="top" title="Suspicious">
-                                    </strong>
+                                <span class="fas fa-exclamation-circle text-danger" data-toggle="tooltip" data-placement="top" title="Suspicious"></span>
                             {% else %}
                                 {% if attr.attr_reputation.pk == 4 %}
-                                    <span style="color:red;" class="glyphicon glyphicon-remove-sign" data-toggle="tooltip" data-placement="top" title="Malicious">
+                                    <span class="fas fa-bomb text-danger" data-toggle="tooltip" data-placement="top" title="Malicious"></span>
                                 {% else %}
-                                    <span data-toggle="tooltip" data-placement="top" title="-">-
+                                        <span data-toggle="tooltip" data-placement="top" title="-">-</span>
                                 {% endif %}
                             {% endif %}
                         {% endif %}
                     {% endif %}
                     {{ attr.attr_reputation }}
               </td>
-              <td>{{ attr.evattrformat }}</td>
 
-                <td style="max-width: 800px;">
+<!--                       style="max-width: 800px;overflow: auto;text-overflow: word-wrap;overflow-wrap: break-word;"-->
+
+              <td>{{ attr.evattrformat }}</td>
+                <td>
                     <a class="" href="{% url 'tasks:evattr_detail' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}"
-                       style="max-width: 800px;overflow: auto;text-overflow: word-wrap;overflow-wrap: break-word;"
+                    style="max-width: 800px;overflow: auto;text-overflow: word-wrap;overflow-wrap: break-word;"
                     >
-                    {{ attr.evattrvalue }}
+                    <h6><span class="badge badge-pill badge-secondary">{{ attr.evattrvalue }}</span></h6>
                     </a>
                 </td>
                 <td>
                     {{ inv.modified_at|date:"Y/m/d H:i:s" }}
                 </td>
                 <td>
-                    <a class="badge" href="#item-inve{{ invevidence.pk }}">
-                        {{invevidence.pk}}
+                    <a href="#item-inve{{ attr.ev.pk }}">
+                        <h6><span class="badge badge-pill badge-secondary">{{ attr.ev.pk}}</span></h6>
                     </a>
                 </td>
-
-              <td>
-                <div class="pull-left">
-                        <a href="{% url 'tasks:evattr_edit' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}"
-                            class="btn btn-default btn-xs">
-                            <span class="glyphicon glyphicon-pencil" data-toggle="tooltip" data-placement="top" title="Edit item">
-                            </span>
-                        </a>
-                        <a href="{% url 'tasks:evattr_observabletoggle' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ invevidence.pk }}"
-                            class="btn btn-default btn-xs">
-                        {% if attr.observable %}
-                            <span class="glyphicon glyphicon-eye-open" data-toggle="tooltip" data-placement="top" title="Toggle Observable">
-                            </span>
-                        {% else %}
-                            <span class="glyphicon glyphicon-ban-circle" data-toggle="tooltip" data-placement="top" title="Toggle Observable">
-                            </span>
-                        {% endif %}
-                        </a>
-
-                </div>
-              </td>
-
-
-
             </tr>
         {% endif %}
-    {% endfor %}
-{% endfor %}
-{% else %}
+<!--     endfor %}-->
+<!-- endfor %}-->
+<!-- else %}-->
+{% empty %}
           <tr>
-            <td colspan="6" class="text-center bg-warning">No matching record found</td>
+            <td colspan="7" class="text-center bg-warning">No matching record found</td>
           </tr>
-{% endif %}
-
+<!-- endif %}-->
+{% endfor %}

@@ -11,44 +11,80 @@
 # 2019.07.29  Lendvay     1      Initial file
 # **********************************************************************;
 -->
+
+                    <table class="table table-sm table-hover display order-column" id="investigations-invi"
+                           style="min-height:45vh"
+                        data-toggle="table"
+                        data-classes="table table-no-bordered"
+                        data-pagination="true"
+                        data-pagination-h-align="left"
+                        data-search="true"
+                        data-search-align="left"
+                        data-show-refresh="true"
+                        data-show-toggle="true"
+                        data-show-columns="true"
+                        data-minimum-count-columns="2"
+                        data-show-pagination-switch="true"
+                        data-id-field="id"
+                        data-page-list="[10, 25, 50, 100, ALL]"
+                        data-show-footer="false"
+                        data-side-pagination="client"
+                        data-buttons-align="left"
+                    >
+                        <thead>
+                        <tr>
+                            <th data-field="id" data-sortable="true">Template ID</th>
+                            <th data-field="name" data-sortable="true">Template Name</th>
+                            <th data-field="title" data-sortable="true">Template Title</th>
+                            <th data-field="enabled" data-sortable="true">Enabled</th>
+                            <th data-field="category" data-sortable="true">Category</th>
+                            <th data-field="created" data-sortable="true">Created (UTC)</th>
+                            <th data-field="modified" data-sortable="true">Modified (UTC)</th>
+                            <th data-field="modifiedy" data-sortable="true">Modified by</th>
+                            <th data-field="owner" data-sortable="true">Owner</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+
 {% if object_list %}
 {% for tasktemplate in object_list %}
                 <tr data-toggle="collapse" data-target="#mytasktemplates{{tasktemplate.pk}}" class="accordion-toggle" id="item-tasktmp-{{tasktemplate.pk}}">
                     <td>
-                        <li class="dropdown" onclick="incrow({{tasktemplate.pk}},'item-tasktmp-','150px')">
-                            <div>
+                        <div class="dropdown" onclick="incrow({{tasktemplate.pk}},'item-tasktmp-','150px')">
+
                             <div class="btn-group">
-                             <button class="btn btn-default btn-xs dropdown-toggle dropdown-toggle-split" onclick="filterFunctionTask()" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
+                             <button class="btn btn-default btn-sm dropdown-toggle dropdown-toggle-split" onclick="filterFunctionTask()" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
                                 {{ tasktemplate.pk }} <span class="caret"></span>
                             </button>
                                 <ul class="dropdown-menu" role="menu">
                                     <li>
                                         <a href="{% url 'tasks:tmp_detail' pk=tasktemplate.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                           class="btn btn-default btn-xs">
+                                           class="btn btn-secondary btn-sm btn-block text-left">
                                             Open
-                                            <span class="glyphicon glyphicon-eye-open"></span>
+                                            <span class="fas fa-eye"></span>
                                         </a>
                                     </li>
                                     <li>
                                         <a href="{% url 'tasks:tmp_edit' pk=tasktemplate.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                          class="btn btn-default btn-xs">
+                                          class="btn btn-secondary btn-sm btn-block text-left">
                                           Edit&nbsp;
-                                          <span class="glyphicon glyphicon-pencil" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
+                                          <span class="fas fa-pen" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
                                         </a>
                                     </li>
                                     <li>&nbsp;</li>
                                     <li>
                                           <a href="{% url 'tasks:tmp_remove' pk=tasktemplate.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                              class="btn btn-danger btn-xs">
-                                          <span class="glyphicon glyphicon-trash" data-toggle="tooltip" data-placement="top" title="Edit item">
+                                              class="btn btn-secondary btn-sm btn-block text-danger font-weight-bold">
+                                          <span class="fas fa-trash-alt" data-toggle="tooltip" data-placement="top" title="Edit item">
                                               Delete
                                           </span>
                                           </a>
                                     </li>
                                 </ul>
                                 </div>
-                            </div>
-                        </li> <!-- .dropdown -->
+
+                        </div> <!-- .dropdown -->
                     </td>
                     <td>
                         {{ tasktemplate.tasktemplatename }}
@@ -75,19 +111,22 @@
                         {{ tasktemplate.user }}
                     </td>
                 </tr>
-                <tr >
-                    <td colspan="8" class="hiddenRow">
+                <tr class="hiddenRow">
+                    <td colspan="9">
                         <div class="accordian-body collapse" id="mytasktemplates{{tasktemplate.pk}}">
                             <div class="invdescription2" style="max-width:25vw">
                             {{ tasktemplate.description|safe }}
                             </div>
                         </div>
                     </td>
-                </tr>
 
+                    <td>&nbsp;</td>
+                </tr>
 {% endfor %}
 {% else %}
           <tr>
-            <td colspan="8" class="text-center bg-warning">No Task Templates</td>
+            <td colspan="9" class="text-center bg-warning">No Task Templates</td>
           </tr>
 {% endif %}
+                        </tbody>
+                    </table>

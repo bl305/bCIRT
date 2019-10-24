@@ -1,4 +1,4 @@
-{% extends "tasks/action_base.html" %}
+{% extends "tasks/action_template.html" %}
 <!--
 # **********************************************************************;
 # Project           : bCIRT
@@ -12,51 +12,39 @@
 # 2019.07.29  Lendvay     1      Initial file
 # **********************************************************************;
 -->
+{% block action_alert %}
+{% endblock action_alert %}
 
-{% block actionslist_active %}active{% endblock actionslist_active%}
-
-{% block preactions %}
-
-{% endblock %}
-
-
-{% block actions_content %}
-    <div class="row">
-        <!-- Left Investigation Info -->
-        <div class="col-sm-12 col-md-12">
-            <div class="panel panel-primary">
-                <header class = "panel-heading">
-                    <div class="panel-title text-center">
-                        <div class="btn-group inline pull-left">
+{% block action_buttons %}
                             <a href="{% url 'tasks:actgrp_create' %}?next1={{ request.get_full_path|urlencode }}"
-                               class="btn btn-default btn-xs">
-                            <span class="glyphicon glyphicon-plus"></span>
-                            New ActionGroup
+                              class="btn btn-outline-secondary btn-sm">
+                            <span class="font-weight-bold" data-toggle="tooltip" data-placement="top" title="Delete item">
+                              <i class="fas fa-plus"></i>
+                              New ActionGroup
+                            </span>
                             </a>
-                        </div>
-                        <strong>&nbsp;ActionGroup Details | {{ actiongroup.pk }}</strong>
-                        <div class="btn-group inline ">
-                            <div class="btn btn-warning btn-xs">
-                            <a style="color:white" href="{% url 'tasks:actgrp_edit' pk=actiongroup.pk %}?next1={{ request.get_full_path|urlencode }}">
-                            <span class="glyphicon glyphicon-pencil"></span>
-                            Edit
+
+                            <a href="{% url 'tasks:actgrp_edit' pk=actiongroup.pk %}?next1={{ request.get_full_path|urlencode }}"
+                              class="btn btn-outline-secondary btn-sm">
+                            <span class="font-weight-bold" data-toggle="tooltip" data-placement="top" title="Delete item">
+                              <i class="fas fa-pen"></i>
+                              Edit
+                            </span>
                             </a>
-                            </div>
-                        </div>
-                    </div>
-                </header>
-                <div class="panel-body inv-panel-body">
+{% endblock action_buttons %}
+
+{% block action_title %}
+                        &nbsp;ActionGroup Details | {{ actiongroup.pk }}
+{% endblock action_title %}
+
+{% block action_body %}
                     <table class="table" id="actions-detail">
                         <tbody >
                             {% include 'tasks/actiongroup_detail_table.html' %}
                         </tbody>
                     </table>
-                    <a href="{% url 'tasks:actgrp_list' %}" class="btn btn-primary pull-right">
-                        <span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>
+                    <a href="{% url 'tasks:actgrp_list' %}" class="btn btn-primary">
+                        <span class="fas fa-arrow-left" aria-hidden="true"></span>
                         <span>ActionGroup list</span>
                     </a>
-                </div>
-            </div>
-        </div>
-    </div>
-{% endblock %}
+{% endblock action_body %}

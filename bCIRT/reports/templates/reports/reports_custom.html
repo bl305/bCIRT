@@ -25,43 +25,22 @@
 <div class="container-fluid">
 	<div class="row">
 		<div class="col-md-12">
-			<div class="well">
+			<div class="card card-body bg-light">
                 <form method="POST">
 
                 {% csrf_token %}
-
                 {% for field in form %}
                     <div class="form-group">
                         <div class="col-sm-offset-2 col-sm-10">
                             <span class="text-danger small">{{ field.errors }}</span>
                         </div>
-                        <label class="control-label col-sm-2" for="Inv_id">{{ field.label_tag }}</label>
-                        <div class="col-sm-10">
-                        {% if field %}
-                            <script type="text/javascript" src="{% static 'bCIRT/timepicker/lib/bootstrap-datepicker.js' %}"></script>
-                            <link rel="stylesheet" type="text/css" href="{% static 'bCIRT//timepicker/lib/bootstrap-datepicker.css' %}" />
-                            {{ field }}
-                            <script>
-                                $(function() {
-                                    $('#{{ field.auto_id }}_0').datepicker({
-                                        calendarWeeks: true,
-                                        clearBtn: true,
-                                        todayHighlight: true,
-                                        showButtonPanel: true,
-                                        changeMonth: true,
-                                        changeYear: true,
-                                        showWeek: true,
-                                        firstDay: 1
-                                        });
-                                });
-                            </script>
-
-                        {% else %}
-                            {{ field }}
-                        {% endif %}
+                        <div class="row container mw-100 d-inline-flex justify-content-start flex-row align-items-start align-content-start flex-nowrap">
+                            <label class="control-label col-sm-2" for="Inv_id">{{ field.label_tag }}</label>
+                            <div class="col-sm-10">
+                                {{ field }}
+                            </div>
                         </div>
                     </div>
-
                 {% endfor %}
                 <button type="submit">Generate</button>
                 </form>
@@ -71,7 +50,7 @@
 <hr class="thick">
     <div class="row">
         <div class="col-md-12">
-            <div class="well">
+            <div class="card card-body bg-light">
                 <p><strong>Phishing Stats Custom</strong></p>
                 <table class="table table-condensed" style="border-collapse:collapse;">
                     <thead>
@@ -106,7 +85,7 @@
     </div>
     <div class="row">
         <div class="col-md-12">
-            <div class="well">
+            <div class="card card-body bg-light">
                 <p><strong>Attackvector Stats Custom</strong></p>
                 <table class="table table-condensed" style="border-collapse:collapse;">
                     <thead>
@@ -142,7 +121,7 @@
 
     <div class="row">
         <div class="col-md-12">
-            <div class="well">
+            <div class="card card-body bg-light">
                 <p><strong>Investigations by Status Custom</strong></p>
                 <table class="table table-condensed" style="border-collapse:collapse;">
                     <thead>
@@ -169,7 +148,7 @@
 	</div>
     <div class="row">
         <div class="col-md-12">
-            <div class="well">
+            <div class="card card-body bg-light">
                 <p><strong>Investigations Duration</strong></p>
                 <table class="table table-condensed" style="border-collapse:collapse;">
                     <thead>
@@ -199,7 +178,7 @@
 	<hr class="thick">
     <div class="row">
         <div class="col-md-4">
-            <div class="well">
+            <div class="card card-body bg-light">
 				<p><strong>Tasks per Investigation All</strong></p>
                 <table class="table table-condensed" style="border-collapse:collapse;">
                     <thead>
@@ -226,7 +205,7 @@
 			</div>
 		</div>
         <div class="col-md-4">
-            <div class="well">
+            <div class="card card-body bg-light">
 				<p><strong>Tasks Manual per Investigation </strong></p>
                 <table class="table table-condensed" style="border-collapse:collapse;">
                     <thead>
@@ -253,7 +232,7 @@
 			</div>
 		</div>
         <div class="col-md-4">
-            <div class="well">
+            <div class="card card-body bg-light">
 				<p><strong>Tasks Auto per Investigation </strong></p>
                 <table class="table table-condensed" style="border-collapse:collapse;">
                     <thead>
@@ -282,7 +261,7 @@
 	</div>
     <div class="row">
         <div class="col-md-12">
-            <div class="well">
+            <div class="card card-body bg-light">
                 <p><strong>Tasks by Status All</strong></p>
                 <table class="table table-condensed" style="border-collapse:collapse;">
                     <thead>
@@ -309,7 +288,7 @@
 	</div>
     <div class="row">
         <div class="col-md-6">
-            <div class="well">
+            <div class="card card-body bg-light">
                 <p><strong>Tasks Duration All</strong></p>
                 <table class="table table-condensed" style="border-collapse:collapse;">
                     <thead>
@@ -336,7 +315,7 @@
 			</div>
 		</div>
         <div class="col-md-6">
-            <div class="well">
+            <div class="card card-body bg-light">
                 <p><strong>Tasks Duration Manual</strong></p>
                 <table class="table table-condensed" style="border-collapse:collapse;">
                     <thead>
@@ -366,7 +345,7 @@
 	<hr class="thick">
     <div class="row">
         <div class="col-md-6">
-            <div class="well">
+            <div class="card card-body bg-light">
                 <p><strong>Attack Vectors All</strong></p>
                 <table class="table table-condensed" style="border-collapse:collapse;">
                     <thead>
@@ -391,7 +370,7 @@
 			</div>
 		</div>
         <div class="col-md-6">
-            <div class="well">
+            <div class="card card-body bg-light">
                 <p><strong>Attack Vectors Victims</strong></p>
                 <table class="table table-condensed" style="border-collapse:collapse;">
                     <thead>
@@ -419,7 +398,7 @@
     <hr class="thick">
     <div class="row">
         <div class="col-md-12">
-            <div class="well">
+            <div class="card card-body bg-light">
                 <p><strong>Tasks by title All</strong></p>
                 <table class="table table-condensed" style="border-collapse:collapse;">
                     <thead>
@@ -445,6 +424,39 @@
 		</div>
 	</div>
 <hr class="thick">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card card-body bg-light">
+                <p><strong>Investigations All Summary (Excluding Suspicious email and None)</strong></p>
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>Summary</th>
+                            <th>ID</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for inv_all_summary in invs_all_summary %}
+                        <tr data-toggle="collapse" data-target="#myinvs{{inv_all_summary.pk}}" class="accordion-toggle">
+                            <td>
+                                {{ inv_all_summary.summary }}
+                            </td>
+                            <td>
+                                {{ inv_all_summary.id }}
+                            </td>
+                            <td>
+                                {{ inv_all_summary.created_at |date:"Y/m/d H:i:s e" }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+			</div>
+		</div>
+	</div>
+<hr class="thick">
+
 </div>
 {% endblock reports_content %}
 </div>

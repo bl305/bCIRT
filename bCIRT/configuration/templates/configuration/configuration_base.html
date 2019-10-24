@@ -19,62 +19,103 @@
 {% load bootstrap4 %}
 
 {% block content %}
+<div class="row w-100">
+    <div class="col-sm-12">
+        <ul class="nav nav-tabs">
 
-    <ul class="nav nav-tabs">
+            <li class="dropdown">
+                <a class="dropdown-toggle btn btn-outline-secondary" data-toggle="dropdown" href="#">
+                    Connections
+                    <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a href="{% url 'configuration:connitem_list' %}"
+                           class="btn btn-secondary btn-sm btn-block text-left">
+                        <span class="fas fa-list"></span>
+                        Connections
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'configuration:connitemf_list' %}"
+                           class="btn btn-secondary btn-sm btn-block text-left">
+                        <span class="fas fa-list"></span>
+                        Connection Fields
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+<!--            Themes menu-->
         <li class="dropdown">
-            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                Connections
-                <span class="caret"></span></a>
+            <a class="dropdown-toggle btn btn-outline-secondary" data-toggle="dropdown" href="#">
+                Theme
+                <span class="caret"></span>
+            </a>
             <ul class="dropdown-menu">
                 <li>
-                    <a class="nav-link" href="{% url 'configuration:connitem_list' %}">
-                    <span class="glyphicon glyphicon-th-list"></span>
-                    List Connections
+                    <a href="#"
+                       class="btn btn-secondary btn-sm btn-block text-left">
+                        Dark -default
                     </a>
                 </li>
                 <li>
-                    <a class="nav-link" href="{% url 'configuration:connitemf_list' %}">
-                    <span class="glyphicon glyphicon-th-list"></span>
-                    List Connection Fields
+                    <a href="#"
+                       class="btn btn-secondary btn-sm btn-block text-left">
+                        Light
                     </a>
                 </li>
             </ul>
         </li>
-        <li class="dropdown">
-            <a class="dropdown-toggle" data-toggle="dropdown" href="#">Theme<span class="caret"></span></a>
-            <ul class="dropdown-menu">
-                <li><a href="#">Dark -default</a></li>
-                <li><a href="#">Light</a></li>
-            </ul>
-        </li>
-        <li class="nav-item {% block configurationmenu_active %}{% endblock configurationmenu_active%}" >
-            <a class="nav-link" href="{% url 'configuration:conf_logging' %}">Logging</a>
-        </li>
+<!--            Themes menu end-->
 
+<!--Updates            -->
         <li class="dropdown">
-            <a class="dropdown-toggle" data-toggle="dropdown" href="#">Update<span class="caret"></span></a>
+            <a class="dropdown-toggle btn btn-outline-secondary" data-toggle="dropdown" href="#">
+                Update
+                <span class="caret"></span>
+            </a>
             <ul class="dropdown-menu">
                 <li>
-                    <a href="{% url 'configuration:conf_updatecreate' %}">
-                      <span class="glyphicon glyphicon-th-list"></span>
+                    <a href="{% url 'configuration:conf_updatecreate' %}"
+                       class="btn btn-secondary btn-sm btn-block text-left">
+                      <span class="fas fa-list"></span>
                       Upload Update
                     </a>
                 </li>
                 <li>
-                    <a href="{% url 'configuration:conf_updatelist' %}">
-                      <span class="glyphicon glyphicon-th-list"></span>
+                    <a href="{% url 'configuration:conf_updatelist' %}"
+                       class="btn btn-secondary btn-sm btn-block text-left">
+                      <span class="fas fa-list"></span>
                       List Updates
                     </a>
                 </li>
             </ul>
         </li>
-        <li class="nav-item " >
-            <a class="nav-link" href="{% url 'configuration:conf_about' %}">About</a>
+<!--            Updates end-->
+        <li class="dropdown">
+            <a class="btn btn-outline-secondary" href="{% url 'configuration:conf_logging' %}">
+                Logging
+            </a>
         </li>
+
+        <li class="dropdown">
+            <a class="btn btn-outline-secondary" href="{% url 'configuration:conf_about' %}">About</a>
+        </li>
+
+        </ul>
+    </div>
+</div>
+
+
+
+
+<div class="container-fluid">
+    <ul class="nav nav-tabs">
+
     </ul>
 
     {% block preconfiguration %}{% endblock %}
     {% block configuration_content %}{% endblock %}
     {% block postconfiguration %}{% endblock %}
-
+</div>
 {% endblock %}

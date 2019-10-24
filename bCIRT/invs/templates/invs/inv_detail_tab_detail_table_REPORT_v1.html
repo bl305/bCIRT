@@ -13,7 +13,7 @@
 -->
 {% if inv.invid %}
     <tr>
-        <td><strong>Investigation ID</strong><br> {{ inv.id }}-{{ inv.invid }} </td>
+        <td><strong>Investigation ID</strong><br> {{ inv.invid }} </td>
         <td><strong>Severity</strong><br> {{ inv.severity }} </td>
         <td><strong>Priority</strong><br> {{ inv.priority }} </td>
         <td><strong>Parent</strong><br> {{ inv.parent }} </td>
@@ -21,6 +21,24 @@
     <tr>
         <td><strong>Status</strong><br> {{ inv.status }} </td>
         <td><strong>Assigned to</strong><br> {{ inv.user }} </td>
+        <td><strong>Incident start</strong><br>
+        {% if inv.incstarttime %}
+            {{ inv.incstarttime|date:"Y/m/d H:i:s" }}
+        {% else %}
+            -
+        {% endif %}
+        </td>
+        <td><strong>Incident end</strong><br>
+        {% if inv.incendtime %}
+            {{ inv.incendtime|date:"Y/m/d H:i:s" }}
+        {% else %}
+            -
+        {% endif %}
+        </td>
+    </tr>
+    <tr>
+        <td><strong>Phase</strong><br> {{ inv.phase }} </td>
+        <td><strong>Category</strong><br> {{ inv.category }} </td>
         <td><strong>Investigation start</strong><br> {{ inv.starttime|date:"Y/m/d H:i:s" }} </td>
         <td><strong>Investigation end</strong><br>
         {% if inv.endtime %}
@@ -31,19 +49,35 @@
         </td>
     </tr>
     <tr>
-        <td><strong>Phase</strong><br> {{ inv.phase }} </td>
-        <td><strong>Category</strong><br> {{ inv.category }} </td>
+        <td><strong>Attack Vector</strong><br> {{ inv.attackvector }} </td>
+        <td><strong>Monetary Loss</strong><br> {{ inv.monetaryloss }} {{ inv.losscurrency }} </td>
         <td><strong>Modified on</strong><br> {{ inv.modified_at|date:"Y/m/d H:i:s" }} </td>
         <td><strong>Modified by</strong><br> {{ inv.modified_by }} </td>
     </tr>
     <tr>
-        <td><strong>Attack Vector</strong><br> {{ inv.attackvector }} </td>
-        <td><strong>Monetary Loss</strong><br> {{ inv.monetaryloss }} {{ inv.losscurrency }} </td>
+        <td><strong>Ticket</strong><br> {{ inv.ticketid }} </td>
+        <td><strong>Reference</strong><br>
+            {% if inv.refid %}
+                {{ inv.refid }}
+            {% else %}
+                -
+            {% endif%}
+        </td>
         <td><strong>Created on</strong><br> {{ inv.created_at|date:"Y/m/d H:i:s" }} </td>
         <td><strong>Created by</strong><br> {{ inv.created_by }} </td>
     </tr>
     <tr>
-        <td colspan="4"><strong>Comment</strong><br> {{ inv.comment }} </td>
+        <td colspan="2"><strong>Comment</strong><br> {{ inv.comment }} </td>
+        <td><strong>Victim Count</strong><br> {{ inv.numofvictims }} </td>
+        <td>
+            <strong>Duration</strong><br>
+            {% if inv.invduration %}
+                {{ inv.invdurationprint }}
+            {% else %}
+                -
+            {% endif %}
+        </td>
+
     </tr>
     <tr>
         <td colspan="4">

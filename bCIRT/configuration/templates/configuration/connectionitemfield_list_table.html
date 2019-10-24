@@ -15,7 +15,7 @@
 {% for connectionitemfield in object_list %}
                 <tr>
                     <td>
-                        <a class="badge" href="{% url 'configuration:connitemf_detail' pk=connectionitemfield.pk %}?next1={{ request.get_full_path|urlencode }}">
+                        <a class="badge badge-secondary" href="{% url 'configuration:connitemf_detail' pk=connectionitemfield.pk %}?next1={{ request.get_full_path|urlencode }}">
                             {{ connectionitemfield.pk }}
                         </a>
                     </td>
@@ -30,10 +30,10 @@
                         <div>
                             <a href="{% url 'configuration:connitemf_edit' pk=connectionitemfield.pk %}"
                                class="btn btn-warning btn-xs">
-                                <span class="glyphicon glyphicon-pencil"></span>
+                                <span class="fas fa-pen"></span>
                             </a>
                             <a href="{% url 'configuration:connitemf_remove' pk=connectionitemfield.pk %}" title="delete" class="btn btn-danger btn-xs pull-right">
-                                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                                <span class="fas fa-trash-alt" aria-hidden="true"></span>
                                 <span class="icon-label"></span>
                             </a>
                         </div>

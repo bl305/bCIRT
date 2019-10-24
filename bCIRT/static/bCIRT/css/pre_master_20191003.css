@@ -1,0 +1,43 @@
+.fittable {
+    table-layout:fixed;
+    width:100%;
+//or instead of width use:    max-width: none;
+//    border:1px solid #f00;
+    word-wrap:break-word;
+}
+
+
+.mycardheader {
+    height: 55px;
+}
+
+.invdescription {
+  margin:1px;
+  word-wrap:break-word;
+  overflow-wrap:break-word;
+}
+
+/// old stuff
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu > .dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: 70px;
+  margin-left: -5px;
+}
+.dropdown-submenu:hover > .dropdown-menu {
+  display: block;
+}
+.dropdown-submenu:hover > a:after {
+  border-left-color: #fff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left > .dropdown-menu {
+  top: 5rem;
+  left: -165%;
+  margin-left: 10px;
+}

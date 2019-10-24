@@ -1,4 +1,4 @@
-{% extends "tasks/task_base.html" %}
+{% extends "tasks/task_template.html" %}
 <!--
 # **********************************************************************;
 # Project           : bCIRT
@@ -12,40 +12,35 @@
 # 2019.07.29  Lendvay     1      Initial file
 # **********************************************************************;
 -->
+{% block task_alert %}
+{% endblock task_alert %}
 
-{% block taskslist_active %}active{% endblock taskslist_active%}
-
-{% block pretasks %}
-
-{% endblock %}
-
-{% block tasks_content %}
-    <div class="row">
-        <!-- Left Investigation Info -->
-        <div class="col-sm-12 col-md-12">
-            <div class="panel panel-primary">
-                <header class = "panel-heading">
-                    <div class="panel-title text-center">
-                        <div class="btn-group inline pull-left">
-                        </div>
-                        <strong>&nbsp;Task Variable Details | {{ taskvar.pk }}</strong>
-                        <div class="btn-group inline ">
-                            <a href="{% url 'tasks:tvar_edit' pk=taskvar.pk %}#?next1={{ request.get_full_path|urlencode }}" class="btn btn-warning btn-xs">
-                            <span class="glyphicon glyphicon-pencil"></span>
+{% block task_buttons %}
+                            <a href="{% url 'tasks:tvar_edit' pk=taskvar.pk %}#?next1={{ request.get_full_path|urlencode }}"
+                                   class="btn btn-outline-secondary btn-sm">
+                                    <span class="font-weight-bold">
+                                        <i class="fas fa-pen"></i>
+                                    </span>
                             Edit
                             </a>
-                        </div>
-                    </div>
-                </header>
-                <div class="panel-body inv-panel-body" id="xxx">
-                    <table class="table" id="investigations-invh">
+&nbsp;
+                            <a href="{% url 'tasks:tvar_remove' pk=taskvar.pk %}#?next1={{ request.get_full_path|urlencode }}"
+                                   class="btn btn-danger btn-sm">
+                                    <span class="font-weight-bold">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </span>
+                            Delete
+                            </a>
+{% endblock task_buttons %}
+
+{% block task_title %}
+                        Task Variable Details | {{ taskvar.pk }}
+{% endblock task_title %}
+
+{% block task_body %}
+                    <table class="table table-sm" id="investigations-invh">
                         <tbody>
                             {% include 'tasks/taskvar_detail_template.html' %}
                         </tbody>
                     </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-{% endblock tasks_content %}
+{% endblock task_body %}

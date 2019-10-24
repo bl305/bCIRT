@@ -1,4 +1,4 @@
-{% extends "assets/asset_base.html" %}
+{% extends "assets/asset_template.html" %}
 <!--
 # **********************************************************************;
 # Project           : bCIRT
@@ -12,27 +12,18 @@
 # 2019.07.29  Lendvay     1      Initial file
 # **********************************************************************;
 -->
-{% block assetslist_active %}active{% endblock assetslist_active%}
+{% block asset_alert %}
+{% endblock asset_alert %}
 
-{% block preassets %}
+{% block asset_buttons %}
+{% endblock asset_buttons %}
 
-{% endblock %}
+{% block asset_title %}
+                        Profile # {{ profile.pk }}
+{% endblock asset_title %}
 
-
-{% block assets_content %}
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="panel panel-primary">
-                <div class = "panel-heading">
-                    <div class="panel-title text-center" >
-                        <div class="btn-group inline pull-left">
-
-                        </div>
-                        <strong> Profile # {{ profile.pk }}</strong>
-                    </div>
-                </div>
-                <div class="panel-body inv-panel-body">
-                    <table class="table table-hover table-striped table-condensed" id="investigations-inve">
+{% block asset_body %}
+                    <table class="table table-sm table-hover table-striped table-condensed" id="investigations-inve">
                         <thead>
                             <tr class="mylist-header">
                                 <th>ProfileID</th>
@@ -56,13 +47,8 @@
                             {% include "assets/profile_detail_table.html" %}
                         </tbody>
                     </table>
-                    <a href="javascript:history.go(-1)" class="btn btn-primary pull-right">
-                        <span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>
+                    <a href="javascript:history.go(-1)" class="btn btn-primary btn-sm">
+                        <span class="fas fa-arrow-left" aria-hidden="true"></span>
                         <span>Back</span>
                     </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-{% endblock %}
+{% endblock asset_body %}

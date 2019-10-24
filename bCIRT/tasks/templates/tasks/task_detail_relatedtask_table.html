@@ -18,7 +18,7 @@
                 <tr class="mylist-meta" style="background-color:#e6e6e6" id="item-p{{ task.parent.pk }}">
                     <!-- e.g.: #item-7 -->
                     <td>
-                      <a class="badge" href="{% url 'tasks:tsk_detail' pk=task.parent.pk %}?next1={{ request.get_full_path|urlencode }}">{{ task.parent.pk }}</a>
+                      <a class="badge badge-secondary" href="{% url 'tasks:tsk_detail' pk=task.parent.pk %}?next1={{ request.get_full_path|urlencode }}">{{ task.parent.pk }}</a>
                     </td>
                     <td>
                         Parent
@@ -41,16 +41,16 @@
                     <td>
                       <div>
                           <a href="{% url 'tasks:tsk_detail' pk=task.parent.pk %}?next1={{ request.get_full_path|urlencode }}"
-                              class="btn btn-success btn-xs">
-                          <span class="glyphicon glyphicon-eye-open" data-toggle="tooltip" data-placement="top" title="View item"></span>
+                              class="btn btn-success btn-sm">
+                          <span class="fas fa-eye" data-toggle="tooltip" data-placement="top" title="View item"></span>
                           </a>
                           <a href="{% url 'tasks:tsk_edit' pk=task.parent.pk %}?next1={{ request.get_full_path|urlencode }}"
-                              class="btn btn-warning btn-xs">
-                          <span class="glyphicon glyphicon-pencil" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
+                              class="btn btn-warning btn-sm">
+                          <span class="fas fa-pen" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
                           </a>
                           <a href="{% url 'tasks:tsk_remove' pk=task.parent.pk %}#?next1={{ request.get_full_path|urlencode }}"
-                              class="btn btn-danger btn-xs pull-right">
-                          <span class="glyphicon glyphicon-trash" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
+                              class="btn btn-danger btn-sm pull-right">
+                          <span class="fas fa-trash-alt" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
                           </a>
                       </div>
                     </td>
@@ -65,7 +65,7 @@
                 <tr class="mylist-meta" style="background-color:#e6e6e6" id="item-c{{ child.pk }}">
                     <!-- e.g.: #item-7 -->
                     <td>
-                      <a class="badge" href="{% url 'tasks:tsk_detail' pk=child.pk %}?next1={{ request.get_full_path|urlencode }}">{{ child.pk }}</a>
+                      <a class="badge badge-secondary" href="{% url 'tasks:tsk_detail' pk=child.pk %}?next1={{ request.get_full_path|urlencode }}">{{ child.pk }}</a>
                     </td>
                     <td>
                         Child
@@ -89,15 +89,15 @@
                       <div>
                           <a href="{% url 'tasks:tsk_detail' pk=child.pk %}?next1={{ request.get_full_path|urlencode }}"
                               class="btn btn-success btn-xs">
-                          <span class="glyphicon glyphicon-eye-open" data-toggle="tooltip" data-placement="top" title="View item"></span>
+                          <span class="fas fa-eye" data-toggle="tooltip" data-placement="top" title="View item"></span>
                           </a>
                           <a href="{% url 'tasks:tsk_edit' pk=child.pk %}?next1={{ request.get_full_path|urlencode }}"
                               class="btn btn-warning btn-xs">
-                          <span class="glyphicon glyphicon-pencil" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
+                          <span class="fas fa-pen" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
                           </a>
                           <a href="{% url 'tasks:tsk_remove' pk=child.pk %}#?next1={{ request.get_full_path|urlencode }}"
-                              class="btn btn-danger btn-xs pull-right">
-                          <span class="glyphicon glyphicon-trash" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
+                              class="btn btn-danger btn-xs">
+                          <span class="fas fa-trash-alt" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
                           </a>
                       </div>
                     </td>

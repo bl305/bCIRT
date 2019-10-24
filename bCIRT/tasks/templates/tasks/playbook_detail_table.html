@@ -18,7 +18,7 @@
                     </td>
                     <td>
                         {% if playbook.inv %}
-                        <a class="badge" href="{% url 'invs:inv_detail' pk=playbook.inv.pk %}?next1={{ request.get_full_path|urlencode }}">
+                        <a class="badge badge-secondary" href="{% url 'invs:inv_detail' pk=playbook.inv.pk %}?next1={{ request.get_full_path|urlencode }}">
                             {{ playbook.inv }}
                         </a>
                         {% else %}

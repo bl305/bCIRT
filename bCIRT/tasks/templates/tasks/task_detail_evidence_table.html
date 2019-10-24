@@ -19,44 +19,47 @@
                 <tr class="mylist-meta" style="background-color:#e6e6e6" id="item-{{ taskevidence.pk }}">
                     <!-- e.g.: #item-7 -->
                     <td>
-                        <li class="dropdown">
+                        <div class="dropdown">
                             <!--<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Dropdown <span class="caret"></span></a>-->
                             <!--<button class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">-->
                                 <!--Dropdown -->
                                 <!--<span class="caret"></span>-->
                             <!--</button>-->
 
-                            <button class="btn btn-default btn-xs dropdown-toggle" onclick="filterFunctionEv()" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
+                            <button class="btn btn-secondary btn-sm dropdown-toggle" onclick="filterFunctionEv()" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
                                 {{ taskevidence.pk }}
                                 <span class="caret"></span>
                             </button>
                                 <ul class="dropdown-menu" role="menu">
                                     <li>
                                           <a href="{% url 'tasks:evattr_create' pk=taskevidence.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                              class="btn btn-default btn-xs">
+                                              class="btn btn-secondary btn-sm btn-block text-left">
                                               Attribute
-                                              <span class="glyphicon glyphicon-plus" data-toggle="tooltip" data-placement="top" title="Edit item">
+                                              <span class="fas fa-plus" data-toggle="tooltip" data-placement="top" title="Edit item">
                                           </span>
                                           </a>
                                     </li>
 
                                     <li>
                                         <a href="{% url 'tasks:ev_detail' pk=taskevidence.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                            class="btn btn-default btn-xs">
+                                            class="btn btn-secondary btn-sm btn-block text-left">
                                             Open&nbsp;
-                                            <span class="glyphicon glyphicon-eye-open" data-toggle="tooltip" data-placement="top" title="Open item"></span>
+                                            <span class="fas fa-eye" data-toggle="tooltip" data-placement="top" title="Open item"></span>
                                         </a>
                                     </li>
                                     <li>
                                         <a href="{% url 'tasks:ev_edit' pk=taskevidence.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                          class="btn btn-default btn-xs">
+                                          class="btn btn-secondary btn-sm btn-block text-left">
                                           Edit&nbsp;
-                                          <span class="glyphicon glyphicon-pencil" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
+                                          <span class="fas fa-pen" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
                                         </a>
                                     </li>
 
                                     <li class="dropdown-submenu">
-                                        <a tabindex="-1" href="#" class="btn btn-default btn-xs">Actions <span class="glyphicon glyphicon-chevron-right"></span></a>
+                                        <a tabindex="-1" href="#"
+                                           class="btn btn-secondary btn-sm btn-block text-left">
+                                            Actions
+                                            <span class="fas fa-chevron-right"></span></a>
                                         <ul class="dropdown-menu dropdown-content" id="myDropdownEv">
                                             <input type="text" placeholder="Search.." id="myInputEv" onkeyup="filterFunctionEv()">
                                             {% for actid in actions %}
@@ -79,7 +82,10 @@
                                     </li>
                                     {% if taskevidence.fileRef %}
                                     <li class="dropdown-submenu">
-                                        <a tabindex="-1" href="#" class="btn btn-default btn-xs">File Actions <span class="glyphicon glyphicon-chevron-right"></span></a>
+                                        <a tabindex="-1" href="#"
+                                        class="btn btn-secondary btn-sm btn-block text-left">
+                                            File Actions
+                                            <span class="fas fa-chevron-right"></span></a>
                                         <ul class="dropdown-menu dropdown-content" id="myDropdownEvFile">
                                             <input type="text" placeholder="Search.." id="myInputEvFile" onkeyup="filterFunctionEvFile()">
                                             {% for actid in actions %}
@@ -105,14 +111,14 @@
                                     <li>&nbsp;</li>
                                     <li>
                                           <a href="{% url 'tasks:ev_remove' pk=taskevidence.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                              class="btn btn-danger btn-xs">
-                                          <span class="glyphicon glyphicon-trash" data-toggle="tooltip" data-placement="top" title="Edit item">
+                                              class="btn btn-secondary btn-sm btn-block text-danger font-weight-bold">
+                                          <span class="fas fa-trash-alt" data-toggle="tooltip" data-placement="top" title="Edit item">
                                               Delete
                                           </span>
                                           </a>
                                     </li>
                                 </ul>
-                        </li> <!-- .dropdown -->
+                        </div> <!-- .dropdown -->
 
                     </td>
                     <td>
@@ -130,14 +136,14 @@
                     <td>
                         {% if taskevidence.fileRef %}
                             <a href="{{BASE_URL}}{{MEDIA_URL}}{{ taskevidence.fileRef.name }}"
-                              class="btn btn-default btn-xs" target="_blank">
-                              <span class="glyphicon glyphicon-floppy-disk">{{ taskevidence.fileName }}</span>
+                              class="btn btn-default btn-sm" target="_blank">
+                              <span class="fas fa-download">{{ taskevidence.fileName }}</span>
                             </a>
                         {% endif %}
                     </td>
                     <td>
                         {% if taskevidence.prevev %}
-                            <a class="badge" href="{% url 'tasks:ev_detail' pk=taskevidence.prevev.pk %}?next1={{ request.get_full_path|urlencode }}">
+                            <a class="badge badge-secondary" href="{% url 'tasks:ev_detail' pk=taskevidence.prevev.pk %}?next1={{ request.get_full_path|urlencode }}">
                                 {{ taskevidence.prevev }}
                             </a>
                         {% else %}
@@ -146,6 +152,171 @@
                     </td>
                     <td></td>
                 </tr>
+<tr>
+                    <td colspan="8">
+                        <table class="table table-sm table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Attribute</th>
+                                    <th>Attribute Value</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                            {% for attr in taskevidence.evattr_evidence.all %}
+                                <tr id="item-attr-{{attr.pk}}">
+                                    <td>
+                                        <div class="container mw-100 d-inline-flex justify-content-start flex-row align-items-center align-content-center flex-nowrap">
+                                            <div class="btn btn-sm">
+                                                {% if attr %}
+                                                    {% if attr.attr_reputation.pk == 1 %}
+                                                    <span class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="Unknown"></span>
+                                                    {% else %}
+                                                        {% if attr.attr_reputation.pk == 2 %}
+                                                            <span style="color:green;" class="fa fa-check-circle" data-toggle="tooltip" data-placement="top" title="Clean"></span>
+                                                        {% else %}
+                                                            {% if attr.attr_reputation.pk == 3 %}
+                                                                <strong>
+                                                                    <span class="fa fa-exclamation-circle text-danger" data-toggle="tooltip" data-placement="top" title="Suspicious"></span>
+                                                                </strong>
+                                                            {% else %}
+                                                                {% if attr.attr_reputation.pk == 4 %}
+                                                                <span class="fa fa-bomb text-danger" data-toggle="tooltip" data-placement="top" title="Malicious"></span>
+                                                                {% else %}
+                                                                <span data-toggle="tooltip" data-placement="top" title="-">&nbsp;-&nbsp;</span>
+                                                                {% endif %}
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    {% endif %}
+                                                {% else %}
+                                                                <span data-toggle="tooltip" data-placement="top" title="-">&nbsp;-&nbsp;</span>
+                                                {% endif %}
+                                            </div>
+                                                <!--Attribute dropdown-->
+                                            <div class="dropdown" onclick="incrow({{attr.pk}},'item-attr-','200px')">
+                                                <button class="btn btn-default btn-sm dropdown-toggle" onclick="filterFunctionEvAttr()" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
+                                                    {{ attr.evattrformat }}
+                                                    <span class="caret"></span>
+                                                </button>
+                                                <ul class="dropdown-menu" role="menu">
+                                                    {% if evidence.inv.readonly or evidence.task.readonly %}
+                                                    <li>
+                                                        <a href="{% url 'tasks:evattr_create' pk=evidence.pk %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ evidence.pk }}"
+                                                            class="btn btn-secondary btn-sm btn-block text-left">
+                                                                <span data-toggle="tooltip" data-placement="top" title="Attribute item">
+                                                                    &nbsp;<i class="fas fa-plus"></i>&nbsp;
+                                                                    Attribute
+                                                                </span>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{% url 'tasks:evattr_edit' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ evidence.pk }}"
+                                                            class="btn btn-secondary btn-sm btn-block text-left">
+                                                            <span data-toggle="tooltip" data-placement="top" title="Attribute item">
+                                                                &nbsp;<i class="fas fa-pencil-alt"></i>&nbsp;
+                                                                Edit
+                                                            </span>
+                                                        </a>
+                                                    </li>
+                                                {% endif %}
+                                                <li class="dropdown-submenu">
+                                                    <a tabindex="-1" href="#" class="btn btn-secondary btn-sm btn-block text-left">
+                                                        Actions <span class="fa fa-chevron-right"></span>
+                                                    </a>
+                                                    <ul class="dropdown-menu dropdown-content" id="myDropdownEvAttr">
+                                                        <input type="text" placeholder="Search.." id="myInputEvAttr" onkeyup="filterFunctionEvAttr()">
+                                                        <li>
+                                                            {% if attr.evattrformat.name == "UserName" or attr.evattrformat.name == "UserID" or attr.evattrformat.name == "Email" or attr.evattrformat.name == "HostName" or attr.evattrformat.name == "IPv4" or attr.evattrformat.name == "IPv6" %}
+                                                                <a href="{% url 'assets:profile_autoadd' inv_pk=inv.pk evattr_pk=attr.pk ev_pk=0 %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ evidence.pk }}"
+                                                                class="">
+                                                                      I - Add To Profile
+                                                                </a>
+                                                            {% endif %}
+                                                        </li>
+                                                        {% if actiongroups_attr %}
+                                                                  {% for actiongroup in actiongroups_attr|dictsort:"0" %}
+                                                                  <li>
+                                                                    {% if evidence.task %}
+                                                                        <a href="{% url 'tasks:act_exec_scriptgroup' pk=actiongroup.pk inv_pk=inv.pk task_pk=evidence.task.pk ev_pk=evidence.pk evattr_pk=attr.pk %}?attr={{attr.pk}}&next1={{ request.get_full_path|urlencode }}#item-inve{{ evidence.pk }}">
+                                                                    {% else %}
+                                                                        <a href="{% url 'tasks:act_exec_scriptgroup' pk=actiongroup.pk inv_pk=inv.pk task_pk=0 ev_pk=evidence.pk evattr_pk=attr.pk %}?attr={{attr.pk}}&next1={{ request.get_full_path|urlencode }}#item-inve{{ evidence.pk }}">
+                                                                    {% endif %}
+                                                                      <span></span>
+                                                                          G{{ actiongroup.pk}} - {{ actiongroup }}
+                                                                      </a>
+                                                                  </li>
+                                                                  {% endfor %}
+                                                        {% endif %}
+                                                        {% for actid in actions|dictsort:"0" %}
+                                                            <li>
+                                                                {% if actid.scriptinput.pk == 3 %}
+                                                                    {% if attr.evattrformat.pk == actid.scriptinputattrtype.pk or actid.scriptinputattrtype.pk is None %}
+                                                                        {% if evidence.task %}
+                                                                            <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=inv.pk task_pk=evidence.task.pk ev_pk=evidence.pk evattr_pk=attr.pk %}?attr={{attr.pk}}&next1={{ request.get_full_path|urlencode }}#item-inve{{ evidence.pk }}">
+                                                                        {% else %}
+                                                                            <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=inv.pk task_pk=0 ev_pk=evidence.pk evattr_pk=attr.pk %}?attr={{attr.pk}}&next1={{ request.get_full_path|urlencode }}#item-inve{{ evidence.pk }}">
+                                                                        {% endif %}
+                                                                        <span></span>
+                                                                        {{ actid.pk }} - {{ actid.title }} ({{ actid.outputtarget.shortname }})
+                                                                        </a>
+                                                                    {% endif %}
+                                                                {% endif %}
+
+                                                            </li>
+                                                          <!--<li class="divider"></li>-->
+                                                        {% endfor %}
+                                            <!--</div>-->
+                                                    </ul>
+                                                </li>
+                                                <li>&nbsp;</li>
+                                                <li>
+                                                      <a href="{% url 'tasks:evattr_remove' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ evidence.pk }}"
+                                                          class="btn btn-secondary btn-sm btn-block">
+                                                      <span class="font-weight-bold text-danger" data-toggle="tooltip" data-placement="top" title="Delete item">
+                                                          <i class="fas fa-trash-alt"></i>
+                                                          Delete
+                                                      </span>
+                                                      </a>
+                                                </li>
+                                              </ul>
+                                            </div> <!-- .dropdown -->
+                                            <!--Attribute dropdown end-->
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="container mw-100 d-inline-flex justify-content-start flex-row align-items-center align-content-center flex">
+
+                                        <a href="{% url 'tasks:evattr_observabletoggle' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ evidence.pk }}"
+                                        >
+                                        {% if attr.observable %}
+                                            <span data-toggle="tooltip" data-placement="top" title="Toggle Observable">
+                                                <i class="fas fa-eye" aria-hidden="true">&nbsp;</i>
+                                            </span>
+                                        {% else %}
+                                            <span class="fas fa-eye-slash" data-toggle="tooltip" data-placement="top" title="Toggle Observable">
+                                                &nbsp;
+                                            </span>
+                                        {% endif %}
+                                        </a>
+
+
+                                        {% if attr.evattrvalue %}
+                                        <a href="{% url 'tasks:evattr_detail' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ evidence.pk }}"
+                                        style="max-width: 1100px;overflow: auto;text-overflow: word-wrap;overflow-wrap: break-word;">
+<!--                                            style="max-width: 1100px;overflow: auto;">-->
+<!--                                        style=" word-wrap: break-word; width: 200px; display: block; "-->
+                                            <h6><span class="badge badge-pill badge-secondary">{{ attr.evattrvalue }}</span></h6>
+                                        </a>
+                                        {% endif %}
+
+</div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </td>
+</tr>
                 <tr class="invev-detail">
                     <td colspan="7">
                         <div class="invdescription2" style="max-width:1200px">
@@ -159,107 +330,6 @@
                                 {% endif %}
                             {% endif %}
                         </div>
-                    </td>
-                    <td>
-                        <table class="table table-bordered">
-                            <tbody>
-                            {% for attr in taskevidence.evattr_evidence.all %}
-                                <tr id="item-attr-{{attr.pk}}">
-                                    <td>
-                                        <li class="btn btn-md">
-                                            {% if attr %}
-                                                {% if attr.attr_reputation.pk == 1 %}
-                                                    <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-placement="top" title="Unknown">
-                                                {% else %}
-                                                    {% if attr.attr_reputation.pk == 2 %}
-                                                        <span style="color:green;" class="glyphicon glyphicon-ok-sign" data-toggle="tooltip" data-placement="top" title="Clean">
-                                                    {% else %}
-                                                        {% if attr.attr_reputation.pk == 3 %}
-                                                            <strong>
-                                                            <span style="color:orange;" class="glyphicon glyphicon-alert" data-toggle="tooltip" data-placement="top" title="Suspicious">
-                                                                </strong>
-                                                        {% else %}
-                                                            {% if attr.attr_reputation.pk == 4 %}
-                                                                <span style="color:red;" class="glyphicon glyphicon-remove-sign" data-toggle="tooltip" data-placement="top" title="Malicious">
-                                                            {% else %}
-                                                                <span data-toggle="tooltip" data-placement="top" title="-">-
-                                                            {% endif %}
-                                                        {% endif %}
-                                                    {% endif %}
-                                                {% endif %}
-                                            {% else %}
-                                                <span data-toggle="tooltip" data-placement="top" title="-">-
-                                            {% endif %}
-                                        </li>
-
-                                        <!--Attribute dropdown-->
-                                        <li class="dropdown" onclick="incrow({{attr.pk}},'item-attr-','200px')">
-                                            <button class="btn btn-default btn-xs dropdown-toggle" onclick="filterFunctionEvAttr()" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
-                                                {{ attr.evattrformat }}
-                                                <span class="caret"></span>
-                                            </button>
-
-                                            <ul class="dropdown-menu" role="menu">
-                                                <li>
-                                                    <a href="{% url 'tasks:evattr_create' pk=taskevidence.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                                        class="btn btn-default btn-xs">
-                                                        Attribute
-                                                        <span class="glyphicon glyphicon-plus" data-toggle="tooltip" data-placement="top" title="Edit item">
-                                                        </span>
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a href="{% url 'tasks:evattr_edit' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                                        class="btn btn-default btn-xs">
-                                                        Edit
-                                                        <span class="glyphicon glyphicon-pencil" data-toggle="tooltip" data-placement="top" title="Edit item">
-                                                        </span>
-                                                    </a>
-                                                </li>
-                                            <li class="dropdown-submenu pull-left">
-                                                <a tabindex="-1" href="#" class="btn btn-default btn-xs">Actions <span class="glyphicon glyphicon-chevron-right"></span></a>
-                                                <ul class="dropdown-menu dropdown-content" id="myDropdownEvAttr">
-                                                    <input type="text" placeholder="Search.." id="myInputEvAttr" onkeyup="filterFunctionEvAttr()">
-                                                    {% for actid in actions %}
-                                                        <li>
-                                                            {% if taskevidence.inv %}
-                                                                <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=taskevidence.inv.pk task_pk=task.pk ev_pk=taskevidence.pk evattr_pk=attr.pk %}?attr={{attr.pk}}&next1={{ request.get_full_path|urlencode }}">
-                                                            {% else %}
-                                                                <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=0 task_pk=task.pk ev_pk=taskevidence.pk evattr_pk=attr.pk %}?attr={{attr.pk}}&next1={{ request.get_full_path|urlencode }}">
-                                                            {% endif %}
-                                                                    <span></span>
-                                                                    {{ actid.pk }} - {{ actid.title }} ({{ actid.outputtarget.shortname }})
-                                                                </a>
-                                                        </li>
-                                                      <!--<li class="divider"></li>-->
-                                                    {% endfor %}
-                                        <!--</div>-->
-                                                </ul>
-
-                                            </li>
-                                            <li>&nbsp;</li>
-                                            <li>
-                                                  <a href="{% url 'tasks:ev_remove' pk=taskevidence.pk %}"
-                                                      class="btn btn-danger btn-xs">
-                                                  <span class="glyphicon glyphicon-trash" data-toggle="tooltip" data-placement="top" title="Edit item">
-                                                      Delete
-                                                  </span>
-                                                  </a>
-                                            </li>
-                                          </ul>
-                                        </li> <!-- .dropdown -->
-                                        <!--Attribute dropdown end-->
-
-                                    </td>
-                                    <td>
-                                        <a class="badge" href="{% url 'tasks:evattr_detail' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}">
-                                            {{ attr.evattrvalue }}
-                                        </a>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
                     </td>
                 </tr>
 

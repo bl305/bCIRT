@@ -16,8 +16,8 @@
 {% for playbook in inv.playbook_inv.all %}
                 <tr>
                     <td>
-                        <a class="badge" href="{% url 'tasks:play_detail' pk=playbook.pk %}?next1={{ request.get_full_path|urlencode }}">
-                            {{ playbook.pk }}
+                        <a href="{% url 'tasks:play_detail' pk=playbook.pk %}?next1={{ request.get_full_path|urlencode }}">
+                            <h6><span class="badge badge-pill badge-secondary">{{ playbook.pk }}</span></h6>
                         </a>
                     </td>
                     <td>
@@ -40,15 +40,18 @@
                     </td>
                     <td>
 	                	{% if user.is_authenticated %}
+                        <div class="row container mw-100 d-inline-flex justify-content-end flex-row align-items-center align-content-center flex-nowrap">
                             <a href="{% url 'tasks:play_edit' pk=playbook.pk %}?next1={{ request.get_full_path|urlencode }}"
-                               class="btn btn-warning btn-xs">
-                                <span class="glyphicon glyphicon-pencil"></span>
+                               class="btn btn-warning btn-sm">
+                                <span class="fa fa-pencil-alt"></span>
                             </a>
+                            &nbsp;
                             <a href="{% url 'tasks:play_remove' pk=playbook.pk %}?next1={{ request.get_full_path|urlencode }}" title="delete"
-                               class="btn btn-danger btn-xs pull-right">
-                                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                               class="btn btn-danger btn-sm">
+                                <span class="fa fa-trash-alt" aria-hidden="true"></span>
                                 <span class="icon-label"></span>
                             </a>
+                        </div>
                         {% endif %}
 
                     </td>

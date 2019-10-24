@@ -1,0 +1,72 @@
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : inv/inv_detail_tab_evidences_observable_table_REPORT_v1.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.09.30
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.09.30  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+
+{% if inv.evidence_inv %}
+
+{% for invevidence in inv.evidence_inv.all %}
+    {% for attr in invevidence.evattr_evidence.all %}
+        {% if attr.observable %}
+            <tr>
+                <td>
+                    {{attr.pk}}
+                </td>
+              <td>
+                    {% if attr.attr_reputation.pk == 1 %}
+                        <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-placement="top" title="Unknown">
+                    {% else %}
+                        {% if attr.attr_reputation.pk == 2 %}
+                            <span style="color:green;" class="glyphicon glyphicon-ok-sign" data-toggle="tooltip" data-placement="top" title="Clean">
+                        {% else %}
+                            {% if attr.attr_reputation.pk == 3 %}
+                                <strong>
+                                <span style="color:orange;" class="glyphicon glyphicon-alert" data-toggle="tooltip" data-placement="top" title="Suspicious">
+                                    </strong>
+                            {% else %}
+                                {% if attr.attr_reputation.pk == 4 %}
+                                    <span style="color:red;" class="glyphicon glyphicon-remove-sign" data-toggle="tooltip" data-placement="top" title="Malicious">
+                                {% else %}
+                                    <span data-toggle="tooltip" data-placement="top" title="-">
+                                {% endif %}
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+                    {{ attr.attr_reputation }}
+              </td>
+              <td>{{ attr.evattrformat }}</td>
+
+                <td style="max-width: 800px;">
+                    <a class="" href="{% url 'tasks:evattr_detail' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}"
+                       style="max-width: 800px;overflow: auto;text-overflow: word-wrap;overflow-wrap: break-word;"
+                    >
+                    {{ attr.evattrvalue }}
+                    </a>
+                </td>
+                <td>
+                    {{ inv.modified_at|date:"Y/m/d H:i:s" }}
+                </td>
+                <td>
+                    <a class="badge" href="#item-inve{{ invevidence.pk }}">
+                        {{invevidence.pk}}
+                    </a>
+                </td>
+            </tr>
+        {% endif %}
+    {% endfor %}
+{% endfor %}
+{% else %}
+          <tr>
+            <td colspan="5" class="text-center bg-warning">No matching record found</td>
+          </tr>
+{% endif %}
+

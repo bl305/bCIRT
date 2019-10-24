@@ -1,4 +1,4 @@
-{% extends "configuration/configuration_base.html" %}
+{% extends "configuration/configuration_template.html" %}
 <!--
 # **********************************************************************;
 # Project           : bCIRT
@@ -13,50 +13,38 @@
 # **********************************************************************;
 -->
 
-{% block configurationlist_active %}active{% endblock configurationlist_active%}
+{% block configuration_alert %}
+{% endblock configuration_alert %}
 
-{% block preconfiguration %}
-
-{% endblock preconfiguration %}
-
-
-{% block configuration_content %}
-    <div class="row">
-        <!-- Left Investigation Info -->
-        <div class="col-sm-12 col-md-12">
-            <div class="panel panel-primary">
-                <header class = "panel-heading">
-                    <div class="panel-title text-center">
-                        <div class="btn-group inline pull-left">
+{% block configuration_buttons %}
                             <a href="{% url 'configuration:connitemf_create' %}?next1={{ request.get_full_path|urlencode }}"
-                               class="btn btn-default btn-xs">
-                            <span class="glyphicon glyphicon-plus"></span>
+                                   class="btn btn-outline-secondary btn-sm">
+                                    <span class="font-weight-bold">
+                                        <i class="fas fa-plus"></i>
+                                    </span>
                             New Connection Item Field
                             </a>
-                        </div>
-                        <strong>&nbsp;Connection Item Field Details | {{ connectionitemfield.pk }}</strong>
-                        <div class="btn-group inline ">
-                            <div class="btn btn-warning btn-xs">
-                            <a style="color:white" href="{% url 'configuration:connitemf_edit' pk=connectionitemfield.pk %}?next1={{ request.get_full_path|urlencode }}">
-                            <span class="glyphicon glyphicon-pencil"></span>
+                            <a href="{% url 'configuration:connitemf_edit' pk=connectionitemfield.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                   class="btn btn-outline-secondary btn-sm">
+                                    <span class="font-weight-bold">
+                                        <i class="fas fa-pen"></i>
+                                    </span>
                             Edit
                             </a>
-                            </div>
-                        </div>
-                    </div>
-                </header>
-                <div class="panel-body inv-panel-body">
-                    <table class="table" id="connectionitem-detail">
+{% endblock configuration_buttons %}
+
+{% block configuration_title %}
+                        Connection Item Field Details | {{ connectionitemfield.pk }}
+{% endblock configuration_title %}
+
+{% block configuration_body %}
+                    <table class="table tbale-sm" id="connectionitem-detail">
                         <tbody >
                             {% include 'configuration/connectionitemfield_detail_table.html' %}
                         </tbody>
                     </table>
                     <a href="{% url 'configuration:connitemf_list' %}" class="btn btn-primary pull-right">
-                        <span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>
+                        <span class="fas fa-arrow-left" aria-hidden="true"></span>
                         <span>Connection Item Field list</span>
                     </a>
-                </div>
-            </div>
-        </div>
-    </div>
-{% endblock configuration_content %}
+{% endblock configuration_body %}

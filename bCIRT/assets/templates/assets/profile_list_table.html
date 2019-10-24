@@ -15,7 +15,7 @@
 {% for profile in object_list %}
                 <tr>
                     <td>
-                        <a class="badge" href="{% url 'assets:prof_detail' pk=profile.pk %}#?next1={{ request.get_full_path|urlencode }}">
+                        <a class="badge badge-secondary" href="{% url 'assets:prof_detail' pk=profile.pk %}#?next1={{ request.get_full_path|urlencode }}">
                             {{ profile.pk }}
                         </a>
                     </td>
@@ -56,7 +56,7 @@
                     </td>
                     <td>
                         {% if profile.inv %}
-                        <a class="badge" href="{% url 'invs:inv_detail' pk=profile.inv.pk %}#?next1={{ request.get_full_path|urlencode }}">
+                        <a class="badge badge-secondary" href="{% url 'invs:inv_detail' pk=profile.inv.pk %}#?next1={{ request.get_full_path|urlencode }}">
                             {{ profile.inv }}
                         </a>
                         {% else %}
@@ -80,11 +80,11 @@
                         <div>
                             <a href="{% url 'assets:prof_edit' pk=profile.pk %}"
                                class="btn btn-warning btn-xs">
-                                <span class="glyphicon glyphicon-pencil"></span>
+                                <span class="fas fa-pen"></span>
                             </a>
                             <a href="{% url 'assets:prof_remove' pk=profile.pk %}" title="delete"
                                class="btn btn-danger btn-xs pull-right">
-                                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                                <span class="fas fa-trash-alt" aria-hidden="true"></span>
                                 <span class="icon-label"></span>
                             </a>
                         </div>

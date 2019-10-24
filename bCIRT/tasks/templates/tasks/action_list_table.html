@@ -15,7 +15,7 @@
 {% for action in object_list %}
                 <tr>
                     <td>
-                        <a class="badge" href="{% url 'tasks:act_detail' pk=action.pk %}?next1={{ request.get_full_path|urlencode }}">{{ action.pk }}</a>
+                        <a class="badge badge-secondary" href="{% url 'tasks:act_detail' pk=action.pk %}?next1={{ request.get_full_path|urlencode }}">{{ action.pk }}</a>
                     </td>
                     <td>
                         {{ action.user }}
@@ -51,38 +51,55 @@
 	                	{% if user.is_authenticated %}
                         <div>
                             {% if action.enabled %}
-                            <a href="#"
-                               class="btn btn-primary btn-xs">
-                                <span title="Enabled" class="glyphicon glyphicon-ok-circle"></span>
-                            </a>
+                                <a href="#"
+                                  class="btn btn-outline-secondary btn-sm">
+                                    <span class="font-weight-bold text-success" data-toggle="tooltip" data-placement="top" title="Enabled">
+                                      <i class="fas fa-check-circle"></i>
+                                    </span>
+                                </a>
                             {% else %}
-                            <a href="#"
-                               class="btn btn-primary btn-xs">
-                                <span title="Disabled" class="glyphicon glyphicon-ban-circle"></span>
-                            </a>
+                                <a href="#"
+                                  class="btn btn-outline-secondary btn-sm">
+                                    <span class="font-weight-bold text-success" data-toggle="tooltip" data-placement="top" title="Disabled">
+                                      <i class="fas fa-times-circle"></i>
+                                    </span>
+                                </a>
                             {% endif %}
                             {% if action.automationid %}
-                            <a href="{% url 'tasks:act_exec_script' pk=action.pk inv_pk=0 task_pk=0 ev_pk=0 evattr_pk=0%}"
-                               class="btn btn-success btn-xs">
-                                <span title="Run" class="glyphicon glyphicon-play"></span>
-                            </a>
+                                <a href="{% url 'tasks:act_exec_script' pk=action.pk inv_pk=0 task_pk=0 ev_pk=0 evattr_pk=0%}"
+                                  class="btn btn-outline-secondary btn-sm">
+                                    <span class="font-weight-bold text-success" data-toggle="tooltip" data-placement="top" title="Run">
+                                      <i class="fas fa-play-circle"></i>
+                                    </span>
+                                </a>
                             {% else %}
-                            <a href="#"
-                               class="btn btn-primary btn-xs">
-                                <span title="No Automation" class="glyphicon glyphicon-remove-sign"></span>
-                            </a>
+                                <a href="#"
+                                  class="btn btn-outline-secondary btn-sm">
+                                    <span class="font-weight-bold text-danger" data-toggle="tooltip" data-placement="top" title="No automation">
+                                      <i class="fas fa-minus-circle"></i>
+                                    </span>
+                                </a>
                             {% endif %}
-                            <a href="{% url 'tasks:act_edit' pk=action.pk %}"
-                               class="btn btn-warning btn-xs">
-                                <span title="Edit" class="glyphicon glyphicon-pencil"></span>
-                            </a>
-                            <a href="{% url 'tasks:act_remove' pk=action.pk %}" title="delete" class="btn btn-danger btn-xs pull-right">
-                                <span title="Delete" class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                                <span class="icon-label"></span>
-                            </a>
+                                <a href="{% url 'tasks:act_edit' pk=action.pk %}"
+                                  class="btn btn-outline-secondary btn-sm">
+                                    <span class="font-weight-bold text-primary" data-toggle="tooltip" data-placement="top" title="Edit">
+                                      <i class="fas fa-pen"></i>
+                                    </span>
+                                </a>
+                                <a href="{% url 'tasks:act_clone' pk=action.pk %}"
+                                  class="btn btn-outline-secondary btn-sm">
+                                    <span class="font-weight-bold text-primary" data-toggle="tooltip" data-placement="top" title="Clone">
+                                      <i class="fas fa-clone"></i>
+                                    </span>
+                                </a>
+                                <a href="{% url 'tasks:act_remove' pk=action.pk %}"
+                                  class="btn btn-danger btn-sm">
+                                    <span class="font-weight-bold text-dark" data-toggle="tooltip" data-placement="top" title="Delete">
+                                      <i class="fas fa-trash-alt"></i>
+                                    </span>
+                                </a>
                         </div>
                         {% endif %}
-
                     </td>
               </tr>
 {% endfor %}

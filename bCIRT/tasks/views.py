@@ -16,7 +16,7 @@ from .models import TaskVar  # , TaskVarType, TaskVarCategory
 from .models import Playbook, PlaybookTemplate, PlaybookTemplateItem, new_playbook
 from .models import Inv
 from .models import Evidence, EvidenceAttr  #  , EvidenceAttrFormat, EvidenceFormat
-from .models import add_task_from_template, run_action, evidenceattrobservabletoggle
+from .models import add_task_from_template, run_action, evidenceattrobservabletoggle, clone_action
 from .models import Action, ActionQ, ActionGroup, ActionGroupMember, Automation
 from tasks.models import playbooktemplateitem_check_delete_condition
 from .forms import TaskForm, TaskTemplateForm, TaskVarForm
@@ -1294,6 +1294,44 @@ class ActionExecScriptGroupRedirectView(LoginRequiredMixin, PermissionRequiredMi
 
         # return reverse('tasks:act_list')
         # return super().get_redirect_url(*args, **kwargs)
+
+class ActionCloneRedirectView(LoginRequiredMixin, PermissionRequiredMixin, generic.RedirectView):
+    """
+    This class performs the "action" execution and records the output in the ActionQ table.
+    """
+    permission_required = ('tasks.view_action', 'tasks.view_actionq', 'tasks.change_actionq')
+    success_url = 'tasks:act_list'
+    actq = ""
+
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
+            logger.info(logmsg)
+        super(ActionCloneRedirectView, self).__init__(*args, **kwargs)
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            # This will redirect to the login view
+            return self.handle_no_permission()
+        elif not self.request.user.has_perm('tasks.change_actionq'):
+            messages.error(self.request, "No permission to change a record !!!")
+            return redirect('tasks:act_list')
+        clone_action(paction_pk=self.kwargs.get('pk'))
+
+        return super(ActionCloneRedirectView, self).dispatch(request, *args, **kwargs)
+
+    def get_redirect_url(self, *args, **kwargs):
+        if 'next1' in self.request.GET:
+            redirect_to = self.request.GET['next1']
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
+                return reverse(self.success_url)
+        else:
+            return reverse(self.success_url)
+        return redirect_to
 
 
 class TaskListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
@@ -2676,7 +2714,7 @@ class PlaybookTemplateItemRemoveView(LoginRequiredMixin, PermissionRequiredMixin
             if len(outmsgitems) != 0:
                 outmsg = "The Task is referenced from other tasks as inputs, Task(s): %s"%(outmsgitems)
                 messages.error(self.request, outmsg)
-                return redirect('tasks:playittmp_remove', pk=curr_pk)
+                return redirect('tasks:playittmp_detail', pk=curr_pk)
 
         # Checks pass, let http method handlers process the request
         return super(PlaybookTemplateItemRemoveView, self).dispatch(request, *args, **kwargs)
@@ -2729,6 +2767,7 @@ class TaskAssignView(LoginRequiredMixin, PermissionRequiredMixin, generic.Redire
         return redirect_to
         # return reverse('tasks:tsk_list')
         # return super().get_redirect_url(*args, **kwargs)
+
 
 
 #### CLOSE TASK
@@ -2821,6 +2860,53 @@ class TaskOpenView(LoginRequiredMixin, PermissionRequiredMixin, generic.Redirect
         return redirect_to
         # return reverse('tasks:tsk_list')
         # return super().get_redirect_url(*args, **kwargs)
+
+
+class TaskWaitingView(LoginRequiredMixin, PermissionRequiredMixin, generic.RedirectView):
+
+    # model = TaskTemplate
+    permission_required = ('tasks.view_task', 'tasks.change_task')
+    # url = reverse_lazy('tasks:ev_list')
+    success_url = 'tasks:tsk_list'
+
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
+            logger.info(logmsg)
+        super(TaskWaitingView, self).__init__(*args, **kwargs)
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            # This will redirect to the login view
+            return self.handle_no_permission()
+        elif not self.request.user.has_perm('tasks.change_task'):
+            messages.error(self.request, "No permission to change a record !!!")
+            return redirect('tasks:tsk_list')
+        task_pk = self.kwargs.get('pk')
+        # Checks pass, let http method handlers process the request
+        # Task.objects.filter(pk=task_pk).update(status=1)
+        task_obj = Task.objects.get(pk=task_pk)
+        task_obj.status = TaskStatus.objects.get(pk=5)
+        task_obj.save()
+
+        # return redirect(self.success_url)
+        return super(TaskWaitingView, self).dispatch(request, *args, **kwargs)
+
+    def get_redirect_url(self, *args, **kwargs):
+        if 'next1' in self.request.GET:
+            redirect_to = self.request.GET['next1']
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
+                return reverse(self.success_url)
+        else:
+            return reverse(self.success_url)
+        return redirect_to
+        # return reverse('tasks:tsk_list')
+        # return super().get_redirect_url(*args, **kwargs)
+
 
 class TaskSkipView(LoginRequiredMixin, PermissionRequiredMixin, generic.RedirectView):
 

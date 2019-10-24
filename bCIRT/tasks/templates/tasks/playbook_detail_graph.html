@@ -1,0 +1,16 @@
+{% extends "tasks/task_template_nonav.html" %}
+
+{% block task_alert %}
+{% endblock task_alert %}
+
+{% block task_buttons %}
+{% endblock task_buttons %}
+
+{% block task_title %}
+                        Graph
+{% endblock task_title %}
+
+{% block task_body %}
+                    <img class="graph w-100 h-100" src="/media/graphs/pb_{{playbook.pk}}.png">
+{% endblock task_body %}
+

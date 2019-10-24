@@ -15,7 +15,7 @@
 {% for actiongroup in object_list %}
                 <tr>
                     <td>
-                        <a class="badge" href="{% url 'tasks:actgrp_detail' pk=actiongroup.pk %}?next1={{ request.get_full_path|urlencode }}">
+                        <a class="badge badge-secondary" href="{% url 'tasks:actgrp_detail' pk=actiongroup.pk %}?next1={{ request.get_full_path|urlencode }}">
                             {{ actiongroup.pk }}
                         </a>
                     </td>
@@ -34,11 +34,12 @@
 	                	{% if user.is_authenticated %}
                         <div>
                             <a href="{% url 'tasks:actgrp_edit' pk=actiongroup.pk %}"
-                               class="btn btn-warning btn-xs">
-                                <span class="glyphicon glyphicon-pencil"></span>
+                               class="btn btn-warning btn-sm">
+                                <span class="fas fa-pen"></span>
                             </a>
-                            <a href="{% url 'tasks:actgrp_remove' pk=actiongroup.pk %}" title="delete" class="btn btn-danger btn-xs pull-right">
-                                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                            &nbsp;
+                            <a href="{% url 'tasks:actgrp_remove' pk=actiongroup.pk %}" title="delete" class="btn btn-danger btn-sm pull-right">
+                                <span class="fas fa-trash-alt" aria-hidden="true"></span>
                                 <span class="icon-label"></span>
                             </a>
                         </div>

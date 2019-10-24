@@ -24,6 +24,7 @@ urlpatterns = [
     url(r"^actions/new/$", views.ActionCreateView.as_view(), name="act_create"),
     url(r"^actions/detail/(?P<pk>\d+)/$", views.ActionDetailView.as_view(), name="act_detail"),
     url(r'^actions/edit/(?P<pk>\d+)/$', views.ActionUpdateView.as_view(), name='act_edit'),
+    url(r'^actions/clone/(?P<pk>\d+)/$', views.ActionCloneRedirectView.as_view(), name='act_clone'),
     url(r'^actions/remove/(?P<pk>\d+)/$', views.ActionRemoveView.as_view(), name='act_remove'),
 
     url(r"^automation/$", views.AutomationListView.as_view(), name="auto_list"),
@@ -77,6 +78,7 @@ urlpatterns = [
     url(r'^assign/(?P<pk>\d+)/$', views.TaskAssignView.as_view(), name='tsk_assign'),
     url(r'^skip/(?P<pk>\d+)/$', views.TaskSkipView.as_view(), name='tsk_skip'),
     url(r'^close/(?P<pk>\d+)/$', views.TaskCloseView.as_view(), name='tsk_close'),
+    url(r'^waiting/(?P<pk>\d+)/$', views.TaskWaitingView.as_view(), name='tsk_wait'),
 
     url(r"^tmp$", views.TaskTemplateListView.as_view(), name="tmp_list"),
     url(r"^tmp/new/$", views.TaskTemplateCreateView.as_view(), name="tmp_create"),

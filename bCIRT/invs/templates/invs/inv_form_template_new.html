@@ -1,0 +1,77 @@
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : inv/inv_form_template.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.07.27
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.07.29  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+{% load field_type %}
+
+{% load static %}
+
+                            {% if form.errors %}
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                        <div class="alert alert-danger">
+                                            <strong>{{ error|escape }}</strong>
+                                        </div>
+                                    {% endfor %}
+                                {% endfor %}
+                                {% for error in form.non_field_errors %}
+                                    <div class="alert alert-danger">
+                                        <strong>{{ error|escape }}</strong>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+
+
+                            {% for field in form %}
+                                <div class="form-group">
+                                    <div class="col-sm-offset-2 col-sm-10">
+                                        <span class="text-danger small">{{ field.errors }}</span>
+                                    </div>
+                                    <label class="control-label col-sm-2" for="Inv_id">{{ field.label_tag }}</label>
+                                    <div class="col-sm-10">
+                                    {% if field|field_type == 'ClearableFileInput' %}
+                                        <div >
+                                        {{ field }}
+                                        </div>
+                                    {% elif field|field_type == 'TinyMCEWidget' %}
+                                        <link href="/tinymce/tinymce4.css" type="text/css" media="all" rel="stylesheet">
+                                        <script type="text/javascript" src="/static/tinymce/js/tinymce/tinymce.min.js"></script>
+                                        {{ field }}
+                                    {% elif field|field_type == 'Select' %}
+                                        <link rel="stylesheet" type="text/css" href="{% static 'bCIRT/bootstrap-select-1.13.2/css/bootstrap-select.min.css' %}" />
+                                        <script src="{% static 'bCIRT/bootstrap-select-1.13.2/js/bootstrap-select.min.js' %}"></script>
+                                        {{ field }}
+                                    {% elif field|field_type == 'SplitDateTimeWidget' %}
+                                        <script type="text/javascript" src="{% static 'bCIRT/timepicker/lib/bootstrap-datepicker.js' %}"></script>
+                                        <link rel="stylesheet" type="text/css" href="{% static 'bCIRT//timepicker/lib/bootstrap-datepicker.css' %}" />
+                                        {{ field }}
+                                        <script>
+                                            $(function() {
+                                                $('#{{ field.auto_id }}_0').datepicker({
+                                                    calendarWeeks: true,
+                                                    clearBtn: true,
+                                                    todayHighlight: true,
+                                                    showButtonPanel: true,
+                                                    changeMonth: true,
+                                                    changeYear: true,
+                                                    showWeek: true,
+                                                    firstDay: 1
+                                                    });
+                                            });
+                                        </script>
+
+                                    {% else %}
+                                        {{ field }}
+                                    {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}

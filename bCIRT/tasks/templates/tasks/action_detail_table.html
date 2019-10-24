@@ -36,8 +36,8 @@
             <strong>Attachment<br></strong>
             {% if action.fileRef %}
                 <a href="{{BASE_URL}}{{MEDIA_URL}}{{ action.fileRef.name }}"
-                  class="btn btn-default btn-xs" target="_blank">
-                  <span class="glyphicon glyphicon-floppy-disk">{{ action.fileName }}</span>
+                  class="btn btn-default btn-sm" target="_blank">
+                  <span class="fas fa-save">{{ action.fileName }}</span>
                 </a>
             {% else %}
                 None

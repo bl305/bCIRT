@@ -1,4 +1,4 @@
-{% extends "tasks/action_base.html" %}
+{% extends "tasks/action_template.html" %}
 <!--
 # **********************************************************************;
 # Project           : bCIRT
@@ -12,51 +12,35 @@
 # 2019.07.29  Lendvay     1      Initial file
 # **********************************************************************;
 -->
+{% block action_alert %}
+{% endblock action_alert %}
 
-{% block actionslist_active %}active{% endblock actionslist_active%}
-
-{% block preactions %}
-
-{% endblock %}
-
-
-{% block actions_content %}
-    <div class="row">
-        <!-- Left Investigation Info -->
-        <div class="col-sm-12 col-md-12">
-            <div class="panel panel-primary">
-                <header class = "panel-heading">
-                    <div class="panel-title text-center">
-                        <div class="btn-group inline pull-left">
-                            <a href="{% url 'tasks:actgrp_create' %}?next1={{ request.get_full_path|urlencode }}"
-                               class="btn btn-default btn-xs">
-                            <span class="glyphicon glyphicon-plus"></span>
-                            New ActionGroupMember
+{% block action_buttons %}
+                            <a href="{% url 'tasks:actgrpmem_create' %}?next1={{ request.get_full_path|urlencode }}"
+                               class="btn btn-outline-secondary btn-sm">
+                                <span class=""><i class="fas fa-plus"></i>&nbsp;</span>
+                                    New ActionGroupMember
                             </a>
-                        </div>
-                        <strong>&nbsp;ActionGroupMember Details | {{ actiongroupmember.pk }}</strong>
-                        <div class="btn-group inline ">
-                            <div class="btn btn-warning btn-xs">
-                            <a style="color:white" href="{% url 'tasks:actgrp_edit' pk=actiongroupmember.pk %}?next1={{ request.get_full_path|urlencode }}">
-                            <span class="glyphicon glyphicon-pencil"></span>
-                            Edit
+                            <a href="{% url 'tasks:actgrpmem_edit' pk=actiongroupmember.pk %}?next1={{ request.get_full_path|urlencode }}"
+                               class="btn btn-outline-secondary btn-sm">
+                                <span class="fas fa-pen"></span>
+                                    Edit
                             </a>
-                            </div>
-                        </div>
-                    </div>
-                </header>
-                <div class="panel-body inv-panel-body">
-                    <table class="table" id="actions-detail">
+{% endblock action_buttons %}
+
+{% block action_title %}
+                        &nbsp;ActionGroupMember Details | {{ actiongroupmember.pk }}
+{% endblock action_title %}
+
+{% block action_body %}
+                    <table class="table table-sm" id="actions-detail">
                         <tbody >
                             {% include 'tasks/actiongroupmember_detail_table.html' %}
                         </tbody>
                     </table>
-                    <a href="{% url 'tasks:actgrp_list' %}" class="btn btn-primary pull-right">
-                        <span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>
+                    <a href="{% url 'tasks:actgrp_list' %}"
+                       class="btn btn-primary btn-sm">
+                        <span class="fas fa-arrow-left" aria-hidden="true"></span>
                         <span>ActionGroupMember list</span>
                     </a>
-                </div>
-            </div>
-        </div>
-    </div>
-{% endblock %}
+{% endblock action_body %}

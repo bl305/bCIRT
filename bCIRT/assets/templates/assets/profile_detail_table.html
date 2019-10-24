@@ -42,7 +42,7 @@
                     </td>
                     <td>
                         {% if profile.inv %}
-                          <a class="badge" href="{% url 'invs:inv_detail' pk=profile.inv.pk %}#?next1={{ request.get_full_path|urlencode }}">
+                          <a class="badge badge-secondary" href="{% url 'invs:inv_detail' pk=profile.inv.pk %}#?next1={{ request.get_full_path|urlencode }}">
                               {{ profile.inv }}
                           </a>
                         {% endif %}
@@ -60,16 +60,14 @@
                          {{ profile.modified_by }}
                     </td>
                     <td>
-                        <div>
                             <a href="{% url 'assets:prof_edit' pk=profile.pk %}"
                                class="btn btn-warning btn-xs">
-                                <span class="glyphicon glyphicon-pencil" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
+                                <span class="fas fa-pen" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
                             </a>
                             <a href="{% url 'assets:prof_remove' pk=profile.pk %}"
                                class="btn btn-danger btn-xs pull-right">
-                                <span class="glyphicon glyphicon-trash" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
+                                <span class="fas fa-trash-alt" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
                             </a>
-                        </div>
                     </td>
                 </tr>
 

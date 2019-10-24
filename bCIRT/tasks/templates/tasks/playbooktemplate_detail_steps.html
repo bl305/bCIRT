@@ -1,0 +1,56 @@
+{% extends "tasks/task_template_nonav.html" %}
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : tasks/playbooktemplate_detail_steps.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.10.19
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.10.19  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+{% block task_alert %}
+{% endblock task_alert %}
+
+{% block task_buttons %}
+                              <a href="{% url 'tasks:playittmp_create' play_pk=playbooktemplate.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                   class="btn btn-outline-secondary btn-sm">
+                                    <span class="font-weight-bold">
+                                        <i class="fas fa-plus"></i>
+                                    </span>
+                                  New Step
+                              </a>
+{% endblock task_buttons %}
+
+{% block task_title %}
+                         Playbook Template Steps | {{ playbooktemplate.playbooktemplateitem_playbooktemplate.all.count }} item{{ playbooktemplate.playbookitem_playbooktemplate.all.count|pluralize }}
+{% endblock task_title %}
+
+{% block task_body %}
+                    {% if error_message %}
+                        <p><strong>{{ error_message }}</strong></p>
+                    {% endif %}
+
+                    <table class="table table-hover table-sm">
+                        <thead>
+                        <tr>
+                            <th>ItemID</th>
+                            <th>Actual</th>
+                            <th>Type</th>
+                            <th>Order</th>
+                            <th>Previous</th>
+                            <th>Next</th>
+                            <th>Owner</th>
+                            <th>Modified</th>
+                            <th>Modified By</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                             {% include 'tasks/playbooktemplate_detail_playbooktemplateitem_table.html' %}
+                        </tbody>
+                    </table>
+{% endblock task_body %}

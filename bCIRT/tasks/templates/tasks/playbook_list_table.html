@@ -15,42 +15,42 @@
 {% for pb in object_list %}
                 <tr id="item-pb-{{pb.pk}}">
                     <td>
-                        <li class="dropdown" onclick="incrow({{pb.pk}},'item-pb-','150px')">
+                        <div class="dropdown" onclick="incrow({{pb.pk}},'item-pb-','150px')">
                             <div>
                             <div class="btn-group">
-                             <button class="btn btn-default btn-xs dropdown-toggle dropdown-toggle-split" onclick="filterFunctionTask()" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
+                             <button class="btn btn-default btn-sm dropdown-toggle dropdown-toggle-split" onclick="filterFunctionTask()" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
                                 {{ pb.pk }} <span class="caret"></span>
                             </button>
 
                                 <ul class="dropdown-menu" role="menu">
                                     <li>
                                         <a href="{% url 'tasks:play_detail' pk=pb.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                           class="btn btn-default btn-xs">
-                                            Open
-                                            <span class="glyphicon glyphicon-eye-open"></span>
+                                           class="btn btn-secondary btn-sm btn-block text-left">
+                                           <span class="fas fa-eye"></span>
+                                           Open
                                         </a>
                                     </li>
                                     <li>
                                         <a href="{% url 'tasks:play_edit' pk=pb.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                          class="btn btn-default btn-xs">
+                                          class="btn btn-secondary btn-sm btn-block text-left">
+                                          <span class="fas fa-pen" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
                                           Edit&nbsp;
-                                          <span class="glyphicon glyphicon-pencil" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
                                         </a>
                                     </li>
 
                                     <li>&nbsp;</li>
                                     <li>
                                           <a href="{% url 'tasks:play_remove' pk=pb.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                              class="btn btn-danger btn-xs">
-                                          <span class="glyphicon glyphicon-trash" data-toggle="tooltip" data-placement="top" title="Edit item">
-                                              Delete
+                                              class="btn btn-secondary btn-sm btn-block text-danger font-weight-bold">
+                                          <span class="fas fa-trash-alt" data-toggle="tooltip" data-placement="top" title="Edit item">
                                           </span>
+                                              Delete
                                           </a>
                                     </li>
                                 </ul>
                                 </div>
                             </div>
-                        </li> <!-- .dropdown -->
+                        </div> <!-- .dropdown -->
 
                     </td>
                     <td>
@@ -64,7 +64,7 @@
                     </td>
                     <td>
                         {% if pb.inv %}
-                        <a class="badge" href="{% url 'invs:inv_detail' pk=pb.inv.pk %}?next1={{ request.get_full_path|urlencode }}">
+                        <a class="badge badge-secondary" href="{% url 'invs:inv_detail' pk=pb.inv.pk %}?next1={{ request.get_full_path|urlencode }}">
                         {{ pb.inv }}
                         </a>
                         {% else %}

@@ -18,7 +18,7 @@
         <td><strong>Priority</strong><br> {{ task.priority }} </td>
         <td><strong>Parent</strong><br>
         {% if task.parent %}
-            <a class="badge" href="{% url 'tasks:tsk_detail' pk=task.parent %}?next1={{ request.get_full_path|urlencode }}">
+            <a class="badge badge-secondary" href="{% url 'tasks:tsk_detail' pk=task.parent %}?next1={{ request.get_full_path|urlencode }}">
                 {{ task.parent }}
             </a>
         {% else %}
@@ -40,7 +40,7 @@
 
         <td colspan="2"><strong>Investigation</strong><br>
             {% if task.inv %}
-            <a class="badge" href="{% url 'invs:inv_detail' pk=task.inv.pk %}?next1={{ request.get_full_path|urlencode }}">
+            <a class="badge badge-secondary" href="{% url 'invs:inv_detail' pk=task.inv.pk %}?next1={{ request.get_full_path|urlencode }}">
                 {{ task.inv.id }}-{{ task.inv.invid }}
             </a>
             {% else %}
@@ -51,7 +51,7 @@
         <td colspan="2"><strong>Category</strong><br> {{ task.category }} </td>
         <td colspan="1"><strong>Input Task</strong><br>
             {% if task.inputfrom %}
-            <a class="badge" href="{% url 'tasks:play_detail' pk=task.inputfrom.pk %}?next1={{ request.get_full_path|urlencode }}">
+            <a class="badge badge-secondary" href="{% url 'tasks:play_detail' pk=task.inputfrom.pk %}?next1={{ request.get_full_path|urlencode }}">
                 {{ task.inputfrom }}
             </a>
             {% else %}
@@ -64,7 +64,7 @@
     <tr>
         <td colspan="2"><strong>Playbook</strong><br>
             {% if task.playbook %}
-            <a class="badge" href="{% url 'tasks:play_detail' pk=task.playbook.pk %}?next1={{ request.get_full_path|urlencode }}">
+            <a class="badge badge-secondary" href="{% url 'tasks:play_detail' pk=task.playbook.pk %}?next1={{ request.get_full_path|urlencode }}">
                 {{ task.playbook }}
             </a>
             {% else %}
@@ -84,12 +84,12 @@
             </tooltip>
             <br>
             {% if task.action %}
-            <a class="badge" href="{% url 'tasks:act_detail' pk=task.action.pk %}?next1={{ request.get_full_path|urlencode }}">
+            <a class="badge badge-secondary" href="{% url 'tasks:act_detail' pk=task.action.pk %}?next1={{ request.get_full_path|urlencode }}">
                 {{ task.action }}
             </a>
             <span class="glyphicon glyphicon-arrow-right"></span>
             {% if task.actiontarget %}
-            <a class="badge" href="{% url 'tasks:tsk_detail' pk=task.actiontarget.pk %}?next1={{ request.get_full_path|urlencode }}">
+            <a class="badge badge-secondary" href="{% url 'tasks:tsk_detail' pk=task.actiontarget.pk %}?next1={{ request.get_full_path|urlencode }}">
                 {{ task.actiontarget }}
             </a>
             {% else %}

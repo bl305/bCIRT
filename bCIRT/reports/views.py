@@ -93,10 +93,22 @@ class Get_Report():
 
     def invs_closed(self):
         retval = Inv.objects.filter(created_at__gte=self.astart)\
-            .filter(created_at__lte=self.aend)\
+            .filter(created_at__lte=self.aend) \
+            .filter(status=2) \
             .values('status__name')\
             .annotate(Count('status'))\
             .order_by('status__name')
+        return retval
+
+    def invs_all_summary(self):
+        retval = Inv.objects.filter(created_at__gte=self.astart)\
+            .filter(created_at__lte=self.aend) \
+            .exclude(summary="Suspicious email")\
+            .exclude(summary=None)\
+            .values('summary','id')\
+            .annotate(total=Count('id'))\
+            .order_by('summary')
+
         return retval
 
     def invduration(self):
@@ -116,6 +128,7 @@ class Get_Report():
         if atype == "Manual":
             inv_closed_tasks = Inv.objects.filter(created_at__gte=self.astart) \
                 .filter(created_at__lte=self.aend) \
+                .filter(status=2) \
                 .filter(task_inv__type=2) \
                 .values('pk') \
                 .annotate(Count('task_inv')) \
@@ -124,6 +137,7 @@ class Get_Report():
         elif atype == "Auto":
             inv_closed_tasks = Inv.objects.filter(created_at__gte=self.astart) \
                 .filter(created_at__lte=self.aend) \
+                .filter(status=2) \
                 .filter(task_inv__type=1) \
                 .values('pk') \
                 .annotate(Count('task_inv')) \
@@ -131,7 +145,8 @@ class Get_Report():
                 .aggregate(Min('task_inv__count'), Avg('task_inv__count'), Max('task_inv__count'))
         else:
             inv_closed_tasks = Inv.objects.filter(created_at__gte=self.astart)\
-                .filter(created_at__lte=self.aend)\
+                .filter(created_at__lte=self.aend) \
+                .filter(status=2) \
                 .values('pk') \
                 .annotate(Count('task_inv')) \
                 .order_by('pk') \
@@ -156,7 +171,8 @@ class Get_Report():
 
     def tasks_closed(self):
         retval = Task.objects.filter(created_at__gte=self.astart)\
-            .filter(created_at__lte=self.aend)\
+            .filter(created_at__lte=self.aend) \
+            .filter(status=2) \
             .values('status__name')\
             .annotate(Count('status'))\
             .order_by('status__name')
@@ -229,7 +245,8 @@ class Get_Report():
 
     def tasks_closed_title(self):
         retval = Task.objects.filter(created_at__gte=self.astart)\
-            .filter(created_at__lte=self.aend)\
+            .filter(created_at__lte=self.aend) \
+            .filter(status=2) \
             .values('title')\
             .annotate(Count('title'))\
             .order_by('-title__count')
@@ -655,7 +672,7 @@ class ReportsDashboardCustom(LoginRequiredMixin, PermissionRequiredMixin, Templa
 
     def post(self, request, *args, **kwargs):
         form = CustomReportForm(data=request.POST)
-        pickerformat = "%m/%d/%Y %H:%M"
+        pickerformat = "%Y-%m-%d %H:%M:%S"
         # dateformat = "%Y-%m-%d %H:%M"
         # datetimenowformat = "%m/%d/%Y %H:%M"
         # newformat = "%Y-%m-%d %H:%M%z"
@@ -666,23 +683,23 @@ class ReportsDashboardCustom(LoginRequiredMixin, PermissionRequiredMixin, Templa
             searchendtime = None
             if form.data:
                 datatmp = form.data
-                if datatmp['starttime_0'] == '':
+                if datatmp['starttime'] == '':
                     rawstarttime = datetime.now()-timedelta(days=25000)
                     # datastarttime = datetime.strftime(rawstarttime,newformat)
                     starttime = utc.localize(rawstarttime)
                     searchstarttime=starttime
                 else:
-                    datastarttime = datatmp['starttime_0']+" "+datatmp['starttime_1']
+                    datastarttime = datatmp['starttime']
                     starttime=datetime.strptime((datastarttime), pickerformat)
                     starttime = utc.localize(starttime)
                     searchstarttime = starttime
-                if datatmp['endtime_0'] == '':
+                if datatmp['endtime'] == '':
                     rawendtime = datetime.now()
                     # dataendtime = datetime.strftime(rawendtime,newformat)
                     endtime = utc.localize(rawendtime)
                     searchendtime=endtime
                 else:
-                    dataendtime = datatmp['endtime_0']+" "+datatmp['endtime_1']
+                    dataendtime = datatmp['endtime']
                     endtime=datetime.strptime((dataendtime), pickerformat)
                     endtime = utc.localize(endtime)
                     searchendtime = endtime
@@ -692,6 +709,7 @@ class ReportsDashboardCustom(LoginRequiredMixin, PermissionRequiredMixin, Templa
                 last30days = datetime.now()-timedelta(days=30)
                 last90days = datetime.now()-timedelta(days=90)
                 invs_closed = Get_Report(searchstarttime, searchendtime).invs_closed()
+                invs_all_summary = Get_Report(searchstarttime, searchendtime).invs_all_summary()
                 invs_closed_stats = Get_Report(searchstarttime, searchendtime).invduration()
                 invs_closed_stats_min = invs_closed_stats['min']
                 invs_closed_stats_max = invs_closed_stats['max']
@@ -731,6 +749,7 @@ class ReportsDashboardCustom(LoginRequiredMixin, PermissionRequiredMixin, Templa
                            'searchstarttime': searchstarttime,
                            'searchendtime': searchendtime,
                            'invs_closed': invs_closed,
+                           'invs_all_summary': invs_all_summary,
                            'invs_closed_stats_min': invs_closed_stats_min,
                            'invs_closed_stats_max': invs_closed_stats_max,
                            'invs_closed_stats_avg': invs_closed_stats_avg,

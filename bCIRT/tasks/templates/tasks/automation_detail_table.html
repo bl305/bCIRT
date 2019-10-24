@@ -24,7 +24,7 @@
     <tr>
         <td colspan="2"><strong>Script Type</strong><br> {{ automation.script_type }} </td>
         <td><strong>Script Category</strong><br> {{ automation.script_category }} </td>
-        <td><strong>TBD</strong><br> TBD </td>
+        <td><strong></strong><br>  </td>
         <td><strong>Modified on</strong><br> {{ automation.modified_at|date:"Y/m/d H:i:s" }} </td>
         <td><strong>Modified by</strong><br> {{ automation.modified_by }} </td>
     </tr>
@@ -55,6 +55,16 @@
                 <div class="container invdescription">
                 <strong>Code</strong><br>
                     <textarea readonly style="width:100%;height:300px">{{ automation.code }}</textarea>
+                </div>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="6">
+            <div class="row">
+                <div class="container invdescription">
+                <strong>Software Requirements</strong><br>
+                    <textarea readonly style="width:100%;height:300px">{{ automation.autorequirements }}</textarea>
                 </div>
             </div>
         </td>

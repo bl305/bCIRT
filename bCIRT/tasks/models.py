@@ -358,7 +358,7 @@ def new_playbook(pplaybooktemplate, pname, pversion, puser, pinv, pdescription, 
                 cloneobj.task = new_task
                 cloneobj.save()
         # print(str(new_task)+"->->"+str(tmp_item_prevtask))
-        #  here I need to map the tempate pks to the new pks so I can assign the proper actions
+        #  here I need to map the template pks to the new pks so I can assign the proper actions
         item_mapping.update({tmp_item.pk: new_task.pk})
     # to run the post-save function:
     playbook_obj.save()
@@ -419,6 +419,12 @@ class Task(models.Model):
     # def save(self, *args, **kwargs):
     #     self.description_html = misaka.html(self.description)
     #     super(Task, self).save(*args, **kwargs)
+
+    def readonly(self):
+        if self.status.name == 'Completed' or self.status.name == 'Skipped':
+            return True
+        else:
+            return False
 
     def save(self, force_insert=False, force_update=False, *args, **kwargs):
         #  this is to check if the status record has been changed or not
@@ -1098,6 +1104,7 @@ class Automation(models.Model):
     script_category = models.ForeignKey(ScriptCategory, on_delete=models.SET_DEFAULT, default='1', blank=False,
                                         null=False, related_name="automation_scriptcategory")
     code = models.TextField(editable=True, default='', blank=True)
+    autorequirements = models.TextField(editable=True, default='', blank=True, null=True)
     fileName = models.CharField(max_length=255, default="", null=True, blank=True)
     fileRef = models.FileField(upload_to=upload_to_action, null=True, blank=True)
     filecreated_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
@@ -1206,6 +1213,18 @@ class Action(models.Model):
             # raise ValidationError(_("You must either define Code or upload a script file!"))
         pass
 
+def clone_action(paction_pk):
+    cloneobj = Action.objects.get(pk=paction_pk)
+    if cloneobj:
+        cloneobj.pk = None
+        # length comes from the model max length - _clone
+        if len(cloneobj.title) >= 44:
+            cloneobj.title = "%s_clone"%(cloneobj.title[:-6])
+        else:
+            cloneobj.title = "%s_clone"%(cloneobj.title)
+        cloneobj.save()
+        return True
+    return False
 
 class ActionGroup(models.Model):
     objects = models.Manager()
@@ -1493,8 +1512,10 @@ def generate_graph_PlaybookTemplate(sender, instance, **kwargs):
         pngfile = "pbtmp_%s.png"%(curr_pk)
         pngfilepath = path.join(MEDIA_ROOT, "graphs", pngfile)
         graph.write_png(pngfilepath)
+        print("H1")
     except Exception:
-        logger.error(Exception)
+        errormsg = "Graphcreate exception %s"%(str(Exception))
+        logger.error(errormsg)
 
 @receiver(models.signals.post_delete, sender=PlaybookTemplateItem)
 def auto_save_PlaybookTemplate(sender, instance, **kwargs):
@@ -1578,15 +1599,15 @@ def new_evidence(puser, ptask, pinv, pcreated_by, pmodified_by, pdescription, pf
         )
         # Saving the file attachments
         if pfilename and pfileref:
-            newev[0].fileName=pfilename
-            newev[0].fileRef.save(pfilename, pfileref)
+            # newev[0].fileName=pfilename
+            # newev[0].fileRef.save(pfilename, pfileref)
             # chunked upload
-            # save_relpath = upload_to_evidence(evidence_obj, cfileref.name)
-            # save_path = path.join(MYMEDIA_ROOT, str(save_relpath))
-            # handle_uploaded_file_chunks(cfileref , save_path)
-            # evidence_obj.fileRef=save_relpath
-            # evidence_obj.fileName=cfileref.name
-            # evidence_obj.save()
+            save_relpath = upload_to_evidence(newev, pfilename)
+            save_path = path.join(MEDIA_ROOT, str(save_relpath))
+            handle_uploaded_file_chunks(pfileref , save_path)
+            newev.fileRef=save_relpath
+            newev.fileName=pfileref.name
+            newev.save()
 
         newev = newev[0]
     else:
@@ -1605,8 +1626,15 @@ def new_evidence(puser, ptask, pinv, pcreated_by, pmodified_by, pdescription, pf
         )
         # Saving the file attachments
         if pfilename and pfileref:
-            newev.fileName = pfilename
-            newev.fileRef.save(pfilename, pfileref)
+            # newev.fileName = pfilename
+            # newev.fileRef.save(pfilename, pfileref)
+            save_relpath = upload_to_evidence(newev, pfilename)
+            save_path = path.join(MEDIA_ROOT, str(save_relpath))
+            handle_uploaded_file_chunks(pfileref , save_path)
+            newev.fileRef=save_relpath
+            newev.fileName=pfileref.name
+            newev.save()
+
     return newev
 
 
@@ -2463,9 +2491,9 @@ class FileHashCalc():
 
 
 # managing chunked uploads
-# def handle_uploaded_file_chunks(pfile, ppath):
-#     with open(ppath, 'wb+') as destination:
-#         for chunk in pfile.chunks():
-#             destination.write(chunk)
+def handle_uploaded_file_chunks(pfile, ppath):
+    with open(ppath, 'wb+') as destination:
+        for chunk in pfile.chunks():
+            destination.write(chunk)
 
 

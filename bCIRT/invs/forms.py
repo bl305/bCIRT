@@ -10,6 +10,8 @@
 # Date        Author      Ref    Description
 # 2019.07.29  Lendvay     1      Initial file
 # **********************************************************************;
+from .widgets import JQueryDateTimePickerInput
+
 from django import forms
 from .models import Inv, InvStatus, InvSeverity, InvPhase, InvCategory, InvAttackvector, InvPriority, CurrencyType
 import logging
@@ -72,7 +74,7 @@ class InvForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -89,7 +91,7 @@ class InvForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -172,7 +174,7 @@ class InvForm(forms.ModelForm):
     )
 
     losscurrency = forms.ModelChoiceField(
-        label='Currency',
+        label='Currency*',
         queryset=CurrencyType.objects.filter(enabled=True),
         empty_label="--Select--",
         required=True,
@@ -187,35 +189,54 @@ class InvForm(forms.ModelForm):
         )
     )
 
-    starttime = forms.SplitDateTimeField(
+    incstarttime = forms.DateTimeField(
+        input_formats=['%Y-%m-%d %H:%M:%S'],
         required=False,
-        label='Start of investigation',
-        input_date_formats=['%m/%d/%Y'],
-        input_time_formats=['%H:%M'],
-        widget=SplitDateTimeWidget(
-            date_format='%m/%d/%Y',
-            time_format='%H:%M',
-            attrs={
+        widget=JQueryDateTimePickerInput(
+            attrs = {
                 'class': 'form-control',
-                'style': 'width:100px',
+                'style': 'width:200px',
             }
         )
     )
 
-    endtime = forms.SplitDateTimeField(
+    incendtime = forms.DateTimeField(
+        input_formats=['%Y-%m-%d %H:%M:%S'],
         required=False,
-        label='End of investigation',
-        input_date_formats=['%m/%d/%Y'],
-        input_time_formats=['%H:%M'],
-        widget=SplitDateTimeWidget(
-            date_format='%m/%d/%Y',
-            time_format='%H:%M',
-            attrs={
+        widget=JQueryDateTimePickerInput(
+            attrs = {
                 'class': 'form-control',
-                'style': 'width:100px',
+                'style': 'width:200px',
             }
         )
     )
+
+    starttime = forms.DateTimeField(
+        input_formats=['%Y-%m-%d %H:%M:%S'],
+        required=False,
+        widget=JQueryDateTimePickerInput(
+            attrs = {
+                'class': 'form-control',
+                'style': 'width:200px',
+            }
+        )
+    )
+
+    endtime = forms.DateTimeField(
+        input_formats=['%Y-%m-%d %H:%M:%S'],
+        required=False,
+        widget=JQueryDateTimePickerInput(
+            attrs = {
+                'class': 'form-control',
+                'style': 'width:200px',
+            }
+        )
+    )
+
+    # attrs = {
+    #     'class': 'form-control',
+    #     'style': 'width:100px',
+    # }
 
     class Meta:
         model = Inv
@@ -237,6 +258,8 @@ class InvForm(forms.ModelForm):
                   'potentialloss',
                   'monetaryloss',
                   'losscurrency',
+                  'incstarttime',
+                  'incendtime',
                   'starttime',
                   'endtime',
                   'processimprovement')
@@ -291,6 +314,21 @@ class InvForm(forms.ModelForm):
             'comment': forms.TextInput(attrs={
                 'size': 50,
                 'style': 'width:50%',
+                'class': 'form-control'}
+            ),
+            'numofvictims': forms.NumberInput(attrs={
+                'size': 20,
+                'style': 'width:20%',
+                'class': 'form-control'}
+            ),
+            'potentialloss': forms.NumberInput(attrs={
+                'size': 20,
+                'style': 'width:20%',
+                'class': 'form-control'}
+            ),
+            'monetaryloss': forms.NumberInput(attrs={
+                'size': 20,
+                'style': 'width:20%',
                 'class': 'form-control'}
             ),
             'losscurrency': forms.TextInput(attrs={

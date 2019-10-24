@@ -12,12 +12,12 @@
 # **********************************************************************;
 -->
 
-                <tr class="ev-detail-table" style="background-color:#e6e6e6" id="item-ev-{{ evidence.pk }}">
+                <tr id="item-ev-{{ evidence.pk }}">
                     <!-- e.g.: #item-7 -->
                     <td>
                         <!--CSSREMOVED                      -->
-                        <li class="dropdown" onclick="incrow({{evidence.pk}},'item-ev-','180px')">
-                            <button class="btn btn-default btn-xs dropdown-toggle" onclick="filterFunctionEv()" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
+                        <div class="dropdown" onclick="incrow({{evidence.pk}},'item-ev-','180px')">
+                            <button class="btn btn-default btn-sm dropdown-toggle" onclick="filterFunctionEv()" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
                                 {{ evidence.pk }}
                                 <span class="caret"></span>
                             </button>
@@ -25,22 +25,23 @@
                             <ul class="dropdown-menu" role="menu">
                                     <li>
                                         <a href="{% url 'tasks:evattr_create' pk=evidence.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                            class="btn btn-default btn-xs">
+                                            class="btn btn-secondary btn-sm btn-block text-left">
                                             Attribute
-                                            <span class="glyphicon glyphicon-plus" data-toggle="tooltip" data-placement="top" title="Edit item">
+                                            <span class="fas fa-plus-circle" data-toggle="tooltip" data-placement="top" title="Edit item">
                                             </span>
                                         </a>
                                     </li>
                                     <li>
                                         <a href="{% url 'tasks:ev_edit' pk=evidence.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                            class="btn btn-default btn-xs">
+                                            class="btn btn-secondary btn-sm btn-block text-left">
                                             Edit
-                                            <span class="glyphicon glyphicon-pencil" data-toggle="tooltip" data-placement="top" title="Edit item">
+                                            <span class="fas fa-pen" data-toggle="tooltip" data-placement="top" title="Edit item">
                                             </span>
                                         </a>
                                     </li>
                                 <li class="dropdown-submenu">
-                                    <a tabindex="-1" href="#" class="btn btn-default btn-xs">Actions <span class="glyphicon glyphicon-chevron-right"></span>
+                                    <a tabindex="-1" href="#" class="btn btn-secondary btn-sm btn-block text-left">
+                                        Actions <span class="fa fa-chevron-right"></span>
                                     </a>
                                     <ul class="dropdown-menu dropdown-content" id="myDropdownEv">
                                         <input type="text" placeholder="Search.." id="myInputEv" onkeyup="filterFunctionEv()">
@@ -48,18 +49,24 @@
                                             <li>
                                                 {% if evidence.task %}
                                                     {% if evidence.inv %}
-                                                        <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=evidence.inv.pk task_pk=evidence.task.pk ev_pk=evidence.pk evattr_pk=0 %}?next1={{ request.get_full_path|urlencode }}">
+                                                        <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=evidence.inv.pk task_pk=evidence.task.pk ev_pk=evidence.pk evattr_pk=0 %}?next1={{ request.get_full_path|urlencode }}"
+                                                        class="btn btn-secondary btn-sm btn-block text-left"
+                                                        >
                                                     {% else %}
-                                                        <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=0 task_pk=evidence.task.pk ev_pk=evidence.pk evattr_pk=0 %}?next1={{ request.get_full_path|urlencode }}">
+                                                        <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=0 task_pk=evidence.task.pk ev_pk=evidence.pk evattr_pk=0 %}?next1={{ request.get_full_path|urlencode }}"
+                                                        class="btn btn-secondary btn-sm btn-block text-left">
+                                                        </a>
                                                     {% endif %}
                                                         <span></span>
                                                         {{ actid.pk }} - {{ actid.title }} ({{ actid.outputtarget.shortname }})
                                                         </a>
                                                 {% else %}
                                                     {% if evidence.inv %}
-                                                        <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=evidence.inv.pk task_pk=0 ev_pk=evidence.pk evattr_pk=0 %}?next1={{ request.get_full_path|urlencode }}">
+                                                        <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=evidence.inv.pk task_pk=0 ev_pk=evidence.pk evattr_pk=0 %}?next1={{ request.get_full_path|urlencode }}"
+                                                        class="btn btn-secondary btn-sm btn-block text-left">
                                                     {% else %}
-                                                        <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=0 task_pk=0 ev_pk=evidence.pk evattr_pk=0 %}?next1={{ request.get_full_path|urlencode }}">
+                                                        <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=0 task_pk=0 ev_pk=evidence.pk evattr_pk=0 %}?next1={{ request.get_full_path|urlencode }}"
+                                                           class="btn btn-secondary btn-sm btn-block text-left">
                                                     {% endif %}
                                                         <span></span>
                                                         {{ actid.pk }} - {{ actid.title }} ({{ actid.outputtarget.shortname }})
@@ -74,20 +81,28 @@
 
                                         {% if invevidence.fileRef %}
                                         <li class="dropdown-submenu">
-                                            <a tabindex="-1" href="#" class="btn btn-default btn-xs">File Actions <span class="glyphicon glyphicon-chevron-right"></span></a>
+                                            <a tabindex="-1" href="#" class="btn btn-default btn-sm">
+                                                File Actions
+                                                <span class="fas fa-arrow-right"></span>
+                                            </a>
                                             <ul class="dropdown-menu dropdown-content" id="myDropdownEvFile">
                                                 <input type="text" placeholder="Search.." id="myInputEvFile" onkeyup="filterFunctionEvFile()">
                                                 {% for actid in actions %}
                                                 {% if actid.scriptinput.pk == 2 %}
                                                   <li>
                                                       {% if invevidence.task %}
-                                                          <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=invevidence.inv.pk task_pk=invevidence.task.pk ev_pk=invevidence.pk evattr_pk=0 %}?next1={{ request.get_full_path|urlencode }}">
-                                                      {% else %}
-                                                          <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=invevidence.inv.pk task_pk=0 ev_pk=invevidence.pk evattr_pk=0 %}?next1={{ request.get_full_path|urlencode }}">
-                                                      {% endif %}
+                                                          <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=invevidence.inv.pk task_pk=invevidence.task.pk ev_pk=invevidence.pk evattr_pk=0 %}?next1={{ request.get_full_path|urlencode }}"
+                                                             class="btn btn-secondary btn-sm btn-block text-left">
                                                           <span></span>
                                                           {{ actid.pk }} - {{ actid.title }} ({{ actid.outputtarget.shortname }})
                                                           </a>
+                                                      {% else %}
+                                                          <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=invevidence.inv.pk task_pk=0 ev_pk=invevidence.pk evattr_pk=0 %}?next1={{ request.get_full_path|urlencode }}"
+                                                             class="btn btn-secondary btn-sm btn-block text-left">
+                                                          <span></span>
+                                                          {{ actid.pk }} - {{ actid.title }} ({{ actid.outputtarget.shortname }})
+                                                          </a>
+                                                      {% endif %}
                                                   </li>
                                                   <!--<li class="divider"></li>-->
                                                  {% endif %}
@@ -101,18 +116,17 @@
                                 <li>&nbsp;</li>
                                 <li>
                                       <a href="{% url 'tasks:ev_remove' pk=evidence.pk %}"
-                                          class="btn btn-danger btn-xs">
-                                      <span class="glyphicon glyphicon-trash" data-toggle="tooltip" data-placement="top" title="Edit item">
+                                         class="btn btn-danger btn-sm btn-block text-left">
+                                      <span class="fas fa-trash-alt" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
                                           Delete
-                                      </span>
                                       </a>
                                 </li>
                             </ul>
-                        </li> <!-- .dropdown -->
+                        </div> <!-- .dropdown -->
                     </td>
                         <td>
                             {% if evidence.inv %}
-                            <a class="badge" href="{% url 'invs:inv_detail' pk=evidence.inv.pk %}?next1={{ request.get_full_path|urlencode }}">
+                            <a class="badge badge-secondary" href="{% url 'invs:inv_detail' pk=evidence.inv.pk %}?next1={{ request.get_full_path|urlencode }}">
                                 {{ evidence.inv }}
                             </a>
                             {% else %}
@@ -121,7 +135,7 @@
                         </td>
                     <td>
                         {% if evidence.task %}
-                        <a class="badge" href="{% url 'tasks:tsk_detail' pk=evidence.task.pk %}?next1={{ request.get_full_path|urlencode }}">
+                        <a class="badge badge-secondary" href="{% url 'tasks:tsk_detail' pk=evidence.task.pk %}?next1={{ request.get_full_path|urlencode }}">
                             {{ evidence.task.title }}
                         </a>
                         {% else %}
@@ -143,26 +157,26 @@
                     <td>
                         {% if evidence.fileRef %}
 <!--                            <a href="{{BASE_URL}}{{MEDIA_URL}}{{ evidence.fileRef.name }}"-->
-<!--                                class="btn btn-default btn-xs" target="_blank">-->
+<!--                                class="btn btn-default btn-sm" target="_blank">-->
 <!--                                <span class="glyphicon glyphicon-floppy-disk">{{ evidence.fileName }}</span>-->
 <!--                            </a>-->
                             {{ evidence.fileName }}
                             <a href="#?next1={{ request.get_full_path|urlencode }}"
-                                class="btn btn-default btn-xs" target="_blank">
-                                <span class="glyphicon glyphicon-info-sign">TBD</span>
+                                class="btn btn-default btn-sm" target="_blank">
+                                <span class="fas fa-info">TBD</span>
                             </a>
 
                             <a href="{% url 'tasks:get_file_raw' ev_pk=evidence.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                class="btn btn-default btn-xs" target="_blank">
-                                <span class="glyphicon glyphicon-floppy-disk"> </span>
+                                class="btn btn-secondary btn-xs" target="_blank" title="Download">
+                                <span class="fa fa-download"> </span>
                             </a>
                             <a href="{% url 'tasks:get_file_zipped' ev_pk=evidence.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                class="btn btn-default btn-xs" target="_blank">
-                                <span class="glyphicon glyphicon-compressed"> </span>
+                                class="btn btn-secondary btn-xs" target="_blank" title="Download zip">
+                                <span class="fa fa-file-archive"> </span>
                             </a>
                             <a href="{% url 'tasks:get_file_zipped' ev_pk=evidence.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                class="btn btn-default btn-xs" target="_blank">
-                                <span class="glyphicon glyphicon-lock"> TBD</span>
+                                class="btn btn-default btn-sm" target="_blank">
+                                <span class="fas fa-lock"> TBD</span>
                             </a>
                         {% else %}
                         -
@@ -171,7 +185,7 @@
                     <td>
                         {% if evidence.actionq_evidence.last %}
                             Action:
-                            <a class="badge" href="{% url 'tasks:actq_detail' pk=evidence.actionq_evidence.last.pk %}?next1={{ request.get_full_path|urlencode }}">
+                            <a class="badge badge-secondary" href="{% url 'tasks:actq_detail' pk=evidence.actionq_evidence.last.pk %}?next1={{ request.get_full_path|urlencode }}">
                                 {{ evidence.actionq_evidence.last }}
                             </a>
                         {% endif %}
@@ -179,109 +193,130 @@
                 </tr>
                 <tr class="ev-detail" id="item-evdetail-{{ evidence.pk}}">
                     <td colspan="9">
-                            <table class="table table-bordered">
+                            <table class="table table-sm table-bordered">
+                            <thead>
+                            <tr>
+                                <th>Attribute</th>
+                                <th>Attribute Value</th>
+                            </tr>
+                            </thead>
+                            <tbody>
                                 <tbody>
                                 {% for attr in evidence.evattr_evidence.all %}
                                     <tr id="item-attr-{{attr.pk}}">
                                         <td>
-                                            <li class="btn btn-md">
-                                                {% if attr %}
-                                                    {% if attr.attr_reputation.pk == 1 %}
-                                                        <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-placement="top" title="Unknown">
-                                                    {% else %}
-                                                        {% if attr.attr_reputation.pk == 2 %}
-                                                            <span style="color:green;" class="glyphicon glyphicon-ok-sign" data-toggle="tooltip" data-placement="top" title="Clean">
+                                            <div class="container mw-100 d-inline-flex justify-content-start flex-row align-items-center align-content-center flex-nowrap">
+                                                <div class="btn btn-sm">
+                                                    {% if attr %}
+                                                        {% if attr.attr_reputation.pk == 1 %}
+                                                        <span class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="Unknown"></span>
                                                         {% else %}
-                                                            {% if attr.attr_reputation.pk == 3 %}
-                                                                <strong>
-                                                                <span style="color:orange;" class="glyphicon glyphicon-alert" data-toggle="tooltip" data-placement="top" title="Suspicious">
-                                                                    </strong>
+                                                            {% if attr.attr_reputation.pk == 2 %}
+                                                                <span style="color:green;" class="fa fa-check-circle" data-toggle="tooltip" data-placement="top" title="Clean"></span>
                                                             {% else %}
-                                                                {% if attr.attr_reputation.pk == 4 %}
-                                                                    <span style="color:red;" class="glyphicon glyphicon-remove-sign" data-toggle="tooltip" data-placement="top" title="Malicious">
+                                                                {% if attr.attr_reputation.pk == 3 %}
+                                                                    <strong>
+                                                                        <span class="fa fa-exclamation-circle text-danger" data-toggle="tooltip" data-placement="top" title="Suspicious"></span>
+                                                                    </strong>
                                                                 {% else %}
-                                                                    <span data-toggle="tooltip" data-placement="top" title="-">-
+                                                                    {% if attr.attr_reputation.pk == 4 %}
+                                                                    <span class="fa fa-bomb text-danger" data-toggle="tooltip" data-placement="top" title="Malicious"></span>
+                                                                    {% else %}
+                                                                    <span data-toggle="tooltip" data-placement="top" title="-">&nbsp;-&nbsp;</span>
+                                                                    {% endif %}
                                                                 {% endif %}
                                                             {% endif %}
                                                         {% endif %}
+                                                    {% else %}
+                                                                    <span data-toggle="tooltip" data-placement="top" title="-">&nbsp;-&nbsp;</span>
                                                     {% endif %}
-                                                {% else %}
-                                                    <span data-toggle="tooltip" data-placement="top" title="-">-
-                                                {% endif %}
-                                            </li>
+                                                </div>
+                                                <!--Attribute dropdown-->
+                                                <div class="dropdown" onclick="incrow({{attr.pk}},'item-attr-','200px')">
+                                                    <button class="btn btn-default btn-sm dropdown-toggle" onclick="filterFunctionEvAttr()" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
+                                                        {{ attr.evattrformat }}
+                                                        <span class="caret"></span>
+                                                    </button>
 
-                                            <!--Attribute dropdown-->
-                                            <li class="dropdown" onclick="incrow({{attr.pk}},'item-attr-','200px')">
-                                                <button class="btn btn-default btn-xs dropdown-toggle" onclick="filterFunctionEvAttr()" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
-                                                    {{ attr.evattrformat }}
-                                                    <span class="caret"></span>
-                                                </button>
-
-                                                <ul class="dropdown-menu" role="menu">
-                                                    <li>
-                                                        <a href="{% url 'tasks:evattr_create' pk=evidence.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                                            class="btn btn-default btn-xs">
-                                                            Attribute
-                                                            <span class="glyphicon glyphicon-plus" data-toggle="tooltip" data-placement="top" title="Edit item">
-                                                            </span>
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="{% url 'tasks:evattr_edit' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                                            class="btn btn-default btn-xs">
-                                                            Edit
-                                                            <span class="glyphicon glyphicon-pencil" data-toggle="tooltip" data-placement="top" title="Edit item">
-                                                            </span>
-                                                        </a>
-                                                    </li>
-                                                <li class="dropdown-submenu pull-left">
-                                                    <a tabindex="-1" href="#" class="btn btn-default btn-xs">Actions Generic<span class="glyphicon glyphicon-chevron-right"></span></a>
-                                                    <ul class="dropdown-menu dropdown-content" id="myDropdownEvAttr">
-                                                        <input type="text" placeholder="Search.." id="myInputEvAttr" onkeyup="filterFunctionEvAttr()">
-                                                        {% for actid in actions %}
-                                                            <li>
-                                                                {% if evidence.task %}
-                                                                    {% if evidence.inv %}
-                                                                        <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=evidence.inv.pk task_pk=evidence.task.pk ev_pk=evidence.pk evattr_pk=attr.pk %}?attr={{attr.pk}}&next1={{ request.get_full_path|urlencode }}">
+                                                    <ul class="dropdown-menu" role="menu">
+                                                        <li>
+                                                            <a href="{% url 'tasks:evattr_create' pk=evidence.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                                                class="btn btn-secondary btn-sm btn-block text-left">
+                                                                    <span data-toggle="tooltip" data-placement="top" title="Attribute item">
+                                                                        &nbsp;<i class="fas fa-plus"></i>&nbsp;
+                                                                        Attribute
+                                                                    </span>
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="{% url 'tasks:evattr_edit' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                                                class="btn btn-secondary btn-sm btn-block text-left">
+                                                                <span data-toggle="tooltip" data-placement="top" title="Attribute item">
+                                                                    &nbsp;<i class="fas fa-pencil-alt"></i>&nbsp;
+                                                                    Edit
+                                                                </span>
+                                                            </a>
+                                                        </li>
+                                                    <li class="dropdown-submenu">
+                                                        <a tabindex="-1" href="#" class="btn btn-secondary btn-block text-left btn-sm">
+                                                            Actions
+                                                            <span class="fas fa-chevron-right"></span></a>
+                                                        <ul class="dropdown-menu dropdown-content" id="myDropdownEvAttr">
+                                                            <input type="text" placeholder="Search.." id="myInputEvAttr" onkeyup="filterFunctionEvAttr()">
+                                                            {% for actid in actions %}
+                                                                <li>
+                                                                    {% if evidence.task %}
+                                                                        {% if evidence.inv %}
+                                                                            <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=evidence.inv.pk task_pk=evidence.task.pk ev_pk=evidence.pk evattr_pk=attr.pk %}?attr={{attr.pk}}&next1={{ request.get_full_path|urlencode }}"
+                                                                                class="btn btn-secondary btn-sm btn-block text-left">
+                                                                            <span></span>
+                                                                            {{ actid.pk }} - {{ actid.title }} ({{ actid.outputtarget.shortname }})
+                                                                            </a>
+                                                                        {% else %}
+                                                                            <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=0 task_pk=evidence.task.pk ev_pk=evidence.pk evattr_pk=attr.pk %}?attr={{attr.pk}}&next1={{ request.get_full_path|urlencode }}"
+                                                                                class="btn btn-secondary btn-sm btn-block text-left">
+                                                                            <span></span>
+                                                                            {{ actid.pk }} - {{ actid.title }} ({{ actid.outputtarget.shortname }})
+                                                                            </a>
+                                                                        {% endif %}
                                                                     {% else %}
-                                                                        <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=0 task_pk=evidence.task.pk ev_pk=evidence.pk evattr_pk=attr.pk %}?attr={{attr.pk}}&next1={{ request.get_full_path|urlencode }}">
+                                                                        {% if evidence.inv %}
+                                                                            <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=evidence.inv.pk task_pk=0 ev_pk=evidence.pk evattr_pk=attr.pk %}?attr={{attr.pk}}&next1={{ request.get_full_path|urlencode }}"
+                                                                                class="btn btn-secondary btn-sm btn-block text-left">
+                                                                            <span></span>
+                                                                            {{ actid.pk }} - {{ actid.title }} ({{ actid.outputtarget.shortname }})
+                                                                            </a>
+                                                                        {% else %}
+                                                                            <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=0 task_pk=0 ev_pk=evidence.pk evattr_pk=attr.pk %}?attr={{attr.pk}}&next1={{ request.get_full_path|urlencode }}"
+                                                                                class="btn btn-secondary btn-sm btn-block text-left">
+                                                                            <span></span>
+                                                                            {{ actid.pk }} - {{ actid.title }} ({{ actid.outputtarget.shortname }})
+                                                                            </a>
+                                                                        {% endif %}
                                                                     {% endif %}
-                                                                        <span></span>
-                                                                        {{ actid.pk }} - {{ actid.title }} ({{ actid.outputtarget.shortname }})
-                                                                        </a>
-                                                                {% else %}
-                                                                    {% if evidence.inv %}
-                                                                        <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=evidence.inv.pk task_pk=0 ev_pk=evidence.pk evattr_pk=attr.pk %}?attr={{attr.pk}}&next1={{ request.get_full_path|urlencode }}">
-                                                                    {% else %}
-                                                                        <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=0 task_pk=0 ev_pk=evidence.pk evattr_pk=attr.pk %}?attr={{attr.pk}}&next1={{ request.get_full_path|urlencode }}">
-                                                                    {% endif %}
-                                                                        <span></span>
-                                                                        {{ actid.pk }} - {{ actid.title }} ({{ actid.outputtarget.shortname }})
-                                                                        </a>
-                                                                {% endif %}
-                                                            </li>
-                                                          <!--<li class="divider"></li>-->
-                                                        {% endfor %}
-                                            <!--</div>-->
-                                                    </ul>
+                                                                </li>
+                                                              <!--<li class="divider"></li>-->
+                                                            {% endfor %}
+                                                <!--</div>-->
+                                                        </ul>
 
-                                                </li>
-                                                <li>&nbsp;</li>
-                                                <li>
-                                                      <a href="{% url 'tasks:evattr_remove' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                                          class="btn btn-danger btn-xs">
-                                                      <span class="glyphicon glyphicon-trash" data-toggle="tooltip" data-placement="top" title="Edit item">
-                                                          Delete
-                                                      </span>
-                                                      </a>
-                                                </li>
-                                              </ul>
-                                            </li> <!-- .dropdown -->
-                                            <!--Attribute dropdown end-->
-
+                                                    </li>
+                                                    <li>&nbsp;</li>
+                                                    <li>
+                                                          <a href="{% url 'tasks:evattr_remove' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                                              class="btn btn-secondary btn-sm btn-block text-danger font-weight-bold">
+                                                          <span class="fas fa-trash-alt" data-toggle="tooltip" data-placement="top" title="Edit item">
+                                                              Delete
+                                                          </span>
+                                                          </a>
+                                                    </li>
+                                                  </ul>
+                                                </div> <!-- .dropdown -->
+                                                <!--Attribute dropdown end-->
+                                            </div>
                                         </td>
                                         <td>
-                                            <a class="badge" href="{% url 'tasks:evattr_detail' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}">
+                                            <a class="badge badge-secondary" href="{% url 'tasks:evattr_detail' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}">
                                                 {{ attr.evattrvalue }}
                                             </a>
                                         </td>

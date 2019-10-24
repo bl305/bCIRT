@@ -1,4 +1,4 @@
-{% extends "tasks/evidence_base.html" %}
+{% extends "tasks/evidence_template.html" %}
 <!--
 # **********************************************************************;
 # Project           : bCIRT
@@ -13,7 +13,7 @@
 # **********************************************************************;
 -->
 
-{% block evidences_content %}
+{% block evidence_alert %}
 <div class="container-fluid investigations-container">
     <div>
         <form action="" method="post">
@@ -21,23 +21,23 @@
             <div class="alert alert-danger">Are you sure you want to delete this item and all attributes?
             <input class='btn btn-danger' type="submit" value="Delete" />
             <a href="javascript:history.go(-1)" class="btn btn-primary">
-                <span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>
+                <span class="fas fa-arrow-left" aria-hidden="true"></span>
                 <span>Cancel</span>
             </a>
                 </div>
         </form>
     </div>
-    <div class="row">
-        <div class="col-md-12 col-md-12">
-                <div class="panel panel-primary">
-                    <div class = "panel-heading">
-                        <div class="panel-title text-center">
-                            <strong> Delete Evidence # {{ evidence.pk }}</strong>
-                        </div>
-                    </div>
+{% endblock evidence_alert %}
 
-                    <div class="panel-body ev-panel-body">
-                        <table class="table table-hover table-striped table-condensed" id="evidences-eve">
+{% block evidence_buttons %}
+{% endblock evidence_buttons %}
+
+{% block evidence_title %}
+                            Delete Evidence # {{ evidence.pk }}
+{% endblock evidence_title %}
+
+{% block evidence_body %}
+                        <table class="table table-sm table-hover table-striped table-condensed" id="evidences-eve">
                             <thead>
                                 <tr class="mylist-header">
                                     <th>EvidenceID</th>
@@ -55,15 +55,4 @@
                             </tbody>
                         </table>
                     </div>
-                </div>
-        </div>
-    </div>
-
-</div>
-
-
-
-
-
-
-{% endblock evidences_content %}
+{% endblock evidence_body %}

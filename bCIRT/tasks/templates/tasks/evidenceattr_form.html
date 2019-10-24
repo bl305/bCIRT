@@ -1,4 +1,4 @@
-{% extends "tasks/evidence_base.html" %}
+{% extends "tasks/evidence_template.html" %}
 <!--
 # **********************************************************************;
 # Project           : bCIRT
@@ -13,33 +13,21 @@
 # **********************************************************************;
 -->
 
-{% block evidenceslist_active %}active{% endblock evidenceslist_active %}
-
-{% load bootstrap4 %}
-
 <!-- BL start -->
 {{ form.media }}
 <!-- BL end -->
 
-{% block preevidences %}
-	<div class="container myregister">
-    </div>
-{% endblock preevidences %}
+{% block evidence_alert %}
+{% endblock evidence_alert %}
 
-{% block evidences_content %}
+{% block evidence_buttons %}
+{% endblock evidence_buttons %}
 
-<!--To manage the evidence types-->
-<ul class="smooth-scroll list-unstyled">
-    <div class="container-fluid">
+{% block evidence_title %}
+                        &nbsp;Edit Evidence Attibute #{{ evidenceattr.pk }}
+{% endblock evidence_title %}
 
-        <div class="row">
-
-            <div class="col-sm-2 col-md-10">
-                <div class="panel panel-primary">
-                    <div class = "panel-heading text-center" style="background-color:#4682B4">
-                        <h3 class="panel-title" style="font-weight:bold;">Edit Evidence Attibute #{{ evidenceattr.pk }} </h3>
-                    </div>
-                    <div class="panel-body">
+{% block evidence_body %}
                         {% if error_message %}
                             <p><strong>{{ error_message }}</strong></p>
                         {% endif %}
@@ -51,29 +39,13 @@
 
                             <div class="form-group">
                                 <div class="col-sm-offset-1 col-sm-11">
-                                    <button type="submit" class="btn btn-success md">Save</button>
-                                    <a href="javascript:history.go(-1)" class="btn btn-primary pull-right">
-                                        <span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>
+                                    <button type="submit" class="btn btn-success btn-sm">Save</button>
+                                    <a href="javascript:history.go(-1)"
+                                       class="btn btn-primary btn-sm">
+                                        <span class="fas fa-arrow-left" aria-hidden="true"></span>
                                         <span>Cancel</span>
                                     </a>
                                 </div>
                             </div>
                         </form>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-sm-10 col-md-2">
-                <div class="panel panel-default" style="color:black">
-                    <div class="panel-body">
-                        <h3>Evidence Attribute Update?</h3>
-                        <p>Evidence attribute details can be updated using this form.</p>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-    </div>
-</ul>
-{% endblock evidences_content %}
+{% endblock evidence_body %}

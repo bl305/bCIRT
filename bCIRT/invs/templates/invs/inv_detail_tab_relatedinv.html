@@ -1,0 +1,48 @@
+{% extends "invs/inv_detail_tab_template.html" %}
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : inv/inv_detail_tab_investigations.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.07.27
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.07.29  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+    <div class="row">
+        <div class="col-sm-12 col-md-12">
+{% block inv_buttons %}
+{% endblock inv_buttons %}
+
+{% block inv_title %}
+&nbsp;Related Investigations
+{% endblock inv_title %}
+
+{% block inv_body %}
+                    {% if error_message %}
+                        <p><strong>{{ error_message }}</strong></p>
+                    {% endif %}
+
+                    <table class="table table-sm table-hover">
+                        <thead>
+                        <tr>
+                            <th>IncID</th>
+                            <th>Type</th>
+                            <th>IncStatus</th>
+                            <th>Created on</th>
+                            <th>Created by</th>
+                            <th>Modified on</th>
+                            <th>Modified by</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            {% include 'invs/inv_detail_tab_relatedinv_table.html' %}
+                        </tbody>
+                    </table>
+{% endblock inv_body %}
+        </div>
+    </div>

@@ -20,13 +20,13 @@
                 <tr class="mylist-meta" style="background-color:#e6e6e6" id="item-{{ playbookitem.pk }}">
                     <!-- e.g.: #item-7 -->
                   <td>
-                      <a class="badge" href="{% url 'tasks:playittmp_detail' pk=playbooktemplateitem.pk %}?next1={{ request.get_full_path|urlencode }}">
+                      <a class="badge badge-secondary" href="{% url 'tasks:playittmp_detail' pk=playbooktemplateitem.pk %}?next1={{ request.get_full_path|urlencode }}">
                           {{ playbooktemplateitem.pk }}
                       </a>
                   </td>
                   <td>
                       {% if playbooktemplateitem.acttask %}
-                      <a class="badge" href="{% url 'tasks:tmp_detail' pk=playbooktemplateitem.acttask.pk %}?next1={{ request.get_full_path|urlencode }}">
+                      <a class="badge badge-secondary" href="{% url 'tasks:tmp_detail' pk=playbooktemplateitem.acttask.pk %}?next1={{ request.get_full_path|urlencode }}">
                           {{ playbooktemplateitem.acttask }}
                       </a>
                         {% else %}
@@ -45,7 +45,7 @@
                   </td>
                   <td>
                       {% if playbooktemplateitem.prevtask %}
-                          <a class="badge" href="{% url 'tasks:playittmp_detail' pk=playbooktemplateitem.prevtask.pk %}?next1={{ request.get_full_path|urlencode }}">
+                          <a class="badge badge-secondary" href="{% url 'tasks:playittmp_detail' pk=playbooktemplateitem.prevtask.pk %}?next1={{ request.get_full_path|urlencode }}">
                               {{ playbooktemplateitem.prevtask.pk }}
                           </a>
                         {% else %}
@@ -54,7 +54,7 @@
                   </td>
                   <td>
                       {% if playbooktemplateitem.nexttask %}
-                          <a class="badge" href="{% url 'tasks:playittmp_detail' pk=playbooktemplateitem.nexttask.pk %}?next1={{ request.get_full_path|urlencode }}">
+                          <a class="badge badge-secondary" href="{% url 'tasks:playittmp_detail' pk=playbooktemplateitem.nexttask.pk %}?next1={{ request.get_full_path|urlencode }}">
                               {{ playbooktemplateitem.nexttask.pk }}
                           </a>
                         {% else %}
@@ -74,11 +74,11 @@
                       <div>
                           <a href="{% url 'tasks:playittmp_edit' pk=playbooktemplateitem.pk %}?next1={{ request.get_full_path|urlencode }}"
                               class="btn btn-warning btn-xs">
-                          <span class="glyphicon glyphicon-pencil" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
+                          <span class="fas fa-pen" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
                           </a>
                           <a href="{% url 'tasks:playittmp_remove' pk=playbooktemplateitem.pk %}?next1={{ request.get_full_path|urlencode }}"
-                              class="btn btn-danger btn-xs pull-right">
-                          <span class="glyphicon glyphicon-trash" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
+                              class="btn btn-danger btn-xs">
+                          <span class="fas fa-trash-alt" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
                           </a>
                       </div>
                   </td>

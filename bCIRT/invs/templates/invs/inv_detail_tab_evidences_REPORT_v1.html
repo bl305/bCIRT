@@ -15,7 +15,23 @@
 <div align="center" class="printheader">
     <strong>&nbsp;Evidences |  {{ inv.evidence_inv.count }} item{{ inv.evidence_inv.count|pluralize }} | {{ user }} at {% now "Y/m/d H:i:s" %} (UTC)</strong>
 </div>
-
+    <div align="center"><strong>Observables</strong></div>
+        <table class="bcirttable" style="">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Reputation</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Value</th>
+                    <th scope="col">Modified</th>
+                    <th scope="col">Evidence</th>
+                </tr>
+            </thead>
+        <tbody>
+            {% include 'invs/inv_detail_tab_evidences_observable_table_REPORT_v1.html' %}
+        </tbody>
+        </table>
+    <div align="center"><strong>Evidences</strong></div>
     <table class="bcirttable">
         <thead>
             <tr>

@@ -1,0 +1,71 @@
+{% extends "tasks/task_template_nonav.html" %}
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : tasks/playbook_detail_main.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.10.19
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.10.19  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+
+{% block task_alert %}
+
+{% endblock task_alert %}
+
+{% block task_buttons %}
+                            {% if user.is_authenticated %}
+                            <div class="dropdown">
+                                 <button class="btn btn-outline-secondary btn-sm dropdown-toggle" onclick="filterFunctionTask()" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
+                                    Actions
+                                     <span class="caret"></span>
+                                </button>
+                                    <ul class="dropdown-menu" role="menu">
+                                        <li>
+                                            <a href="{% url 'tasks:play_edit' pk=playbook.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                              class="btn btn-secondary btn-sm btn-block text-left">
+                                              <span class="fas fa-pen" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
+                                                Edit&nbsp;
+                                            </a>
+                                        </li>
+                                        <li>&nbsp;</li>
+                                        <li>
+                                              <a href="{% url 'tasks:play_remove' pk=playbook.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                                  class="btn btn-secondary btn-sm btn-block text-danger">
+                                              <span class="fas fa-trash-alt" data-toggle="tooltip" data-placement="top" title="Edit item">
+                                              </span>
+                                                  Delete
+                                              </a>
+                                        </li>
+                                    </ul>
+                            </div> <!-- .dropdown -->
+                        {% endif %}
+{% endblock task_buttons %}
+
+{% block task_title %}
+                            Playbook # {{ playbook.pk }} | {{ playbook.name }} | {{ user }} at {% now "Y/m/d H:i:s" %} (UTC)
+{% endblock task_title %}
+
+{% block task_body %}
+                        <table class="table table-sm table-hover table-striped table-condensed" id="investigations-inve">
+                            <thead>
+                                <tr class="mylist-header">
+                                    <th>ID</th>
+                                    <th>Investigation</th>
+                                    <th>Owner</th>
+                                    <th>Version</th>
+                                    <th>Created on</th>
+                                    <th>Created by</th>
+                                    <th>Modified on</th>
+                                    <th>Modified by</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% include "tasks/playbook_detail_table.html" %}
+                            </tbody>
+                        </table>
+{% endblock task_body %}

@@ -1,3 +1,4 @@
+{% extends "invs/inv_detail_tab_template.html" %}
 <!--
 # **********************************************************************;
 # Project           : bCIRT
@@ -11,36 +12,39 @@
 # 2019.07.29  Lendvay     1      Initial file
 # 2019.09.05  Lendvay     2      Added observable fields
 # **********************************************************************;
--->    <div class="row">
+-->
+{% block invevidence_active %}active{% endblock invevidence_active %}
+<div class="row w-100">
         <div class="col-sm-12">
-                <div class="panel panel-primary">
-                    <div class = "panel-heading">
-                        <div class="panel-title text-center" >
-                              <div class="btn-group inline pull-left">
-                                  {% if inv.status.name != "Closed" %}
-                                  <!--<a href=" url 'investigationdetails_create' investigation.pk %}"-->
-                                  <a href="{% url 'tasks:ev_create' inv_pk=inv.pk task_pk=0 %}?next1={{ request.get_full_path|urlencode }}"
-                                     class="btn btn-default btn-xs">
-                                  <span class="glyphicon glyphicon-plus"></span>
-                                  New Evidence
-                                  </a>
-                                  {% endif %}
-                              </div>
-                            <strong>&nbsp;Evidences |  {{ inv.evidence_inv.count }} item{{ inv.evidence_inv.count|pluralize }} | {{ user }} at {% now "Y/m/d H:i:s" %} (UTC)</strong>
-                        </div>
-                    </div>
-                    <div align="center"><h3><strong>Observables</strong></h3></div>
-                    <div class="panel-body inv-panel-body">
-                        <table class="table" style="">
+{% block inv_buttons %}
+                            {% if user.is_authenticated %}
+                                {% if inv.status.name != "Closed" %}
+                                <!--<a href=" url 'investigationdetails_create' investigation.pk %}"-->
+                                <a href="{% url 'tasks:ev_create' inv_pk=inv.pk task_pk=0 %}?next1={{ request.get_full_path|urlencode }}"
+                                class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-plus">&nbsp;</i>
+                                    New Evidence
+                                </a>
+                                {% endif %}
+                            {% endif %}
+{% endblock inv_buttons %}
+
+{% block inv_title %}
+                                &nbsp;Evidences |  {{ inv.evidence_inv.count }} item{{ inv.evidence_inv.count|pluralize }} | {{ user }} at {% now "Y/m/d H:i:s" %} (UTC)
+{% endblock inv_title %}
+
+{% block inv_body %}
+                <div align="center"><h3><strong>Observables</strong></h3></div>
+                        <table class="table table-sm w-100">
                             <thead>
-                                <tr>
+                                <tr class="text-wrap .border">
+                                    <th scope="col">Actions</th>
                                     <th scope="col">#</th>
                                     <th scope="col">Reputation</th>
                                     <th scope="col">Type</th>
                                     <th scope="col">Value</th>
                                     <th scope="col">Modified</th>
                                     <th scope="col">Evidence</th>
-                                    <th scope="col">Actions</th>
                                 </tr>
                             </thead>
                         <tbody>
@@ -48,14 +52,14 @@
                         </tbody>
                         </table>
 
-<!--                        data-pagination="false"-->
-<!--                        data-show-pagination-switch="true"-->
-<!--                        data-side-pagination="client"-->
-<!--                        data-pagination-h-align="left"-->
-<!--                        data-pagination-detail-h-align="right"-->
-<!--                        https://bootstrap-table.com/docs/api/table-options/#pagination-->
+    <!--                        data-pagination="false"-->
+    <!--                        data-show-pagination-switch="true"-->
+    <!--                        data-side-pagination="client"-->
+    <!--                        data-pagination-h-align="left"-->
+    <!--                        data-pagination-detail-h-align="right"-->
+    <!--                        https://bootstrap-table.com/docs/api/table-options/#pagination-->
                         <div align="center"><h3><strong>Evidences</strong></h3></div>
-                        <table class="table table-hover table-striped table-condensed" id="investigations-inve"
+                        <table class="table table-hover table-sm table-striped table-condensed" id="investigations-inve"
                                style="min-height:45vh;"
 
                         >
@@ -76,17 +80,7 @@
                             <!--<tr><td colspan="8" style="min-height:400px">&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;</td></tr>-->
                             </tbody>
                         </table>
-                        <div class="modal fade" id="modal-investigations-inve">
-                            <!--<div class="modal-dialog" style="max-height:90%; max-width: 90%;">-->
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-
-                                </div>
-                            </div>
-                        </div>
+{% endblock inv_body %}
                     </div>
-                </div>
-
-        </div>
-    </div>
+</div>
 <div id="thebottom"></div>

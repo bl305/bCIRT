@@ -15,7 +15,7 @@
 {% for pbtmp in object_list %}
                 <tr id="item-pbtmp-{{pbtmp.pk}}">
                     <td>
-                        <li class="dropdown" onclick="incrow({{pbtmp.pk}},'item-pbtmp-','180px')">
+                        <div class="dropdown" onclick="incrow({{pbtmp.pk}},'item-pbtmp-','180px')">
                             <!--<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Dropdown <span class="caret"></span></a>-->
                             <!--<button class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">-->
                                 <!--Dropdown -->
@@ -23,49 +23,49 @@
                             <!--</button>-->
                             <div>
                             <div class="btn-group">
-                             <button class="btn btn-default btn-xs dropdown-toggle dropdown-toggle-split" onclick="filterFunctionTask()" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
+                             <button class="btn btn-default btn-sm dropdown-toggle dropdown-toggle-split" onclick="filterFunctionTask()" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
                                 {{ pbtmp.pk }} <span class="caret"></span>
                             </button>
 
                                 <ul class="dropdown-menu" role="menu">
                                     <li>
                                         <a href="{% url 'tasks:playtmp_detail' pk=pbtmp.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                           class="btn btn-default btn-xs">
+                                           class="btn btn-secondary btn-sm btn-block text-left">
+                                            <span class="fas fa-eye"></span>
                                             Open
-                                            <span class="glyphicon glyphicon-eye-open"></span>
                                         </a>
                                     </li>
                                     <li>
                                         <a href="{% url 'tasks:playtmp_edit' pk=pbtmp.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                          class="btn btn-default btn-xs">
+                                          class="btn btn-secondary btn-sm btn-block text-left">
+                                          <span class="fas fa-pen" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
                                           Edit&nbsp;
-                                          <span class="glyphicon glyphicon-pencil" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
                                         </a>
                                     </li>
                                     <li>&nbsp</li>
                                     <li>
                                         <a href="{% url 'tasks:playtmp_export' pk=pbtmp.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                           class="btn btn-default btn-xs">
+                                           class="btn btn-secondary btn-sm btn-block text-left">
+                                            <span class="fas fa-save"></span>
                                             Export
-                                            <span class="glyphicon glyphicon-export"></span>
                                         </a>
                                     </li>
                                     <li>
                                           <a href="{% url 'tasks:playtmp_remove' pk=pbtmp.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                              class="btn btn-danger btn-xs">
-                                          <span class="glyphicon glyphicon-trash" data-toggle="tooltip" data-placement="top" title="Edit item">
-                                              Delete
+                                              class="btn btn-secondary btn-sm btn-block text-danger font-weight-bold">
+                                          <span class="fas fa-trash-alt" data-toggle="tooltip" data-placement="top" title="Edit item">
                                           </span>
+                                              Delete
                                           </a>
                                     </li>
                                 </ul>
                                 </div>
                             </div>
-                        </li> <!-- .dropdown -->
+                        </div> <!-- .dropdown -->
 
                     </td>
                     <td>
-                        <a class="badge" href="{% url 'tasks:playtmp_detail' pk=pbtmp.pk %}?next1={{ request.get_full_path|urlencode }}">
+                        <a class="badge badge-secondary" href="{% url 'tasks:playtmp_detail' pk=pbtmp.pk %}?next1={{ request.get_full_path|urlencode }}">
                         {{ pbtmp.name }}
                         </a>
                     </td>

@@ -11,27 +11,38 @@
 # 2019.07.29  Lendvay     1      Initial file
 # **********************************************************************;
 -->
-{% if playbooktemplateitem.pk %}next
+{% if playbooktemplateitem.pk %}
+next
     <tr>
         <td><strong>ID</strong><br> {{ playbooktemplateitem.pk }} </td>
         <td><strong>Actual</strong><br> {{ playbooktemplateitem.acttask }} </td>
         <td><strong>Next</strong><br> {{ playbooktemplateitem.nexttask }} </td>
         <td><strong>Owner</strong><br> {{ playbooktemplateitem.user }}</td>
-        <td></td>
         <td>
             <strong>Playbook Template</strong><br>
-            <a class="badge"
+            <a class="badge badge-secondary"
                href="{% url 'tasks:playtmp_detail' pk=playbooktemplateitem.playbooktemplateid.pk %}?next1={{ request.get_full_path|urlencode }}">
                 {{ playbooktemplateitem.playbooktemplateid }}
             </a>
         </td>
-        <td></td>
     </tr>
     <tr>
-        <td colspan="6"><strong>TBD</strong><br> modified created etc </td>
+        <td><strong>Created</strong><br>
+            {{ playbooktemplateitem.created_at|date:"Y/m/d H:i:s" }}
+        </td>
+        <td><strong>Created by</strong><br>
+            {{ playbooktemplateitem.created_by }}
+        </td>
+        <td><strong>Modified</strong><br>
+            {{ playbooktemplateitem.modified_at|date:"Y/m/d H:i:s" }}
+        </td>
+        <td><strong>Modified by</strong><br>
+            {{ playbooktemplateitem.modified_by }}
+        </td>
+        <td colspan="1"></td>
     </tr>
     <tr>
-        <td colspan="6">
+        <td colspan="5">
             <div class="row">
             <div class="container invdescription">
                 <strong>Description</strong><br>

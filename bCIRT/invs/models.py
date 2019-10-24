@@ -182,6 +182,9 @@ class Inv(models.Model):
     losscurrency = models.ForeignKey(CurrencyType, on_delete=models.SET_DEFAULT, default="1",
                                      related_name="inv_currencytype", blank=True, null=False)
     numofvictims = models.PositiveIntegerField(default=None, blank=True, null=True)
+    incstarttime = models.DateTimeField(auto_now=False, blank=True, null=True)
+    incendtime = models.DateTimeField(auto_now=False, blank=True, null=True)
+
     # check if the status has been changed
     __original_status = None
 
@@ -198,6 +201,12 @@ class Inv(models.Model):
         else:
             outstr = "%s-%s-%s" % (self.pk, self.attackvector.name, str(self.user)[0:2])
         return outstr
+
+    def readonly(self):
+        if self.status.name == 'Closed' or self.status.name == 'Archived':
+            return True
+        else:
+            return False
 
     # def save(self, *args, **kwargs):
     def save(self, force_insert=False, force_update=False, *args, **kwargs):
@@ -247,6 +256,10 @@ class Inv(models.Model):
 
     def opentasklistprint(self):
         retval = self.task_inv.exclude(status__name='Completed').exclude(status__name='Skipped').count()
+        return retval
+
+    def opentasklist(self):
+        retval = self.task_inv.exclude(status__name='Completed').exclude(status__name='Skipped')
         return retval
 
     def get_absolute_url(self):

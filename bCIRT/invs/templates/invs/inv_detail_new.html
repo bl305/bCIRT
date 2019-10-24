@@ -1,0 +1,95 @@
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : inv/inv_detail_tab_detail.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.07.27
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.07.29  Lendvay     1      Initial file
+# 2019.09.06  Lendvay     2      Print preview in new window
+# **********************************************************************;
+-->
+            <div class="card card-primary w-100">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="container mw-100 d-inline-flex justify-content-start flex-row align-items-center align-content-center flex-nowrap">
+                            {% if user.is_authenticated %}
+                                <div class="dropdown">
+                                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle" onclick="filterFunctionInv()" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
+                                        Actions
+                                        <span class="caret"></span>
+                                    </button>
+                                        <ul class="dropdown-menu" role="menu">
+                                            {% if inv.status.name != "Closed" %}
+                                            <li>
+                                                <a href="{% url 'tasks:ev_create' inv_pk=inv.pk task_pk=0 %}?next1={{ request.get_full_path|urlencode }}"
+                                                      class="btn btn-secondary btn-sm btn-block text-left">
+                                                  <span class="" data-toggle="tooltip" data-placement="top" title="New Evidence item">
+                                                      <i class="fas fa-plus">&nbsp;</i>
+                                                      New Evidence
+                                                  </span>
+                                                  </a>
+                                            </li>
+<!--                                            <li>&nbsp;</li>-->
+                                            {% endif %}
+                                            <li>
+                                                <a href="{% url 'invs:inv_edit' pk=inv.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                                  class="btn btn-secondary btn-sm btn-block text-left">
+                                                  <span class="" data-toggle="tooltip" data-placement="top" title="Edit Evidence item">
+                                                      <i class="fas fa-pencil-alt">&nbsp;</i>
+                                                      Edit
+                                                </span>
+                                                </a>
+                                            </li>
+<!--                                            <li>&nbsp;</li>-->
+                                            <li class="dropdown-submenu">
+                                                <a tabindex="-1" href="#" class="btn btn-secondary btn-sm btn-block text-left">
+                                                    <span class="">
+                                                        <i class="fas fa-file-export"></i>
+                                                        Export&nbsp;
+                                                    </span>
+                                                <i class="fas fa-caret-right"></i>
+                                                </a>
+                                                <ul class="dropdown-menu dropdown-content">
+                                                    <li>
+                                                        <a href="{% url 'invs:inv_detail_print' pk=inv.pk %}?next1={{ request.get_full_path|urlencode }}" target="_blank"
+                                                          class="btn btn-secondary btn-sm btn-block text-left">
+                                                          <span data-toggle="tooltip" data-placement="top" title="Edit item">
+                                                              <i class="fas fa-print"></i>
+                                                              Print Preview
+                                                        </span>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+
+                                            </li>
+                                            <li>&nbsp;</li>
+                                            <li>
+                                                  <a href="{% url 'invs:inv_remove' pk=inv.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                                      class="btn btn-secondary btn-sm btn-block">
+                                                  <span class="font-weight-bold text-danger" data-toggle="tooltip" data-placement="top" title="Delete item">
+                                                      <i class="fas fa-trash-alt"></i>
+                                                      Delete
+                                                  </span>
+                                                  </a>
+                                            </li>
+                                        </ul>
+                                    </div> <!-- .dropdown -->
+                            {% endif %}
+                            <div class="container d-inline-flex flex-row align-items-center justify-content-center align-content-center flex-nowrap">
+                                <p class="h4">&nbsp;Investigation Details | #{{ inv.id }} - {{ inv.invid }} | {{ user }} at {% now "Y/m/d H:i:s" %} (UTC)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body inv-card-body">
+                    <table class="table table-sm" id="investigations-invh">
+                        <tbody>
+                            {% include 'invs/inv_detail_tab_detail_table.html' %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>

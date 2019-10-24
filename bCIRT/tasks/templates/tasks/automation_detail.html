@@ -1,4 +1,4 @@
-{% extends "tasks/action_base.html" %}
+{% extends "tasks/action_template.html" %}
 <!--
 # **********************************************************************;
 # Project           : bCIRT
@@ -12,60 +12,47 @@
 # 2019.07.29  Lendvay     1      Initial file
 # **********************************************************************;
 -->
-{% block ptitle %}Automations {{ automation.pk }}-{{ automation.name }}{% endblock %}
+{% block action_alert %}
+{% endblock action_alert %}
 
-{% block actionslist_active %}active{% endblock actionslist_active%}
-
-{% block preactions %}
-
-{% endblock %}
-
-
-{% block actions_content %}
-    <div class="row">
-        <!-- Left Investigation Info -->
-        <div class="col-sm-12 col-md-12">
-            <div class="panel panel-primary">
-                <header class = "panel-heading">
-                    <div class="panel-title text-center">
+{% block action_buttons %}
                         {% if perms.tasks.add_automation %}
-                        <div class="btn-group inline pull-left">
                             <a href="{% url 'tasks:auto_create' %}?next1={{ request.get_full_path|urlencode }}"
-                               class="btn btn-default btn-xs">
-                            <span class="glyphicon glyphicon-plus"></span>
+                               class="btn btn-outline-secondary btn-sm">
+                            <span class="font-weight-bold">
+                                <i class="fas fa-plus"></i>
+                            </span>
                             New Automation Script
                             </a>
-                        </div>
                         {% endif %}
-                        <strong>&nbsp;Automation Details | {{ automation.pk }}</strong>
                         {% if perms.tasks.change_automation %}
-                        <div class="btn-group inline ">
-                            <div class="btn btn-warning btn-xs">
-                            <a style="color:white" href="{% url 'tasks:auto_edit' pk=automation.pk %}?next1={{ request.get_full_path|urlencode }}">
-                            <span class="glyphicon glyphicon-pencil"></span>
-                            Edit
+                            <a href="{% url 'tasks:auto_edit' pk=automation.pk %}?next1={{ request.get_full_path|urlencode }}"
+                               class="btn btn-outline-secondary btn-sm">
+                                <span class="font-weight-bold">
+                                    <i class="fas fa-pen"></i>
+                                </span>
+                                Edit
                             </a>
-                            </div>
-                        </div>
                         {% endif %}
-                    </div>
-                </header>
-                <div class="panel-body inv-panel-body">
-                    <table class="table" id="automation-detail">
+{% endblock action_buttons %}
+
+{% block action_title %}
+                        &nbsp;Automation Details | {{ automation.pk }}
+{% endblock action_title %}
+
+{% block action_body %}
+                    <table class="table table-sm" id="automation-detail">
                         <tbody >
                             {% include 'tasks/automation_detail_table.html' %}
                         </tbody>
                     </table>
                     <a href="{% url 'tasks:act_exec_script' pk=automation.pk inv_pk=0 task_pk=0 ev_pk=0 evattr_pk=0 %}"
                        class="btn btn-success btn-sm">
-                        <span class="glyphicon glyphicon-play"></span>
+                        <span class="fas fa-play-circle"></span>
                     </a>
-                    <a href="{% url 'tasks:auto_list' %}" class="btn btn-primary pull-right">
-                        <span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>
+                    <a href="{% url 'tasks:auto_list' %}"
+                       class="btn btn-primary btn-sm">
+                        <span class="fas fa-arrow-left" aria-hidden="true"></span>
                         <span>Automations list</span>
                     </a>
-                </div>
-            </div>
-        </div>
-    </div>
-{% endblock actions_content %}
+{% endblock action_body %}

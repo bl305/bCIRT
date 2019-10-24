@@ -21,108 +21,12 @@
 
 
 {% block tasks_content %}
-    <div class="row">
-        <div class="col-sm-12">
 
-                <div class="panel panel-primary">
-                    <div class = "panel-heading">
-                        <div class="panel-title text-center" >
-                              <div class="btn-group inline pull-left">
-                              </div>
-                            <strong> Playbook Template # {{ playbooktemplate.pk }} | {{ playbooktemplate.name }} | {{ user }} at {% now "Y/m/d H:i:s" %} (UTC)</strong>
-                        </div>
-                    </div>
-                    <div class="panel-body inv-panel-body">
-                        <table class="table table-hover table-striped table-condensed" id="investigations-inve">
-                            <thead>
-                                <tr class="mylist-header">
-                                    <th>ID</th>
-                                    <th>Playbook Template</th>
-                                    <th>Owner</th>
-                                    <th>Version</th>
-                                    <th>Created on</th>
-                                    <th>Created by</th>
-                                    <th>Modified on</th>
-                                    <th>Modified by</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% include "tasks/playbooktemplate_detail_table.html" %}
-                            </tbody>
-                        </table>
+    {% include 'tasks/playbooktemplate_detail_panels.html' %}
 
-                    </div>
-                </div>
+    <a href="javascript:history.go(-1)" class="btn btn-primary btn-sm">
+        <span class="fas fa-arrow-left" aria-hidden="true"></span>
+        <span>Back</span>
+    </a>
 
-        </div>
-    </div>
-
-    <div class="row">
-
-        <!-- Right Investigation Info -->
-        <div class="col-sm-12 col-md-12">
-            <div class="panel panel-primary">
-                <div class = "panel-heading">
-                    <div class="panel-title text-center">
-                         <div class="btn-group inline pull-left">
-                              <a href="{% url 'tasks:playittmp_create' play_pk=playbooktemplate.pk %}?next1={{ request.get_full_path|urlencode }}" class="btn btn-default btn-xs">
-                                  <span class="glyphicon glyphicon-plus"></span>
-                                  New Step
-                              </a>
-                          </div>
-                         <strong>&nbsp;Playbook Template Steps | {{ playbooktemplate.playbooktemplateitem_playbooktemplate.all.count }} item{{ playbooktemplate.playbookitem_playbooktemplate.all.count|pluralize }}</strong>
-                    </div>
-                </div>
-                <div class="panel-body">
-
-                    {% if error_message %}
-                        <p><strong>{{ error_message }}</strong></p>
-                    {% endif %}
-
-                    <table class="table table-hover">
-                        <thead>
-                        <tr>
-                            <th>ItemID</th>
-                            <th>Actual</th>
-                            <th>Type</th>
-                            <th>Order</th>
-                            <th>Previous</th>
-                            <th>Next</th>
-                            <th>Owner</th>
-                            <th>Modified</th>
-                            <th>Modified By</th>
-                            <th>Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                             {% include 'tasks/playbooktemplate_detail_playbooktemplateitem_table.html' %}
-                        </tbody>
-                    </table>
-                        <a href="javascript:history.go(-1)" class="btn btn-primary pull-right">
-                            <span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>
-                            <span>Back</span>
-                        </a>
-
-                </div>
-            </div>
-
-        </div>
-
-    </div>
-    <div class="row">
-        <!-- Right Investigation Info -->
-        <div class="col-sm-12 col-md-12">
-            <div class="panel panel-primary">
-                <div class = "panel-heading">
-                    <div class="panel-title text-center">
-                        Graph
-                    </div>
-                </div>
-                <div class="panel-body">
-                    <img class="graph" src="/media/graphs/pbtmp_{{playbooktemplate.pk}}.png">
-                </div>
-            </div>
-        </div>
-    </div>
 {% endblock tasks_content %}

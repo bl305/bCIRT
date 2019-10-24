@@ -1,4 +1,4 @@
-{% extends "configuration/configuration_base.html" %}
+{% extends "configuration/configuration_template.html" %}
 <!--
 # **********************************************************************;
 # Project           : bCIRT
@@ -12,40 +12,34 @@
 # 2019.08.11  Lendvay     1      Initial file
 # **********************************************************************;
 -->
+{% block configuration_alert %}
+{% endblock configuration_alert %}
 
-{% block configurationlist_active %}active{% endblock configurationlist_active %}
-
-{% block preconfiguration %}
-		{% if user.is_authenticated %}
-
-	    {% endif %}
-{% endblock preconfiguration %}
-
-{% block configuration_content %}
-<div class="row">
-    <div class="col-sm-12">
-        <div align="center">
-            <div class="panel panel-primary">
-                <div class = "panel-heading">
-                    <div class="panel-title">
-                          <div class="btn-group inline pull-left">
+{% block configuration_buttons %}
                               {% if user.is_authenticated %}
-                                <a href="{% url 'configuration:connitemf_create' %}" class="btn btn-default btn-xs">
-                                    <span class="glyphicon glyphicon-plus-sign"></span>
+                                <a href="{% url 'configuration:connitemf_create' %}"
+                                   class="btn btn-outline-secondary btn-sm">
+                                    <span class="font-weight-bold">
+                                        <i class="fas fa-plus"></i>
+                                    </span>
                                     Connection Item Field
                                 </a>
                               {% endif %}
-                           </div>
-                    </div>
-                        <strong>Connection Item Field list at {% now "Y/m/d H:i:s" %} (UTC)</strong>
-                </div>
-                <div class="panel-body" style="color:black;height:80%;width:100%;overflow:auto;">
-                    <table class="table table-hover display order-column" id="investigations-invi"
+{% endblock configuration_buttons %}
+
+{% block configuration_title %}
+                        Connection Item Field list at {% now "Y/m/d H:i:s" %} (UTC)
+{% endblock configuration_title %}
+
+{% block configuration_body %}
+                    <table class="table table-sm table-hover display order-column" id="investigations-invi"
                            style="min-height:45vh"
                         data-toggle="table"
                         data-classes="table table-no-bordered"
                         data-pagination="true"
+                        data-pagination-h-align="left"
                         data-search="true"
+                        data-search-align="left"
                         data-show-refresh="true"
                         data-show-toggle="true"
                         data-show-columns="true"
@@ -56,6 +50,7 @@
                         data-show-footer="false"
                         data-side-pagination="client"
                         data-sort-name="title"
+                        data-buttons-align="left"
                     >
                         <thead>
                         <tr>
@@ -69,9 +64,4 @@
                             {% include 'configuration/connectionitemfield_list_table.html' %}
                         </tbody>
                     </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock configuration_content %}
+{% endblock configuration_body %}

@@ -1,3 +1,4 @@
+{% extends "invs/inv_detail_tab_template.html" %}
 <!--
 # **********************************************************************;
 # Project           : bCIRT
@@ -11,78 +12,84 @@
 # 2019.07.29  Lendvay     1      Initial file
 # 2019.09.06  Lendvay     2      Print preview in new window
 # **********************************************************************;
--->    <div class="row">
+-->
+{% block invdetail_active %}active{% endblock invdetail_active %}
+{% block inv_alert %}
+{% endblock inv_alert %}
 
-        <!-- Left Investigation Info -->
-        <div class="col-sm-12 col-md-12">
-            <div class="panel panel-primary">
-                <div class = "panel-heading">
-                    <div class="panel-title text-center">
-                        <div class="btn-group inline pull-left">
-                            <li class="dropdown">
-                                <button class="btn btn-default btn-xs dropdown-toggle" onclick="filterFunctionInv()" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
-                                    Actions
-                                    <span class="caret"></span>
-                                </button>
-                                    <ul class="dropdown-menu" role="menu">
-                                        {% if inv.status.name != "Closed" %}
-                                        <li>
-                                            <a href="{% url 'tasks:ev_create' inv_pk=inv.pk task_pk=0 %}?next1={{ request.get_full_path|urlencode }}"
-                                               class="btn btn-default btn-xs">
-                                            New Evidence
-                                                <span class="glyphicon glyphicon-plus"></span>
-                                            </a>
-                                        </li>
-                                        {% endif %}
-                                        <li>
-                                            <a href="{% url 'invs:inv_edit' pk=inv.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                              class="btn btn-default btn-xs">
-                                              Edit
-                                              <span class="glyphicon glyphicon-pencil" data-toggle="tooltip" data-placement="top" title="Edit item">
-                                            </span>
-                                            </a>
-                                        </li>
-                                        <li class="dropdown-submenu">
-                                            <a tabindex="-1" href="#" class="btn btn-default btn-xs">Export<span class="glyphicon glyphicon-export"></span></a>
-                                            <ul class="dropdown-menu dropdown-content">
-                                                <li>
-                                                    <a href="{% url 'invs:inv_detail_print' pk=inv.pk %}?next1={{ request.get_full_path|urlencode }}" target="_blank"
-                                                      class="btn btn-default btn-xs">
-                                                      Print Preview
-                                                      <span class="glyphicon glyphicon-export" data-toggle="tooltip" data-placement="top" title="Edit item">
+{% block inv_buttons %}
+                            {% if user.is_authenticated %}
+                                <div class="dropdown">
+                                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle" onclick="filterFunctionInv()" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
+                                        Actions
+                                        <span class="caret"></span>
+                                    </button>
+                                        <ul class="dropdown-menu" role="menu">
+                                            {% if inv.status.name != "Closed" %}
+                                            <li>
+                                                <a href="{% url 'tasks:ev_create' inv_pk=inv.pk task_pk=0 %}?next1={{ request.get_full_path|urlencode }}"
+                                                      class="btn btn-secondary btn-sm btn-block text-left">
+                                                  <span class="" data-toggle="tooltip" data-placement="top" title="New Evidence item">
+                                                      <i class="fas fa-plus">&nbsp;</i>
+                                                  </span>
+                                                      New Evidence
+                                                  </a>
+                                            </li>
+<!--                                            <li>&nbsp;</li>-->
+                                            {% endif %}
+                                            <li>
+                                                <a href="{% url 'invs:inv_edit' pk=inv.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                                  class="btn btn-secondary btn-sm btn-block text-left">
+                                                  <span class="" data-toggle="tooltip" data-placement="top" title="Edit Evidence item">
+                                                      <i class="fas fa-pencil-alt">&nbsp;</i>
+                                                  </span>
+                                                      Edit
+                                                </a>
+                                            </li>
+<!--                                            <li>&nbsp;</li>-->
+                                            <li class="dropdown-submenu">
+                                                <a tabindex="-1" href="#" class="btn btn-secondary btn-sm btn-block text-left">
+                                                    <span class="">
+                                                        <i class="fas fa-file-export"></i>
                                                     </span>
-                                                    </a>
-                                                </li>
-                                            </ul>
+                                                        Export&nbsp;
+                                                <i class="fas fa-caret-right"></i>
+                                                </a>
+                                                <ul class="dropdown-menu dropdown-content">
+                                                    <li>
+                                                        <a href="{% url 'invs:inv_detail_print' pk=inv.pk %}?next1={{ request.get_full_path|urlencode }}" target="_blank"
+                                                          class="btn btn-secondary btn-sm btn-block text-left">
+                                                          <span data-toggle="tooltip" data-placement="top" title="Edit item">
+                                                              <i class="fas fa-print"></i>
+                                                          </span>
+                                                              Print Preview
+                                                        </a>
+                                                    </li>
+                                                </ul>
 
-                                        </li>
-                                        <li>&nbsp;</li>
-                                        <li>
-                                              <a href="{% url 'invs:inv_remove' pk=inv.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                                  class="btn btn-danger btn-xs">
-                                              <span class="glyphicon glyphicon-trash" data-toggle="tooltip" data-placement="top" title="Edit item">
-                                                  Delete
-                                              </span>
-                                              </a>
-                                        </li>
-                                    </ul>
-                            </li> <!-- .dropdown -->
+                                            </li>
+                                            <li>&nbsp;</li>
+                                            <li>
+                                                  <a href="{% url 'invs:inv_remove' pk=inv.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                                      class="btn btn-secondary btn-sm btn-block">
+                                                  <span class="font-weight-bold text-danger" data-toggle="tooltip" data-placement="top" title="Delete item">
+                                                      <i class="fas fa-trash-alt"></i>
+                                                      Delete
+                                                  </span>
+                                                  </a>
+                                            </li>
+                                        </ul>
+                                    </div> <!-- .dropdown -->
+                            {% endif %}
+{% endblock inv_buttons %}
+{% block inv_title %}
+&nbsp;Investigation Details | #{{ inv.id }} - {{ inv.invid }} | {{ user }} at {% now "Y/m/d H:i:s" %} (UTC)
+{% endblock inv_title %}
 
-
-
-                        </div>
-                        <strong>&nbsp;Investigation Details | {{ inv.id }}-{{ inv.invid }} | {{ user }} at {% now "Y/m/d H:i:s" %} (UTC)</strong>
-
-                    </div>
-                </div>
-                <div class="panel-body inv-panel-body" id="xxx">
-                    <table class="table" id="investigations-invh">
+{% block inv_body %}
+                    <table class="table table-sm" id="investigations-invh">
                         <tbody>
                             {% include 'invs/inv_detail_tab_detail_table.html' %}
                         </tbody>
                     </table>
-                </div>
-            </div>
-        </div>
-
-    </div>
+{% endblock inv_body %}

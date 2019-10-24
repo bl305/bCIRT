@@ -15,7 +15,7 @@
 {% for automation in object_list %}
                 <tr>
                     <td>
-                        <a class="badge" href="{% url 'tasks:auto_detail' pk=automation.pk %}?next1={{ request.get_full_path|urlencode }}">{{ automation.pk }}</a>
+                        <a class="badge badge-secondary" href="{% url 'tasks:auto_detail' pk=automation.pk %}?next1={{ request.get_full_path|urlencode }}">{{ automation.pk }}</a>
                     </td>
                     <td>
                         {{ automation.user }}
@@ -49,16 +49,16 @@
                         <div>
                             {% if automation.code_file %}
                             <a href="{% url 'tasks:act_exec_script' pk=automation.pk inv_pk=0 task_pk=0 ev_pk=0 evattr_pk=0%}"
-                               class="btn btn-success btn-xs">
-                                <span class="glyphicon glyphicon-play"></span>
+                               class="btn btn-success btn-sm">
+                                <span class="fas fa-play-circle"></span>
                             </a>
                             {% endif %}
                             <a href="{% url 'tasks:auto_edit' pk=automation.pk %}"
-                               class="btn btn-warning btn-xs">
-                                <span class="glyphicon glyphicon-pencil"></span>
+                               class="btn btn-warning btn-sm">
+                                <span class="fas fa-pen"></span>
                             </a>
-                            <a href="{% url 'tasks:auto_remove' pk=automation.pk %}" title="delete" class="btn btn-danger btn-xs pull-right">
-                                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                            <a href="{% url 'tasks:auto_remove' pk=automation.pk %}" title="delete" class="btn btn-danger btn-sm pull-right">
+                                <span class="fas fa-trash-alt" aria-hidden="true"></span>
                                 <span class="icon-label"></span>
                             </a>
                         </div>

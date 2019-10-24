@@ -15,78 +15,47 @@
 {% for playbooktemplateitem in object_list %}
                 <tr id="item-pbtmpit-{{playbooktemplateitem.pk}}">
                     <td>
-                        <style>
-                        .dropdown-submenu {
-                          position: relative;
-                        }
-                        .dropdown-submenu > .dropdown-menu {
-                          top: 0;
-                          left: 100%;
-                          margin-top: -6px;
-                          margin-left: -1px;
-                        }
-                        .dropdown-submenu:hover > .dropdown-menu {
-                          display: block;
-                        }
-                        .dropdown-submenu:hover > a:after {
-                          border-left-color: #fff;
-                        }
-                        .dropdown-submenu.pull-left {
-                          float: none;
-                        }
-                        .dropdown-submenu.pull-left > .dropdown-menu {
-                          left: -100%;
-                          margin-left: 10px;
-                        }
-
-                        </style>
-                        <li class="dropdown" onclick="incrow({{playbooktemplateitem.pk}},'item-pbtmpit-','150px')">
-                            <!--<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Dropdown <span class="caret"></span></a>-->
-                            <!--<button class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">-->
-                                <!--Dropdown -->
-                                <!--<span class="caret"></span>-->
-                            <!--</button>-->
-                            <div>
+                        <div class="dropdown" onclick="incrow({{playbooktemplateitem.pk}},'item-pbtmpit-','150px')">
                             <div class="btn-group">
-                             <button class="btn btn-default btn-xs dropdown-toggle dropdown-toggle-split" onclick="filterFunctionTask()" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
+                             <button class="btn btn-secondary btn-sm dropdown-toggle dropdown-toggle-split" onclick="filterFunctionTask()" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
                                 {{ playbooktemplateitem.pk }} <span class="caret"></span>
                             </button>
 
                                 <ul class="dropdown-menu" role="menu">
                                     <li>
                                         <a href="{% url 'tasks:playittmp_detail' pk=playbooktemplateitem.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                           class="btn btn-default btn-xs">
-                                            Open
-                                            <span class="glyphicon glyphicon-eye-open"></span>
+                                           class="btn btn-secondary btn-sm btn-block text-left">
+                                            <span class="fas fa-eye"></span>
+                                            View
                                         </a>
                                     </li>
                                     <li>
                                         <a href="{% url 'tasks:playittmp_edit' pk=playbooktemplateitem.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                          class="btn btn-default btn-xs">
+                                          class="btn btn-secondary btn-sm btn-block text-left">
+                                          <span class="fas fa-pen" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
                                           Edit&nbsp;
-                                          <span class="glyphicon glyphicon-pencil" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
                                         </a>
                                     </li>
 
                                     <li>&nbsp;</li>
                                     <li>
                                           <a href="{% url 'tasks:playittmp_remove' pk=playbooktemplateitem.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                              class="btn btn-danger btn-xs">
-                                          <span class="glyphicon glyphicon-trash" data-toggle="tooltip" data-placement="top" title="Edit item">
-                                              Delete
+                                              class="btn btn-secondary btn-sm btn-block text-danger font-weight-bold">
+                                          <span class="fas fa-trash-alt" data-toggle="tooltip" data-placement="top" title="Edit item">
                                           </span>
+                                              Delete
                                           </a>
                                     </li>
                                 </ul>
                                 </div>
                             </div>
-                        </li> <!-- .dropdown -->
+                        </div> <!-- .dropdown -->
 
 
                     </td>
                     <td>
                         {% if playbooktemplateitem.playbooktemplateid %}
-                        <a class="badge" href="{% url 'tasks:playtmp_detail' pk=playbooktemplateitem.playbooktemplateid.pk %}?next1={{ request.get_full_path|urlencode }}">
+                        <a class="badge badge-secondary" href="{% url 'tasks:playtmp_detail' pk=playbooktemplateitem.playbooktemplateid.pk %}?next1={{ request.get_full_path|urlencode }}">
                             {{ playbooktemplateitem.playbooktemplateid.id }}-{{ playbooktemplateitem.playbooktemplateid.name }}
                         </a>
                         {% else %}

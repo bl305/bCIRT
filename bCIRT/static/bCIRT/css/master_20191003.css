@@ -1,0 +1,310 @@
+body {
+//    padding-top: 55px;
+    margin: 0;
+    overflow: visible;
+    background-color: transparent;
+    color: gray;
+    max-width: 100%;
+}
+
+.btn-group-xs > .btn, .btn-xs {
+  padding: .25rem .4rem;
+  font-size: .875rem;
+  line-height: .5;
+  border-radius: .2rem;
+}
+
+.starter-template {
+    padding: 3rem 1.5rem;
+    text-align: center;
+}
+
+
+.navbar-brand {
+    height: 20px;
+    font-family: "Courier New";
+    font-weight: bold;
+}
+
+.nav-item {
+    font-family: Consolas;
+    font-weight: bold;
+}
+
+.dropdown-item {
+    font-family: Consolas;
+}
+
+//.myfooter {
+//    position: absolute;
+//    clear: both;
+//    color: gray;
+//    text-align: center;
+//    bottom: 0;
+//    height: 0px;
+//    width: 100%;
+//    margin-bottom: 0;
+//}
+
+.mytext {
+    font-family: Consolas;
+    font-weight: bold;
+}
+
+.main {
+  margin-top: 50px;
+//  width: 100%;
+  overflow-x: hidden;
+}
+
+/* Solid border */
+hr.solid {
+  border-top: 3px solid black;
+}
+
+/* Dashed border */
+hr.dashed {
+  border-top: 3px dashed black;
+}
+
+/* Dotted border */
+hr.dotter {
+  border-top: 3px dotted black;
+}
+
+/* Thick border */
+hr.thick {
+  border: 3px solid black;
+}
+
+/* Large rounded border */
+hr.large {
+  border: 10px solid black;
+  border-radius: 5px;
+}
+
+img.graph {
+   width: 100%;
+   height: 100%;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+.indextable {
+    font-size: 8px;
+}
+
+.hideOverflow
+{
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+    width:100%;
+    display:block;
+}
+
+// Dropdown tool
+
+
+
+//############ Dropdown filter
+//#https://www.w3schools.com/howto/tryit.asp?filename=tryhow_css_js_dropdown_filter
+//.dropbtn {
+//  background-color: #4CAF50;
+//  color: white;
+//  padding: 16px;
+//  font-size: 16px;
+//  border: none;
+//  cursor: pointer;
+//}
+
+//.dropbtn:hover, .dropbtn:focus {
+//  background-color: #3e8e41;
+//}
+
+#myInput {
+  border-box: box-sizing;
+//  background-image: url('searchicon.png');
+  background-position: 14px 12px;
+  background-color: transparent;
+  background-repeat: no-repeat;
+//  font-size: 16px;
+//  padding: 14px 20px 12px 45px;
+  padding: 8px 15px 6px 10px;
+  border: none;
+  border-bottom: 1px solid #ddd;
+  color: black;
+  width: 100%;
+}
+
+#myInput:focus {outline: 3px solid #ddd;}
+#myInput:hover {color:green; background-color:yellow;}
+
+#myInput2 {
+  border-box: box-sizing;
+//  background-image: url('searchicon.png');
+  background-position: 14px 12px;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  padding: 8px 15px 6px 10px;
+  border: none;
+  border-bottom: 1px solid #ddd;
+  color: black;
+  width: 100%;
+}
+
+#myInput2:focus {outline: 3px solid #ddd;}
+#myInput2:hover {color:green; background-color:yellow;}
+
+#myInputInv {
+  border-box: box-sizing;
+  //background-image: url('searchicon.png');
+  background-position: 14px 12px;
+  background-color: transparent;
+  background-repeat: no-repeat;
+//  font-size: 16px;
+//  padding: 14px 20px 12px 45px;
+  padding: 8px 15px 6px 10px;
+  border: none;
+  border-bottom: 1px solid #ddd;
+  color: black;
+  width: 100%;
+}
+
+#myInputInv:focus {outline: 3px solid #ddd;}
+#myInputInv:hover {color:green; background-color:yellow;}
+
+#myInputTaskTemplate {
+  border-box: box-sizing;
+//  background-image: url('searchicon.png');
+  background-position: 14px 12px;
+  background-color: transparent;
+  background-repeat: no-repeat;
+//  font-size: 16px;
+//  padding: 14px 20px 12px 45px;
+  padding: 8px 15px 6px 10px;
+  border: none;
+  border-bottom: 1px solid #ddd;
+  color: black;
+  width: 100%;
+}
+
+#myInputTaskTemplate:focus {outline: 3px solid #ddd;}
+#myInputTaskTemplate:hover {color:green; background-color:yellow;}
+
+#myInputTask {
+  border-box: box-sizing;
+//  background-image: url('searchicon.png');
+  background-position: 14px 12px;
+  background-color: transparent;
+  background-repeat: no-repeat;
+//  font-size: 16px;
+//  padding: 14px 20px 12px 45px;
+  padding: 8px 15px 6px 10px;
+  border: none;
+  border-bottom: 1px solid #ddd;
+  color: black;
+  width: 100%;
+}
+
+#myInputTask:focus {outline: 3px solid #ddd;}
+#myInputTask:hover {color:green; background-color:yellow;}
+
+#myInputTaskSelect {
+  border-box: box-sizing;
+//  background-image: url('searchicon.png');
+  background-position: 14px 12px;
+  background-color: transparent;
+  background-repeat: no-repeat;
+//  font-size: 16px;
+//  padding: 14px 20px 12px 45px;
+  padding: 8px 15px 6px 10px;
+  border: none;
+  border-bottom: 1px solid #ddd;
+  color: black;
+  width: 100%;
+}
+
+#myInputTaskSelect:focus {outline: 3px solid #ddd;}
+#myInputTaskSelect:hover {color:green; background-color:yellow;}
+
+#myInputPlay {
+  border-box: box-sizing;
+//  background-image: url('searchicon.png');
+  background-position: 14px 12px;
+  background-color: transparent;
+  background-repeat: no-repeat;
+//  font-size: 16px;
+//  padding: 14px 20px 12px 45px;
+  padding: 8px 15px 6px 10px;
+  border: none;
+  border-bottom: 1px solid #ddd;
+  color: black;
+  width: 100%;
+}
+
+#myInputPlay:focus {outline: 3px solid #ddd;}
+#myInputPlay:hover {color:green; background-color:yellow;}
+
+#myInputEv {
+  border-box: box-sizing;
+  background-image: url('searchicon.png');
+  background-position: 14px 12px;
+  background-color: transparent;
+  background-repeat: no-repeat;
+//  font-size: 16px;
+//  padding: 14px 20px 12px 45px;
+  padding: 8px 15px 6px 10px;
+  border: none;
+  border-bottom: 1px solid #ddd;
+  color: black;
+  width: 100%;
+}
+
+#myInputEv:focus {outline: 3px solid #ddd;}
+#myInputEv:hover {color:green; background-color:yellow;}
+
+#myInputEvAttr {
+  border-box: box-sizing;
+//  background-image: url('searchicon.png');
+  background-position: 14px 12px;
+  background-color: transparent;
+  background-repeat: no-repeat;
+//  font-size: 16px;
+//  padding: 14px 20px 12px 45px;
+  padding: 8px 15px 6px 10px;
+  border: none;
+  border-bottom: 1px solid #ddd;
+  color: black;
+  width: 100%;
+}
+
+#myInputEvAttr:focus {outline: 3px solid #ddd;}
+#myInputEvAttr:hover {color:green; background-color:yellow;}
+
+
+#myInputEvFile {
+  border-box: box-sizing;
+//  background-image: url('searchicon.png');
+  background-position: 14px 12px;
+  background-color: transparent;
+  background-repeat: no-repeat;
+//  font-size: 16px;
+//  padding: 14px 20px 12px 45px;
+  padding: 8px 15px 6px 10px;
+  border: none;
+  border-bottom: 1px solid #ddd;
+  color: black;
+  width: 100%;
+}
+
+#myInputEvFile:focus {outline: 3px solid #ddd;}
+#myInputEvFile:hover {color:green; background-color:yellow;}
+
+
+.show {display: block;}
+
+
+// dropdown2

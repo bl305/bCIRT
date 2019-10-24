@@ -19,7 +19,7 @@
                 <tr class="mylist-meta" style="background-color:#e6e6e6" id="item-{{ taskvar.pk }}">
                     <!-- e.g.: #item-7 -->
                   <td>
-                      <a class="badge" href="{% url 'tasks:tvar_detail' pk=taskvar.pk %}?next1={{ request.get_full_path|urlencode }}">{{ taskvar.pk }}</a>
+                      <a class="badge badge-secondary" href="{% url 'tasks:tvar_detail' pk=taskvar.pk %}?next1={{ request.get_full_path|urlencode }}">{{ taskvar.pk }}</a>
                   </td>
                   <td>
                       {{ taskvar.category }}
@@ -49,15 +49,15 @@
                           <div>
                               <a href="{% url 'tasks:tvar_detail' pk=taskvar.pk %}?next1={{ request.get_full_path|urlencode }}"
                                   class="btn btn-success btn-xs">
-                              <span class="glyphicon glyphicon-eye-open" data-toggle="tooltip" data-placement="top" title="View item"></span>
+                              <span class="fas fa-eye" data-toggle="tooltip" data-placement="top" title="View item"></span>
                               </a>
                               <a href="{% url 'tasks:tvar_edit' pk=taskvar.pk %}?next1={{ request.get_full_path|urlencode }}"
                                   class="btn btn-warning btn-xs">
-                              <span class="glyphicon glyphicon-pencil" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
+                              <span class="fas fa-pen" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
                               </a>
                               <a href="{% url 'tasks:tvar_remove' pk=taskvar.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                  class="btn btn-danger btn-xs pull-right">
-                              <span class="glyphicon glyphicon-trash" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
+                                  class="btn btn-danger btn-xs">
+                              <span class="fas fa-trash-alt" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
                               </a>
                           </div>
                       {% endif %}

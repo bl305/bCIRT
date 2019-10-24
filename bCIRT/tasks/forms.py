@@ -12,6 +12,7 @@
 # 2019.08.19  Lendvay     1      Added "enabled" ot the form for actions
 # **********************************************************************;
 from django import forms
+from invs.widgets import JQueryDateTimePickerInput
 from tinymce import TinyMCE
 from .models import Task, TaskCategory, TaskPriority, TaskStatus, TaskTemplate, TaskType, TaskVar, TaskVarCategory, \
     TaskVarType, Type, EvidenceFormat, EvidenceAttrFormat, EvidenceAttr, Evidence, EvReputation, \
@@ -195,8 +196,7 @@ class ActionForm(forms.ModelForm):
         labels = {
             "description": "Description*",
             "fileRef": "Attachment",
-            'argument': 'Argument (override: $FILE$ can be used to refer to the evidence file, $EVIDENCE$ for '
-                        'the description/attribute, $OUTDIR$ for any output files)',
+            'argument': 'Argument (parameters: $FILE$, $EVIDENCE$, $OUTDIR$',
             "timeout": "Timeout (sec)",
             'title': 'Title*',
             'version': 'Version*',
@@ -218,7 +218,7 @@ class ActionForm(forms.ModelForm):
             'argument': forms.Textarea(attrs={
                 'rows': '1',
                 'cols': '25',
-                'style': 'width:50%',
+                'style': 'width:90%',
                 'class': 'form-control'}
             ),
             'timeout': forms.NumberInput(attrs={
@@ -335,13 +335,19 @@ class TaskForm(forms.ModelForm):
         if kwargs.get('instance'):
             curr_obj = kwargs.get('instance')
             current_pk = curr_obj.pk
-            if inv_pk:
+            if inv_pk and inv_pk!='0' and inv_pk!=0:
                 inv_obj = Inv.objects.get(pk=inv_pk)
-            else:
+                self.fields['parent'].queryset = inv_obj.task_inv.exclude(pk=current_pk)
+                self.fields['inputfrom'].queryset = inv_obj.task_inv.exclude(pk=current_pk)
+            elif inv_pk!='0' and inv_pk!=0:
                 inv_obj = curr_obj.inv
-            self.fields['parent'].queryset = inv_obj.task_inv.exclude(pk=current_pk)
-            self.fields['inputfrom'].queryset = inv_obj.task_inv.exclude(pk=current_pk)
-        elif inv_pk:
+                self.fields['parent'].queryset = inv_obj.task_inv.exclude(pk=current_pk)
+                self.fields['inputfrom'].queryset = inv_obj.task_inv.exclude(pk=current_pk)
+            else:
+                self.fields['parent'].queryset = Task.objects.all()
+                self.fields['inputfrom'].queryset = Task.objects.all()
+
+        elif inv_pk and inv_pk!='0' and inv_pk!=0:
             inv_obj = Inv.objects.get(pk=inv_pk)
             self.fields['parent'].queryset = inv_obj.task_inv.all()
             self.fields['inputfrom'].queryset = inv_obj.task_inv.all()
@@ -512,32 +518,52 @@ class TaskForm(forms.ModelForm):
         )
     )
 
-    starttime = forms.SplitDateTimeField(
+    # starttime = forms.SplitDateTimeField(
+    #     required=False,
+    #     label='Start of task',
+    #     input_date_formats=['%m/%d/%Y'],
+    #     input_time_formats=['%H:%M'],
+    #     widget=SplitDateTimeWidget(
+    #         date_format='%m/%d/%Y',
+    #         time_format='%H:%M',
+    #         attrs={
+    #             'class': 'form-control',
+    #             'style': 'width:100px',
+    #         }
+    #     )
+    # )
+    starttime = forms.DateTimeField(
+        input_formats=['%Y-%m-%d %H:%M:%S'],
         required=False,
-        label='Start of task',
-        input_date_formats=['%m/%d/%Y'],
-        input_time_formats=['%H:%M'],
-        widget=SplitDateTimeWidget(
-            date_format='%m/%d/%Y',
-            time_format='%H:%M',
-            attrs={
+        widget=JQueryDateTimePickerInput(
+            attrs = {
                 'class': 'form-control',
-                'style': 'width:100px',
+                'style': 'width:200px',
             }
         )
     )
 
-    endtime = forms.SplitDateTimeField(
+    # endtime = forms.SplitDateTimeField(
+    #     required=False,
+    #     label='End of task',
+    #     input_date_formats=['%m/%d/%Y'],
+    #     input_time_formats=['%H:%M'],
+    #     widget=SplitDateTimeWidget(
+    #         date_format='%m/%d/%Y',
+    #         time_format='%H:%M',
+    #         attrs={
+    #             'class': 'form-control',
+    #             'style': 'width:100px',
+    #         }
+    #     )
+    # )
+    endtime = forms.DateTimeField(
+        input_formats=['%Y-%m-%d %H:%M:%S'],
         required=False,
-        label='End of task',
-        input_date_formats=['%m/%d/%Y'],
-        input_time_formats=['%H:%M'],
-        widget=SplitDateTimeWidget(
-            date_format='%m/%d/%Y',
-            time_format='%H:%M',
-            attrs={
+        widget=JQueryDateTimePickerInput(
+            attrs = {
                 'class': 'form-control',
-                'style': 'width:100px',
+                'style': 'width:200px',
             }
         )
     )
@@ -1646,7 +1672,7 @@ class EvidenceAttrForm(forms.ModelForm):
         widgets = {
             'observable': forms.CheckboxInput(
                 attrs={
-                    'class': 'custom-control-input custom-control-label',
+                    'class': 'form-check',
                 }
             ),
             'evattrvalue': forms.TextInput(attrs={
@@ -1742,10 +1768,11 @@ class AutomationForm(forms.ModelForm):
 
     #   fileRef = forms.FileField(widget=CustomClearableFileInput)
     class Meta:
-        fields = ("user", "name", "version", "type", "script_type", "script_category", "code", "fileRef", "description")
+        fields = ("user", "name", "version", "type", "script_type", "script_category", "code", "autorequirements", "fileRef", "description")
         model = Automation
         labels = {
             "description": "Description*",
+            "autorequirements": "Software reuqirements",
             "fileRef": "Attachment",
             'name': 'Name*',
             'version': 'Version*',
@@ -1762,6 +1789,11 @@ class AutomationForm(forms.ModelForm):
                 'class': 'form-control'}
             ),
             'code': forms.Textarea(attrs={
+                'size': 20,
+                'style': 'width:90%;min-height:500px',
+                'class': 'form-control'}
+            ),
+            'autorequirements': forms.Textarea(attrs={
                 'size': 20,
                 'style': 'width:90%',
                 'class': 'form-control'}

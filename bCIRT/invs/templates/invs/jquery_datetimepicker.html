@@ -1,0 +1,17 @@
+<!--https://www.jqueryscript.net/time-clock/Clean-jQuery-Date-Time-Picker-Plugin-datetimepicker.html-->
+<!--<div class="input-group date" id="{{ widget.datetimepicker_id }}" data-target-input="nearest" style="width:250px">-->
+  {% include "django/forms/widgets/input.html" %}
+<!--  <div class="input-group-append" data-target="#{{ widget.datetimepicker_id }}" data-toggle="datetimepicker">-->
+<!--    <div class="input-group-text"><i class="fa fa-calendar-alt"></i></div>-->
+<!--  </div>-->
+<!--</div>-->
+
+<script>
+    $("#{{ widget.datetimepicker_id }}").datetimepicker({
+      format:'Y-m-d H:i:s',
+      step: 30,
+      todayButton:true,
+//    $('#{{ field.auto_id }}').datetimepicker();
+  });
+
+</script>

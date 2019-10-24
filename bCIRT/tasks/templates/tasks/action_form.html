@@ -1,4 +1,4 @@
-{% extends "tasks/action_base.html" %}
+{% extends "tasks/action_template.html" %}
 <!--
 # **********************************************************************;
 # Project           : bCIRT
@@ -12,29 +12,18 @@
 # 2019.07.29  Lendvay     1      Initial file
 # **********************************************************************;
 -->
-{% block actionslist_active %}active{% endblock actionslist_active %}
-
-{% load bootstrap4 %}
 
 <!-- BL start -->
 {{ form.media }}
 <!-- BL end -->
+{% block action_buttons %}
+{% endblock action_buttons %}
 
-{% block preactions %}
-	<div class="container myregister">
-    </div>
-{% endblock preactions %}
+{% block action_title %}
+                        &nbsp;Edit Action {{ action.pk }} - {{ action.title }}
+{% endblock action_title %}
 
-{% block actions_content %}
-<ul class="smooth-scroll list-unstyled">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-sm-2 col-md-10">
-                <div class="panel panel-primary">
-                    <div class = "panel-heading text-center" style="background-color:#4682B4">
-                        <h3 class="panel-title" style="font-weight:bold;">Edit Action {{ action.pk }} - {{ action.title }}</h3>
-                    </div>
-                    <div class="panel-body">
+{% block action_body %}
                         {% if error_message %}
                             <p><strong>{{ error_message }}</strong></p>
                         {% endif %}
@@ -45,27 +34,13 @@
                             <input type="hidden" name="next" value="{{ request.GET.next1 }}">
                             <div class="form-group">
                                 <div class="col-sm-offset-1 col-sm-11">
-                                    <button type="submit" class="btn btn-success md">Save</button>
+                                    <button type="submit" class="btn btn-success btn-sm">Save</button>
                                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                    <a href="javascript:history.go(-1)" class="btn btn-primary pull-right">
-                                        <span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>
+                                    <a href="javascript:history.go(-1)" class="btn btn-primary btn-sm">
+                                        <span class="fas fa-arrow-left" aria-hidden="true"></span>
                                         <span>Cancel</span>
                                     </a>
                                 </div>
                             </div>
                         </form>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-10 col-md-2">
-                <div class="panel panel-default" style="color:black">
-                    <div class="panel-body">
-                        <h3>Action Update?</h3>
-                        <p>Action details can be updated using this form.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</ul>
-{% endblock actions_content %}
+{% endblock action_body %}

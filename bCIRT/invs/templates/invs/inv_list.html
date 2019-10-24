@@ -22,30 +22,38 @@
 {% endblock %}
 
 {% block invs_content %}
-<div class="row">
+<div class="row w-100">
     <div class="col-sm-12">
-        <div align="center">
-            <div class="panel panel-primary">
-                <div class = "panel-heading">
-                    <div class="panel-title">
-                          <div class="btn-group inline pull-left">
-                              {% if user.is_authenticated %}
-                                  <a href="{% url 'invs:inv_create' %}?next1={{ request.get_full_path|urlencode }}" class="btn btn-default btn-xs">
-                                      <span class="glyphicon glyphicon-plus-sign"></span>
-                                      New Investigation
-                                  </a>
-                              {% endif %}
-                           </div>
+        <div align="left">
+            <div class="card card-primary w-100">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="container mw-100 d-inline-flex justify-content-start flex-row align-items-center align-content-center flex-nowrap">
+                            {% if user.is_authenticated %}
+                                <a href="{% url 'invs:inv_create' %}?next1={{ request.get_full_path|urlencode }}"
+                                class="btn btn-outline-secondary btn-sm">
+                                <span class=""></span>
+                                    <i class="fas fa-plus"></i>
+                                New Investigation
+                                </a>
+                            {% endif %}
+                            <div class="container d-inline-flex flex-row align-items-center justify-content-center align-content-center flex-nowrap">
+                                <p class="h4">&nbsp;Investigations for {{ user }} at {% now "Y/m/d H:i:s" %} (UTC)</p>
+                            </div>
+                        </div>
                     </div>
-                        <strong>&nbsp;Investigations for {{ user }} at {% now "Y/m/d H:i:s" %} (UTC)</strong>
                 </div>
-                <div class="panel-body inv-panel-body">
-                    <table class="table table-hover display order-column" id="investigations-invi"
+                <div class="card-body inv-card-body">
+<!--                    <table class="table table-sm table-hover display order-column" id="investigations-invi"-->
+<table class="table table-sm table-hover display order-column" id="investigations-invi"
                            style="min-height:55vh"
                         data-toggle="table"
-                        data-classes="table table-no-bordered"
+                        data-classes="table table-sm table-no-bordered"
                         data-pagination="true"
+                        data-pagination-h-align="left"
+                        data-page-size="25"
                         data-search="true"
+                        data-search-align="left"
                         data-show-refresh="true"
                         data-show-toggle="true"
                         data-show-columns="true"
@@ -55,6 +63,7 @@
                         data-page-list="[10, 25, 50, 100, ALL]"
                         data-show-footer="false"
                         data-side-pagination="client"
+                        data-buttons-align="left"
                     >
                         <thead>
                         <tr>

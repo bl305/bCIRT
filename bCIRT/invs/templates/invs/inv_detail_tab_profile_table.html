@@ -15,7 +15,9 @@
 {% for profile in inv.profile_inv.all %}
                 <tr>
                     <td>
-                        <a class="badge" href="{% url 'assets:prof_detail' pk=profile.pk %}?next1={{ request.get_full_path|urlencode }}">{{ profile.pk }}</a>
+                        <a href="{% url 'assets:prof_detail' pk=profile.pk %}?next1={{ request.get_full_path|urlencode }}">
+                            <h6><span class="badge badge-pill badge-secondary">{{ profile.pk }}</span></h6>
+                        </a>
                     </td>
                     <td>
                         {% if profile.username %}
@@ -53,18 +55,17 @@
 
                     <td>
 	                	{% if user.is_authenticated %}
-                        <div class="row inv-index-row">
-                                        <a href="{% url 'assets:prof_edit' pk=profile.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                           class="btn btn-warning btn-xs">
-                                            <span class="glyphicon glyphicon-pencil"></span>
-                                        </a>
-                                        </th>
-                                        <th>
-                                        <a href="{% url 'assets:prof_remove' pk=profile.pk %}?next1={{ request.get_full_path|urlencode }}" title="delete"
-                                           class="btn btn-danger btn-xs pull-right">
-                                            <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                                            <span class="icon-label"></span>
-                                        </a>
+                        <div class="row container mw-100 d-inline-flex justify-content-end flex-row align-items-center align-content-center flex-nowrap">
+                                    <a href="{% url 'assets:prof_edit' pk=profile.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                       class="btn btn-warning btn-sm">
+                                        <span class="fa fa-pencil-alt"></span>
+                                    </a>
+                            &nbsp;
+                                    <a href="{% url 'assets:prof_remove' pk=profile.pk %}?next1={{ request.get_full_path|urlencode }}" title="delete"
+                                       class="btn btn-danger btn-sm">
+                                        <span class="fa fa-trash-alt" aria-hidden="true"></span>
+                                        <span class="icon-label"></span>
+                                    </a>
                         </div>
                         {% endif %}
 

@@ -19,7 +19,7 @@
                 <tr class="mylist-meta" style="background-color:#e6e6e6" id="item-{{ playbookitem.pk }}">
                     <!-- e.g.: #item-7 -->
                   <td>
-                      <a class="badge" href="{% url 'tasks:tsk_detail' pk=playbookitem.pk %}?next1={{ request.get_full_path|urlencode }}">
+                      <a class="badge badge-secondary" href="{% url 'tasks:tsk_detail' pk=playbookitem.pk %}?next1={{ request.get_full_path|urlencode }}">
                           {{ playbookitem.pk }}
                       </a>
                   </td>
@@ -45,21 +45,19 @@
                         {{ playbookitem.modified_by }}
                     </td>
                   <td>
-                      <div>
                           <a href="{% url 'tasks:tsk_edit' pk=playbookitem.pk %}?next1={{ request.get_full_path|urlencode }}"
                               class="btn btn-warning btn-xs">
-                          <span class="glyphicon glyphicon-pencil" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
+                          <span class="fas fa-pen" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
                           </a>
                           <a href="{% url 'tasks:tsk_remove' pk=playbookitem.pk %}?next1={{ request.get_full_path|urlencode }}"
-                              class="btn btn-danger btn-xs pull-right">
-                          <span class="glyphicon glyphicon-trash" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
+                              class="btn btn-danger btn-xs">
+                          <span class="fas fa-trash-alt" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
                           </a>
-                      </div>
                   </td>
                 </tr>
 
                 <tr class="invev-detail">
-                  <td colspan="8">{{ playbookitem.description|safe }}</td>
+                  <td colspan="9">{{ playbookitem.description|safe }}</td>
                 </tr>
 {% endfor %}
 {% else %}

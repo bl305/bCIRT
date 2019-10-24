@@ -15,40 +15,39 @@
 {% for taskvar in object_list %}
                 <tr id="item-taskvar-{{ taskvar.pk }}">
                     <td>
-                        <li class="dropdown" onclick="incrow({{taskvar.pk}},'item-taskvar-','150px')">
+                        <div class="dropdown" onclick="incrow({{taskvar.pk}},'item-taskvar-','150px')">
                             <div>
                             <div class="btn-group">
-                             <button class="btn btn-default btn-xs dropdown-toggle dropdown-toggle-split" onclick="filterFunctionTask()" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
+                             <button class="btn btn-default btn-sm dropdown-toggle dropdown-toggle-split" onclick="filterFunctionTask()" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
                                 {{ taskvar.pk }} <span class="caret"></span>
                             </button>
                                 <ul class="dropdown-menu" role="menu">
                                     <li>
                                         <a href="{% url 'tasks:tvar_detail' pk=taskvar.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                           class="btn btn-default btn-xs">
+                                           class="btn btn-secondary btn-sm btn-block text-left">
+                                            <span class="fas fa-eye"></span>
                                             Open
-                                            <span class="glyphicon glyphicon-eye-open"></span>
                                         </a>
                                     </li>
                                     <li>
                                         <a href="{% url 'tasks:tvar_edit' pk=taskvar.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                          class="btn btn-default btn-xs">
+                                          class="btn btn-secondary btn-sm btn-block text-left">
+                                          <span class="fas fa-pen" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
                                           Edit&nbsp;
-                                          <span class="glyphicon glyphicon-pencil" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
                                         </a>
                                     </li>
                                     <li>&nbsp;</li>
                                     <li>
                                           <a href="{% url 'tasks:tvar_remove' pk=taskvar.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                              class="btn btn-danger btn-xs">
-                                          <span class="glyphicon glyphicon-trash" data-toggle="tooltip" data-placement="top" title="Edit item">
+                                              class="btn btn-secondary btn-sm btn-block text-danger font-weight-bold">
+                                              <span class="fas fa-trash-alt" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
                                               Delete
-                                          </span>
                                           </a>
                                     </li>
                                 </ul>
                                 </div>
                             </div>
-                        </li> <!-- .dropdown -->
+                        </div> <!-- .dropdown -->
                     </td>
                     <td>
                         {{ taskvar.name }}
@@ -70,7 +69,7 @@
                     </td>
                     <td>
                         {% if taskvar.task %}
-                            <a class="badge" href="{% url 'tasks:tsk_detail' pk=taskvar.task %}?next1={{ request.get_full_path|urlencode }}">
+                            <a class="badge badge-secondary" href="{% url 'tasks:tsk_detail' pk=taskvar.task.pk %}?next1={{ request.get_full_path|urlencode }}">
                                 {{ taskvar.task }}
                             </a>
                         {% else %}
@@ -79,7 +78,7 @@
                     </td>
                     <td>
                         {% if taskvar.tasktemplate %}
-                            <a class="badge" href="{% url 'tasks:tmp_detail' pk=taskvar.tasktemplate.pk %}?next1={{ request.get_full_path|urlencode }}">
+                            <a class="badge badge-secondary" href="{% url 'tasks:tmp_detail' pk=taskvar.tasktemplate.pk %}?next1={{ request.get_full_path|urlencode }}">
                                 {{ taskvar.tasktemplate }}
                             </a>
                         {% else %}

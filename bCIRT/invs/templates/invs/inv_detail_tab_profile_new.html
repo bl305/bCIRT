@@ -1,0 +1,67 @@
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : inv/inv_detail_tab_profile.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.07.27
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.07.29  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+    <div class="row w-100">
+
+        <!-- Right Investigation Info -->
+        <div class="col-sm-12 col-md-12">
+            <div class="card card-primary w-100">
+                <div class="card-header">
+                    <div class="card-title">
+                        <div class="container mw-100 d-inline-flex justify-content-start flex-row align-items-center align-content-center flex-nowrap">
+                            {% if user.is_authenticated %}
+                                <a href="{% url 'assets:prof_create' inv_pk=inv.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                class="btn btn-outline-secondary btn-sm">
+                                <span class=""></span>
+                                    <i class="fas fa-plus"></i>
+                                New Profile
+                                </a>
+                            {% endif %}
+                            <div class="container d-inline-flex flex-row align-items-center justify-content-center align-content-center flex-nowrap">
+                                <p class="h4">&nbsp;Victim Profiles | {{ inv.profile_inv.all.count }} item{{ inv.profile_inv.all.count|pluralize }} | {{ user }} at {% now "Y/m/d H:i:s" %} (UTC)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body inv-card-body">
+
+                    {% if error_message %}
+                        <p><strong>{{ error_message }}</strong></p>
+                    {% endif %}
+
+                    <table class="table table-hover table-sm">
+                        <thead>
+                        <tr>
+                            <th>Profile ID</th>
+                            <th>Username</th>
+                            <th>UserID</th>
+                            <th>Email</th>
+                            <th>Host</th>
+                            <th>IP</th>
+                            <th>Location</th>
+                            <th>Modified on</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            <!-- include 'investigations/partial_investigations_incidents_list.html' %}-->
+                            {% include 'invs/inv_detail_tab_profile_table.html' %}
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>

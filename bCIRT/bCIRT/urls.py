@@ -31,6 +31,8 @@ from . import views
 from django.conf import settings
 from django.conf.urls.static import static
 
+
+from django.contrib.auth import views as auth_views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r"^$", views.HomePage.as_view(), name="home"),
@@ -48,7 +50,6 @@ urlpatterns = [
     url(r"^reports/", include("reports.urls", namespace="reports")),
 
     url(r'session_security/', include('session_security.urls')),
-
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
