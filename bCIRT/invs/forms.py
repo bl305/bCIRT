@@ -13,9 +13,9 @@
 from .widgets import JQueryDateTimePickerInput
 
 from django import forms
-from .models import Inv, InvStatus, InvSeverity, InvPhase, InvCategory, InvAttackvector, InvPriority, CurrencyType
+from .models import Inv, InvStatus, InvSeverity, InvPhase, InvCategory, InvAttackvector, InvPriority, \
+    CurrencyType, InvReviewRules
 import logging
-from django.forms.widgets import SplitDateTimeWidget  # , ClearableFileInput
 from tinymce import TinyMCE
 # Get the user so we can use this
 from django.contrib.auth import get_user_model
@@ -51,14 +51,15 @@ class InvForm(forms.ModelForm):
 
     status = forms.ModelChoiceField(
         label='Status*',
-        queryset=InvStatus.objects.filter(enabled=True).order_by('name'),
+        queryset=InvStatus.objects.filter(enabled=True).exclude(name="Review2").exclude(name="Closed").
+            exclude(name="Archived").order_by('name'),
         empty_label="--Select--",
         widget=forms.Select(
             attrs={
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -106,7 +107,7 @@ class InvForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -121,7 +122,7 @@ class InvForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -136,7 +137,7 @@ class InvForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -151,7 +152,7 @@ class InvForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -167,7 +168,7 @@ class InvForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -183,7 +184,7 @@ class InvForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-secondary btn-sm',
                 'style': 'width:30%',
             }
         )
@@ -193,7 +194,7 @@ class InvForm(forms.ModelForm):
         input_formats=['%Y-%m-%d %H:%M:%S'],
         required=False,
         widget=JQueryDateTimePickerInput(
-            attrs = {
+            attrs={
                 'class': 'form-control',
                 'style': 'width:200px',
             }
@@ -204,7 +205,7 @@ class InvForm(forms.ModelForm):
         input_formats=['%Y-%m-%d %H:%M:%S'],
         required=False,
         widget=JQueryDateTimePickerInput(
-            attrs = {
+            attrs={
                 'class': 'form-control',
                 'style': 'width:200px',
             }
@@ -215,7 +216,7 @@ class InvForm(forms.ModelForm):
         input_formats=['%Y-%m-%d %H:%M:%S'],
         required=False,
         widget=JQueryDateTimePickerInput(
-            attrs = {
+            attrs={
                 'class': 'form-control',
                 'style': 'width:200px',
             }
@@ -226,7 +227,7 @@ class InvForm(forms.ModelForm):
         input_formats=['%Y-%m-%d %H:%M:%S'],
         required=False,
         widget=JQueryDateTimePickerInput(
-            attrs = {
+            attrs={
                 'class': 'form-control',
                 'style': 'width:200px',
             }
@@ -339,6 +340,120 @@ class InvForm(forms.ModelForm):
         }
 
 
+class InvReviewRulesForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop("user", None)
+
+        super(InvReviewRulesForm, self).__init__(*args, **kwargs)
+        logger.info("InvForm - "+str(user))
+
+        if kwargs.get('instance'):
+            current_pk = kwargs.get('instance').pk
+            self.fields['parent'].queryset = Inv.objects.all().exclude(pk=current_pk)
+        self.fields['user'].initial = user
+        # self.fields['status'].initial = 3
+        # self.fields['phase'].initial = 1
+        # self.fields['severity'].initial = 2
+        # self.fields['priority'].initial = 1
+        # self.fields['losscurrency'].initial = 1
+        # self.fields['numofvictims'].initial = None
+
+    severity = forms.ModelChoiceField(
+        label='Severity*',
+        queryset=InvSeverity.objects.filter(enabled=True),
+        empty_label="--Select--",
+        widget=forms.Select(
+            attrs={
+                'class': 'selectpicker show-tick form-control',  # form-control
+                'data-live-search': 'true',
+                'data-width': 'auto',
+                'data-style': 'btn-secondary btn-sm',
+                'style': 'width:50%',
+            }
+        )
+    )
+
+    category = forms.ModelChoiceField(
+        label='Category*',
+        queryset=InvCategory.objects.filter(enabled=True),
+        empty_label="--Select--",
+        widget=forms.Select(
+            attrs={
+                'class': 'selectpicker show-tick form-control',  # form-control
+                'data-live-search': 'true',
+                'data-width': 'auto',
+                'data-style': 'btn-secondary btn-sm',
+                'style': 'width:50%',
+            }
+        )
+    )
+
+    priority = forms.ModelChoiceField(
+        label='Priority*',
+        queryset=InvPriority.objects.filter(enabled=True),
+        empty_label="--Select--",
+        widget=forms.Select(
+            attrs={
+                'class': 'selectpicker show-tick form-control',  # form-control
+                'data-live-search': 'true',
+                'data-width': 'auto',
+                'data-style': 'btn-secondary btn-sm',
+                'style': 'width:50%',
+            }
+        )
+    )
+
+    attackvector = forms.ModelChoiceField(
+        label='Attack vector*',
+        queryset=InvAttackvector.objects.filter(enabled=True),
+        empty_label="--Select--",
+        required=True,
+        widget=forms.Select(
+            attrs={
+                'class': 'selectpicker show-tick form-control',  # form-control
+                'data-live-search': 'true',
+                'data-width': 'auto',
+                'data-style': 'btn-secondary btn-sm',
+                'style': 'width:50%',
+            }
+        )
+    )
+
+    class Meta:
+        model = InvReviewRules
+        fields = ('rulename',
+                  'priority',
+                  'severity',
+                  'category',
+                  'attackvector',
+                  'potentialloss',
+                  'monetaryloss',
+                  )
+        labels = {
+            'rulename': "Rule Name",
+            'potentialloss': "Potential Loss",
+            'monetaryloss': "Monetary Loss",
+        }
+        widgets = {
+            'rulename': forms.TextInput(attrs={
+                'size': 50,
+                'style': 'width:50%;',
+                'class': 'form-control'}
+            ),
+            'potentialloss': forms.NumberInput(attrs={
+                'size': 20,
+                'style': 'width:20%',
+                'class': 'form-control'}
+            ),
+            'monetaryloss': forms.NumberInput(attrs={
+                'size': 20,
+                'style': 'width:20%',
+                'class': 'form-control'}
+            ),
+        }
+
+
 class InvSuspiciousEmailForm(forms.Form):
     invid = forms.CharField(
         label='Investigation',
@@ -386,3 +501,53 @@ class InvSuspiciousEmailForm(forms.Form):
         )
     )
     fileRef = forms.FileField(label='Attachment')
+
+
+class InvReviewer1Form(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop("user", None)
+        super(InvReviewer1Form, self).__init__(*args, **kwargs)
+        logger.info("InvReview1Form - "+str(user))
+
+    class Meta:
+        model = Inv
+        fields = (
+                  'reviewer1comment',
+                  )
+        labels = {
+            'reviewer1comment': "Reviewer #1 Comments",
+        }
+        widgets = {
+            'reviewer1comment': forms.Textarea(attrs={
+                'rows': '5',
+                'cols': '68',
+                'style': 'width:90%',
+                'class': 'form-control'}
+            ),
+        }
+
+
+class InvReviewer2Form(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop("user", None)
+        super(InvReviewer2Form, self).__init__(*args, **kwargs)
+        logger.info("InvReview2Form - "+str(user))
+
+    class Meta:
+        model = Inv
+        fields = (
+                  'reviewer2comment',
+                  )
+        labels = {
+            'reviewer2comment': "Reviewer #2 Comments",
+        }
+        widgets = {
+            'reviewer2comment': forms.Textarea(attrs={
+                'rows': '5',
+                'cols': '68',
+                'style': 'width:90%',
+                'class': 'form-control'}
+            ),
+        }

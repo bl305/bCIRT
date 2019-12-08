@@ -1,0 +1,10 @@
+{% extends 'assets/host_form_template_ajax.html' %}
+{% block modaltitle %}
+    Update Host | {{ host.pk }}
+{%endblock modaltitle %}
+{% block modalactionclass %}
+    js-host-update-form
+{% endblock modalactionclass %}
+{% block modalaction %}
+    {% url 'assets:hostaj_update' form.instance.pk %}
+{% endblock modalaction %}

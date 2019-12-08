@@ -1,0 +1,12 @@
+{% extends "invs/inv_base.html" %}
+
+    {% block invprofile_active %}active{% endblock invprofile_active %}
+
+    {% block preinvs %}
+    {% endblock preinvs %}
+
+    {% block invs_content %}
+        {% include 'invs/inv_detail_tab_profile.html' %}
+    {% endblock invs_content %}
+
+    {% block postinvs %}{% endblock postinvs %}

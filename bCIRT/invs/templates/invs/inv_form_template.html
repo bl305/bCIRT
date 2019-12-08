@@ -32,8 +32,8 @@
 
                             <table class="table table-sm table-borderless">
                                 {% for field in form %}
-                                <div class="form-group">
-                                    <tr>
+<!--                                <div class="form-group">-->
+                                    <tr class="form-group">
                                         <th><label class='col-form-label' for="Inv_id">{{field.label_tag }}</label></th>
                                         <td class="d-flex justify-content-left">
                                             {% if field|field_type == 'ClearableFileInput' %}
@@ -51,8 +51,18 @@
                                             {% endif %}
                                         </td>
                                      </tr>
-                                </div>
+<!--                                </div>-->
                                 {% endfor %}
                           </table>
 
-
+<script>
+$(function()
+{
+  $('#submitForm').submit(function(){
+    $("button[type='submit']", this)
+      .text("Please Wait...")
+      .attr('disabled', 'disabled');
+    return true;
+  });
+});
+</script>

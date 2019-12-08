@@ -1,0 +1,10 @@
+{% extends 'tasks/evidence_form_template_ajax.html' %}
+{% block modaltitle %}
+    Create Evidence
+{% endblock modaltitle %}
+{% block modalactionclass %}
+    js-invev-create-form
+{% endblock modalactionclass %}
+{% block modalaction %}
+        {% url 'tasks:invevaj_create' inv_pk=view.kwargs.inv_pk task_pk=view.kwargs.task_pk %}
+{% endblock modalaction %}

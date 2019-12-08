@@ -1,0 +1,51 @@
+{% extends "tasks/evidence_template.html" %}
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : tasks/task_form_addticketandclose.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.11.13
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.11.13  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+
+<!-- BL start -->
+{{ form.media }}
+<!-- BL end -->
+
+{% block evidencetmp_alert %}
+{% endblock evidencetmp_alert %}
+
+{% block evidencetmp_buttons %}
+{% endblock evidencetmp_buttons %}
+
+{% block evidencetmp_title %}
+                        Add ticket and close Task #{{view.kwargs.task_pk}}
+{{taskname}}
+{% endblock evidencetmp_title %}
+
+{% block evidencetmp_body %}
+                        {% if error_message %}
+                            <p><strong>{{ error_message }}</strong></p>
+                        {% endif %}
+                        <form class="form-horizontal" role="form" action="" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {% include 'invs/inv_form_template.html' %}
+                            <!--To redirect to the previous page-->
+                            <input type="hidden" name="next" value="{{ request.GET.next1 }}">
+
+                            <div class="form-group">
+                                    <button type="submit" class="btn btn-success btn-sm">Save</button>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                    <a href="javascript:history.go(-1)"
+                                       class="btn btn-primary btn-sm">
+                                        <span class="fas fa-arrow-left" aria-hidden="true"></span>
+                                        <span>Cancel</span>
+                                    </a>
+                            </div>
+                        </form>
+{% endblock evidencetmp_body %}

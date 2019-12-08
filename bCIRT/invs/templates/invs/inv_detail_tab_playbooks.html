@@ -14,7 +14,7 @@
 -->
     <div class="row w-100">
         <div class="col-sm-12 col-md-12">
-{% block inv_buttons %}
+{% block invtmp_buttons %}
                             {% if user.is_authenticated %}
                             <div class="dropdown">
                                 {% if inv.status.name != "Closed" %}
@@ -41,36 +41,18 @@
                                     {% endif %}
                                 </div>
                             {% endif %}
-{% endblock inv_buttons %}
+{% endblock invtmp_buttons %}
 
-{% block inv_title %}
+{% block invtmp_title %}
                                 &nbsp;Related Playbooks | {{ inv.playbook_inv.all.count }} item{{ inv.playbook_inv.all.count|pluralize }} | {{ user }} at {% now "Y/m/d H:i:s" %} (UTC)
-{% endblock inv_title %}
+{% endblock invtmp_title %}
 
-{% block inv_body %}
+{% block invtmp_body %}
                     {% if error_message %}
                         <p><strong>{{ error_message }}</strong></p>
                     {% endif %}
-
-                    <table class="table table-hover table-sm">
-                        <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Playbook</th>
-                            <th>Version</th>
-                            <th>Created on</th>
-                            <th>Created by</th>
-                            <th>Modified on</th>
-                            <th>Modified by</th>
-                            <th>Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                            <!-- include 'investigations/partial_investigations_incidents_list.html' %}-->
-                            {% include 'invs/inv_detail_tab_playbooks_table.html' %}
-                        </tbody>
-                    </table>
-{% endblock inv_body %}
+                    {% include 'invs/inv_detail_tab_playbooks_table.html' %}
+{% endblock invtmp_body %}
 
         </div>
 

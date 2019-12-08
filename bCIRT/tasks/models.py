@@ -49,11 +49,10 @@ logger = logging.getLogger('log_file_verbose')
 
 # Get the user so we can use this
 from django.contrib.auth import get_user_model
+from django import template
 User = get_user_model()
-
 # https://docs.djangoproject.com/en/1.11/howto/custom-template-tags/#inclusion-tags
 # This is for the in_group_members check template tag
-from django import template
 register = template.Library()
 
 
@@ -421,6 +420,7 @@ class Task(models.Model):
     #     super(Task, self).save(*args, **kwargs)
 
     def readonly(self):
+        print(self.status.name)
         if self.status.name == 'Completed' or self.status.name == 'Skipped':
             return True
         else:
@@ -431,7 +431,7 @@ class Task(models.Model):
         if self.status != self.__original_status:
             if self.status.name == "Completed":
                 if not self.evidence_task.all() and self.type == 2:
-                    raise ValidationError(_('You must create an evidence to be able to close.'))
+                    raise ValidationError(_('You must create an evidence to be able to close the task.'))
 
                 # if status changed do something here
                 # check for tasks which are target of any action and are automatic tasks (type=1) and not closed
@@ -454,7 +454,7 @@ class Task(models.Model):
                             # here we need to find the proper evidence...
                             sourcetask = Task.objects.get(pk=self.pk)
                             evid = sourcetask.evidence_task.all()
-                            evattrs = None
+                            # evattrs = None
                             # here we will need a nested for loop
                             if TaskVar.objects.filter(task=sourcetask, name='ActionTarget', category=2).exists():
                                 taskvar_obj = TaskVar.objects.get(task=sourcetask, name='ActionTarget', category=2)
@@ -551,13 +551,17 @@ class Task(models.Model):
         # updating inv time
         if self.inv:
             if self.modified_by is None:
-                pmodified_by='admin'
+                pmodified_by = 'admin'
             else:
-                pmodified_by=str(self.modified_by)
+                pmodified_by = str(self.modified_by)
             Inv.objects.filter(pk=self.inv.pk).update(modified_at=timezone_now(), modified_by=pmodified_by)
 
         super(Task, self).save(force_insert, force_update, *args, **kwargs)
         self.__original_status = self.status
+
+    def clean(self):
+        if self.inv.readonly():
+            raise ValidationError(_('The Investigation is Read-Only!'))
 
     def taskdurationprint(self):
         if self.taskduration:
@@ -712,7 +716,7 @@ class Evidence(models.Model):
             ismalicious = StringParser().check_malicious(self.description)
 
             if ismalicious:
-                setobservable = False
+                # setobservable = False
                 if EvReputation.objects.get(name=ismalicious):
                     attr_rep = EvReputation.objects.get(name=ismalicious)
                 else:
@@ -746,17 +750,15 @@ class Evidence(models.Model):
         if self.inv is None and self.task is None:
             raise ValidationError(_('You must select an Investigation or a Task.'))
         if self.task and Task.objects.filter(pk=self.task.pk).exists:
-            if Task.objects.get(pk=self.task.pk).status.name == "Completed" or \
-                 Task.objects.get(pk=self.task.pk).status.name == "Skipped":
+            # if Task.objects.get(pk=self.task.pk).status.name == "Completed" or \
+            #      Task.objects.get(pk=self.task.pk).status.name == "Skipped":
+            if self.task and Task.objects.get(pk=self.task.pk).readonly():
                 raise ValidationError(_('Task cannot be closed!'))
         if self.inv and Inv.objects.filter(pk=self.inv.pk).exists():
-            if Inv.objects.get(pk=self.inv.pk).status.name == "Closed" or \
-                Inv.objects.get(pk=self.inv.pk).status.name == "Archived":
+            # if Inv.objects.get(pk=self.inv.pk).status.name == "Closed" or \
+            #     Inv.objects.get(pk=self.inv.pk).status.name == "Archived":
+            if self.task and Task.objects.get(pk=self.task.pk).readonly():
                 raise ValidationError(_('Investigation cannot be closed!'))
-
-
-
-
         super(Evidence, self).clean()
 
 
@@ -847,6 +849,7 @@ class EvidenceAttr(models.Model):
                 Inv.objects.get(pk=self.ev.inv.pk).status.name == "Archived":
                 raise ValidationError(_('Investigation cannot be closed!'))
         pass
+
 
 def evidenceattrobservabletoggle(pattrpk):
     evattr_obj = EvidenceAttr.objects.get(pk=pattrpk)
@@ -1209,9 +1212,10 @@ class Action(models.Model):
     def clean(self):
         # Don't allow draft entries to have a pub_date.
         # if (self.fileRef == "") and (self.code == ""):
-            # raise ValidationError(_('You must define Code or upload a script.'))
-            # raise ValidationError(_("You must either define Code or upload a script file!"))
+        #     raise ValidationError(_('You must define Code or upload a script.'))
+        #     raise ValidationError(_("You must either define Code or upload a script file!"))
         pass
+
 
 def clone_action(paction_pk):
     cloneobj = Action.objects.get(pk=paction_pk)
@@ -1219,12 +1223,13 @@ def clone_action(paction_pk):
         cloneobj.pk = None
         # length comes from the model max length - _clone
         if len(cloneobj.title) >= 44:
-            cloneobj.title = "%s_clone"%(cloneobj.title[:-6])
+            cloneobj.title = "%s_clone" % cloneobj.title[:-6]
         else:
-            cloneobj.title = "%s_clone"%(cloneobj.title)
+            cloneobj.title = "%s_clone" % cloneobj.title
         cloneobj.save()
         return True
     return False
+
 
 class ActionGroup(models.Model):
     objects = models.Manager()
@@ -1448,7 +1453,7 @@ class PlaybookTemplateItem(models.Model):
             reftaskout = list()
             for i in reftasks:
                 reftaskout.append(i.pk)
-            raise ValidationError("Task #%s is providing input for other tasks: #%s"%(self.pk, reftaskout))
+            raise ValidationError("Task #%s is providing input for other tasks: #%s" % (self.pk, reftaskout))
         super(PlaybookTemplateItem, self).delete(*args, **kwargs)
 
     def clean(self):
@@ -1499,13 +1504,13 @@ def generate_graph_PlaybookTemplate(sender, instance, **kwargs):
             prevtask = pbtmpitem.prevtask.pk
         else:
             prevtask = "Start"
-        taskinfo = "%d - %s"%(pbtmpitem.pk, pbtmpitem.acttask.title)
+        taskinfo = "%d - %s" % (pbtmpitem.pk, pbtmpitem.acttask.title)
         # print("%s - %d - %d"%(taskinfo,pbtmpitem.itemorder,prevtask))
-        alabel = "  %d [label=\"#%d: %s\"]\n"%(pbtmpitem.pk, pbtmpitem.itemorder, taskinfo)
+        alabel = "  %d [label=\"#%d: %s\"]\n" % (pbtmpitem.pk, pbtmpitem.itemorder, taskinfo)
         aitem = "  %s -> %s\n" % (prevtask, pbtmpitem.pk)
         graphfilecontents += alabel
         graphfilecontents += aitem
-    graphfilecontents +="\n}\n}"
+    graphfilecontents += "\n}\n}"
     # https://renenyffenegger.ch/notes/tools/Graphviz/examples/index
     try:
         (graph,) = pydot.graph_from_dot_data(graphfilecontents)
@@ -1514,41 +1519,43 @@ def generate_graph_PlaybookTemplate(sender, instance, **kwargs):
         graph.write_png(pngfilepath)
         print("H1")
     except Exception:
-        errormsg = "Graphcreate exception %s"%(str(Exception))
+        errormsg = "Graphcreate exception %s" % (str(Exception))
         logger.error(errormsg)
+
 
 @receiver(models.signals.post_delete, sender=PlaybookTemplateItem)
 def auto_save_PlaybookTemplate(sender, instance, **kwargs):
     playbooktemplate_obj=instance.playbooktemplateid
     playbooktemplate_obj.save()
 
+
 @receiver(models.signals.post_save, sender=Playbook)
 def generate_graph_Playbook(sender, instance, **kwargs):
     """
     Generate playbooktemplate graph
     """
-    curr_pk=instance.pk
+    curr_pk = instance.pk
     graphfilecontents = "digraph demo1 {\nsubgraph cluster_p {\nlabel = \"Playbook #"+str(curr_pk)+" - "+instance.name+"\"; \nnode [shape=record fontname=Arial];\nStart [shape=circle]\n"
 
     # ptmpitem_related_obj = PlaybookTemplateItem.objects.filter(playbooktemplateid=instance.pk)
-    pitem_related_obj =  instance.task_playbook.all()
-    # print("Steps:%d"%(len(ptmpitem_related_obj)))
+    pitem_related_obj = instance.task_playbook.all()
+    # print("Steps:%d" % (len(ptmpitem_related_obj)))
     for pitem in pitem_related_obj:
         if pitem.actiontarget:
             prevtask = pitem.actiontarget.pk
         else:
             prevtask = "Start"
-        taskinfo = "%d - %s"%(pitem.pk, pitem.title)
-        # print("%s - %d - %d"%(taskinfo,pbtmpitem.itemorder,prevtask))
-        alabel = "  %d [label=\"%s\"]\n"%(pitem.pk, taskinfo)
+        taskinfo = "%d - %s" % (pitem.pk, pitem.title)
+        # print("%s - %d - %d" % (taskinfo,pbtmpitem.itemorder,prevtask))
+        alabel = "  %d [label=\"%s\"]\n" % (pitem.pk, taskinfo)
         aitem = "  %s -> %s\n" % (prevtask, pitem.pk)
         graphfilecontents += alabel
         graphfilecontents += aitem
-    graphfilecontents +="\n}\n}"
+    graphfilecontents += "\n}\n}"
     # https://renenyffenegger.ch/notes/tools/Graphviz/examples/index
     try:
         (graph,) = pydot.graph_from_dot_data(graphfilecontents)
-        pngfile = "pb_%s.png"%(curr_pk)
+        pngfile = "pb_%s.png" % (curr_pk)
         pngfilepath = path.join(MEDIA_ROOT, "graphs", pngfile)
         graph.write_png(pngfilepath)
     except Exception:
@@ -1599,15 +1606,15 @@ def new_evidence(puser, ptask, pinv, pcreated_by, pmodified_by, pdescription, pf
         )
         # Saving the file attachments
         if pfilename and pfileref:
-            # newev[0].fileName=pfilename
-            # newev[0].fileRef.save(pfilename, pfileref)
+            newev[0].fileName=pfilename
+            newev[0].fileRef.save(pfilename, pfileref)
             # chunked upload
-            save_relpath = upload_to_evidence(newev, pfilename)
-            save_path = path.join(MEDIA_ROOT, str(save_relpath))
-            handle_uploaded_file_chunks(pfileref , save_path)
-            newev.fileRef=save_relpath
-            newev.fileName=pfileref.name
-            newev.save()
+            # save_relpath = upload_to_evidence(newev, pfilename)
+            # save_path = path.join(MEDIA_ROOT, str(save_relpath))
+            # handle_uploaded_file_chunks(pfileref , save_path)
+            # newev.fileRef=save_relpath
+            # newev.fileName=pfileref.name
+            # newev.save()
 
         newev = newev[0]
     else:
@@ -1626,14 +1633,14 @@ def new_evidence(puser, ptask, pinv, pcreated_by, pmodified_by, pdescription, pf
         )
         # Saving the file attachments
         if pfilename and pfileref:
-            # newev.fileName = pfilename
-            # newev.fileRef.save(pfilename, pfileref)
-            save_relpath = upload_to_evidence(newev, pfilename)
-            save_path = path.join(MEDIA_ROOT, str(save_relpath))
-            handle_uploaded_file_chunks(pfileref , save_path)
-            newev.fileRef=save_relpath
-            newev.fileName=pfileref.name
-            newev.save()
+            newev.fileName = pfilename
+            newev.fileRef.save(pfilename, pfileref)
+            # save_relpath = upload_to_evidence(newev, pfilename)
+            # save_path = path.join(MEDIA_ROOT, str(save_relpath))
+            # handle_uploaded_file_chunks(pfileref , save_path)
+            # newev.fileRef=save_relpath
+            # newev.fileName=pfileref.name
+            # newev.save()
 
     return newev
 
@@ -1851,7 +1858,7 @@ def remove_html_markup(s):
 
 
 def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pinv_pk, pargdyn, pattr):
-    actuser = pactuser  #  self.request.user
+    actuser = pactuser  # self.request.user
     actusername = pactusername  # self.request.user.get_username()
     oldev_file = None
     oldev_file_name = None
@@ -1867,7 +1874,8 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
     if evattr_pk != 0 and evattr_pk is not None:
         evattr_obj = EvidenceAttr.objects.get(pk=evattr_pk)
 
-    if ev_pk == '0' or ev_pk == None:
+    # if ev_pk == '0' or ev_pk == None:
+    if ev_pk == '0' or ev_pk is None:
         oldev_id = None
         oldev_obj = None
     else:
@@ -1880,7 +1888,8 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
             oldev_file = None
             oldev_file_name = None
 
-    if ptask_pk == '0' or ptask_pk == None:
+    # if ptask_pk == '0' or ptask_pk == None:
+    if ptask_pk == '0' or ptask_pk is None:
         task_id = None
         task_obj = None
     else:
@@ -1890,7 +1899,8 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
         actionid = pact_pk
     else:
         actionid = 0
-    if pinv_pk == '0' or pinv_pk == None:
+    # if pinv_pk == '0' or pinv_pk == None:
+    if pinv_pk == '0' or pinv_pk is None:
         inv_id = None
         inv_obj = None
     else:
@@ -1943,14 +1953,14 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
     # and spaces in filenames...
     # destfile = os.path.join(destdir, os.path.basename(cmd))
     # copy(srcfile, destfile)
-    # print("SRCFILE:%s"%(srcfile))
+    # print("SRCFILE:%s" % (srcfile))
     # print("DSTFILE:%s" % (destfile))
     newname = str(act_id)+"_"
     newscript = tempfile.NamedTemporaryFile(mode='w+t', prefix=newname)
     # Put the code into the temp file from action code
     putintofile = action_obj.automationid.code  # .\
-        # replace('echo', '#echo')#.\
-        # replace('$FILE$', destfile)
+    #    replace('echo', '#echo')#.\
+    #    replace('$FILE$', destfile)
     # replace('$EVIDENCE$', destfile)
     # replace('$OUTDIR$', destfile)
 
@@ -1962,7 +1972,7 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
                 # the scripts should contain the same names case sensitive
                 # bordered by "$" signs
                 fieldname = connitemfield.connectionitemfieldname
-                replacethis = "$%s$" % (fieldname)
+                replacethis = "$%s$" % fieldname
                 if connitemfield.encryptvalue:
                     fieldvalue = decrypt_string(connitemfield.connectionitemfieldvalue)
                     putintofile = putintofile.replace(replacethis, fieldvalue)
@@ -2067,7 +2077,7 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
     elif action_obj.automationid.type.pk == 5:  # Internal command
         from tasks.scripts import String_Parser
         sp1 = String_Parser.StringParser
-        afuncoutput = getattr(sp1, action_obj.automationid.code)('',argument)
+        afuncoutput = getattr(sp1, action_obj.automationid.code)('', argument)
         if action_obj.automationid.code == "check_malicious":
             ismalicious = afuncoutput
             if action_obj.scriptinput.pk == 1:
@@ -2106,19 +2116,25 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
     resstatus = results.get('status')
     resoutput = results.get('output')
     respid = results.get('pid')
-    resoutputl = None
+    # resoutputl = None
     if action_obj.scriptoutput:
-        if action_obj.scriptoutput.name == "List":
-            from ast import literal_eval
-            resoutput = literal_eval(resoutput)
-        if action_obj.scriptoutput.delimiter:
-            resoutput = OutputProcessor().split_delimiter(resoutput, action_obj.scriptoutput.delimiter)
+        try:
+            if action_obj.scriptoutput.name == "List":
+                from ast import literal_eval
+                resoutput = literal_eval(resoutput)
+            if action_obj.scriptoutput.delimiter:
+                resoutput = OutputProcessor().split_delimiter(resoutput, action_obj.scriptoutput.delimiter)
+        except:
+            resoutput = "ERROR in parsing output"
+            reserror = "Cannot parse output"
+        finally:
+            pass
     # save action to the actionQ
 
     actionq_stopid=None
     evid = None
     actq = None
-    # if argumentoutput == "None":
+    # if argumentoutput == "None"
     if action_outputtarget == 1:
         # Description is target for output
         # create the actionQ items
@@ -2132,7 +2148,7 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
                                      ActionQStatus.objects.get(name="Finished"), actuser)
         # update the actionQ with the parent value
         ActionQ.objects.filter(pk=actionq_startid.pk).update(parent=actionq_stopid)
-
+        # print("Here2")
         #  Output to Description field in new evidence
         evid = new_evidence(
             puser=actuser,
@@ -2144,9 +2160,10 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
             pparent=oldev_obj,
             pparentattr=evattr_obj
         )
+        # print("EVID: %s" % (evid))
         # Add an attribute with reputation
         if ismalicious:
-            setobservable = False
+            # setobservable = False
             if EvReputation.objects.get(name=ismalicious):
                 attr_rep = EvReputation.objects.get(name=ismalicious)
             else:
@@ -2227,8 +2244,6 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
                     cloneevidattr.pk = None
                     cloneevidattr.attr_reputation = attr_rep
                     newclone = cloneevidattr.save()
-
-
         elif (isinstance(resoutput,str)):
             for item1 in resoutput.splitlines():
                 # add_evattr(actuser, oldev_obj, item1, currevattrformat, actusername, actusername)
@@ -2277,7 +2292,7 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
 
                 # copy files to the evidences folder
                 evfolder = 'uploads/evidences'
-                srcfilename1 = os.path.join(destoutdirname,fname)
+                srcfilename1 = os.path.join(destoutdirname, fname)
                 dstfilename1 = os.path.join(MEDIA_ROOT, evfolder, fname)
                 # if os.path.isfile(srcfilename1):
                 #     copy(srcfilename1, dstfilename1)
@@ -2329,7 +2344,7 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
                 imgurl1 = str(Evidence.objects.get(pk=evfid.pk).fileRef)
                 imgpath = str(os.path.join("../../../../media/", imgurl1))
                 # Check if the uploaded file is an image and put it in the description
-                if check_file_type(os.path.join(MEDIA_ROOT,imgurl1)) == 'image':
+                if check_file_type(os.path.join(MEDIA_ROOT, imgurl1)) == 'image':
                     imgtag = '<p><img src="'+imgpath+'" alt="'+fname+'" width="1024" height="768" border="2" /></p>'
                     newdesc = olddesc + "<br>" + imgtag
                     Evidence.objects.filter(pk=evfid.pk).update(description=newdesc)
@@ -2406,7 +2421,6 @@ def new_actionq(pactuser, pactionid, ptaskid, pinvid, poldevid, pparent, ptitle,
         status=pstatus,
         created_by=pcreated_by
     )
-
     return newactionq
 
 
@@ -2495,5 +2509,3 @@ def handle_uploaded_file_chunks(pfile, ppath):
     with open(ppath, 'wb+') as destination:
         for chunk in pfile.chunks():
             destination.write(chunk)
-
-

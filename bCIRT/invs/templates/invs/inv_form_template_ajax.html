@@ -1,0 +1,69 @@
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : invs/inv_form_template_ajax.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.11.02
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.11.02  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+
+<!-- BL start -->
+{{ form.media }}
+<!-- BL end -->
+
+{% block preinvs %}
+    {% block invtmp_alert %}{% endblock invtmp_alert %}
+{% endblock preinvs %}
+
+{% block invs_content %}
+                              <div class="modal-header">
+                                <h4 class="modal-title">
+                                    {% block modaltitle %}{%endblock modaltitle %}
+                                </h4>
+                                <button type="button" class="btn btn-sm close"
+                                        data-dismiss="modal" aria-label="Close">
+                                  <span aria-hidden="true">&times;</span>
+                                </button>
+                              </div>
+                        {% if error_message %}
+                            <p><strong>{{ error_message }}</strong></p>
+                        {% endif %}
+<!--                        <form class="form-horizontal js-inv-create-form" role="form" action="{% url 'invs:invaj_create' %}" method="post" enctype="multipart/form-data">-->
+                        <form id="submitForm"
+                                class="form-horizontal {% block modalactionclass%}{% endblock modalactionclass%}"
+                              role="form"
+                              action="{% block modalaction %}{% endblock modalaction %}"
+                              method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                              <div class="modal-body">
+                                {% include 'invs/inv_form_template.html' %}
+                                {% block modalbody%}{% endblock modalbody%}
+                              </div>
+                            <!--To redirect to the previous page-->
+                            <input type="hidden" name="next" value="{{ request.GET.next1 }}">
+                            <div class="modal-footer">
+                                <div class="container d-inline-flex justify-content-start flex-row align-items-start align-content-start flex-nowrap">
+                                    <div class="form-group">
+    <!--                                    <div class="container mw-100 d-inline-flex justify-content-start flex-row align-items-start align-content-start flex-nowrap">-->
+                                            <button type="submit" class="btn btn-success btn-sm">
+                                                Save
+                                            </button>
+                                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                            <button type="button" class="btn btn-primary btn-sm"
+                                                    data-dismiss="modal">
+                                                <span class="fas fa-arrow-left" aria-hidden="true"></span>
+                                                Cancel
+                                            </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+
+
+
+{% endblock invs_content %}

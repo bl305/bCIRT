@@ -36,6 +36,14 @@
                                     <i class="fas fa-plus"></i>
                                 New Investigation
                                 </a>
+
+                                <button type="button"
+                                        class="btn btn-outline-secondary btn-sm js-create-inv"
+                                        data-url="{% url 'invs:invaj_create' %}">
+                                  <span class="fas fa-plus"></span>
+                                  New Investigation
+                                </button>
+
                             {% endif %}
                             <div class="container d-inline-flex flex-row align-items-center justify-content-center align-content-center flex-nowrap">
                                 <p class="h4">&nbsp;Investigations for {{ user }} at {% now "Y/m/d H:i:s" %} (UTC)</p>
@@ -45,54 +53,7 @@
                 </div>
                 <div class="card-body inv-card-body">
 <!--                    <table class="table table-sm table-hover display order-column" id="investigations-invi"-->
-<table class="table table-sm table-hover display order-column" id="investigations-invi"
-                           style="min-height:55vh"
-                        data-toggle="table"
-                        data-classes="table table-sm table-no-bordered"
-                        data-pagination="true"
-                        data-pagination-h-align="left"
-                        data-page-size="25"
-                        data-search="true"
-                        data-search-align="left"
-                        data-show-refresh="true"
-                        data-show-toggle="true"
-                        data-show-columns="true"
-                        data-minimum-count-columns="2"
-                        data-show-pagination-switch="true"
-                        data-id-field="id"
-                        data-page-list="[10, 25, 50, 100, ALL]"
-                        data-show-footer="false"
-                        data-side-pagination="client"
-                        data-buttons-align="left"
-                    >
-                        <thead>
-                        <tr>
-                            <th data-field="id" data-sortable="true">Inv ID</th>
-                            <th data-field="status" data-sortable="true">Status</th>
-                            <th data-field="priority" data-sortable="true">Priority</th>
-                            <th data-field="ticketid" data-sortable="true">Ticket</th>
-                            <th data-field="refid" data-sortable="true">Reference</th>
-                            <th data-field="description" data-sortable="true">Description</th>
-                            <th data-field="invid" data-sortable="true">Investigation</th>
-                            <th data-field="parent" data-sortable="true">Parent</th>
-                            <th data-field="phase" data-sortable="true">Phase</th>
-                            <th data-field="assigned" data-sortable="true">Assigned To</th>
-                            <th data-field="start" data-sortable="true" data-visible="false">Investigation Start</th>
-                            <th data-field="created" data-sortable="true">Created on (UTC)</th>
-                            <th data-field="modified" data-sortable="true">Modified on (UTC)</th>
-                            <th data-field="modifiedby" data-sortable="true">Modified by</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                            {% include 'invs/inv_list_table.html' %}
-                        </tbody>
-                    </table>
-                    <div class="modal fade" id="modal-investigations-invi">
-                      <div class="modal-dialog">
-                        <div class="modal-content">
-                        </div>
-                      </div>
-                    </div>
+                    {% include 'invs/inv_list_table.html' %}
                 </div>
             </div>
         </div>

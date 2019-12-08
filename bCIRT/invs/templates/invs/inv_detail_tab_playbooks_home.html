@@ -1,0 +1,12 @@
+{% extends "invs/inv_base.html" %}
+
+    {% block invplaybook_active %}active{% endblock invplaybook_active %}
+
+    {% block preinvs %}
+    {% endblock preinvs %}
+
+    {% block invs_content %}
+        {% include 'invs/inv_detail_tab_playbooks.html' %}
+    {% endblock invs_content %}
+
+    {% block postinvs %}{% endblock postinvs %}

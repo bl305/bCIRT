@@ -1,4 +1,4 @@
-{% extends "tasks/evidence_template.html" %}
+{% extends "tasks/evidencetmp_template.html" %}
 <!--
 # **********************************************************************;
 # Project           : bCIRT
@@ -13,7 +13,7 @@
 # **********************************************************************;
 -->
 
-{% block evidence_alert %}
+{% block evidencetmp_alert %}
 <div class="container-fluid investigations-container">
     <div>
         <form action="" method="post">
@@ -27,16 +27,16 @@
                 </div>
         </form>
     </div>
-{% endblock evidence_alert %}
+{% endblock evidencetmp_alert %}
 
-{% block evidence_buttons %}
-{% endblock evidence_buttons %}
+{% block evidencetmp_buttons %}
+{% endblock evidencetmp_buttons %}
 
-{% block evidence_title %}
+{% block evidencetmp_title %}
                              Delete Evidence Attribute # {{ evidenceattr.pk }}
-{% endblock evidence_title %}
+{% endblock evidencetmp_title %}
 
-{% block evidence_body %}
+{% block evidencetmp_body %}
                         <table class="table table-sm table-hover table-striped table-condensed" id="evidences-eve">
                             <thead>
                                 <tr class="mylist-header">
@@ -56,4 +56,4 @@
                             </tbody>
                         </table>
                     </div>
-{% endblock evidence_body %}
+{% endblock evidencetmp_body %}

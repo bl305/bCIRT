@@ -1,0 +1,96 @@
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : inv/inv_evidence_tab_evidences_observable_tablebody.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.11.23
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.11.23  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+{% if inv.evidence_inv %}
+ {% for invevidence in inv.evidence_inv.all %}
+ {% for attr in invevidence.evattr_evidence.all %}
+
+        {% if attr.observable %}
+            <tr>
+              <td>
+	                	{% if user.is_authenticated %}
+                        <div class="row container mw-100 d-inline-flex justify-content-between flex-row align-items-center align-content-center flex-nowrap">
+                            <a href="{% url 'tasks:evattr_edit' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}"
+                               class="btn btn-warning btn-xs">
+                                <span class="fa fa-pencil-alt"></span>
+                            </a>
+                            &nbsp;
+                            <a href="{% url 'tasks:evattr_observabletoggle' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ attr.ev.pk }}"
+                                class="btn btn-outline-primary btn-xs">
+                            {% if attr.observable %}
+                                <span class="fa fa-eye-slash"></span>
+                            {% endif %}
+                            </a>
+                            &nbsp;
+                            <a href="{% url 'tasks:evattr_remove' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}"
+                               class="btn btn-danger btn-xs">
+                                <span class="fa fa-trash-alt"></span>
+                            </a>
+
+                        </div>
+                        {% endif %}
+              </td>
+
+                <td>
+                    {{attr.pk}}
+                </td>
+              <td>
+                    {% if attr.attr_reputation.pk == 1 %}
+                  <span class="fas fa-question-circle" data-toggle="tooltip" data-placement="top" title="Unknown"></span>
+                    {% else %}
+                        {% if attr.attr_reputation.pk == 2 %}
+                            <span class="fas fa-check-circle text-success" data-toggle="tooltip" data-placement="top" title="Clean"></span>
+                        {% else %}
+                            {% if attr.attr_reputation.pk == 3 %}
+                                <span class="fas fa-exclamation-circle text-danger" data-toggle="tooltip" data-placement="top" title="Suspicious"></span>
+                            {% else %}
+                                {% if attr.attr_reputation.pk == 4 %}
+                                    <span class="fas fa-bomb text-danger" data-toggle="tooltip" data-placement="top" title="Malicious"></span>
+                                {% else %}
+                                        <span data-toggle="tooltip" data-placement="top" title="-">-</span>
+                                {% endif %}
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+                    {{ attr.attr_reputation }}
+              </td>
+
+<!--                       style="max-width: 800px;overflow: auto;text-overflow: word-wrap;overflow-wrap: break-word;"-->
+
+              <td>{{ attr.evattrformat }}</td>
+                <td>
+                    <a class="" href="{% url 'tasks:evattr_detail' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}"
+                    style="max-width: 800px;overflow: auto;text-overflow: word-wrap;overflow-wrap: break-word;"
+                    >
+                    <h6><span class="badge badge-pill badge-secondary">{{ attr.evattrvalue }}</span></h6>
+                    </a>
+                </td>
+                <td>
+                    {{ inv.modified_at|date:"Y/m/d H:i:s" }}
+                </td>
+                <td>
+                    <a href="#item-inve{{ attr.ev.pk }}">
+                        <h6><span class="badge badge-pill badge-secondary">{{ attr.ev.pk}}</span></h6>
+                    </a>
+                </td>
+            </tr>
+        {% endif %}
+     {% endfor %}
+{% endfor %}
+{% else %}
+<!-- empty %}-->
+          <tr>
+            <td colspan="7" class="text-center bg-warning">No matching record found</td>
+          </tr>
+{% endif %}
+<!-- endfor %}-->

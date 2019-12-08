@@ -12,7 +12,13 @@
 # 2019.09.06  Lendvay     2      Added session security
 # **********************************************************************;
 from __future__ import unicode_literals
-
+# password change imports
+from django.contrib import messages
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.forms import PasswordChangeForm
+from django.shortcuts import render, redirect
+# password change imports
+from django.utils.timezone import now as timezone_now
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
 from django.dispatch import receiver
@@ -45,10 +51,34 @@ class RegisterAccountPage(CreateView):
 def set_new_user_inactive(sender, instance, **kwargs):
     # This is to disable newly created users
     if instance._state.adding is True:
-        print("Creating Inactive User")
+        # print("Creating Inactive User")
         instance.is_active = True
         # enable the one below to disable users upon creation
         # this includes the first admin account!!!
         # instance.is_active = False
     else:
-        print("Updating User Record")
+        # print("Updating User Record")
+        pass
+
+
+from users.models import Profile
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+
+        if form.is_valid():
+            user = form.save()
+            profile_obj = Profile.objects.get(user__pk=request.user.pk)
+            profile_obj.passwordmodified_at = timezone_now()
+            profile_obj.save()
+            update_session_auth_hash(request, user)  # Important!
+            messages.success(request, 'Your password was successfully updated!')
+            return redirect('home')
+        else:
+            messages.error(request, 'Please correct the error below.')
+    else:
+        form = PasswordChangeForm(request.user)
+    return render(request, 'accounts/account_change_password.html', {
+        'form': form
+    })
+

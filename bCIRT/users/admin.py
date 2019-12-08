@@ -13,3 +13,13 @@
 from django.contrib import admin
 
 # Register your models here.
+from . import models
+from import_export.admin import ImportExportModelAdmin
+
+class ProfileInline(admin.TabularInline):
+    model = models.Profile
+
+
+@admin.register(models.Profile)
+class ProfileAdmin(ImportExportModelAdmin):
+    pass

@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1 class="page-header">Hosts</h1>
+  <!-- BUTTON TO TRIGGER THE ACTION -->
+  <p>
+    <button type="button"
+            class="btn btn-primary js-create-host"
+            data-url="{% url 'assets:host_create' %}">
+      <span class="fas fa-plus"></span>
+      New host
+    </button>
+  </p>
+
+  <table class="table" id="host-table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% include 'assets/partial_host_list.html' %}
+    </tbody>
+  </table>
+  <!-- THE MODAL WE WILL BE USING -->
+  <div class="modal fade" id="modal-host">
+    <div class="modal-dialog">
+      <div class="modal-content">
+      </div>
+    </div>
+  </div>
+{% endblock %}

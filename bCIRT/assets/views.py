@@ -12,11 +12,14 @@
 # 2019.09.06  Lendvay     2      Added session security
 # **********************************************************************;
 # from django.shortcuts import render
-from .models import Host, Profile, new_profile, new_create_profile_from_evattrs
+from .models import Host, Profile, new_create_profile_from_evattrs  # new_profile
 from .forms import HostForm, ProfileForm
-from tasks.models import EvidenceAttr
-from invs.models import Inv
-from django.shortcuts import redirect, reverse  # ,render, get_object_or_404
+# from tasks.models import EvidenceAttr
+# from invs.models import Inv
+from django.shortcuts import redirect, reverse, get_object_or_404  # ,render,
+from django.http import JsonResponse
+from django.template.loader import render_to_string
+
 from django.contrib import messages
 from django.contrib.auth.mixins import (
     LoginRequiredMixin,
@@ -27,6 +30,7 @@ import logging
 from bCIRT.custom_variables import LOGSEPARATOR, LOGLEVEL
 from django.utils.http import is_safe_url
 from bCIRT.settings import ALLOWED_HOSTS
+
 # check remaining session time
 # from django.contrib.sessions.models import Session
 # from datetime import datetime, timezone
@@ -67,6 +71,7 @@ class HostCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Create
     success_url = 'assets:host_list'
 
     def __init__(self, *args, **kwargs):
+        self.object = None
         if LOGLEVEL == 1:
             pass
         elif LOGLEVEL == 2:
@@ -149,6 +154,7 @@ class HostUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Update
     success_url = 'assets:host_list'
 
     def __init__(self, *args, **kwargs):
+        self.object = None
         if LOGLEVEL == 1:
             pass
         elif LOGLEVEL == 2:
@@ -265,6 +271,7 @@ class ProfileCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Cre
     success_url = 'assets:prof_list'
 
     def __init__(self, *args, **kwargs):
+        self.object = None
         if LOGLEVEL == 1:
             pass
         elif LOGLEVEL == 2:
@@ -355,6 +362,7 @@ class ProfileUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Upd
     success_url = 'assets:prof_list'
 
     def __init__(self, *args, **kwargs):
+        self.object = None
         if LOGLEVEL == 1:
             pass
         elif LOGLEVEL == 2:
@@ -485,3 +493,78 @@ class ProfileCreateRedirectView(LoginRequiredMixin, PermissionRequiredMixin, gen
 
         # return reverse('tasks:act_list')
         # return super().get_redirect_url(*args, **kwargs)
+
+
+# ######## AJAX CRUD TEST
+# from django.shortcuts import render
+
+# def hosts_list(request):
+#     hosts = Host.objects.all()
+#     return render(request, 'assets/hosts_list.html', {'hosts': hosts})
+# class HostListViewAjaxRaw(generic.View):
+#     def get(self, request):
+#         hosts =  list(Host.objects.all().values())
+#         data =  dict()
+#         data['hosts'] = hosts
+#         return JsonResponse(data)
+
+# def hosts_create(request):
+#     form = HostForm()
+#     context = {'form': form}
+#     html_form = render_to_string('assets/partial_host_create.html',
+#         context,
+#         request=request,
+#     )
+#     return JsonResponse({'html_form': html_form})
+#
+def save_host_form(request, form, template_name):
+    data = dict()
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+            data['form_is_valid'] = True
+            hosts = Host.objects.all()
+            # data['html_data_list'] = render_to_string('assets/partial_host_list.html', {
+            #     'hosts': hosts
+            # })
+            data['html_data_list'] = render_to_string('assets/host_list_tablebody.html', {
+                'object_list': hosts
+            })
+        else:
+            data['form_is_valid'] = False
+    context = {'form': form}
+    data['html_form'] = render_to_string(template_name, context, request=request)
+    return JsonResponse(data)
+
+
+def hostaj_create_view(request):
+    if request.method == 'POST':
+        form = HostForm(request.POST)
+    else:
+        form = HostForm()
+    return save_host_form(request, form, 'assets/host_form_create_ajax.html')
+
+
+def hostaj_update_view(request, pk):
+    host = get_object_or_404(Host, pk=pk)
+    if request.method == 'POST':
+        form = HostForm(request.POST, instance=host)
+    else:
+        form = HostForm(instance=host)
+    return save_host_form(request, form, 'assets/host_form_update_ajax.html')
+
+
+def hostaj_delete_view(request, pk):
+    host = get_object_or_404(Host, pk=pk)
+    data = dict()
+    if request.method == 'POST':
+        host.delete()
+        data['form_is_valid'] = True  # This is just to play along with the existing code
+        hosts = Host.objects.all()
+        data['html_data_list'] = render_to_string('assets/host_list_tablebody.html', {
+            'object_list': hosts
+        })
+    else:
+        context = {'host': host}
+        data['html_form'] = render_to_string('assets/host_form_delete_ajax.html', context, request=request)
+    return JsonResponse(data)

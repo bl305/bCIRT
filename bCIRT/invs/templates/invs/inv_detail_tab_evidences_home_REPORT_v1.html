@@ -1,0 +1,52 @@
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : inv/inv_detail_tab_evidence__home_REPORT_v1.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.11.23
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.11.23  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+<br>
+<div align="center" class="printheader">
+    <strong>&nbsp;Evidences |  {{ inv.evidence_inv.count }} item{{ inv.evidence_inv.count|pluralize }} | {{ user }} at {% now "Y/m/d H:i:s" %} (UTC)</strong>
+</div>
+    <div align="center"><strong>Observables</strong></div>
+        <table class="bcirttable">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Reputation</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Value</th>
+                    <th scope="col">Modified</th>
+                    <th scope="col">Evidence</th>
+                </tr>
+            </thead>
+        <tbody>
+            {% include 'invs/inv_detail_tab_evidences_observable_tablebody_REPORT_v1.html' %}
+        </tbody>
+        </table>
+    <div align="center"><strong>Evidences</strong></div>
+    <table class="bcirttable">
+        <thead>
+            <tr>
+                <th>EvidenceID</th>
+                <th>Created on</th>
+                <th>Created by</th>
+                <th>Modified on</th>
+                <th>Modified by</th>
+                <th>Attachment</th>
+                <th>Task</th>
+                <th>Attributes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% include 'invs/inv_detail_tab_evidences_tablebody_REPORT_v1.html' %}
+        <!--<tr><td colspan="8" style="min-height:400px">&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;</td></tr>-->
+        </tbody>
+    </table>

@@ -10,65 +10,30 @@
 # Date        Author      Ref    Description
 # 2019.07.29  Lendvay     1      Initial file
 # **********************************************************************;
--->                <tr class="mylist-meta" style="background-color:#e6e6e6" id="item-{{ evidence.pk }}">
-                    <!-- e.g.: #item-7 -->
-                    <td>
-                        {{ host.pk }}
-                    </td>
-                    <td>
-                        {{ host.name }}
-                    </td>
-                    <td>
-                        {% for hosts in host.hostname_hosts.all %}
-                            {{ hosts.name }}<br>
-                        {% endfor %}
-                    </td>
-                    <td>
-                        {% for ips in host.ipaddress_hosts.all %}
-                            {{ ips.ip }}<br>
-                        {% endfor %}
-                    </td>
+-->
+<!--https://makitweb.com/make-live-editable-table-with-jquery-ajax/-->
+<!--https://www.jqueryscript.net/text/AJAX-Edit-In-Place-Plugin-jQuery-jeditable.html-->
+<!--https://www.jqueryscript.net/text/Ajax-enabled-In-place-Editor-For-jQuery-doomEdit.html-->
+<!--https://visiblydribbling.wordpress.com/2009/11/01/inline-editing-with-jquery-jeditable-and-django/-->
+<!--https://stackoverflow.com/questions/56290703/django-edit-html-table-rows-and-update-database-->
 
-                    <td>
-                        {% if host.inv %}
-                        <a href="">{{ host.inv }}</a>
-                        {% else %}
-                        NA
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if host.task %}
-                        <a href="#">{{ host.task }}</a>
-                        {% else %}
-                        NA
-                        {% endif %}
-                    </td>
-                    <td>
-                        {{ host.created_at|date:"Y/m/d H:i:s" }}
-                    </td>
-                    <td>
-                        {{ host.created_by }}
-                    </td>
-                    <td>
-                         {{ host.modified_at|date:"Y/m/d H:i:s" }}
-                    </td>
-                    <td>
-                         {{ host.modified_by }}
-                    </td>
-                    <td>
-                        <div>
-                            <a href="{% url 'assets:host_edit' pk=host.pk %}"
-                                class="btn btn-warning btn-xs">
-                            <span class="fas fa-pen" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
-                            </a>
-                            <a href="{% url 'assets:host_remove' pk=host.pk %}"
-                                class="btn btn-danger btn-xs pull-right">
-                            <span class="fas fa-trash-alt" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
-                            </a>
-                        </div>
-                    </td>
-                </tr>
-
-                <tr class="invev-detail">
-                    <td colspan="10">{{ host.description|safe }}</td>
-                </tr>
+                        <table class="table table-sm table-hover table-striped table-condensed" id="investigations-inve">
+                            <thead>
+                                <tr class="mylist-header">
+                                    <th>HostID</th>
+                                    <th>Host</th>
+                                    <th>Hostnames</th>
+                                    <th>IPs</th>
+                                    <th>Investigation</th>
+                                    <th>Task</th>
+                                    <th>Created on</th>
+                                    <th>Created by</th>
+                                    <th>Modified on</th>
+                                    <th>Modified by</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% include "assets/host_detail_tablebody.html" %}
+                            </tbody>
+                        </table>

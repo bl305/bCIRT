@@ -23,26 +23,7 @@
 {% endblock asset_title %}
 
 {% block asset_body %}
-                        <table class="table table-sm table-hover table-striped table-condensed" id="investigations-inve">
-                            <thead>
-                                <tr class="mylist-header">
-                                    <th>HostID</th>
-                                    <th>Host</th>
-                                    <th>Hostnames</th>
-                                    <th>IPs</th>
-                                    <th>Investigation</th>
-                                    <th>Task</th>
-                                    <th>Created on</th>
-                                    <th>Created by</th>
-                                    <th>Modified on</th>
-                                    <th>Modified by</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% include "assets/host_detail_table.html" %}
-                            </tbody>
-                        </table>
+                        {% include 'assets/host_detail_table.html' %}
                         <a href="javascript:history.go(-1)" class="btn btn-primary btn-sm">
                             <span class="fas fa-arrow-left" aria-hidden="true"></span>
                             <span>Back</span>

@@ -13,6 +13,7 @@
 from __future__ import unicode_literals
 from django.db import models
 from django.contrib.auth.models import User
+# from datetime import date, timedelta
 
 from django.contrib.auth.signals import user_logged_in, user_logged_out, user_login_failed
 from django.dispatch import receiver
@@ -42,6 +43,7 @@ class UserAudit(models.Model):
     def __str__(self):
         return '{0} - {1} - {2} - {3} - {4} - {5}'.format(self.event_time, self.eventtype, self.action, self.username,
                                                           self.ip, self.host)
+
 
 # for logging - define "error" named logging handler and logger in settings.py
 error_log = logging.getLogger('error')
@@ -100,6 +102,7 @@ def user_logged_out_callback(sender, request, user, **kwargs):
         # log the error
         # error_log.error("log_user_logged_out request: %s, error: %s" % (request, Exception))
 
+
 @receiver(user_login_failed)
 def user_login_failed_callback(sender, credentials, **kwargs):
     UserAudit.objects.create(eventtype='account_login',
@@ -109,6 +112,21 @@ def user_login_failed_callback(sender, credentials, **kwargs):
     logger.warning('login failed {credentials}'.format(
         credentials=credentials['username'],
     ))
+
+# capture PW reset
+# from django.db.models.signals import pre_save
+#
+# @receiver(pre_save, sender=User)
+# def user_updated(sender, **kwargs):
+#     user = kwargs.get('instance', None)
+#     if user:
+#         new_password = user.password
+#         try:
+#             old_password = User.objects.get(pk=user.pk).password
+#         except User.DoesNotExist:
+#             old_password = None
+#         if new_password != old_password:
+#             print("XXXXXXX")
 
 # FILE SYSTEM LOGGING
 #  LOGGING
@@ -147,4 +165,23 @@ def user_login_failed_callback(sender, credentials, **kwargs):
 #     ))
 
 
-
+# Password expiration
+# https://stackoverflow.com/questions/15571046/django-force-password-expiration
+# from datetime import date, timedelta
+# from django.contrib.auth import authenticate, login
+#
+# def my_view(request):
+#     username = request.POST['username']
+#     password = request.POST['password']
+#     user = authenticate(username=username, password=password)
+#     if user is not None:
+#         if user.is_active:
+#             if date.today() - user.password_date > timedelta(days=30):
+#                 # Redirect to password change page
+#             else:
+#                 login(request, user)
+#                 # Redirect to a success page.
+#         else:
+#             # Return a 'disabled account' error message
+#     else:
+#     # Return an 'invalid login' error message.

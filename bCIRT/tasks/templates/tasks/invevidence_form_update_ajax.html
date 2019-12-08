@@ -1,0 +1,10 @@
+{% extends 'tasks/evidence_form_template_ajax.html' %}
+{% block modaltitle %}
+    Update Evidence #{{ form.instance }}
+{% endblock modaltitle %}
+{% block modalactionclass %}
+    js-invev-update-form
+{% endblock modalactionclass %}
+{% block modalaction %}
+        {% url 'tasks:invevaj_update' pk=form.instance.pk %}
+{% endblock modalaction %}

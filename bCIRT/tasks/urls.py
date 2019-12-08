@@ -49,9 +49,11 @@ urlpatterns = [
 
     url(r"^actiongroupmembers/$", views.ActionGroupMemberListView.as_view(), name="actgrpmem_list"),
     url(r"^actiongroupmembers/new/$", views.ActionGroupMemberCreateView.as_view(), name="actgrpmem_create"),
-    url(r"^actiongroupmembers/detail/(?P<pk>\d+)/$", views.ActionGroupMemberDetailView.as_view(), name="actgrpmem_detail"),
+    url(r"^actiongroupmembers/detail/(?P<pk>\d+)/$", views.ActionGroupMemberDetailView.as_view(),
+        name="actgrpmem_detail"),
     url(r'^actiongroupmembers/edit/(?P<pk>\d+)/$', views.ActionGroupMemberUpdateView.as_view(), name='actgrpmem_edit'),
-    url(r'^actiongroupmembers/remove/(?P<pk>\d+)/$', views.ActionGroupMemberRemoveView.as_view(), name='actgrpmem_remove'),
+    url(r'^actiongroupmembers/remove/(?P<pk>\d+)/$', views.ActionGroupMemberRemoveView.as_view(),
+        name='actgrpmem_remove'),
 
     url(r"^evidences/$", views.EvidenceListView.as_view(), name="ev_list"),
     url(r"^evidences/new/(?P<inv_pk>\d+)/(?P<task_pk>\d+)/$", views.EvidenceCreateView.as_view(), name="ev_create"),
@@ -59,6 +61,14 @@ urlpatterns = [
     # url(r'^(?P<pk>\d+)/(?P<inv_pk>\d+)/(?P<task_pk>\d+)/edit/$', views.EvidenceUpdateView.as_view(), name='ev_edit'),
     url(r'^evidences/edit/(?P<pk>\d+)/$', views.EvidenceUpdateView.as_view(), name='ev_edit'),
     url(r'^evidences/remove/(?P<pk>\d+)/$', views.EvidenceRemoveView.as_view(), name='ev_remove'),
+
+    url(r'^evidences/create/(?P<inv_pk>\d+)/(?P<task_pk>\d+)/$', views.XEvidenceCreateAjaxView.as_view(),
+        name='evaj_create'),
+
+    # Investogations views
+    url(r'^evidences/inv/create/(?P<inv_pk>\d+)/(?P<task_pk>\d+)/$', views.InvEvidenceCreateAjaxView.as_view(),
+        name='invevaj_create'),
+    url(r'^evidences/inv/update/(?P<pk>\d+)/$', views.InvEvidenceUpdateAjaxView.as_view(), name='invevaj_update'),
 
     url(r"^evidences/evattr$", views.EvidenceAttrListView.as_view(), name="evattr_list"),
     url(r"^evidences/evattr/new/(?P<pk>\d+)/$", views.EvidenceAttrCreateView.as_view(), name="evattr_create"),
@@ -79,6 +89,7 @@ urlpatterns = [
     url(r'^skip/(?P<pk>\d+)/$', views.TaskSkipView.as_view(), name='tsk_skip'),
     url(r'^close/(?P<pk>\d+)/$', views.TaskCloseView.as_view(), name='tsk_close'),
     url(r'^waiting/(?P<pk>\d+)/$', views.TaskWaitingView.as_view(), name='tsk_wait'),
+    url(r'^addticketandclose/(?P<task_pk>\d+)/$', views.AddTicketAndCloseView.as_view(), name='tsk_addticketandclose'),
 
     url(r"^tmp$", views.TaskTemplateListView.as_view(), name="tmp_list"),
     url(r"^tmp/new/$", views.TaskTemplateCreateView.as_view(), name="tmp_create"),

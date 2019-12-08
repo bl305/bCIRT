@@ -26,6 +26,7 @@ class GroupMemberInline(admin.TabularInline):
     model = models.InvSeverity
     model = models.InvStatus
     model = models.Inv
+    model = models.InvReviewRules
     model = models.CurrencyType
 
 # admin.site.register(models.Inv)
@@ -74,4 +75,9 @@ class InvStatusAdmin(ImportExportModelAdmin):
 
 @admin.register(models.Inv)
 class InvAdmin(ImportExportModelAdmin):
+    pass
+
+
+@admin.register(models.InvReviewRules)
+class InvReviewRulesAdmin(ImportExportModelAdmin):
     pass

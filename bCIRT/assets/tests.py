@@ -31,11 +31,11 @@ from django.test import Client
 class ProfileTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        print("setUpTestData: Run once to set up non-modified data for all class methods.")
+        print("TEST (setUpTestData): Run once to set up non-modified data for all class methods.")
         pass
 
     def setUp(self):
-        print("setUp: Run once for every test method to setup clean data.")
+        print("TEST (setUp): Run once for every test method to setup clean data.")
         # create permissions group
         # group_name = "AssetsAll"
         # self.group = Group(name=group_name)
@@ -47,12 +47,14 @@ class ProfileTest(TestCase):
         pass
 
     def tearDown(self):
+        print("TEST (Teardown)")
         self.user.delete()
         # self.group.delete()
 
     def test_create_user(self):
+        print("TEST (Create user)")
         User = get_user_model()
-        user = User.objects.create_user(username="bcirt", email='bcirt@bcirt.com', password='AlmaFa1.')
+        user = User.objects.create_user(username="bcirt", email='bcirt@bcirt.com', password='Password1.')
         self.assertEqual(user.email, 'bcirt@bcirt.com')
         self.assertTrue(user.is_active)
         self.assertFalse(user.is_staff)
@@ -72,12 +74,19 @@ class ProfileTest(TestCase):
         #     User.objects.create_user(username='bcirt', email='', password="AlmaFa1.")
 
     def test_create_superuser(self):
+        print("TEST (Create superuser)")
         User = get_user_model()
-        admin_user = User.objects.create_superuser(username='admin', email='admin@bcirt.com', password='AlmaFa1.')
+        admin_user = User.objects.create_superuser(username='admin', email='admin@bcirt.com', password='Password1.')
         self.assertEqual(admin_user.email, 'admin@bcirt.com')
         self.assertTrue(admin_user.is_active)
         self.assertTrue(admin_user.is_staff)
         self.assertTrue(admin_user.is_superuser)
+
+
+        # self.c.login(username='admin', password='Password1.')
+        # response = self.c.get(reverse('assets:host_list'))
+        # self.assertEqual(response.status_code, 200, u'user should have access')
+
         # try:
             # username is None for the AbstractUser option
             # username does not exist for the AbstractBaseUser option
@@ -90,10 +99,14 @@ class ProfileTest(TestCase):
         #         username='admin', email='admin@bcirt.com', password='AlmaFa1.', is_superuser=False)
 
     def test_user_can_access(self):
+        print("TEST (User can access)")
         #     self.user.groups.add(self.group)
         #     self.user.save()
-        self.c.login(username='admin', password='Almafa1.')
+        self.c.login(username='test', password='Password1.')
         response = self.c.get(reverse('assets:host_list'))
+        # login = self.client.login(username='admin', password='Password1.')
+        # self.assertTrue(login)
+        # response = self.c.post('/accounts/login/', {'username': 'test', 'password': 'Password1.'})
         self.assertEqual(response.status_code, 200, u'user should have access')
     #
     # def create_profile(self, username="Username"):

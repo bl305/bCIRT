@@ -68,14 +68,14 @@ tinymce4_init();})();
 {% block evidence_alert %}
 {% endblock evidence_alert %}
 
-{% block evidence_buttons %}
-{% endblock evidence_buttons %}
+{% block evidencetmp_buttons %}
+{% endblock evidencetmp_buttons %}
 
-{% block evidence_title %}
+{% block evidencetmp_title %}
                         &nbsp;Edit Evidence #{{ evidence.pk }} | {{ evidence.evidenceformat.name }}
-{% endblock evidence_title %}
+{% endblock evidencetmp_title %}
 
-{% block evidence_body %}
+{% block evidencetmp_body %}
                         {% if error_message %}
                             <p><strong>{{ error_message }}</strong></p>
                         {% endif %}
@@ -96,4 +96,4 @@ tinymce4_init();})();
                                 </div>
                             </div>
                         </form>
-{% endblock evidence_body %}
+{% endblock evidencetmp_body %}

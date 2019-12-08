@@ -13,45 +13,37 @@
 # 2019.09.05  Lendvay     2      Added observable fields
 # **********************************************************************;
 -->
-{% block invevidence_active %}active{% endblock invevidence_active %}
+
 <div class="row w-100">
         <div class="col-sm-12">
-{% block inv_buttons %}
+{% block invtmp_buttons %}
                             {% if user.is_authenticated %}
-                                {% if inv.status.name != "Closed" %}
+                                {% if not inv.readonly %}
                                 <!--<a href=" url 'investigationdetails_create' investigation.pk %}"-->
                                 <a href="{% url 'tasks:ev_create' inv_pk=inv.pk task_pk=0 %}?next1={{ request.get_full_path|urlencode }}"
                                 class="btn btn-outline-secondary btn-sm">
                                     <i class="fas fa-plus">&nbsp;</i>
                                     New Evidence
                                 </a>
+
+                                <button type="button"
+                                        class="btn btn-outline-secondary btn-sm js-create-invev"
+                                        data-url="{% url 'tasks:invevaj_create' inv_pk=inv.pk task_pk=0 %}">
+                                  <span class="fas fa-plus"></span>
+                                  New Evidence
+                                </button>
+
                                 {% endif %}
                             {% endif %}
-{% endblock inv_buttons %}
+{% endblock invtmp_buttons %}
 
-{% block inv_title %}
+{% block invtmp_title %}
                                 &nbsp;Evidences |  {{ inv.evidence_inv.count }} item{{ inv.evidence_inv.count|pluralize }} | {{ user }} at {% now "Y/m/d H:i:s" %} (UTC)
-{% endblock inv_title %}
+{% endblock invtmp_title %}
 
-{% block inv_body %}
+{% block invtmp_body %}
                 <div align="center"><h3><strong>Observables</strong></h3></div>
-                        <table class="table table-sm w-100">
-                            <thead>
-                                <tr class="text-wrap .border">
-                                    <th scope="col">Actions</th>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Reputation</th>
-                                    <th scope="col">Type</th>
-                                    <th scope="col">Value</th>
-                                    <th scope="col">Modified</th>
-                                    <th scope="col">Evidence</th>
-                                </tr>
-                            </thead>
-                        <tbody>
                             {% include 'invs/inv_detail_tab_evidences_observable_table.html' %}
-                        </tbody>
-                        </table>
-
     <!--                        data-pagination="false"-->
     <!--                        data-show-pagination-switch="true"-->
     <!--                        data-side-pagination="client"-->
@@ -59,28 +51,9 @@
     <!--                        data-pagination-detail-h-align="right"-->
     <!--                        https://bootstrap-table.com/docs/api/table-options/#pagination-->
                         <div align="center"><h3><strong>Evidences</strong></h3></div>
-                        <table class="table table-hover table-sm table-striped table-condensed" id="investigations-inve"
-                               style="min-height:45vh;"
-
-                        >
-                            <thead class="mylist-header">
-                                <tr class="text-nowrap .border">
-                                    <th>EvidenceID</th>
-                                    <th>Created on</th>
-                                    <th>Created by</th>
-                                    <th>Modified on</th>
-                                    <th>Modified by</th>
-                                    <th>Attachment</th>
-                                    <th>Task</th>
-                                    <th>Attributes</th>
-                                </tr>
-                            </thead>
-                            <tbody>
                                 {% include 'invs/inv_detail_tab_evidences_table.html' %}
                             <!--<tr><td colspan="8" style="min-height:400px">&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;</td></tr>-->
-                            </tbody>
-                        </table>
-{% endblock inv_body %}
+{% endblock invtmp_body %}
                     </div>
 </div>
 <div id="thebottom"></div>

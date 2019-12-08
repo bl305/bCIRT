@@ -100,13 +100,75 @@
         <td><strong>Modified by</strong><br> {{ inv.modified_by }} </td>
     </tr>
     <tr>
-        <td colspan="5"> </td>
+        <td colspan="2">
+            <strong>Review #1
+                {% if inv.reviewed1_by %}
+                    {{ inv.reviewed1_by }}
+                {% else %}
+                    {{ inv.reviewer1 }}
+                {% endif %}
+            </strong><br>
+            {% if inv.reviewed1_at %}
+                {{ inv.reviewed1_at|date:"Y/m/d H:i:s" }}
+            {% else %}
+                {% if inv.status.name == "Review1" and user.profile.reviewer1 %}
+                    <a href="{% url 'invs:inv_review1complete' pk=inv.pk %}?next1={{ request.get_full_path|urlencode }}"
+                    class="btn btn-success btn-sm">
+                        <span class="">Complete</span>
+                    </a>
+                    <a href="{% url 'invs:inv_review1' pk=inv.pk %}?next1={{ request.get_full_path|urlencode }}"
+                    class="btn btn-warning btn-sm">
+                        <span class="">Comment&Reassign</span>
+                    </a>
+                {% endif %}
+            {% endif %}
+        </td>
+        <td colspan="2">
+            <strong>Review #2
+                {% if inv.reviewed2_by %}
+                    {{ inv.reviewed2_by }}
+                {% else %}
+                    {{ inv.reviewer2 }}
+                {% endif %}
+            </strong><br>
+            {% if inv.reviewed2_at %}
+                {{ inv.reviewed2_at|date:"Y/m/d H:i:s" }}
+            {% else %}
+                {% if inv.status.name == "Review2" and user.profile.reviewer2 %}
+                    <a href="{% url 'invs:inv_review2complete' pk=inv.pk %}?next1={{ request.get_full_path|urlencode }}"
+                    class="btn btn-success btn-sm">
+                        <span class="">Complete</span>
+                    </a>
+                    <a href="{% url 'invs:inv_review2' pk=inv.pk %}?next1={{ request.get_full_path|urlencode }}"
+                    class="btn btn-warning btn-sm">
+                        <span class="">Comment&Reassign</span>
+                    </a>
+                {% endif %}
+            {% endif %}
+        </td>
+        <td colspan="1"> </td>
         <td><strong>Created on</strong><br> {{ inv.created_at|date:"Y/m/d H:i:s" }} </td>
         <td><strong>Created by</strong><br> {{ inv.created_by }} </td>
     </tr>
     <tr>
         <td colspan="7">
-            <div class="container invdescription">
+            <div class="container invdescription" >
+                <strong>Review Comments #1</strong><br>
+                {{ inv.reviewer1comment|safe }}
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="7">
+            <div class="container invdescription" >
+                <strong>Review Comments #2</strong><br>
+                {{ inv.reviewer2comment|safe }}
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="7">
+            <div class="container invdescription" >
                 <strong>Incident Description</strong><br>
                 {{ inv.description_html|safe }}
             </div>
@@ -114,13 +176,21 @@
     </tr>
     <tr>
         <td colspan="7">
-            <div class="container invdescription">
+            <div class="container invdescription" >
                 <strong>Executive Summary</strong><br>
                 {% if inv.summary  %}
                     {{ inv.summary|safe }}
                 {% else %}
                     -
                 {% endif %}
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="7">
+            <div class="container invdescription">
+                <strong>Process Improvements</strong><br>
+                {{ inv.processimprovement|safe }}
             </div>
         </td>
     </tr>

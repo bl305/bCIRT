@@ -1,0 +1,54 @@
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : inv/inv_detail_tab_tasks_tablebody_REPORT_v1.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.11.23
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.11.24  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+{% if inv.task_inv.count > 0 %}
+{% for task in inv.task_inv.all %}
+                    <tr data-toggle="collapse" data-target="#mytasks{{task.pk}}" class="accordion-toggle" id="item-task-{{ task.pk }}">
+                        <td>
+                            {{ task.pk }}
+                        </td>
+                        <td>
+                            {{ task.title }}
+                        </td>
+                        <td>
+                            {{ task.status }}
+                        </td>
+                        <td>
+                            {% if task.playbook %}
+                                {{ task.playbook }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ task.type }}
+                        </td>
+                        <td>
+                            {{ task.created_at|date:"Y/m/d H:i:s" }}
+                        </td>
+                        <td>
+                            {{ task.created_by }}
+                        </td>
+                        <td>
+                            {{ task.modified_at|date:"Y/m/d H:i:s" }}
+                        </td>
+                        <td>
+                            {{ task.modified_by }}
+                        </td>
+                    </tr>
+{% endfor %}
+{% else %}
+          <tr>
+            <td colspan="9" class="text-center bg-warning">No matching record found</td>
+          </tr>
+{% endif %}

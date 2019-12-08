@@ -1,0 +1,79 @@
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : inv/inv_detail_tab_profile_tablebody.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.11.23
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.11.23  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+{% if inv.profile_inv.count > 0 %}
+{% for profile in inv.profile_inv.all %}
+                <tr>
+                    <td>
+                        <a href="{% url 'assets:prof_detail' pk=profile.pk %}?next1={{ request.get_full_path|urlencode }}">
+                            <h6><span class="badge badge-pill badge-secondary">{{ profile.pk }}</span></h6>
+                        </a>
+                    </td>
+                    <td>
+                        {% if profile.username %}
+                            {{ profile.username }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if profile.userid %}
+                            {{ profile.userid }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if profile.email %}
+                            {{ profile.email }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if profile.host %}
+                            {{ profile.host }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if profile.ip %}
+                            {{ profile.ip }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if profile.location %}
+                            {{ profile.location }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ profile.modified_at|date:"Y/m/d H:i:s" }}
+                    </td>
+
+                    <td>
+	                	{% if user.is_authenticated %}
+                        <div class="row container mw-100 d-inline-flex justify-content-end flex-row align-items-center align-content-center flex-nowrap">
+                                    <a href="{% url 'assets:prof_edit' pk=profile.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                       class="btn btn-warning btn-sm">
+                                        <span class="fa fa-pencil-alt"></span>
+                                    </a>
+                            &nbsp;
+                                    <a href="{% url 'assets:prof_remove' pk=profile.pk %}?next1={{ request.get_full_path|urlencode }}" title="delete"
+                                       class="btn btn-danger btn-sm">
+                                        <span class="fa fa-trash-alt" aria-hidden="true"></span>
+                                        <span class="icon-label"></span>
+                                    </a>
+                        </div>
+                        {% endif %}
+
+                    </td>
+              </tr>
+{% endfor %}
+{% else %}
+          <tr>
+            <td colspan="9" class="text-center bg-warning">No matching record found</td>
+          </tr>
+{% endif %}

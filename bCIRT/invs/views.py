@@ -10,9 +10,13 @@
 # Date        Author      Ref    Description
 # 2019.07.29  Lendvay     1      Initial file
 # 2019.09.06  Lendvay     2      Added session security
+# 2019.11.29  Lendvay     3      Added reviewers
 # **********************************************************************;
 from tasks.models import TaskTemplate, PlaybookTemplate, Action, ActionGroupMember
 from tasks.models import new_playbook, new_evidence, task_close
+from django.core.exceptions import ValidationError
+from django.utils.timezone import now as timezone_now
+# from django.utils.translation import gettext_lazy as _
 # from tasks.models import Task, Playbook
 import os
 import shutil
@@ -21,8 +25,11 @@ import tempfile
 from zipfile import ZipFile
 from bCIRT.settings import MEDIA_ROOT
 from shutil import copyfile
-from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
+from django.shortcuts import redirect, reverse  # , get_object_or_404  # ,render,
+from django.http import JsonResponse
+from django.template.loader import render_to_string
+# from django.views.decorators.csrf import csrf_exempt
+# from django.utils.decorators import method_decorator
 # to manage manual uploads
 # from os import path
 # from bCIRT.custom_variables import MYMEDIA_ROOT
@@ -30,10 +37,10 @@ from django.utils.decorators import method_decorator
 # from django.shortcuts import render
 ##############
 
-from .forms import InvForm, InvSuspiciousEmailForm
+from .forms import InvForm, InvSuspiciousEmailForm, InvReviewer1Form, InvReviewer2Form
 from .models import Inv, InvStatus, new_inv, InvCategory, InvAttackvector, InvPhase, InvSeverity, CurrencyType,\
-    InvPriority
-from django.shortcuts import redirect, reverse    # ,render, get_object_or_404
+    InvPriority  # , InvReviewRules
+# from django.shortcuts import redirect, reverse    # ,render, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.mixins import (
     LoginRequiredMixin,
@@ -132,6 +139,51 @@ class InvDetailPrintView(LoginRequiredMixin, PermissionRequiredMixin, generic.De
         # Checks pass, let http method handlers process the request
         return super(InvDetailPrintView, self).dispatch(request, *args, **kwargs)
 
+# TESTING EXPORT
+#https://simpleisbetterthancomplex.com/packages/2016/08/11/django-import-export.html
+from django.http import HttpResponse
+from .resources import InvResource
+#
+# def exportreviewrules(request):
+#     invreviewrules_resource = InvReviewRulesResource()
+#     dataset = invreviewrules_resource.export()
+#     response = HttpResponse(dataset.json, content_type='application/json')
+#     response['Content-Disposition'] = 'attachment; filename="invreviewrules.json"'
+#     return response
+class ExportInvView(LoginRequiredMixin, PermissionRequiredMixin, generic.View):
+    # Exports the Inv table details into JSON
+
+    # context = {"title": "Task evidences"}  # data that has to be rendered to pdf template
+    # model = InvReviewRules
+    permission_required = ('invs.view_inv', 'tasks.view_evidence', 'tasks:view_task', 'tasks:view_playbook')
+    context = {"title": "Investigation Export"}
+
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
+            logger.info(logmsg)
+        super(ExportInvView, self).__init__(*args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        # self.context['invrule'] = self.get_object()
+        # self.context['user'] = self.request.user.get_username()xxx
+        inv_resource = InvResource()
+        # to filter enable the following lines below
+        inv_pk = self.kwargs.get('pk')
+        queryset = Inv.objects.filter(pk=inv_pk)
+        dataset = inv_resource.export(queryset)
+        #filter end
+        #nofilter
+        # dataset = invreviewrules_resource.export()
+        response = HttpResponse(dataset.json, content_type='application/json')
+        response['Content-Disposition'] = 'attachment; filename="inv_'+str(inv_pk)+'.json"'
+        return response
+
+
 
 # #############################################################################3
 # Investigation related views
@@ -161,6 +213,7 @@ class InvCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateV
     success_url = 'invs:inv_list'
 
     def __init__(self, *args, **kwargs):
+        self.object = None
         if LOGLEVEL == 1:
             pass
         elif LOGLEVEL == 2:
@@ -232,16 +285,14 @@ class InvDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailV
         kwargs['templatecategories'] = TaskTemplate.objects.filter(enabled=True)
         kwargs['playbooks'] = PlaybookTemplate.objects.filter(enabled=True)
         kwargs['actions'] = Action.objects.filter(enabled=True)
-
-
-        inv_obj = Inv.objects.get(pk=self.kwargs.get('pk'))
-        ev_obj = inv_obj.evidence_inv.all()
-        evattr_set = set()
-        for ev_obj_item in ev_obj:
-            if ev_obj_item.evattr_evidence.all():
-                for evattr_obj in ev_obj_item.evattr_evidence.all():
-                    evattr_set.add(evattr_obj)
-        kwargs['invevidence_evattr_evidence_all'] = evattr_set
+        # inv_obj = Inv.objects.get(pk=self.kwargs.get('pk'))
+        # ev_obj = inv_obj.evidence_inv.all()
+        # evattr_set = set()
+        # for ev_obj_item in ev_obj:
+        #     if ev_obj_item.evattr_evidence.all():
+        #         for evattr_obj in ev_obj_item.evattr_evidence.all():
+        #             evattr_set.add(evattr_obj)
+        # kwargs['invevidence_evattr_evidence_all'] = evattr_set
         # actiongrmember_file = set()
         # actiongrmember_desc = set()
         # actiongrmember_attr = set()
@@ -251,15 +302,15 @@ class InvDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailV
         if ActionGroupMember.objects.all():
             for actgrpmember in ActionGroupMember.objects.all():
                 # input is description scriptinput=1:
-                if actgrpmember.actionid.enabled == True and actgrpmember.actionid.scriptinput.pk == 1:
+                if actgrpmember.actionid.enabled is True and actgrpmember.actionid.scriptinput.pk == 1:
                     # actiongrmember_desc.add(actgrpmember.actionid)
                     actiongroups_desc.add(actgrpmember.actiongroupid)
                 # input is file scriptinput=2:
-                elif actgrpmember.actionid.enabled == True and actgrpmember.actionid.scriptinput.pk == 2:
+                elif actgrpmember.actionid.enabled is True and actgrpmember.actionid.scriptinput.pk == 2:
                     # actiongrmember_file.add(actgrpmember.actionid)
                     actiongroups_file.add(actgrpmember.actiongroupid)
                 # input is attribute scriptinput=1:
-                elif actgrpmember.actionid.enabled == True and actgrpmember.actionid.scriptinput.pk == 3:
+                elif actgrpmember.actionid.enabled is True and actgrpmember.actionid.scriptinput.pk == 3:
                     # actiongrmember_attr.add(actgrpmember.actionid)
                     actiongroups_attr.add(actgrpmember.actiongroupid)
                 # input is none of the above:
@@ -297,6 +348,7 @@ class InvUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateV
     success_url = 'invs:inv_list'
 
     def __init__(self, *args, **kwargs):
+        self.object = None
         if LOGLEVEL == 1:
             pass
         elif LOGLEVEL == 2:
@@ -391,8 +443,8 @@ class InvAssignView(LoginRequiredMixin, PermissionRequiredMixin, generic.Redirec
         inv_pk = self.kwargs.get('pk')
         # Checks pass, let http method handlers process the request
         Inv.objects.filter(pk=inv_pk).update(user=self.request.user)
-        assigned_pk = InvStatus.objects.get(name='Assigned')
-        Inv.objects.filter(pk=inv_pk).update(status=assigned_pk)
+        assigned_obj = InvStatus.objects.get(name='Assigned')
+        Inv.objects.filter(pk=inv_pk).update(status=assigned_obj)
         # return redirect(self.success_url)
         return super(InvAssignView, self).dispatch(request, *args, **kwargs)
 
@@ -406,6 +458,217 @@ class InvAssignView(LoginRequiredMixin, PermissionRequiredMixin, generic.Redirec
         return redirect_to
         # return reverse('tasks:tsk_list')
         # return super().get_redirect_url(*args, **kwargs)
+
+
+class InvReview1UpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
+    login_url = '/'
+    redirect_field_name = 'invs/inv_detail.html'
+    form_class = InvReviewer1Form
+    model = Inv
+    permission_required = ('invs.change_inv',)
+    success_url = 'invs:inv_list'
+
+    def __init__(self, *args, **kwargs):
+        self.object = None
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
+            logger.info(logmsg)
+        super(InvReview1UpdateView, self).__init__(*args, **kwargs)
+
+    def get_success_url(self):
+        if 'next1' in self.request.GET:
+            redirect_to = self.request.GET['next1']
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
+                return reverse(self.success_url)
+        else:
+            return reverse(self.success_url)
+        return redirect_to
+
+    def get_context_data(self, **kwargs):
+        # kwargs['instance'] = Inv.objects.all()
+        return super(InvReview1UpdateView, self).get_context_data(**kwargs)
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            # This will redirect to the login view
+            return self.handle_no_permission()
+        elif not self.request.user.has_perm('invs.change_inv'):
+            messages.error(self.request, "No permission to change a record !!!")
+            return redirect('invs:inv_detail', pk=self.kwargs.get('pk'))
+        # Checks pass, let http method handlers process the request
+        return super(InvReview1UpdateView, self).dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        # self.object.modified_by = self.request.user.get_username()
+        self.object.reviewer1 = self.request.user  # .get_username()
+        self.object.status = InvStatus.objects.get(pk=3)
+        self.object.save()
+        return super(InvReview1UpdateView, self).form_valid(form)
+
+
+class InvReview2UpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
+    login_url = '/'
+    redirect_field_name = 'invs/inv_detail.html'
+    form_class = InvReviewer2Form
+    model = Inv
+    permission_required = ('invs.change_inv',)
+    success_url = 'invs:inv_list'
+
+    def __init__(self, *args, **kwargs):
+        self.object = None
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
+            logger.info(logmsg)
+        super(InvReview2UpdateView, self).__init__(*args, **kwargs)
+
+    def get_success_url(self):
+        if 'next1' in self.request.GET:
+            redirect_to = self.request.GET['next1']
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
+                return reverse(self.success_url)
+        else:
+            return reverse(self.success_url)
+        return redirect_to
+
+    def get_context_data(self, **kwargs):
+        # kwargs['instance'] = Inv.objects.all()
+        return super(InvReview2UpdateView, self).get_context_data(**kwargs)
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            # This will redirect to the login view
+            return self.handle_no_permission()
+        elif not self.request.user.has_perm('invs.change_inv'):
+            messages.error(self.request, "No permission to change a record !!!")
+            return redirect('invs:inv_detail', pk=self.kwargs.get('pk'))
+        # Checks pass, let http method handlers process the request
+        return super(InvReview2UpdateView, self).dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        # self.object.modified_by = self.request.user.get_username()
+        self.object.reviewer2 = self.request.user  # .get_username()
+        self.object.status = InvStatus.objects.get(pk=3)
+        self.object.save()
+        return super(InvReview2UpdateView, self).form_valid(form)
+
+
+class InvReview1CompleteView(LoginRequiredMixin, PermissionRequiredMixin, generic.RedirectView):
+    permission_required = ('invs.view_inv', 'invs.change_inv')
+    success_url = 'invs:inv_list'
+
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
+            logger.info(logmsg)
+        super(InvReview1CompleteView, self).__init__(*args, **kwargs)
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            # This will redirect to the login view
+            return self.handle_no_permission()
+        elif not self.request.user.has_perm('invs.change_inv'):
+            messages.error(self.request, "No permission to change a record !!!")
+            return redirect('invs:inv_list')
+        inv_pk = self.kwargs.get('pk')
+        inv_obj = Inv.objects.get(pk=inv_pk)
+        # Checks pass, let http method handlers process the request
+        Inv.objects.filter(pk=inv_pk).update(user=self.request.user)
+        assigned_obj = InvStatus.objects.get(name='Review2')
+        Inv.objects.filter(pk=inv_pk).update(reviewer1=self.request.user)
+        Inv.objects.filter(pk=inv_pk).update(reviewed1_by=self.request.user.get_username())
+        Inv.objects.filter(pk=inv_pk).update(reviewed1_at=timezone_now())
+        Inv.objects.filter(pk=inv_pk).update(status=assigned_obj)
+        try:
+            inv_obj.full_clean()
+            reviewers2 = User.objects.filter(profile__reviewer2=True)
+            reviewers2list = set()
+            for reviewer2 in reviewers2:
+                reviewers2list.add(reviewer2)
+            randomreviewer2 = reviewers2.order_by("?").first()
+            Inv.objects.filter(pk=inv_pk).update(reviewer2=randomreviewer2)
+        except ValidationError as e:
+            messages.error(self.request, "No permission to change a record !!!")
+            return redirect('invs:inv_detail', pk=inv_pk)
+        # return redirect(self.success_url)
+        return super(InvReview1CompleteView, self).dispatch(request, *args, **kwargs)
+
+    def get_redirect_url(self, *args, **kwargs):
+        if 'next1' in self.request.GET:
+            redirect_to = self.request.GET['next1']
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
+                return reverse(self.success_url)
+        else:
+            return reverse(self.success_url)
+        return redirect_to
+
+
+class InvReview2CompleteView(LoginRequiredMixin, PermissionRequiredMixin, generic.RedirectView):
+    permission_required = ('invs.view_inv', 'invs.change_inv')
+    success_url = 'invs:inv_list'
+
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
+            logger.info(logmsg)
+        super(InvReview2CompleteView, self).__init__(*args, **kwargs)
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            # This will redirect to the login view
+            return self.handle_no_permission()
+        elif not self.request.user.has_perm('invs.change_inv'):
+            inv_pk = self.kwargs.get('pk')
+            messages.error(self.request, "No permission to change a record !!!")
+            return redirect('invs:inv_detail', pk=inv_pk)
+        inv_pk = self.kwargs.get('pk')
+        # Checks pass, let http method handlers process the request
+        # Inv.objects.filter(pk=inv_pk).update(user=self.request.user)
+        assigned_obj = InvStatus.objects.get(name='Closed')
+        # Inv.objects.filter(pk=inv_pk).update(status=assigned_obj)
+        inv_obj = Inv.objects.get(pk=inv_pk)
+        Inv.objects.filter(pk=inv_pk).update(reviewer2=self.request.user)
+        Inv.objects.filter(pk=inv_pk).update(reviewed2_by=self.request.user.get_username())
+        Inv.objects.filter(pk=inv_pk).update(reviewed2_at=timezone_now())
+        inv_obj.status = assigned_obj
+        Inv.objects.filter(pk=inv_pk).update(status=assigned_obj)
+        try:
+            inv_obj.full_clean()
+        except ValidationError as e:
+            messages.error(self.request, "No permission to change a record !!!")
+            return redirect('invs:inv_detail', pk=inv_pk)
+            # raise ValidationError(_('First review must happen first!'))
+        # https://goodcode.io/articles/django-assert-raises-validationerror/
+        inv_obj.save()
+
+        # return redirect(self.success_url)
+        return super(InvReview2CompleteView, self).dispatch(request, *args, **kwargs)
+
+    def get_redirect_url(self, *args, **kwargs):
+        if 'next1' in self.request.GET:
+            redirect_to = self.request.GET['next1']
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
+                return reverse(self.success_url)
+        else:
+            return reverse(self.success_url)
+        return redirect_to
 
 # ########### TESTING
 # from django.shortcuts import render
@@ -428,7 +691,7 @@ class InvAssignView(LoginRequiredMixin, PermissionRequiredMixin, generic.Redirec
 #     if request.method == 'POST':
 #         form = InvSuspiciousEmailForm(request.POST, request.FILES)
 #         if form.is_valid():
-#             handle_uploaded_file_chunks(request.FILES['file'], '/tmp/xxx.txt')
+#             handle_uploaded_file_chunks(request.FILES['file'], '/tmp/aaa.txt')
 #             return HttpResponseRedirect('home')
 #     else:
 #         form = InvSuspiciousEmailForm()
@@ -441,6 +704,16 @@ class InvSuspiciousEmailCreateView(LoginRequiredMixin, PermissionRequiredMixin, 
     form_class = InvSuspiciousEmailForm
     permission_required = ('invs.view_inv', 'tasks.view_task')
     success_url = '../'
+
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
+            logger.info(logmsg)
+        super(InvSuspiciousEmailCreateView, self).__init__(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
         # kwargs['user'] = self.request.user
@@ -486,7 +759,7 @@ class InvSuspiciousEmailCreateView(LoginRequiredMixin, PermissionRequiredMixin, 
                           pmonetaryloss=0,
                           plosscurrency=CurrencyType.objects.get(pk=1),
                           pnumofvictims=None
-        )
+                          )
         # add the uploaded file to evidences without assigning to any task
         # if the file is email, the evidence need to be attached to the first task
         evidence_obj = new_evidence(
@@ -525,10 +798,9 @@ class InvSuspiciousEmailCreateView(LoginRequiredMixin, PermissionRequiredMixin, 
             if playbook_obj.task_playbook.last():
                 first_task = playbook_obj.task_playbook.last()
             # add evidence to the first task
-            evidence_obj.task=first_task
+            evidence_obj.task = first_task
             evidence_obj.save()
             # this will attach the file to the first evidence
-
             # need to close the first task
             task_close(first_task.pk, 'action')
 
@@ -601,7 +873,7 @@ class InvSuspiciousEmailCreateView(LoginRequiredMixin, PermissionRequiredMixin, 
                             try:
                                 shutil.copyfileobj(source, target)
                             except Exception:
-                                print("Error:%s" % (Exception))
+                                print("Error:%s" % Exception)
 
                         # print(os.path.join(destoutdirpath,filename))
 
@@ -628,7 +900,7 @@ class InvSuspiciousEmailCreateView(LoginRequiredMixin, PermissionRequiredMixin, 
                         # print("filetouploadpath:%s" % (filetouploadpath))
                         filetoupload = open(filetouploadpath)
 
-                        evidence_obj = new_evidence(
+                        new_evidence(
                             puser=auser_obj,
                             ptask=first_task,
                             pinv=inv_obj,
@@ -652,9 +924,128 @@ class InvSuspiciousEmailCreateView(LoginRequiredMixin, PermissionRequiredMixin, 
 
                         # need to close the first task
                         task_close(first_task.pk, 'action')
-
         return super(InvSuspiciousEmailCreateView, self).form_valid(form)
-#################################3
+
+        # def get_success_url(self):
+        #     if 'next1' in self.request.GET:
+        #         redirect_to = self.request.GET['next1']
+        #         if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
+        #             return reverse(self.success_url)
+        #     else:
+        #         return reverse(self.success_url)
+        #     return redirect_to
+
+
+class InvTabDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.TemplateView):
+    template_name = 'invs/inv_detail_tab_detail_home.html'
+    permission_required = ('invs.view_inv', 'tasks.view_task')
+
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
+            logger.info(logmsg)
+        super(InvTabDetailView, self).__init__(*args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super(InvTabDetailView, self).get_context_data(**kwargs)
+        kwargs['inv'] = Inv.objects.get(pk=self.kwargs.get('pk'))
+        return kwargs
+
+
+class InvTabProfileView(LoginRequiredMixin, PermissionRequiredMixin, generic.TemplateView):
+    template_name = 'invs/inv_detail_tab_profile_home.html'
+    permission_required = ('invs.view_inv', 'tasks.view_task')
+
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
+            logger.info(logmsg)
+        super(InvTabProfileView, self).__init__(*args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super(InvTabProfileView, self).get_context_data(**kwargs)
+        kwargs['inv'] = Inv.objects.get(pk=self.kwargs.get('pk'))
+        return kwargs
+
+
+class InvTabPlaybookView(LoginRequiredMixin, PermissionRequiredMixin, generic.TemplateView):
+    template_name = 'invs/inv_detail_tab_playbooks_home.html'
+    permission_required = ('invs.view_inv', 'tasks.view_task')
+
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
+            logger.info(logmsg)
+        super(InvTabPlaybookView, self).__init__(*args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super(InvTabPlaybookView, self).get_context_data(**kwargs)
+        kwargs['inv'] = Inv.objects.get(pk=self.kwargs.get('pk'))
+        kwargs['playbooks'] = PlaybookTemplate.objects.filter(enabled=True)
+        return kwargs
+
+
+class InvTabTasksView(LoginRequiredMixin, PermissionRequiredMixin, generic.TemplateView):
+    template_name = 'invs/inv_detail_tab_tasks_home.html'
+    permission_required = ('invs.view_inv', 'tasks.view_task')
+
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
+            logger.info(logmsg)
+        super(InvTabTasksView, self).__init__(*args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super(InvTabTasksView, self).get_context_data(**kwargs)
+        kwargs['inv'] = Inv.objects.get(pk=self.kwargs.get('pk'))
+        kwargs['templatecategories'] = TaskTemplate.objects.filter(enabled=True)
+        # kwargs['actions'] = Action.objects.filter(enabled=True)
+        return kwargs
+
+
+class InvTabEvidencesView(LoginRequiredMixin, PermissionRequiredMixin, generic.TemplateView):
+    template_name = 'invs/inv_detail_tab_evidences_home.html'
+    permission_required = ('invs.view_inv', 'tasks.view_task')
+
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
+            logger.info(logmsg)
+        super(InvTabEvidencesView, self).__init__(*args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super(InvTabEvidencesView, self).get_context_data(**kwargs)
+        kwargs['inv'] = Inv.objects.get(pk=self.kwargs.get('pk'))
+        # kwargs['templatecategories'] = TaskTemplate.objects.filter(enabled=True)
+        kwargs['actions'] = Action.objects.filter(enabled=True)
+        return kwargs
+
+# ################################3
 # import os
 # from bCIRT.settings import MEDIA_ROOT
 # from django.core.files.storage import default_storage
@@ -663,3 +1054,117 @@ class InvSuspiciousEmailCreateView(LoginRequiredMixin, PermissionRequiredMixin, 
 #     save_path = os.path.join(MEDIA_ROOT, 'uploads', request.FILES['file'])
 #     path = default_storage.save(save_path, request.FILES['file'])
 #     return default_storage.path(path)
+
+
+# def save_inv_form(request, form, template_name):
+#     data = dict()
+#     if request.method == 'POST':
+#         if form.is_valid():
+#             form.save()
+#             data['form_is_valid'] = True
+#             invs = Inv.objects.all()
+#             data['html_data_list'] = render_to_string('invs/inv_detail_tab_evidence_tablebody.html', {
+#                 'object_list': invs
+#             })
+#         else:
+#             data['form_is_valid'] = False
+#     context = {'form': form}
+#     data['html_form'] = render_to_string(template_name, context, request=request)
+#     return JsonResponse(data)
+#
+# def invaj_create_view(request):
+#     if request.method == 'POST':
+#         form = InvForm(request.POST)
+#     else:
+#         form = InvForm()
+#     return save_inv_form(request, form, 'invs/inv_form_create_ajax.html')
+
+
+class InvCreateAjaxView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
+    model = Inv
+    form_class = InvForm
+    permission_required = ('invs.add_inv',)
+    # success_url = 'invs:inv_list'
+    # template_name = 'invs/inv_form_create_ajax.html'
+    # success_url = reverse_lazy('invs:inv_list')
+    ajax_partial = 'invs/inv_form_create_ajax.html'
+    # ajax_list = 'invs/inv_list.html'
+    ajax_list = 'invs/inv_list_tablebody.html'
+    context_object_name = 'object_list'
+
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
+            logger.info(logmsg)
+        super(InvCreateAjaxView, self).__init__(*args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        self.object = None
+        context = self.get_context_data()
+        if request.is_ajax():
+            html_form = render_to_string(self.ajax_partial, context, request)
+            return JsonResponse({'html_form': html_form})
+        else:
+            return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        # return super(InvCreateAjaxView, self).get_context_data(**kwargs)
+        context = super(InvCreateAjaxView, self).get_context_data(**kwargs)
+        invs = Inv.objects.all()
+        context['object_list'] = invs
+        return context
+
+    def form_valid(self, form):
+        data = dict()
+        context = self.get_context_data()
+
+        if form.is_valid():
+            self.object = form.save(commit=False)
+            self.object.user = self.request.user
+            self.object.modified_by = self.request.user.get_username()
+            self.object.created_by = self.request.user.get_username()
+            self.object.save()
+            # form.save()
+            data['form_is_valid'] = True
+            data['html_data_list'] = render_to_string(
+                self.ajax_list, context, self.request)
+        else:
+            data['form_is_valid'] = False
+        data['html_form'] = render_to_string(
+            self.ajax_partial, context, request=self.request)
+
+        if self.request.is_ajax():
+            return JsonResponse(data)
+        else:
+            return super().form_valid(form)
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            # This will redirect to the login view
+            return self.handle_no_permission()
+        elif not self.request.user.has_perm('invs.add_inv'):
+            messages.error(self.request, "No permission to add a record !!!")
+            return redirect('invs:inv_list')
+        else:
+            pass
+        # Checks pass, let http method handlers process the request
+        return super(InvCreateAjaxView, self).dispatch(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        """This method is what injects forms with their keyword
+            arguments."""
+        # grab the current set of form #kwargs
+        kwargs = super(InvCreateAjaxView, self).get_form_kwargs()
+        # Update the kwargs with the user_id
+        # kwargs['inv_pk'] = self.kwargs.get('inv_pk')
+        kwargs['user'] = self.request.user
+        return kwargs
+
+
+# https://www.abidibo.net/blog/2014/05/26/how-implement-modal-popup-django-forms-bootstrap/
+# https://dkoug.com/django/django-ajax-class-based-views/
+# https://chriskief.com/2013/10/29/advanced-django-class-based-views-modelforms-and-ajax-example-tutorial/

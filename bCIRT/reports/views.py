@@ -11,7 +11,7 @@
 # 2019.07.29  Lendvay     1      Initial file
 # 2019.09.06  Lendvay     2      Added session security
 # **********************************************************************;
-from django.views.generic import TemplateView, View
+from django.views.generic import TemplateView  # , View
 from django.contrib.auth.mixins import (
     LoginRequiredMixin,
     PermissionRequiredMixin,
@@ -22,23 +22,22 @@ from invs.models import Inv
 from tasks.models import Task
 from reports.forms import CustomReportForm
 from bCIRT.settings import ALLOWED_HOSTS
-from django.views.generic.edit import FormView
+# from django.views.generic.edit import FormView
 from django.urls import reverse_lazy
 from pytz import timezone
 from datetime import datetime
 
-import pygal
-from django.shortcuts import redirect, reverse    # ,render, get_object_or_404
+from django.shortcuts import redirect, reverse  # ,render, get_object_or_404
 from django.contrib import messages
 from django.utils.http import is_safe_url
 # from django.contrib.sessions.models import Session
 # from datetime import datetime, timezone
 from django.db.models.functions import Concat
-from django.db.models import CharField #  , Value as V
-from django.db.models.functions.datetime import Extract
+from django.db.models import CharField  # , Value as V
+from django.db.models.functions.datetime import ExtractMonth, ExtractYear
 
 from django.utils.timezone import now as timezone_now
-from django.db.models import Count, Avg, Min, Max, Sum, F
+from django.db.models import Count, Avg, Min, Max, Sum  # , F
 from bCIRT.custom_variables import LOGSEPARATOR, LOGLEVEL
 from django.shortcuts import render
 import pygal
@@ -50,7 +49,7 @@ logger = logging.getLogger('log_file_verbose')
 
 
 def durationprint(timevalue=None):
-    retval = "-"
+    # retval = "-"
     if timevalue is not None:
         tduration = timevalue
         day = int(tduration // (24 * 3600))
@@ -82,6 +81,7 @@ class ReportsPage(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
             logger.info(logmsg)
         super(ReportsPage, self).__init__(*args, **kwargs)
 
+
 class Get_Report():
     def __init__(self, astart=None, aend=None):
         self.astart = astart
@@ -100,12 +100,24 @@ class Get_Report():
             .order_by('status__name')
         return retval
 
+    def phishing_malicious_attachments(self):
+        retval = EvidenceAttr.objects \
+            .filter(attr_reputation__name='Malicious') \
+            .filter(Q(evattrformat__name__startswith='Hash_') | Q(evattrformat__name='FileName')) \
+            .filter(ev__inv__attackvector__name='Phishing') \
+            .filter(ev__inv__status=2) \
+            .values_list('ev__inv__created_at', 'ev__inv') \
+            .distinct() \
+            .order_by('ev__inv')
+
+        return retval
+
     def invs_all_summary(self):
         retval = Inv.objects.filter(created_at__gte=self.astart)\
             .filter(created_at__lte=self.aend) \
             .exclude(summary="Suspicious email")\
             .exclude(summary=None)\
-            .values('summary','id')\
+            .values('summary', 'id')\
             .annotate(total=Count('id'))\
             .order_by('summary')
 
@@ -153,20 +165,20 @@ class Get_Report():
                 .aggregate(Min('task_inv__count'), Avg('task_inv__count'), Max('task_inv__count'))
 
         if inv_closed_tasks['task_inv__count__min']:
-            min = int(inv_closed_tasks['task_inv__count__min'])
+            amin = int(inv_closed_tasks['task_inv__count__min'])
         else:
-            min = 0
+            amin = 0
         if inv_closed_tasks['task_inv__count__avg']:
-            avg = round(inv_closed_tasks['task_inv__count__avg'])
+            aavg = round(inv_closed_tasks['task_inv__count__avg'])
         else:
-            avg = 0
+            aavg = 0
         if inv_closed_tasks['task_inv__count__max']:
-            max = int(inv_closed_tasks['task_inv__count__max'])
+            amax = int(inv_closed_tasks['task_inv__count__max'])
         else:
-            max = 0
-        retval = {'min': min,
-                  'max': max,
-                  'avg': avg}
+            amax = 0
+        retval = {'min': amin,
+                  'max': amax,
+                  'avg': aavg}
         return retval
 
     def tasks_closed(self):
@@ -227,7 +239,7 @@ class Get_Report():
         retval = Inv.objects.filter(created_at__gte=self.astart)\
             .filter(created_at__lte=self.aend)\
             .filter(status=2) \
-            .values('attackvector__name','losscurrency__currencyshortname')\
+            .values('attackvector__name', 'losscurrency__currencyshortname')\
             .annotate(potential=Sum('potentialloss'), monetary=Sum('monetaryloss'))\
             .order_by('attackvector__name') \
             .filter(Q(potential__gt=0) | Q(monetary__gt=0))
@@ -238,7 +250,7 @@ class Get_Report():
             .filter(created_at__lte=self.aend)\
             .filter(status=2) \
             .filter(attackvector__name='Phishing') \
-            .values('pk','losscurrency__currencyshortname')\
+            .values('pk', 'losscurrency__currencyshortname')\
             .annotate(potential=Sum('potentialloss'), monetary=Sum('monetaryloss'))\
             .filter(Q(potential__gt=0) | Q(monetary__gt=0))
         return retval
@@ -251,6 +263,7 @@ class Get_Report():
             .annotate(Count('title'))\
             .order_by('-title__count')
         return retval
+
 
 class ReportsDashboardPage(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
     template_name = 'reports/reports_dashboard.html'
@@ -467,7 +480,7 @@ class ReportsDashboardPage(LoginRequiredMixin, PermissionRequiredMixin, Template
         kwargs['phish_closed_stats'] = Inv.objects.all() \
             .filter(status=2) \
             .filter(attackvector__name='Phishing') \
-            .values('pk','losscurrency__currencyshortname')\
+            .values('pk', 'losscurrency__currencyshortname')\
             .annotate(potential=Sum('potentialloss'), monetary=Sum('monetaryloss'))\
             .filter(Q(potential__gt=0) | Q(monetary__gt=0))
 
@@ -525,7 +538,7 @@ class ReportsDashboardMonthlyPageMemory(LoginRequiredMixin, PermissionRequiredMi
 def reports_dashboard_monthly_invsclosed():
     invsource = Inv.objects.filter(status__name='Closed'). \
         annotate(
-        mydate=Concat(Extract('created_at', 'year'), Extract('created_at', 'month'), output_field=CharField())). \
+        mydate=Concat(ExtractYear('created_at'), ExtractMonth('created_at'), output_field=CharField())). \
         values_list('mydate'). \
         values('mydate'). \
         annotate(count=Count('mydate')). \
@@ -533,7 +546,9 @@ def reports_dashboard_monthly_invsclosed():
 
     invstattable = list()
     for invitems in invsource:
-        invstattable.append((invitems['mydate'], invitems['count']))
+        newitem = "%s%s" % (invitems['mydate'][0:4], '{:02d}'.format(int(invitems['mydate'][4:])))
+        # invstattable.append((invitems['mydate'], invitems['count']))
+        invstattable.append((newitem, invitems['count']))
     b_chart = pygal.Bar()
     b_chart.title = "Closed Investigations by Month"
     # b_chart.x_labels = map(str, range(201908, 201910))
@@ -546,12 +561,12 @@ def reports_dashboard_monthly_invsclosed():
 
 
 def reports_dashboard_monthly_invsattackvector():
-    ### testing
+    # ## testing
     # .filter(created_at__gt=timezone_now() - timedelta(days=30)) \
     attackvectorsource = Inv.objects\
         .filter(status=2) \
         .annotate(
-        mydate=Concat(Extract('created_at', 'year'), Extract('created_at', 'month'), output_field=CharField())) \
+            mydate=Concat(ExtractYear('created_at'), ExtractMonth('created_at'), output_field=CharField())) \
         .values_list('mydate') \
         .values('mydate', 'attackvector__name') \
         .annotate(count=Count('mydate')) \
@@ -561,10 +576,16 @@ def reports_dashboard_monthly_invsattackvector():
     attackvectornames = set()
     attackvectordates = set()
     for attackvectoritems in attackvectorsource:
+        newitem = "%s%s" % (attackvectoritems['mydate'][0:4], '{:02d}'.format(int(attackvectoritems['mydate'][4:])))
+        # attackvectorstattable.append(
+        #     (attackvectoritems['mydate'], attackvectoritems['attackvector__name'], attackvectoritems['count']))
+        # attackvectornames.add(attackvectoritems['attackvector__name'])
+        # attackvectordates.add(attackvectoritems['mydate'])
         attackvectorstattable.append(
-            (attackvectoritems['mydate'], attackvectoritems['attackvector__name'], attackvectoritems['count']))
+            (newitem, attackvectoritems['attackvector__name'], attackvectoritems['count']))
         attackvectornames.add(attackvectoritems['attackvector__name'])
-        attackvectordates.add(attackvectoritems['mydate'])
+        attackvectordates.add(newitem)
+
     c_chart = pygal.StackedBar()
     c_chart.title = "Closed Investigations by AttackVector by Month"
 
@@ -622,7 +643,7 @@ def reports_dashboard_monthly_invsattackvector_phishingmalware():
         .filter(ev__inv__attackvector__name='Phishing')\
         .filter(ev__inv__status=2)\
         .annotate(
-        mydate=Concat(Extract('ev__inv__created_at', 'year'), Extract('ev__inv__created_at', 'month'), output_field=CharField())) \
+            mydate=Concat(ExtractYear('ev__inv__created_at'), ExtractMonth('ev__inv__created_at'), output_field=CharField())) \
         .values_list('mydate', 'ev__inv')\
         .distinct()\
         .order_by('mydate')
@@ -630,8 +651,11 @@ def reports_dashboard_monthly_invsattackvector_phishingmalware():
     tmplist = list()
     tmpnames = set()
     for items in countofmalicious:
-        tmplist.append(items[0])
-        tmpnames.add(items[0])
+        newitem = "%s%s" % (items[0][0:4], '{:02d}'.format(int(items[0][4:])))
+        # tmplist.append(items[0])
+        # tmpnames.add(items[0])
+        tmplist.append(newitem)
+        tmpnames.add(newitem)
     b_chart = pygal.Bar()
     b_chart.title = "Phishing emails malware attachment by Month"
     for tmpname in tmpnames:
@@ -643,12 +667,14 @@ def reports_dashboard_monthly_invsattackvector_phishingmalware():
     return {'graph_data_attackvectorphishingmalware': countofmalicious_data,
             'graph_table_attackvectorphishingmalware': countofmalicioustable}
 
+
 class ReportsDashboardCustom(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
     template_name = 'reports/reports_custom.html'
     permission_required = ('invs.view_inv', 'tasks.view_task')
     form_class = CustomReportForm
     initial = {'key': 'value'}
     success_url = reverse_lazy('reports:rep_dashboardcustom')
+
     def __init__(self, *args, **kwargs):
         if LOGLEVEL == 1:
             pass
@@ -678,36 +704,36 @@ class ReportsDashboardCustom(LoginRequiredMixin, PermissionRequiredMixin, Templa
         # newformat = "%Y-%m-%d %H:%M%z"
         if form.is_valid():
             # self.send_mail(form.cleaned_data)
-            utc=timezone("UTC")
-            searchstarttime=None
-            searchendtime = None
+            utc = timezone("UTC")
+            # searchstarttime = None
+            # searchendtime = None
             if form.data:
                 datatmp = form.data
                 if datatmp['starttime'] == '':
                     rawstarttime = datetime.now()-timedelta(days=25000)
                     # datastarttime = datetime.strftime(rawstarttime,newformat)
                     starttime = utc.localize(rawstarttime)
-                    searchstarttime=starttime
+                    searchstarttime = starttime
                 else:
                     datastarttime = datatmp['starttime']
-                    starttime=datetime.strptime((datastarttime), pickerformat)
+                    starttime = datetime.strptime((datastarttime), pickerformat)
                     starttime = utc.localize(starttime)
                     searchstarttime = starttime
                 if datatmp['endtime'] == '':
                     rawendtime = datetime.now()
                     # dataendtime = datetime.strftime(rawendtime,newformat)
                     endtime = utc.localize(rawendtime)
-                    searchendtime=endtime
+                    searchendtime = endtime
                 else:
                     dataendtime = datatmp['endtime']
-                    endtime=datetime.strptime((dataendtime), pickerformat)
+                    endtime = datetime.strptime((dataendtime), pickerformat)
                     endtime = utc.localize(endtime)
                     searchendtime = endtime
 
                 form = CustomReportForm()
-                last0days = datetime.now()
-                last30days = datetime.now()-timedelta(days=30)
-                last90days = datetime.now()-timedelta(days=90)
+                # last0days = datetime.now()
+                # last30days = datetime.now()-timedelta(days=30)
+                # last90days = datetime.now()-timedelta(days=90)
                 invs_closed = Get_Report(searchstarttime, searchendtime).invs_closed()
                 invs_all_summary = Get_Report(searchstarttime, searchendtime).invs_all_summary()
                 invs_closed_stats = Get_Report(searchstarttime, searchendtime).invduration()
@@ -740,8 +766,8 @@ class ReportsDashboardCustom(LoginRequiredMixin, PermissionRequiredMixin, Templa
                 phish_closed_stats = Get_Report(searchstarttime, searchendtime).phishing_stats()
                 attackvector_stats = Get_Report(searchstarttime, searchendtime).attackvector_stats()
                 tasks_closed_title = Get_Report(searchstarttime, searchendtime).tasks_closed_title()
-                #xxx
-
+                phishing_malicious_attachments = Get_Report(searchstarttime, searchendtime).\
+                    phishing_malicious_attachments()
 
                 context = {'form': form,
                            'starttime': starttime,
@@ -774,9 +800,10 @@ class ReportsDashboardCustom(LoginRequiredMixin, PermissionRequiredMixin, Templa
                            'phish_closed_stats': phish_closed_stats,
                            'attackvector_stats': attackvector_stats,
                            'tasks_closed_title': tasks_closed_title,
+                           'phishing_malicious_attachments': phishing_malicious_attachments,
                            }
             else:
-                context = {'':''}
+                context = {'': ''}
             return render(request, 'reports/reports_custom.html', context)
         return render(request, 'reports/reports_custom.html', {'form': form})
 

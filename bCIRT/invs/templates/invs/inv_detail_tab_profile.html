@@ -14,7 +14,7 @@
 -->
     <div class="row w-100">
         <div class="col-sm-12 col-md-12">
-{% block inv_buttons %}
+{% block invtmp_buttons %}
                             {% if user.is_authenticated %}
                                 <a href="{% url 'assets:prof_create' inv_pk=inv.pk %}?next1={{ request.get_full_path|urlencode }}"
                                 class="btn btn-outline-secondary btn-sm">
@@ -23,36 +23,17 @@
                                 New Profile
                                 </a>
                             {% endif %}
-{% endblock inv_buttons %}
+{% endblock invtmp_buttons %}
 
-{% block inv_title %}
+{% block invtmp_title %}
                                 &nbsp;Victim Profiles | {{ inv.profile_inv.all.count }} item{{ inv.profile_inv.all.count|pluralize }} | {{ user }} at {% now "Y/m/d H:i:s" %} (UTC)
-{% endblock inv_title %}
+{% endblock invtmp_title %}
 
-{% block inv_body %}
+{% block invtmp_body %}
                     {% if error_message %}
                         <p><strong>{{ error_message }}</strong></p>
                     {% endif %}
-
-                    <table class="table table-hover table-sm">
-                        <thead>
-                        <tr>
-                            <th>Profile ID</th>
-                            <th>Username</th>
-                            <th>UserID</th>
-                            <th>Email</th>
-                            <th>Host</th>
-                            <th>IP</th>
-                            <th>Location</th>
-                            <th>Modified on</th>
-                            <th>Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                            <!-- include 'investigations/partial_investigations_incidents_list.html' %}-->
-                            {% include 'invs/inv_detail_tab_profile_table.html' %}
-                        </tbody>
-                    </table>
-{% endblock inv_body %}
+                        {% include 'invs/inv_detail_tab_profile_table.html' %}
+{% endblock invtmp_body %}
         </div>
     </div>

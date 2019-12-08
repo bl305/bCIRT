@@ -1,0 +1,13 @@
+{% extends 'assets/host_form_template_ajax.html' %}
+{% block modaltitle %}
+    Delete Host | {{ host.pk }}
+{%endblock modaltitle %}
+{% block modalactionclass %}
+    js-host-delete-form
+{% endblock modalactionclass %}
+{% block modalaction %}
+    {% url 'assets:hostaj_delete' host.id %}
+{% endblock modalaction %}
+{% block modalbody %}
+    {% include 'assets/host_detail_table.html' %}
+{% endblock modalbody %}

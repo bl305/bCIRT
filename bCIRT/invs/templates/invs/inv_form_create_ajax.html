@@ -1,0 +1,10 @@
+{% extends 'invs/inv_form_template_ajax.html' %}
+{% block modaltitle %}
+    Create Investigation
+{% endblock modaltitle %}
+{% block modalactionclass %}
+    js-inv-create-form
+{% endblock modalactionclass %}
+{% block modalaction %}
+    {% url 'invs:invaj_create' %}
+{% endblock modalaction %}

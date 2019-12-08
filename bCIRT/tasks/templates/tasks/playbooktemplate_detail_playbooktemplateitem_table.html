@@ -76,10 +76,12 @@
                               class="btn btn-warning btn-xs">
                           <span class="fas fa-pen" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
                           </a>
+{% if not playbooktemplateitem.prevtask %}
                           <a href="{% url 'tasks:playittmp_remove' pk=playbooktemplateitem.pk %}?next1={{ request.get_full_path|urlencode }}"
                               class="btn btn-danger btn-xs">
                           <span class="fas fa-trash-alt" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
                           </a>
+{% endif %}
                       </div>
                   </td>
                 </tr>

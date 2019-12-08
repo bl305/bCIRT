@@ -222,8 +222,12 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
                 "enabled": "1",
                 "description": "Domain address"
             },
-
-        ]
+            {
+                "name": "Question",
+                "enabled": "1",
+                "description": "Question"
+            },
+       ]
         try:
             self.stdout.write("Initiating EvidenceAttrFormat")
             for evattrformatitem in evidenceattrformat:
@@ -315,7 +319,18 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
                 "name": "Archived",
                 "enabled": "1",
                 "description": "Archived Investigation"
-            }
+            },
+            {
+                "name": "Review1",
+                "enabled": "1",
+                "description": "#1 reviewer"
+            },
+            {
+                "name": "Review2",
+                "enabled": "1",
+                "description": "#2 reviewer"
+            },
+
         ]
         try:
             self.stdout.write("Initiating InvStatus")

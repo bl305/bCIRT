@@ -12,10 +12,10 @@
 # 2019.09.09  Lendvay     1      Initial file
 # **********************************************************************;
 -->
-{% load static %}
+
 {% block prereports %}
-<div class="container">
-	<div class="col-md-12">
+<div class="container-fluid">
+	<div class="col-md-12 text-center">
 		<div class="content">
 			<h2>Custom Reports</h2> Current filter: {{ searchstarttime|date:"Y/m/d H:i:s e" }} - {{ searchendtime|date:"Y/m/d H:i:s e" }}<br>
 		</div>
@@ -83,6 +83,35 @@
             </div>
         </div>
     </div>
+<hr class="thick">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card card-body bg-light">
+                <p><strong>Phishing Malicious Atachments</strong></p>
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>ID</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in phishing_malicious_attachments %}
+                        <tr data-toggle="collapse" data-target="#myinvs{{inv_all_summary.pk}}" class="accordion-toggle">
+                            <td>
+                                {{ item.0 |date:"Y/m/d H:i:s e" }}
+                            </td>
+                            <td>
+                                <a href="{% url 'invs:inv_detail' pk=item.1 %}"><h6><span class="badge badge-pill badge-secondary">{{item.1}}</span></h6></a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+			</div>
+		</div>
+	</div>
+<hr class="thick">
     <div class="row">
         <div class="col-md-12">
             <div class="card card-body bg-light">
@@ -118,7 +147,7 @@
             </div>
         </div>
     </div>
-
+<hr class="thick">
     <div class="row">
         <div class="col-md-12">
             <div class="card card-body bg-light">
@@ -146,6 +175,7 @@
 			</div>
 		</div>
 	</div>
+<hr class="thick">
     <div class="row">
         <div class="col-md-12">
             <div class="card card-body bg-light">
@@ -443,7 +473,7 @@
                                 {{ inv_all_summary.summary }}
                             </td>
                             <td>
-                                {{ inv_all_summary.id }}
+                                <a href="{% url 'invs:inv_detail' pk=inv_all_summary.id %}"><h6><span class="badge badge-pill badge-secondary">{{ inv_all_summary.id }}</span></h6></a>
                             </td>
                             <td>
                                 {{ inv_all_summary.created_at |date:"Y/m/d H:i:s e" }}
@@ -460,3 +490,5 @@
 </div>
 {% endblock reports_content %}
 </div>
+
+

@@ -23,20 +23,20 @@
                 </td>
               <td>
                     {% if attr.attr_reputation.pk == 1 %}
-                        <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-placement="top" title="Unknown">
+                        <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-placement="top" title="Unknown"></span>
                     {% else %}
                         {% if attr.attr_reputation.pk == 2 %}
-                            <span style="color:green;" class="glyphicon glyphicon-ok-sign" data-toggle="tooltip" data-placement="top" title="Clean">
+                            <span style="color:green;" class="glyphicon glyphicon-ok-sign" data-toggle="tooltip" data-placement="top" title="Clean"></span>
                         {% else %}
                             {% if attr.attr_reputation.pk == 3 %}
                                 <strong>
-                                <span style="color:orange;" class="glyphicon glyphicon-alert" data-toggle="tooltip" data-placement="top" title="Suspicious">
-                                    </strong>
+                                    <span style="color:orange;" class="glyphicon glyphicon-alert" data-toggle="tooltip" data-placement="top" title="Suspicious"></span>
+                                </strong>
                             {% else %}
                                 {% if attr.attr_reputation.pk == 4 %}
-                                    <span style="color:red;" class="glyphicon glyphicon-remove-sign" data-toggle="tooltip" data-placement="top" title="Malicious">
+                                    <span style="color:red;" class="glyphicon glyphicon-remove-sign" data-toggle="tooltip" data-placement="top" title="Malicious"></span>
                                 {% else %}
-                                    <span data-toggle="tooltip" data-placement="top" title="-">
+                                    <span data-toggle="tooltip" data-placement="top" title="-"></span>
                                 {% endif %}
                             {% endif %}
                         {% endif %}

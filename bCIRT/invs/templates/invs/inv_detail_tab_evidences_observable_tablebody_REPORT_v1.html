@@ -1,0 +1,68 @@
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : inv/inv_evidence_tab_evidences_observable_tablebody_REPORT_v1.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.11.23
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.11.23  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+{% if inv.evidence_inv %}
+ {% for invevidence in inv.evidence_inv.all %}
+ {% for attr in invevidence.evattr_evidence.all %}
+
+        {% if attr.observable %}
+            <tr>
+                <td>
+                    {{attr.pk}}
+                </td>
+              <td>
+                    {% if attr.attr_reputation.pk == 1 %}
+                  <span class="fas fa-question-circle" data-toggle="tooltip" data-placement="top" title="Unknown"></span>
+                    {% else %}
+                        {% if attr.attr_reputation.pk == 2 %}
+                            <span class="fas fa-check-circle text-success" data-toggle="tooltip" data-placement="top" title="Clean"></span>
+                        {% else %}
+                            {% if attr.attr_reputation.pk == 3 %}
+                                <span class="fas fa-exclamation-circle text-danger" data-toggle="tooltip" data-placement="top" title="Suspicious"></span>
+                            {% else %}
+                                {% if attr.attr_reputation.pk == 4 %}
+                                    <span class="fas fa-bomb text-danger" data-toggle="tooltip" data-placement="top" title="Malicious"></span>
+                                {% else %}
+                                        <span data-toggle="tooltip" data-placement="top" title="-">-</span>
+                                {% endif %}
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+                    {{ attr.attr_reputation }}
+              </td>
+
+<!--                       style="max-width: 800px;overflow: auto;text-overflow: word-wrap;overflow-wrap: break-word;"-->
+
+              <td>
+                  {{ attr.evattrformat }}
+              </td>
+                <td>
+                    {{ attr.evattrvalue }}
+                </td>
+                <td>
+                    {{ inv.modified_at|date:"Y/m/d H:i:s" }}
+                </td>
+                <td>
+                    {{ attr.ev.pk}}
+                </td>
+            </tr>
+        {% endif %}
+     {% endfor %}
+{% endfor %}
+{% else %}
+<!-- empty %}-->
+          <tr>
+            <td colspan="7" class="text-center bg-warning">No matching record found</td>
+          </tr>
+{% endif %}
+<!-- endfor %}-->

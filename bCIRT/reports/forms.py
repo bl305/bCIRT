@@ -16,10 +16,11 @@ from invs.widgets import JQueryDateTimePickerInput
 from django.contrib.auth import get_user_model
 import logging
 
-from django.forms.widgets import SplitDateTimeWidget  # , ClearableFileInput
+# from django.forms.widgets import SplitDateTimeWidget  # , ClearableFileInput
 
 logger = logging.getLogger('log_file_verbose')
 User = get_user_model()
+
 
 class CustomReportForm(forms.Form):
     # enddate = forms.DateField(
@@ -50,7 +51,7 @@ class CustomReportForm(forms.Form):
         input_formats=['%Y-%m-%d %H:%M:%S'],
         required=False,
         widget=JQueryDateTimePickerInput(
-            attrs = {
+            attrs={
                 'class': 'form-control',
                 'style': 'width:200px',
             }
@@ -75,7 +76,7 @@ class CustomReportForm(forms.Form):
         input_formats=['%Y-%m-%d %H:%M:%S'],
         required=False,
         widget=JQueryDateTimePickerInput(
-            attrs = {
+            attrs={
                 'class': 'form-control',
                 'style': 'width:200px',
             }

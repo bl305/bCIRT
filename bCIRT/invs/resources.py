@@ -17,7 +17,8 @@ from .models import InvAttackvector, \
     InvPhase,\
     InvSeverity,\
     InvStatus,\
-    Inv
+    Inv,\
+    InvReviewRules
 
 class InvAttackvectorResource(resources.ModelResource):
     class Meta:
@@ -52,3 +53,7 @@ class InvStatusResource(resources.ModelResource):
 class InvResource(resources.ModelResource):
     class Meta:
         model = Inv
+
+class InvReviewRulesResource(resources.ModelResource):
+    class Meta:
+        model = InvReviewRules

@@ -13,6 +13,8 @@
 # from django.shortcuts import render
 from django.conf.urls import url
 from . import views
+# from django.views.generic.base import TemplateView
+
 # from django.contrib.auth import views as auth_views
 
 app_name = 'assets'
@@ -27,11 +29,16 @@ urlpatterns = [
     url(r"^profile/autoadd/(?P<inv_pk>\d+)/(?P<evattr_pk>\d+)/(?P<ev_pk>\d+)/$",
         views.ProfileCreateRedirectView.as_view(), name="profile_autoadd"),
 
-    url(r"^host$", views.HostListView.as_view(), name="host_list"),
+    url(r"^host/$", views.HostListView.as_view(), name="host_list"),
     url(r"^host/new/$", views.HostCreateView.as_view(), name="host_create"),
     url(r"^host/detail/(?P<pk>\d+)/$", views.HostDetailView.as_view(), name="host_detail"),
     url(r'^host/(?P<pk>\d+)/edit/$', views.HostUpdateView.as_view(), name='host_edit'),
     url(r'^host/(?P<pk>\d+)/remove/$', views.HostRemoveView.as_view(), name='host_remove'),
+    
+    url(r'^hostaj/create/$', views.hostaj_create_view, name='hostaj_create'),
+    url(r'^hostaj/(?P<pk>\d+)/update/$', views.hostaj_update_view, name='hostaj_update'),
+    url(r'^hostaj/(?P<pk>\d+)/delete/$', views.hostaj_delete_view, name='hostaj_delete'),
+
     #
     # url(r"^hostname$", views.HostnameListView.as_view(), name="hostname_list"),
     # url(r"^hostname/new/$", views.HostnameCreateView.as_view(), name="hostname_create"),

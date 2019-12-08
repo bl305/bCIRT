@@ -10,9 +10,10 @@
 # Revision History  : v1
 # Date        Author      Ref    Description
 # 2019.07.29  Lendvay     1      Initial file
+# 2019.11.23  Lendvay     1      Updates
 # **********************************************************************;
 -->
-{% load staticfiles %}
+{% load static %}
 
 <html lang="en">
 <head>
@@ -53,22 +54,22 @@
 </head>
 <body>
 <div class="row">
-    {% include 'invs/inv_detail_tab_detail_REPORT_v1.html' %}
+    {% include 'invs/inv_detail_tab_detail_home_REPORT_v1.html' %}
 </div>
 <div class="row">
-    {% include 'invs/inv_detail_tab_investigations_REPORT_v1.html' %}
+    {% include 'invs/inv_detail_tab_relatedinv_table_REPORT_v1.html' %}
 </div>
 <div class="row">
-    {% include 'invs/inv_detail_tab_profile_REPORT_v1.html' %}
+    {% include 'invs/inv_detail_tab_profile_home_REPORT_v1.html' %}
 </div>
 <div class="row">
-    {% include 'invs/inv_detail_tab_playbooks_REPORT_v1.html' %}
+    {% include 'invs/inv_detail_tab_playbooks_home_REPORT_v1.html' %}
 </div>
 <div class="row">
-    {% include 'invs/inv_detail_tab_tasks_REPORT_v1.html' %}
+    {% include 'invs/inv_detail_tab_tasks_home_REPORT_v1.html' %}
 </div>
 <div class="row">
-    {% include 'invs/inv_detail_tab_evidences_REPORT_v1.html' %}
+    {% include 'invs/inv_detail_tab_evidences_home_REPORT_v1.html' %}
 </div>
 
 </body>

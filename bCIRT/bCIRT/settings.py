@@ -101,7 +101,7 @@ INSTALLED_APPS = [
     'tasks',
     'assets',
     'reports',
-    'import_export'
+    'import_export',
 ]
 IMPORT_EXPORT_USE_TRANSACTIONS = True
 
@@ -337,7 +337,7 @@ INTERNAL_IPS = ['127.0.0.1']
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 # hard coded session close - this will expire regardless of activity
 # SESSION_COOKIE_AGE = 5 * 60 #5 minutes
-#SESSION_COOKIE_AGE = 60 * 60  # 1 hour
+# SESSION_COOKIE_AGE = 60 * 60  # 1 hour
 SESSION_SAVE_EVERY_REQUEST = True  # refresh session timeout
 # TBD session timeout - it's only client side
 
@@ -424,3 +424,4 @@ INVESTIGATIONS_URL = '/inv/'
 
 TASKS_ROOT = os.path.join(BASE_DIR, 'tasks')
 TASKS_URL = '/task/'
+FILE_UPLOAD_MAX_MEMORY_SIZE = 262144000  # =250 MB

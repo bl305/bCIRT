@@ -21,6 +21,29 @@
 {% block title %}{% endblock title %}
 
 {% block content %}
+{% if inv %}
+    <ul class="nav nav-tabs w-100">
+        <li class="nav-item">
+            <a class="disabled text-left nav-link text-primary" href="#">Investigation: #{{ inv.id }} - {{ inv.invid }}</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link btn-outline-secondary {% block invdetail_active %}{% endblock invdetail_active %}" href="{% url 'invs:inv_detailtab' pk=inv.pk %}">Details</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link btn-outline-secondary {% block invprofile_active %}{% endblock invprofile_active %}" href="{% url 'invs:inv_profiletab' pk=inv.pk %}">Profiles({{ inv.profile_inv.all.count }})</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link btn-outline-secondary {% block invplaybook_active %}{% endblock invplaybook_active %}" href="{% url 'invs:inv_playbooktab' pk=inv.pk %}">Playbooks({{ inv.playbook_inv.all.count }})</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link btn-outline-secondary {% block invtask_active %}{% endblock invtask_active %}" href="{% url 'invs:inv_tasktab' pk=inv.pk %}">Tasks({{ inv.task_inv.all.count }}/{{inv.opentasklistprint}})</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link btn-outline-secondary {% block invevidence_active %}{% endblock invevidence_active %}" href="{% url 'invs:inv_evidencetab' pk=inv.pk %}">Evidences({{ inv.evidence_inv.count }})</a>
+        </li>
+
+    </ul>
+{% endif %}
 
     {% block preinvs %}{% endblock preinvs %}
     {% block invs_content %}{% endblock invs_content %}

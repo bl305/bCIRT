@@ -187,3 +187,13 @@ class ProfileForm(forms.ModelForm):
                 }
             ),
         }
+
+
+##### CRUD TEST
+# from django import forms
+# from .models import Host
+#
+# class HostFormAjax(forms.ModelForm):
+#     class Meta:
+#         model = Host
+#         fields = ['name','created_by']

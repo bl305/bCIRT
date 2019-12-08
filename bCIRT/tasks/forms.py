@@ -10,8 +10,11 @@
 # Date        Author      Ref    Description
 # 2019.07.29  Lendvay     1      Initial file
 # 2019.08.19  Lendvay     1      Added "enabled" ot the form for actions
+# 2019.11.17  Lendvay     1      Fixed the playbooktemplates
 # **********************************************************************;
 from django import forms
+# from django.db.models import Count, Avg, Min, Max, Sum, F
+from django.db.models import Max
 from invs.widgets import JQueryDateTimePickerInput
 from tinymce import TinyMCE
 from .models import Task, TaskCategory, TaskPriority, TaskStatus, TaskTemplate, TaskType, TaskVar, TaskVarCategory, \
@@ -22,7 +25,6 @@ from .models import Task, TaskCategory, TaskPriority, TaskStatus, TaskTemplate, 
 from assets.models import Host, Hostname, Ipaddress, Profile
 from configuration.models import ConnectionItem
 # from django.core.exceptions import ValidationError
-from django.forms.widgets import SplitDateTimeWidget  # , ClearableFileInput
 # Get the user so we can use this
 from django.contrib.auth import get_user_model
 import logging
@@ -54,7 +56,7 @@ class ActionForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -74,7 +76,7 @@ class ActionForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -89,7 +91,7 @@ class ActionForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -104,7 +106,7 @@ class ActionForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -120,7 +122,7 @@ class ActionForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -135,7 +137,7 @@ class ActionForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -150,7 +152,7 @@ class ActionForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -165,7 +167,7 @@ class ActionForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -181,7 +183,7 @@ class ActionForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -292,7 +294,7 @@ class ActionGroupMemberForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -307,7 +309,7 @@ class ActionGroupMemberForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -335,11 +337,11 @@ class TaskForm(forms.ModelForm):
         if kwargs.get('instance'):
             curr_obj = kwargs.get('instance')
             current_pk = curr_obj.pk
-            if inv_pk and inv_pk!='0' and inv_pk!=0:
+            if inv_pk and inv_pk != '0' and inv_pk != 0:
                 inv_obj = Inv.objects.get(pk=inv_pk)
                 self.fields['parent'].queryset = inv_obj.task_inv.exclude(pk=current_pk)
                 self.fields['inputfrom'].queryset = inv_obj.task_inv.exclude(pk=current_pk)
-            elif inv_pk!='0' and inv_pk!=0:
+            elif inv_pk != '0' and inv_pk != 0:
                 inv_obj = curr_obj.inv
                 self.fields['parent'].queryset = inv_obj.task_inv.exclude(pk=current_pk)
                 self.fields['inputfrom'].queryset = inv_obj.task_inv.exclude(pk=current_pk)
@@ -347,7 +349,7 @@ class TaskForm(forms.ModelForm):
                 self.fields['parent'].queryset = Task.objects.all()
                 self.fields['inputfrom'].queryset = Task.objects.all()
 
-        elif inv_pk and inv_pk!='0' and inv_pk!=0:
+        elif inv_pk and inv_pk != '0' and inv_pk != 0:
             inv_obj = Inv.objects.get(pk=inv_pk)
             self.fields['parent'].queryset = inv_obj.task_inv.all()
             self.fields['inputfrom'].queryset = inv_obj.task_inv.all()
@@ -367,7 +369,7 @@ class TaskForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -383,7 +385,7 @@ class TaskForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -400,7 +402,7 @@ class TaskForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -417,7 +419,7 @@ class TaskForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -434,7 +436,7 @@ class TaskForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -451,7 +453,7 @@ class TaskForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -467,7 +469,7 @@ class TaskForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -482,7 +484,7 @@ class TaskForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -497,7 +499,7 @@ class TaskForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -512,7 +514,7 @@ class TaskForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -536,13 +538,12 @@ class TaskForm(forms.ModelForm):
         input_formats=['%Y-%m-%d %H:%M:%S'],
         required=False,
         widget=JQueryDateTimePickerInput(
-            attrs = {
+            attrs={
                 'class': 'form-control',
                 'style': 'width:200px',
             }
         )
     )
-
     # endtime = forms.SplitDateTimeField(
     #     required=False,
     #     label='End of task',
@@ -561,7 +562,7 @@ class TaskForm(forms.ModelForm):
         input_formats=['%Y-%m-%d %H:%M:%S'],
         required=False,
         widget=JQueryDateTimePickerInput(
-            attrs = {
+            attrs={
                 'class': 'form-control',
                 'style': 'width:200px',
             }
@@ -641,7 +642,7 @@ class TaskTemplateForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -657,7 +658,7 @@ class TaskTemplateForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -674,7 +675,7 @@ class TaskTemplateForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -691,7 +692,7 @@ class TaskTemplateForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -706,7 +707,7 @@ class TaskTemplateForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -721,7 +722,7 @@ class TaskTemplateForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -736,7 +737,7 @@ class TaskTemplateForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -813,7 +814,7 @@ class TaskVarForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -829,7 +830,7 @@ class TaskVarForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -845,7 +846,7 @@ class TaskVarForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -860,7 +861,7 @@ class TaskVarForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -875,7 +876,7 @@ class TaskVarForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -937,7 +938,7 @@ class PlaybookForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -953,7 +954,7 @@ class PlaybookForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -997,7 +998,7 @@ class PlaybookTemplateForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -1045,70 +1046,53 @@ class PlaybookTemplateItemForm(forms.ModelForm):
         self.fields['playbooktemplateid'].initial = self.play_pk
         self.fields['user'].initial = user
         # self.fields['itemorder'].initial = 100
-        from django.db.models import Max
         if PlaybookTemplateItem.objects.filter(playbooktemplateid=self.play_pk):
-            self.fields['itemorder'].initial = int(PlaybookTemplateItem.objects.filter(playbooktemplateid=self.play_pk).aggregate(Max('itemorder'))['itemorder__max'])+1
+            self.fields['itemorder'].initial = int(PlaybookTemplateItem.objects.
+                                                   filter(playbooktemplateid=self.play_pk).
+                                                   aggregate(Max('itemorder'))['itemorder__max'])+1
         else:
             self.fields['itemorder'].initial = 100
 
+        # This means that we are editing
         if kwargs.get('instance'):
             currentitem_pk = kwargs.get('instance').pk
+
+            # print("EDIT: %s %s"%(currentitem_pk,type(currentitem_pk)))
+            if currentitem_pk:
+                try:
+                    if PlaybookTemplateItem.objects.filter(pk=currentitem_pk):
+                        actual_playbooktemplateitem_obj = PlaybookTemplateItem.objects.get(pk=currentitem_pk)
+                        actual_playbook_obj = actual_playbooktemplateitem_obj.playbooktemplateid
+                        prevtask = actual_playbook_obj.playbooktemplateitem_playbooktemplate.\
+                            filter(itemorder__lt=actual_playbooktemplateitem_obj.itemorder).exclude(pk=currentitem_pk)
+                        print(prevtask)
+                        nexttask = actual_playbook_obj.playbooktemplateitem_playbooktemplate.\
+                            exclude(pk=currentitem_pk)
+                        print(nexttask)
+                        self.fields['prevtask'].queryset = prevtask
+                        self.fields['nexttask'].queryset = nexttask
+                except Exception:
+                    self.fields['nexttask'].queryset = PlaybookTemplateItem.objects.all()
+                    self.fields['prevtask'].queryset = PlaybookTemplateItem.objects.all()
+                    pass
+
+        # This means we are creating a new item
         else:
-            currentitem_pk = 0
-        if self.play_pk != "0":
+            if self.play_pk != "0":
+                try:
+                    if PlaybookTemplateItem.objects.filter(playbooktemplateid=self.play_pk):
+                        actual_playbooktemplate_obj = PlaybookTemplate.objects.get(pk=self.play_pk)
+                        # actual_playbooktemplate = actual_playbooktemplate_obj.pk
+                        actual_alltasks = actual_playbooktemplate_obj.playbooktemplateitem_playbooktemplate.all()
+                        self.fields['nexttask'].queryset = actual_alltasks
+                        self.fields['prevtask'].queryset = actual_alltasks
 
-            # print("play_pk:"+str(self.play_pk))
-            # self.fields['nexttask'].queryset = TaskTemplate.objects.filter(enabled=True).values('category','title')
-            # self.fields['nexttask'].queryset = PlaybookTemplateItem.objects.filter(playbooktemplateid=self.play_pk)
-            # xxx=TaskTemplate.objects.get(pk=PlaybookTemplateItem.objects.get(pk=self.play_pk).acttask.pk).pk
-            try:
-                if PlaybookTemplateItem.objects.get(pk=self.play_pk):
-                    # actual_playbookitem = PlaybookTemplateItem.objects.get(pk=self.play_pk)
-                    # actual_playbooktemplate = actual_playbookitem.playbooktemplateid.pk
-                    # print("PBTITEM:"+str(actual_playbookitem))
-                    #     print("PB:"+str(actual_playbooktemplate))
-
-
-                    # print("PBNEW:"+str(actual_playbooktemplate))
-                    # print(PlaybookTemplateItem.objects.filter(playbooktemplateid=actual_playbooktemplate).
-                    # exclude(pk=actual_playbookitem.pk))
-                    # print("playbook:"+str(PlaybookTemplate.objects.get(pk=8)))
-                    # self.fields['nexttask'].queryset = PlaybookTemplateItem.objects.filter(
-                    # playbooktemplateid=self.play_pk)
-                    #     self.fields['nexttask'].queryset = PlaybookTemplateItem.objects.filter(
-                    #     playbooktemplateid=actual_playbooktemplate).exclude(pk=actual_playbookitem.pk)
-                    actual_playbooktemplate = PlaybookTemplateItem.objects.get(pk=currentitem_pk).playbooktemplateid.pk
-                    actual_playbooktemplateitem_obj = PlaybookTemplateItem.objects.get(pk=currentitem_pk)
-                    actual_playbooktemplate_obj = actual_playbooktemplateitem_obj.playbooktemplateid
-                    actual_playbooktemplate = actual_playbooktemplate_obj.pk
-
-                    self.fields['nexttask'].queryset = PlaybookTemplateItem.objects.filter(
-                        playbooktemplateid=actual_playbooktemplate).exclude(pk=currentitem_pk)
-                    self.fields['prevtask'].queryset = PlaybookTemplateItem.objects.filter(
-                        playbooktemplateid=actual_playbooktemplate).\
-                        exclude(pk=currentitem_pk).\
-                        filter(itemorder__lt=actual_playbooktemplateitem_obj.itemorder)
-                else:
-                    self.fields['prevtask'].queryset = PlaybookTemplateItem.objects.filter(pk=0)
-                    self.fields['nexttask'].queryset = PlaybookTemplateItem.objects.filter(pk=0)
-
-            except Exception:
-                # self.fields['nexttask'].queryset = PlaybookTemplateItem.objects.filter(pk=0)
-                # self.fields['prevtask'].queryset = PlaybookTemplateItem.objects.filter(pk=0)
-                self.fields['nexttask'].queryset = PlaybookTemplateItem.objects.filter(enabled=True)
-                if currentitem_pk != 0:
-                    actual_playbooktemplateitem_obj = PlaybookTemplateItem.objects.get(pk=currentitem_pk)
-                    self.fields['prevtask'].queryset = PlaybookTemplateItem.objects.\
-                        filter(enabled=True).\
-                        filter(itemorder__lt=actual_playbooktemplateitem_obj.itemorder)
-                else:
+                except Exception:
                     self.fields['prevtask'].queryset = PlaybookTemplateItem.objects.filter(enabled=True)
-
-
-        else:
-            # self.fields['nexttask'].queryset = TaskTemplate.objects.filter(enabled=True)
-            self.fields['nexttask'].queryset = PlaybookTemplateItem.objects.filter(enabled=True)
-
+                    self.fields['nexttask'].queryset = PlaybookTemplateItem.objects.filter(enabled=True)
+            else:
+                self.fields['prevtask'].queryset = PlaybookTemplateItem.objects.filter(enabled=True)
+                self.fields['nexttask'].queryset = PlaybookTemplateItem.objects.filter(enabled=True)
 
     user = forms.ModelChoiceField(
         label='Owner:',
@@ -1119,7 +1103,7 @@ class PlaybookTemplateItemForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -1129,12 +1113,13 @@ class PlaybookTemplateItemForm(forms.ModelForm):
         label='PlaybookTemplate*',
         queryset=PlaybookTemplate.objects.filter(enabled=True),
         empty_label="--Select--",
+        disabled=True,
         widget=forms.Select(
             attrs={
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -1142,7 +1127,7 @@ class PlaybookTemplateItemForm(forms.ModelForm):
 
     prevtask = forms.ModelChoiceField(
             label="Previous Task",
-            queryset=TaskTemplate.objects.filter(enabled=True),
+            queryset=None,  # TaskTemplate.objects.filter(enabled=True),
             # the line above is overriden by the __INIT__ only allow available tasks
             empty_label="--None--",
             required=False,
@@ -1151,7 +1136,7 @@ class PlaybookTemplateItemForm(forms.ModelForm):
                     'class': 'selectpicker show-tick form-control',  # form-control
                     'data-live-search': 'true',
                     'data-width': 'auto',
-                    'data-style': 'btn-default btn-sm',
+                    'data-style': 'btn-outline-secondary btn-sm',
                     'style': 'width:50%',
                 }
             )
@@ -1167,7 +1152,7 @@ class PlaybookTemplateItemForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -1184,7 +1169,7 @@ class PlaybookTemplateItemForm(forms.ModelForm):
                     'class': 'selectpicker show-tick form-control',  # form-control
                     'data-live-search': 'true',
                     'data-width': 'auto',
-                    'data-style': 'btn-default btn-sm',
+                    'data-style': 'btn-outline-secondary btn-sm',
                     'style': 'width:50%',
                 }
             )
@@ -1225,11 +1210,6 @@ class PlaybookTemplateItemForm(forms.ModelForm):
                 }
             ),
         }
-
-
-class TinyMCEWidget(TinyMCE):
-    def use_required_attribute(self, *args):
-        return False
 
 
 class HostForm(forms.ModelForm):
@@ -1349,7 +1329,7 @@ class ProfileForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -1417,11 +1397,6 @@ class ProfileForm(forms.ModelForm):
         }
 
 
-class TinyMCEWidget(TinyMCE):
-    def use_required_attribute(self, *args):
-        return False
-
-
 # class CustomClearableFileInput(ClearableFileInput):
 #     template_name = 'invs/customclearablefileinput.html'
 class EvidenceForm(forms.ModelForm):
@@ -1438,7 +1413,6 @@ class EvidenceForm(forms.ModelForm):
 
 ###############
         if kwargs.get('instance'):
-            logger.info("AAA")
             curr_obj = kwargs.get('instance')
             current_pk = curr_obj.pk
             if inv_pk:
@@ -1446,7 +1420,7 @@ class EvidenceForm(forms.ModelForm):
             else:
                 inv_obj = curr_obj.inv
             self.fields['task'].queryset = inv_obj.task_inv.exclude(pk=current_pk)
-        elif inv_pk == '0':
+        elif inv_pk == '0' or inv_pk == 0:
             self.fields['task'].queryset = Task.objects.all()
         else:
             inv_obj = Inv.objects.get(pk=inv_pk)
@@ -1454,8 +1428,6 @@ class EvidenceForm(forms.ModelForm):
         #     self.fields['task'].queryset = Task.objects.all()
 
 ###############
-
-
         if EvidenceFormat.objects.get(pk=2):
             self.fields['evidenceformat'].initial = EvidenceFormat.objects.get(pk=2)
         # if kwargs.get('instance'):
@@ -1471,7 +1443,7 @@ class EvidenceForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -1488,7 +1460,7 @@ class EvidenceForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -1505,7 +1477,7 @@ class EvidenceForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -1521,7 +1493,7 @@ class EvidenceForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -1538,7 +1510,7 @@ class EvidenceForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-secondary btn-sm',
                 'style': 'width:50%',
                 'onChange': '''
                 if ($(this).val() == 1) { editorRAW();};
@@ -1559,7 +1531,7 @@ class EvidenceForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -1607,7 +1579,7 @@ class EvidenceAttrForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -1623,7 +1595,7 @@ class EvidenceAttrForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -1640,7 +1612,7 @@ class EvidenceAttrForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -1656,7 +1628,7 @@ class EvidenceAttrForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -1709,7 +1681,7 @@ class AutomationForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -1724,7 +1696,7 @@ class AutomationForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -1744,7 +1716,7 @@ class AutomationForm(forms.ModelForm):
                     'class': 'selectpicker show-tick form-control',  # form-control
                     'data-live-search': 'true',
                     'data-width': 'auto',
-                    'data-style': 'btn-default btn-sm',
+                    'data-style': 'btn-outline-secondary btn-sm',
                     'style': 'width:50%',
                 }
             )
@@ -1760,7 +1732,7 @@ class AutomationForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-default btn-sm',
+                'data-style': 'btn-outline-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -1768,7 +1740,8 @@ class AutomationForm(forms.ModelForm):
 
     #   fileRef = forms.FileField(widget=CustomClearableFileInput)
     class Meta:
-        fields = ("user", "name", "version", "type", "script_type", "script_category", "code", "autorequirements", "fileRef", "description")
+        fields = ("user", "name", "version", "type", "script_type", "script_category", "code", "autorequirements",
+                  "fileRef", "description")
         model = Automation
         labels = {
             "description": "Description*",
@@ -1814,3 +1787,31 @@ class AutomationForm(forms.ModelForm):
                 }
             ),
         }
+
+
+# Add a ticket to the Task and close the task
+class AddTicketAndCloseForm(forms.Form):
+    ticket = forms.CharField(
+        label='Ticket*',
+        max_length=50,
+        widget=forms.TextInput(attrs={
+            'size': 20,
+            'style': 'width:50%;',
+            'class': 'form-control'}
+        )
+    )
+    status = forms.ModelChoiceField(
+        label='Status*',
+        queryset=TaskStatus.objects.filter(enabled=True),
+        empty_label="--Select--",
+        initial=5,
+        widget=forms.Select(
+            attrs={
+                'class': 'selectpicker show-tick form-control',  # form-control
+                'data-live-search': 'true',
+                'data-width': 'auto',
+                'data-style': 'btn-outline-secondary btn-sm',
+                'style': 'width:50%',
+            }
+        )
+    )

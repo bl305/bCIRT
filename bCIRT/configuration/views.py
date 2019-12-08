@@ -103,6 +103,7 @@ class UpdatePackageCreateView(LoginRequiredMixin, PermissionRequiredMixin, Creat
     success_url = 'configuration:conf_updatelist'
 
     def __init__(self, *args, **kwargs):
+        self.object = None
         if LOGLEVEL == 1:
             pass
         elif LOGLEVEL == 2:
@@ -192,6 +193,7 @@ class UpdatePackageUpdateView(LoginRequiredMixin, PermissionRequiredMixin, Updat
     success_url = 'configuration:conf_updatelist'
 
     def __init__(self, *args, **kwargs):
+        self.object = None
         if LOGLEVEL == 1:
             pass
         elif LOGLEVEL == 2:

@@ -1,0 +1,10 @@
+{% extends 'tasks/evidence_form_template_ajax.html' %}
+{% block modaltitle %}
+    Update Evidence
+{% endblock modaltitle %}
+{% block modalactionclass %}
+    js-ev-update-form
+{% endblock modalactionclass %}
+{% block modalaction %}
+    {% url 'tasks:evaj_update' inv_pk=form.instance.inv.pk task_pk=form.instance.task.pk %}
+{% endblock modalaction %}

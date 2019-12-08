@@ -15,17 +15,21 @@ from .models import Task, TaskTemplate, TaskType, TaskPriority, TaskCategory, Ta
 from .models import TaskVar  # , TaskVarType, TaskVarCategory
 from .models import Playbook, PlaybookTemplate, PlaybookTemplateItem, new_playbook
 from .models import Inv
-from .models import Evidence, EvidenceAttr  #  , EvidenceAttrFormat, EvidenceFormat
-from .models import add_task_from_template, run_action, evidenceattrobservabletoggle, clone_action
+from .models import Evidence, EvidenceAttr  # , EvidenceAttrFormat, EvidenceFormat
+from .models import add_task_from_template, run_action, evidenceattrobservabletoggle, clone_action, new_evidence
 from .models import Action, ActionQ, ActionGroup, ActionGroupMember, Automation
 from tasks.models import playbooktemplateitem_check_delete_condition
-from .forms import TaskForm, TaskTemplateForm, TaskVarForm
+from .forms import TaskForm, TaskTemplateForm, TaskVarForm, AddTicketAndCloseForm
 from .forms import ActionForm, ActionGroupForm, ActionGroupMemberForm, AutomationForm
 from .forms import EvidenceAttrForm, EvidenceForm
 from .forms import PlaybookForm, PlaybookTemplateForm, PlaybookTemplateItemForm
-from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
-from django.shortcuts import redirect, reverse
+# from django.views.decorators.csrf import csrf_exempt
+# from django.utils.decorators import method_decorator
+from django.urls import reverse_lazy
+from django.shortcuts import redirect, reverse # , get_object_or_404  # ,render,
+from django.http import JsonResponse
+from django.template.loader import render_to_string
+from django.db.models import Q
 from django.contrib import messages
 from django.contrib.auth.mixins import (
     LoginRequiredMixin,
@@ -53,10 +57,11 @@ from .resources import PlaybookTemplateResource, PlaybookTemplateItemResource, T
 from bCIRT.settings import MEDIA_ROOT
 from shutil import copy
 import tempfile
+from bCIRT.custom_variables import LOGLEVEL, LOGSEPARATOR
 from django.contrib.auth import get_user_model
 User = get_user_model()
 logger = logging.getLogger('log_file_verbose')
-from bCIRT.custom_variables import LOGLEVEL, LOGSEPARATOR
+
 
 #  ##### Export functions start ######
 class PlaybookTemplateExportView(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailView):
@@ -102,7 +107,7 @@ class PlaybookTemplateExportView(LoginRequiredMixin, PermissionRequiredMixin, ge
     def get(self, request, *args, **kwargs):
         self.context['playbooktemplate'] = self.get_object()
         self.context['user'] = self.request.user.get_username()
-        response = None
+        # response = None
         # Collecting playbooktemplate values
         pbtmp_pk = str(self.get_object().pk)
 
@@ -179,8 +184,7 @@ class PlaybookTemplateExportView(LoginRequiredMixin, PermissionRequiredMixin, ge
                     tskvar_objset = tskvar_objset | tskvar_obj
         # generate the dataset for export
         tskvar_dataset = taskvar_resource.export(tskvar_objset)
-        self.save_to_file(a_dir=destdir, a_filename='TaskVar.json',
-                     a_content=tskvar_dataset.json)
+        self.save_to_file(a_dir=destdir, a_filename='TaskVar.json', a_content=tskvar_dataset.json)
         # Exporting values PlaybookTemplateItem
         # response = HttpResponse(tskvar_dataset.json, content_type='application/json')
         # response['Content-Disposition'] = 'attachment; filename="TaskVar.json"'
@@ -196,8 +200,8 @@ class PlaybookTemplateExportView(LoginRequiredMixin, PermissionRequiredMixin, ge
                         act_obj = Action.objects.filter(pk=act_pk)
                         act_objset = act_objset | act_obj
                         if act_obj[0].fileRef:
-                            srcfile = os.path.join(str(MEDIA_ROOT),str(act_obj[0].fileRef))
-                            destfile = os.path.join(destactdir,os.path.basename(str(act_obj[0].fileRef)))
+                            srcfile = os.path.join(str(MEDIA_ROOT), str(act_obj[0].fileRef))
+                            destfile = os.path.join(destactdir, os.path.basename(str(act_obj[0].fileRef)))
                             copy(srcfile, destfile)
         # generate the dataset for export
         act_dataset = action_resource.export(act_objset)
@@ -224,7 +228,8 @@ class PlaybookTemplateExportView(LoginRequiredMixin, PermissionRequiredMixin, ge
 
 # ##### Export functions end ######
 # class GetPlaybookTemplateZippedView(LoginRequiredMixin, PermissionRequiredMixin, generic.TemplateView):
-#     permission_required = ('tasks.view_playbooktemplate','tasks.view_playbooktemplateitem','tasks.view_tasktemplate','tasks.view_taskvar')
+#     permission_required = ('tasks.view_playbooktemplate','tasks.view_playbooktemplateitem','tasks.view_tasktemplate',
+#     'tasks.view_taskvar')
 #     context = {"title": "Directory Zipped Download"}
 #     pass
 
@@ -246,9 +251,9 @@ class GetFileRawView(LoginRequiredMixin, PermissionRequiredMixin, generic.Detail
 
     def get(self, request, *args, **kwargs):
         ev_pk = self.kwargs.get('ev_pk')
-        fileName = None
-        filepath = None
-        fullpath = None
+        # fileName = None
+        # filepath = None
+        # fullpath = None
         http_response = HttpResponse('Record not found!!!')
 
         if Evidence.objects.filter(pk=ev_pk).exists():
@@ -258,7 +263,7 @@ class GetFileRawView(LoginRequiredMixin, PermissionRequiredMixin, generic.Detail
             fullpath = os.path.join(fileroot, filepath)
 
             now = datetime.now()
-            date_time = now.strftime("%Y%m%d-%H%M%S")
+            # date_time = now.strftime("%Y%m%d-%H%M%S")
             if filepath is not None:
                 http_response = FileResponse(open(fullpath, "rb"))
                 http_response['Content-Disposition'] = 'attachment; filename=%s' % origfilename
@@ -271,7 +276,7 @@ class GetFileRawView(LoginRequiredMixin, PermissionRequiredMixin, generic.Detail
 
 class GetFileZippedView(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailView):
     model = Evidence
-    permission_required = ('tasks.view_evidence')
+    permission_required = 'tasks.view_evidence'
     context = {"title": "Evidence Download"}
 
     def __init__(self, *args, **kwargs):
@@ -286,9 +291,9 @@ class GetFileZippedView(LoginRequiredMixin, PermissionRequiredMixin, generic.Det
 
     def get(self, request, *args, **kwargs):
         ev_pk = self.kwargs.get('ev_pk')
-        fileName = None
-        filepath = None
-        fullpath = None
+        # fileName = None
+        # filepath = None
+        # fullpath = None
         http_response = HttpResponse('Record not found!!!')
 
         if Evidence.objects.filter(pk=ev_pk).exists():
@@ -314,7 +319,7 @@ class GetFileZippedView(LoginRequiredMixin, PermissionRequiredMixin, generic.Det
         # E.g [myfile.zip]/somefiles/file1.txt
         zip_subdir = pprefix
         # zip filename
-        zip_filename = None
+        # zip_filename = None
         if pzip_filename is not None:
             zip_filename = pzip_filename+".zip"
         else:
@@ -367,7 +372,7 @@ class AutomationListView(LoginRequiredMixin, PermissionRequiredMixin, generic.Li
         return super(AutomationListView, self).get_context_data(**kwargs)
 
 
-@method_decorator(csrf_exempt, name='dispatch')
+# @method_decorator(csrf_exempt, name='dispatch')
 class AutomationCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
     #  fields = ("inv", "user", "description", "fileRef")
     model = Automation
@@ -376,6 +381,7 @@ class AutomationCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.
     success_url = 'tasks:auto_list'
 
     def __init__(self, *args, **kwargs):
+        self.object = None
         if LOGLEVEL == 1:
             pass
         elif LOGLEVEL == 2:
@@ -455,7 +461,7 @@ class AutomationDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.
         return super(AutomationDetailView, self).dispatch(request, *args, **kwargs)
 
 
-@method_decorator(csrf_exempt, name='dispatch')
+# @method_decorator(csrf_exempt, name='dispatch')
 class AutomationUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
     login_url = '/'
     # redirect_field_name = 'tasks/evidence_detail.html'
@@ -465,6 +471,7 @@ class AutomationUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.
     success_url = 'tasks:auto_list'
 
     def __init__(self, *args, **kwargs):
+        self.object = None
         if LOGLEVEL == 1:
             pass
         elif LOGLEVEL == 2:
@@ -573,7 +580,7 @@ class ActionListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListVi
         return super(ActionListView, self).get_context_data(**kwargs)
 
 
-@method_decorator(csrf_exempt, name='dispatch')
+# @method_decorator(csrf_exempt, name='dispatch')
 class ActionCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
     #  fields = ("inv", "user", "description", "fileRef")
     model = Action
@@ -582,6 +589,7 @@ class ActionCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Crea
     success_url = 'tasks:act_list'
 
     def __init__(self, *args, **kwargs):
+        self.object = None
         if LOGLEVEL == 1:
             pass
         elif LOGLEVEL == 2:
@@ -661,7 +669,7 @@ class ActionDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.Deta
         return super(ActionDetailView, self).dispatch(request, *args, **kwargs)
 
 
-@method_decorator(csrf_exempt, name='dispatch')
+# @method_decorator(csrf_exempt, name='dispatch')
 class ActionUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
     login_url = '/'
     # redirect_field_name = 'tasks/evidence_detail.html'
@@ -671,6 +679,7 @@ class ActionUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Upda
     success_url = 'tasks:act_list'
 
     def __init__(self, *args, **kwargs):
+        self.object = None
         if LOGLEVEL == 1:
             pass
         elif LOGLEVEL == 2:
@@ -785,6 +794,7 @@ class ActionQDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.Det
             return redirect('tasks:act_detail', pk=self.kwargs.get('pk'))
         # Checks pass, let http method handlers process the request
         return super(ActionQDetailView, self).dispatch(request, *args, **kwargs)
+
 
 # ActionGroups
 class ActionGroupListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
@@ -1170,7 +1180,7 @@ class ActionGroupMemberRemoveView(LoginRequiredMixin, PermissionRequiredMixin, g
         return super(ActionGroupMemberRemoveView, self).dispatch(request, *args, **kwargs)
 
 
-class OutputProcessor():
+class OutputProcessor(LoginRequiredMixin):
 
     def __init__(self, *args, **kwargs):
         if LOGLEVEL == 1:
@@ -1295,6 +1305,7 @@ class ActionExecScriptGroupRedirectView(LoginRequiredMixin, PermissionRequiredMi
         # return reverse('tasks:act_list')
         # return super().get_redirect_url(*args, **kwargs)
 
+
 class ActionCloneRedirectView(LoginRequiredMixin, PermissionRequiredMixin, generic.RedirectView):
     """
     This class performs the "action" execution and records the output in the ActionQ table.
@@ -1349,14 +1360,13 @@ class TaskListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView
             logger.info(logmsg)
         super(TaskListView, self).__init__(*args, **kwargs)
 
-
     def get_context_data(self, **kwargs):
         # create_task()
         kwargs['templatecategories'] = TaskTemplate.objects.filter(enabled=True)
         return super(TaskListView, self).get_context_data(**kwargs)
 
 
-@method_decorator(csrf_exempt, name='dispatch')
+# @method_decorator(csrf_exempt, name='dispatch')
 class TaskCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
     model = Task
     form_class = TaskForm
@@ -1364,6 +1374,7 @@ class TaskCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Create
     success_url = 'tasks:tsk_list'
 
     def __init__(self, *args, **kwargs):
+        self.object = None
         if LOGLEVEL == 1:
             pass
         elif LOGLEVEL == 2:
@@ -1449,7 +1460,7 @@ class TaskDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.Detail
         return super(TaskDetailView, self).dispatch(request, *args, **kwargs)
 
 
-@method_decorator(csrf_exempt, name='dispatch')
+# @method_decorator(csrf_exempt, name='dispatch')
 class TaskUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
     login_url = '/'
     redirect_field_name = 'tasks/task_detail.html'
@@ -1459,6 +1470,7 @@ class TaskUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Update
     success_url = 'tasks:tsk_list'
 
     def __init__(self, *args, **kwargs):
+        self.object = None
         if LOGLEVEL == 1:
             pass
         elif LOGLEVEL == 2:
@@ -1543,8 +1555,9 @@ class TaskRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generic.Delete
             return redirect('tasks:tsk_detail', pk=self.kwargs.get('pk'))
         # Checks pass, let http method handlers process the request
         return super(TaskRemoveView, self).dispatch(request, *args, **kwargs)
-#  #################### TASK TEMPLATE VIEWS###############################
 
+
+#  #################### TASK TEMPLATE VIEWS###############################
 class TaskTemplateListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
     model = TaskTemplate
     form_class = TaskTemplateForm
@@ -1572,6 +1585,7 @@ class TaskTemplateCreateView(LoginRequiredMixin, PermissionRequiredMixin, generi
     success_url = 'tasks:tmp_list'
 
     def __init__(self, *args, **kwargs):
+        self.object = None
         if LOGLEVEL == 1:
             pass
         elif LOGLEVEL == 2:
@@ -1658,6 +1672,7 @@ class TaskTemplateUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generi
     success_url = 'tasks:tmp_list'
 
     def __init__(self, *args, **kwargs):
+        self.object = None
         if LOGLEVEL == 1:
             pass
         elif LOGLEVEL == 2:
@@ -1801,12 +1816,13 @@ class TaskTemplateAddView(LoginRequiredMixin, PermissionRequiredMixin, generic.R
         else:
             tmp_user = None
         inv_obj = self.kwargs.get('inv_pk')
-        if inv_obj != None and inv_obj!='0':
+        # if inv_obj != None and inv_obj!='0':
+        if inv_obj is not None and inv_obj != '0':
             tmp_inv = Inv.objects.get(pk=self.kwargs.get('inv_pk'))
         else:
             tmp_inv = None
         if tmp_obj.action:
-            # tmp_action = TaskTemplate.objects.get(pk=tmp_obj.action.pk) # BL XXXXXXXX
+            # tmp_action = TaskTemplate.objects.get(pk=tmp_obj.action.pk) # BL
             tmp_action = Action.objects.get(pk=tmp_obj.action.pk)
         else:
             tmp_action = None
@@ -1851,7 +1867,7 @@ class TaskTemplateAddView(LoginRequiredMixin, PermissionRequiredMixin, generic.R
         # This section below generates the variables for the new task
         myvars = TaskVar.objects.filter(tasktemplate=tmp_pk)
         for myvar in myvars:
-            var_instance = TaskVar.objects.create(
+            TaskVar.objects.create(
                 category=myvar.category,
                 type=myvar.type,
                 task=task_instance,
@@ -1862,7 +1878,8 @@ class TaskTemplateAddView(LoginRequiredMixin, PermissionRequiredMixin, generic.R
                 enabled=myvar.enabled
             )
 
-        # task_instance = Task.objects.create(title="autotest", description="x", priority=TaskPriority.objects.get(pk=1))
+        # task_instance = Task.objects.create(title="autotest", description="x", priority=TaskPriority.objects.
+        # get(pk=1))
         # return redirect(self.success_url)
         return super(TaskTemplateAddView, self).dispatch(request, *args, **kwargs)
 
@@ -1906,6 +1923,7 @@ class TaskVarCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Cre
     success_url = 'tasks:tvar_list'
 
     def __init__(self, *args, **kwargs):
+        self.object = None
         if LOGLEVEL == 1:
             pass
         elif LOGLEVEL == 2:
@@ -2006,6 +2024,7 @@ class TaskVarUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Upd
     success_url = 'tasks:tvar_list'
 
     def __init__(self, *args, **kwargs):
+        self.object = None
         if LOGLEVEL == 1:
             pass
         elif LOGLEVEL == 2:
@@ -2150,7 +2169,8 @@ class PlaybookCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Re
         else:
             tmp_user = None
         inv_obj = self.kwargs.get('inv_pk')
-        if inv_obj != None and inv_obj != '0':
+        # if inv_obj != None and inv_obj != '0':
+        if inv_obj is not None and inv_obj != '0':
             tmp_inv = Inv.objects.get(pk=inv_pk)
         else:
             tmp_inv = None
@@ -2209,6 +2229,7 @@ class PlaybookUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Up
     success_url = 'tasks:play_list'
 
     def __init__(self, *args, **kwargs):
+        self.object = None
         if LOGLEVEL == 1:
             pass
         elif LOGLEVEL == 2:
@@ -2271,7 +2292,6 @@ class PlaybookRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generic.De
             logger.info(logmsg)
         super(PlaybookRemoveView, self).__init__(*args, **kwargs)
 
-
     def get_success_url(self):
         if 'next1' in self.request.GET:
             redirect_to = self.request.GET['next1']
@@ -2323,6 +2343,7 @@ class PlaybookTemplateCreateView(LoginRequiredMixin, PermissionRequiredMixin, ge
     success_url = 'tasks:playtmp_list'
 
     def __init__(self, *args, **kwargs):
+        self.object = None
         if LOGLEVEL == 1:
             pass
         elif LOGLEVEL == 2:
@@ -2410,6 +2431,7 @@ class PlaybookTemplateUpdateView(LoginRequiredMixin, PermissionRequiredMixin, ge
     success_url = 'tasks:playtmp_list'
 
     def __init__(self, *args, **kwargs):
+        self.object = None
         if LOGLEVEL == 1:
             pass
         elif LOGLEVEL == 2:
@@ -2525,6 +2547,7 @@ class PlaybookTemplateItemCreateView(LoginRequiredMixin, PermissionRequiredMixin
     success_url = 'tasks:playittmp_list'
 
     def __init__(self, *args, **kwargs):
+        self.object = None
         if LOGLEVEL == 1:
             pass
         elif LOGLEVEL == 2:
@@ -2619,6 +2642,7 @@ class PlaybookTemplateItemUpdateView(LoginRequiredMixin, PermissionRequiredMixin
     success_url = 'tasks:playittmp_list'
 
     def __init__(self, *args, **kwargs):
+        self.object = None
         if LOGLEVEL == 1:
             pass
         elif LOGLEVEL == 2:
@@ -2712,7 +2736,7 @@ class PlaybookTemplateItemRemoveView(LoginRequiredMixin, PermissionRequiredMixin
         elif curr_pk:
             outmsgitems = playbooktemplateitem_check_delete_condition(curr_pk)
             if len(outmsgitems) != 0:
-                outmsg = "The Task is referenced from other tasks as inputs, Task(s): %s"%(outmsgitems)
+                outmsg = "The Task is referenced from other tasks as inputs, Task(s): %s" % outmsgitems
                 messages.error(self.request, outmsg)
                 return redirect('tasks:playittmp_detail', pk=curr_pk)
 
@@ -2720,7 +2744,7 @@ class PlaybookTemplateItemRemoveView(LoginRequiredMixin, PermissionRequiredMixin
         return super(PlaybookTemplateItemRemoveView, self).dispatch(request, *args, **kwargs)
 
 
-##### Assign task to the user
+# #### Assign task to the user
 class TaskAssignView(LoginRequiredMixin, PermissionRequiredMixin, generic.RedirectView):
 
     # model = TaskTemplate
@@ -2769,8 +2793,7 @@ class TaskAssignView(LoginRequiredMixin, PermissionRequiredMixin, generic.Redire
         # return super().get_redirect_url(*args, **kwargs)
 
 
-
-#### CLOSE TASK
+# ### CLOSE TASK
 class TaskCloseView(LoginRequiredMixin, PermissionRequiredMixin, generic.RedirectView):
 
     # model = TaskTemplate
@@ -2959,6 +2982,7 @@ class EvidenceListView(LoginRequiredMixin, PermissionRequiredMixin, generic.List
     model = Evidence
     form_class = EvidenceForm
     permission_required = ('tasks.view_evidence',)
+    paginate_by = 25
 
     def __init__(self, *args, **kwargs):
         if LOGLEVEL == 1:
@@ -2970,13 +2994,70 @@ class EvidenceListView(LoginRequiredMixin, PermissionRequiredMixin, generic.List
             logger.info(logmsg)
         super(EvidenceListView, self).__init__(*args, **kwargs)
 
+    def get_queryset(self):
+        result = super(EvidenceListView, self).get_queryset()
+        # search related stuff
+        pager_raw = self.request.GET.get("pager")
+        if pager_raw == "25":
+            self.paginate_by = 25
+        elif pager_raw == "50":
+            self.paginate_by = 50
+        elif pager_raw == "100":
+            self.paginate_by = 100
+        order_by = self.request.GET.get("order")
+        if order_by == "id":
+            order_by = "id"
+        elif order_by == "created":
+            order_by = "created_at"
+        elif order_by == "modified":
+            order_by = "modified_at"
+        elif order_by == "filename":
+            order_by = "fileName"
+        elif order_by == "assigned":
+            order_by = "user"
+        elif order_by == "investigation":
+            order_by = "investigation"
+        elif order_by == "task":
+            order_by = "task"
+        else:
+            order_by = "id"
+        queryset_list = Evidence.objects.all().order_by(order_by)
+        query = self.request.GET.get("q")
+        if query:
+            queryset_list = queryset_list.filter(
+                    Q(fileName__icontains=query) |
+                    Q(modified_by__icontains=query) |
+                    Q(description__icontains=query) |
+                    Q(created_by__icontains=query)
+                    ).distinct().order_by(order_by)
+            result = queryset_list
+        return result
+
     def get_context_data(self, **kwargs):
         kwargs['actions'] = Action.objects.filter(enabled=True).order_by('title')
-        return super(EvidenceListView, self).get_context_data(**kwargs)
+        # search related stuff
+        kwargs['pager'] = self.paginate_by
+        itemnum = Evidence.objects.all().count()
+        divresult = divmod(itemnum, self.paginate_by)
+        if divresult[1]:
+            finres = divresult[0] + 1
+        else:
+            finres = 0
+        kwargs['allcount'] = finres
+        if self.request.GET.get('q'):
+            kwargs['q'] = str(self.request.GET.get('q'))
+        if self.request.GET.get('page'):
+            kwargs['page'] = int(self.request.GET.get('page'))
+        if self.request.GET.get('order'):
+            kwargs['order'] = str(self.request.GET.get('order'))
 
-@method_decorator(csrf_exempt, name='dispatch')
+        context = super(EvidenceListView, self).get_context_data(**kwargs)
+        return context
+
+
+# @method_decorator(csrf_exempt, name='dispatch')
 class EvidenceCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
-    #fields = ("inv", "user", "description", "fileRef")
+    # fields = ("inv", "user", "description", "fileRef")
     model = Evidence
     form_class = EvidenceForm
     permission_required = ('tasks.add_evidence',)
@@ -2985,6 +3066,7 @@ class EvidenceCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Cr
     success_url = 'tasks:ev_list'
 
     def __init__(self, *args, **kwargs):
+        self.object = None
         if LOGLEVEL == 1:
             pass
         elif LOGLEVEL == 2:
@@ -3058,6 +3140,7 @@ class EvidenceCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Cr
         kwargs['user'] = self.request.user
         return kwargs
 
+
 class EvidenceDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailView):
     model = Evidence
     permission_required = ('tasks.view_evidence',)
@@ -3087,7 +3170,7 @@ class EvidenceDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.De
         return super(EvidenceDetailView, self).dispatch(request, *args, **kwargs)
 
 
-@method_decorator(csrf_exempt, name='dispatch')
+# @method_decorator(csrf_exempt, name='dispatch')
 class EvidenceUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
     login_url = '/'
     # redirect_field_name = 'tasks/evidence_detail.html'
@@ -3097,6 +3180,7 @@ class EvidenceUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Up
     success_url = 'tasks:ev_list'
 
     def __init__(self, *args, **kwargs):
+        self.object = None
         if LOGLEVEL == 1:
             pass
         elif LOGLEVEL == 2:
@@ -3259,6 +3343,7 @@ class EvidenceAttrCreateView(LoginRequiredMixin, PermissionRequiredMixin, generi
     success_url = 'tasks:evattr_list'
 
     def __init__(self, *args, **kwargs):
+        self.object = None
         if LOGLEVEL == 1:
             pass
         elif LOGLEVEL == 2:
@@ -3352,6 +3437,7 @@ class EvidenceAttrUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generi
     success_url = 'tasks:evattr_list'
 
     def __init__(self, *args, **kwargs):
+        self.object = None
         if LOGLEVEL == 1:
             pass
         elif LOGLEVEL == 2:
@@ -3495,12 +3581,14 @@ class EvidenceAttrObservableToggleView(LoginRequiredMixin, PermissionRequiredMix
         # return reverse('tasks:tsk_list')
         # return super().get_redirect_url(*args, **kwargs)
 
+
 # #######################################################
 class AddToProfileRedirectView(LoginRequiredMixin, PermissionRequiredMixin, generic.RedirectView):
     """
     This class performs the "add tp profile" action on an attribute depending on it's type.
     """
-    permission_required = ('tasks.view_evidence', 'tasks.change_evidence','tasks.view_evidenceattr', 'tasks.change_evidenceattr')
+    permission_required = ('tasks.view_evidence', 'tasks.change_evidence', 'tasks.view_evidenceattr',
+                           'tasks.change_evidenceattr')
     success_url = 'tasks:ev_list'
 
     def __init__(self, *args, **kwargs):
@@ -3547,3 +3635,414 @@ class AddToProfileRedirectView(LoginRequiredMixin, PermissionRequiredMixin, gene
 
         # return reverse('tasks:act_list')
         # return super().get_redirect_url(*args, **kwargs)
+
+
+class AddTicketAndCloseView(LoginRequiredMixin, PermissionRequiredMixin, generic.FormView):
+    template_name = 'tasks/task_form_addticketandclose.html'
+    permission_required = ('invs.view_inv', 'tasks.view_task')
+    form_class = AddTicketAndCloseForm
+    success_url = reverse_lazy('tasks:task_list')
+    # success_url = '../'
+
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
+            logger.info(logmsg)
+        super(AddTicketAndCloseView, self).__init__(*args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        # kwargs['user'] = self.request.user
+        kwargs['taskname'] = Task.objects.get(pk=self.kwargs.get('task_pk')).title
+        return super(AddTicketAndCloseView, self).get_context_data(**kwargs)
+
+    # def get_initial(self):
+    #     initial = super(AddTicketAndCloseView, self).get_initial()
+    #     if self.request.user.is_authenticated:
+    #         initial.update({'name': self.request.user.get_full_name()})
+    #     return initial
+
+    def form_valid(self, form):
+        cleandata = form.cleaned_data
+        auser = self.request.user.get_username()
+        auser_obj = self.request.user
+        cdescription = cleandata['ticket']
+        cstatus = cleandata['status']
+        task_pk = self.kwargs.get('task_pk')
+        task_obj_list = Task.objects.filter(pk=task_pk)
+        task_obj = task_obj_list[0]
+        inv_obj = task_obj.inv
+        # add an evidence
+        evidence_obj = new_evidence(
+            puser=auser_obj,
+            ptask=task_obj,
+            pinv=inv_obj,
+            pcreated_by=auser,
+            pmodified_by=auser,
+            pdescription=cdescription,
+            pevformat=None,
+            pparent=None,
+            pparentattr=None,
+            pfilename=None,
+            # pfilename=None,
+            pfileref=None,
+            # pfileref=None,
+            pforce=True,
+        )
+        task_obj_list.update(status=cstatus)
+
+        return super(AddTicketAndCloseView, self).form_valid(form)
+
+    def get_success_url(self):
+        if 'next1' in self.request.GET:
+            redirect_to = self.request.GET['next1']
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
+                return reverse(self.success_url)
+        else:
+            return reverse(self.success_url)
+        return redirect_to
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            # This will redirect to the login view
+            return self.handle_no_permission()
+        elif not self.request.user.has_perm('tasks.change_task'):
+            messages.error(self.request, "No permission to change a record !!!")
+            return redirect('tasks:tsk_detail', pk=self.kwargs.get('pk'))
+        # Checks pass, let http method handlers process the request
+        return super(AddTicketAndCloseView, self).dispatch(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        """This method is what injects forms with their keyword
+            arguments."""
+        # grab the current set of form #kwargs
+        kwargs = super(AddTicketAndCloseView, self).get_form_kwargs()
+        # Update the kwargs with the user_id
+        # kwargs['user'] = self.request.user
+        return kwargs
+
+
+#  ##################  AJAX
+# @method_decorator(csrf_exempt, name='dispatch')
+class XEvidenceCreateAjaxView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
+    model = Evidence
+    form_class = EvidenceForm
+    permission_required = ('tasks.add_evidence',)
+    # success_url = 'invs:inv_list'
+    # template_name = 'invs/inv_form_create_ajax.html'
+    # success_url = reverse_lazy('invs:inv_list')
+    ajax_partial = 'tasks/evidence_form_create_ajax.html'
+    # ajax_list = 'tasks/evidence_list.html'
+    # ajax_list = 'invs/inv_detail_tab_evidences.html'
+    ajax_list = 'tasks/evidence_list_tablebody.html'
+    context_object_name = 'object_list'
+
+    def __init__(self, *args, **kwargs):
+        self.object = None
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
+            logger.info(logmsg)
+        super(XEvidenceCreateAjaxView, self).__init__(*args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        self.object = None
+        context = self.get_context_data()
+        if request.is_ajax():
+            html_form = render_to_string(self.ajax_partial, context, request)
+            return JsonResponse({'html_form': html_form})
+        else:
+            return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        return super(XEvidenceCreateAjaxView, self).get_context_data(**kwargs)
+        # context = super(XEvidenceCreateAjaxView, self).get_context_data(**kwargs)
+        # evs = Evidence.objects.all()
+        # context['object_list'] = evs
+        # return context
+
+    def form_valid(self, form):
+        data = dict()
+        context = self.get_context_data()
+
+        if form.is_valid():
+            self.object = form.save(commit=False)
+            self.object.user = self.request.user
+            self.object.modified_by = self.request.user.get_username()
+            self.object.created_by = self.request.user.get_username()
+            if self.request.FILES:
+                self.object.fileName = self.request.FILES['fileRef'].name
+            self.object.save()
+            data['form_is_valid'] = True
+            data['html_data_list'] = render_to_string(
+                self.ajax_list, context, self.request)
+        else:
+            data['form_is_valid'] = False
+        data['html_form'] = render_to_string(
+            self.ajax_partial, context, request=self.request)
+
+        if self.request.is_ajax():
+            return JsonResponse(data)
+        else:
+            return super().form_valid(form)
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            # This will redirect to the login view
+            return self.handle_no_permission()
+        elif not self.request.user.has_perm('tasks.add_evidence'):
+            messages.error(self.request, "No permission to add a record !!!")
+            return redirect('tasks:ev_list')
+        else:
+            pass
+        # Checks pass, let http method handlers process the request
+        return super(XEvidenceCreateAjaxView, self).dispatch(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        """This method is what injects forms with their keyword
+            arguments."""
+        # grab the current set of form #kwargs
+        kwargs = super(XEvidenceCreateAjaxView, self).get_form_kwargs()
+        # Update the kwargs with the user_id
+        inv_pk = self.kwargs.get('inv_pk')
+        task_pk = self.kwargs.get('task_pk')
+        if inv_pk:
+            # self.inv_pk = inv_pk
+            pass
+        else:
+            inv_pk = 0
+        if task_pk:
+            # self.task_pk = task_pk
+            pass
+        else:
+            task_pk = 0
+
+        kwargs['inv_pk'] = inv_pk
+        kwargs['task_pk'] = task_pk
+        kwargs['user'] = self.request.user
+        return kwargs
+
+
+# @method_decorator(csrf_exempt, name='dispatch')
+class InvEvidenceCreateAjaxView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
+    model = Evidence
+    form_class = EvidenceForm
+    permission_required = ('tasks.add_evidence',)
+    # success_url = 'invs:inv_list'
+    # template_name = 'invs/inv_form_create_ajax.html'
+    # success_url = reverse_lazy('invs:inv_list')
+    # ajax_partial = 'tasks/evidence_form_create_ajax.html'
+    ajax_partial = 'tasks/invevidence_form_create_ajax.html'
+    # ajax_list = 'tasks/evidence_list.html'
+    # ajax_list = 'invs/inv_detail_tab_evidences.html'
+    ajax_list = 'invs/inv_detail_tab_evidences_tablebody.html'
+    context_object_name = 'inv'
+
+    def __init__(self, *args, **kwargs):
+        self.object = None
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
+            logger.info(logmsg)
+        super(InvEvidenceCreateAjaxView, self).__init__(*args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        # return super(InvEvidenceCreateAjaxView, self).get_context_data(**kwargs)
+        context = super(InvEvidenceCreateAjaxView, self).get_context_data(**kwargs)
+        inv_pk = self.kwargs.get('inv_pk')
+        inv = Inv.objects.get(pk=inv_pk)
+        context['inv'] = inv
+        return context
+
+    def get(self, request, *args, **kwargs):
+        self.object = None
+        context = self.get_context_data()
+        if request.is_ajax():
+            html_form = render_to_string(self.ajax_partial, context, request)
+            return JsonResponse({'html_form': html_form})
+        else:
+            return super(InvEvidenceCreateAjaxView, self).get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        data = dict()
+        context = self.get_context_data()
+        if form.is_valid():
+            self.object = form.save(commit=False)
+            self.object.user = self.request.user
+            self.object.modified_by = self.request.user.get_username()
+            self.object.created_by = self.request.user.get_username()
+            # file upload is not possible via ajax other than async upload
+            if self.request.FILES:
+                self.object.fileName = self.request.FILES['fileRef'].name
+            self.object.save()
+            data['form_is_valid'] = True
+            # logger.info(self.ajax_list)
+            data['html_data_list'] = render_to_string(
+                self.ajax_list, context, self.request)
+        else:
+            data['form_is_valid'] = False
+
+        data['html_form'] = render_to_string(
+            self.ajax_partial, context, request=self.request)
+
+        if self.request.is_ajax():
+            return JsonResponse(data)
+        else:
+            return super(InvEvidenceCreateAjaxView, self).form_valid(form)
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            # This will redirect to the login view
+            return self.handle_no_permission()
+        elif not self.request.user.has_perm('tasks.add_evidence'):
+            messages.error(self.request, "No permission to add a record !!!")
+            return redirect('invs:inv_list')
+        else:
+            pass
+        # Checks pass, let http method handlers process the request
+        return super(InvEvidenceCreateAjaxView, self).dispatch(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        """This method is what injects forms with their keyword
+            arguments."""
+        # grab the current set of form #kwargs
+        kwargs = super(InvEvidenceCreateAjaxView, self).get_form_kwargs()
+        # Update the kwargs with the user_id
+        inv_pk = self.kwargs.get('inv_pk')
+        task_pk = self.kwargs.get('task_pk')
+        if inv_pk:
+            # self.inv_pk = inv_pk
+            pass
+        else:
+            inv_pk = 0
+        if task_pk:
+            # self.task_pk = task_pk
+            pass
+        else:
+            task_pk = 0
+
+        kwargs['inv_pk'] = inv_pk
+        kwargs['task_pk'] = task_pk
+        kwargs['user'] = self.request.user
+        return kwargs
+
+
+class InvEvidenceUpdateAjaxView(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
+    model = Evidence
+    form_class = EvidenceForm
+    permission_required = ('tasks.change_evidence',)
+    ajax_partial = 'tasks/invevidence_form_update_ajax.html'
+    ajax_list = 'invs/inv_detail_tab_evidences_tablebody.html'
+    context_object_name = 'inv'
+
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
+            logger.info(logmsg)
+        super(InvEvidenceUpdateAjaxView, self).__init__(*args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        # return super(InvEvidenceUpdateAjaxView, self).get_context_data(**kwargs)
+        context = super(InvEvidenceUpdateAjaxView, self).get_context_data(**kwargs)
+        pk = self.kwargs.get('pk')
+        inv = Evidence.objects.get(pk=pk).inv
+        context['inv'] = inv
+        return context
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        context = self.get_context_data()
+        if request.is_ajax():
+            html_form = render_to_string(self.ajax_partial, context, request)
+            return JsonResponse({'html_form': html_form})
+        else:
+            return super(InvEvidenceUpdateAjaxView, self).get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        data = dict()
+        context = self.get_context_data()
+        if form.is_valid():
+            self.object = form.save(commit=False)
+            self.object.modified_by = self.request.user.get_username()
+            if self.request.FILES:
+                self.object.fileName = self.request.FILES['fileRef'].name
+            self.object.save()
+            data['form_is_valid'] = True
+            # logger.info(self.ajax_list)
+            data['html_data_list'] = render_to_string(
+                self.ajax_list, context, self.request)
+        else:
+            data['form_is_valid'] = False
+
+        data['html_form'] = render_to_string(
+            self.ajax_partial, context, request=self.request)
+
+        if self.request.is_ajax():
+            return JsonResponse(data)
+        else:
+            return super(InvEvidenceUpdateAjaxView, self).form_valid(form)
+
+    def dispatch(self, request, *args, **kwargs):
+        ev_obj = self.kwargs.get('pk')
+        ev_pk = Evidence.objects.get(pk=ev_obj)
+        if not request.user.is_authenticated:
+            # This will redirect to the login view
+            return self.handle_no_permission()
+        elif not self.request.user.has_perm('tasks.change_evidence'):
+            messages.error(self.request, "No permission to change a record !!!")
+            return redirect('tasks:ev_detail', pk=ev_obj)
+        elif ev_pk.task and ev_pk.task.status.name == "Completed":
+            messages.error(self.request, "Task is Completed!!!")
+            return redirect('tasks:ev_detail', pk=ev_obj)
+        elif ev_pk.task and ev_pk.task.status.name == "Skipped":
+            messages.error(self.request, "Task is Skipped!!!")
+            return redirect('tasks:ev_detail', pk=ev_obj)
+        elif ev_pk.inv and ev_pk.inv.status.name == "Closed":
+            messages.error(self.request, "Investigation is Closed!!!")
+            return redirect('tasks:ev_detail', pk=ev_obj)
+        elif ev_pk.inv and ev_pk.inv.status.name == "Archived":
+            messages.error(self.request, "Investigation is Archived!!!")
+            return redirect('tasks:ev_detail', pk=ev_obj)
+        # Checks pass, let http method handlers process the request
+        return super(InvEvidenceUpdateAjaxView, self).dispatch(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        """This method is what injects forms with their keyword
+            arguments."""
+        # grab the current set of form #kwargs
+        kwargs = super(InvEvidenceUpdateAjaxView, self).get_form_kwargs()
+        # Update the kwargs with the user_id
+        # inv_pk = self.kwargs.get('inv_pk')
+        # task_pk = self.kwargs.get('task_pk')
+        pk = self.kwargs.get('pk')
+        ev = Evidence.objects.get(pk=pk)
+        inv_pk = ev.inv
+        task_pk = ev.task
+        if inv_pk:
+            inv_pk = inv_pk.pk
+            pass
+        else:
+            inv_pk = 0
+        if task_pk:
+            task_pk = task_pk
+            pass
+        else:
+            task_pk = 0
+
+        kwargs['inv_pk'] = inv_pk
+        kwargs['task_pk'] = task_pk
+        kwargs['user'] = self.request.user
+        return kwargs

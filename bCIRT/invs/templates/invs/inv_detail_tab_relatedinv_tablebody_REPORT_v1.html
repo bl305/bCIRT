@@ -1,0 +1,76 @@
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : inv/inv_relatedinv_tablebody_REPORT_v1.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.11.23
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.11.23  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+{% if inv.parent %}
+
+   <!-- Guardian authentication check -->
+            <!-- |dictsortreversed:"id" -->
+                <tr class="mylist-meta" style="background-color:#e6e6e6" id="item-i{{ inv.parent.pk }}">
+                    <!-- e.g.: #item-7 -->
+                    <td>
+                          {{ inv.parent.pk }}
+                    </td>
+                    <td>
+                        Parent
+                    </td>
+                    <td>
+                      {{ inv.parent.status }}
+                    </td>
+                    <td>
+                      {{ inv.parent.created_at|date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                      {{ inv.parent.created_by }}
+                    </td>
+                    <td>
+                      {{ inv.parent.modified_at|date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                      {{ inv.parent.modified_by }}
+                    </td>
+                </tr>
+
+{% elif inv.inv_parent.all %}
+{% for child in inv.inv_parent.all %}
+
+                <tr class="mylist-meta" style="background-color:#e6e6e6" id="item-c{{ child.pk }}">
+                    <!-- e.g.: #item-7 -->
+                    <td>
+                            {{ child.pk }}
+                    </td>
+                    <td>
+                        Child
+                    </td>
+                    <td>
+                      {{ child.status }}
+                    </td>
+                    <td>
+                      {{ child.created_at|date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                      {{ child.created_by }}
+                    </td>
+                    <td>
+                      {{ child.modified_at|date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                      {{ child.modified_by }}
+                    </td>
+                </tr>
+
+{% endfor %}
+{% else %}
+          <tr>
+            <td colspan="7" class="text-center bg-warning">No matching record found</td>
+          </tr>
+{% endif %}

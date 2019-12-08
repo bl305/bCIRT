@@ -1,0 +1,34 @@
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : inv/inv_detail_tab_playbooks_home_REPORT_v1.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.11.23
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.11.23  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+<br>
+<div align="center" class="printheader">
+    <strong>&nbsp;Related Playbooks | {{ inv.playbook_inv.all.count }} item{{ inv.playbook_inv.all.count|pluralize }} | {{ user }} at {% now "Y/m/d H:i:s" %} (UTC)</strong>
+</div>
+<table class="bcirttable">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Playbook</th>
+        <th>Version</th>
+        <th>Created on</th>
+        <th>Created by</th>
+        <th>Modified on</th>
+        <th>Modified by</th>
+    </tr>
+    </thead>
+    <tbody>
+        <!-- include 'investigations/partial_investigations_incidents_list.html' %}-->
+        {% include 'invs/inv_detail_tab_playbooks_tablebody_REPORT_v1.html' %}
+    </tbody>
+</table>

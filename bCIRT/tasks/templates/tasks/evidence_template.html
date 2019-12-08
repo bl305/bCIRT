@@ -15,11 +15,10 @@
 {% block evidenceslist_active %}active{% endblock evidenceslist_active %}
 
 {% block preevidences %}
-    {% block evidence_alert %}{% endblock evidence_alert %}
-{% endblock %}
+    {% block evidencetmp_alert %}{% endblock evidencetmp_alert %}
+{% endblock preevidences %}
 
 {% block evidences_content %}
-
     <div class="row w-100">
         <div class="col-sm-12">
             <div class="card card-primary w-100">
@@ -27,16 +26,16 @@
                     <div class="row w-100">
                         <div class="card-title w-100">
                             <div class="container mw-100 d-inline-flex justify-content-start flex-row align-items-center align-content-center flex-nowrap">
-                                    {% block evidence_buttons %}{% endblock evidence_buttons %}
+                                    {% block evidencetmp_buttons %}{% endblock evidencetmp_buttons %}
                                 <div class="container d-inline-flex flex-row align-items-center justify-content-center align-content-center flex-nowrap">
-                                    <p class="h4">&nbsp;{% block evidence_title %}{% endblock evidence_title %}</p>
+                                    <p class="h4">&nbsp;{% block evidencetmp_title %}{% endblock evidencetmp_title %}</p>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="card-body inv-card-body">
-                    {% block evidence_body %}{% endblock evidence_body %}
+                    {% block evidencetmp_body %}{% endblock evidencetmp_body %}
                 </div>
             </div>
         </div>

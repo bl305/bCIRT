@@ -1,0 +1,104 @@
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : inv/inv_relatedinv_tablebody.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.11.23
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.11.23  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+{% if inv.parent %}
+
+   <!-- Guardian authentication check -->
+            <!-- |dictsortreversed:"id" -->
+                <tr class="mylist-meta" style="background-color:#e6e6e6" id="item-i{{ inv.parent.pk }}">
+                    <!-- e.g.: #item-7 -->
+                    <td>
+                      <a class="badge badge-secondary" href="{% url 'invs:inv_detail' pk=inv.parent.pk %}?next1={{ request.get_full_path|urlencode }}">
+                          {{ inv.parent.pk }}
+                      </a>
+                    </td>
+                    <td>
+                        Parent
+                    </td>
+                    <td>
+                      {{ inv.parent.status }}
+                    </td>
+                    <td>
+                      {{ inv.parent.created_at|date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                      {{ inv.parent.created_by }}
+                    </td>
+                    <td>
+                      {{ inv.parent.modified_at|date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                      {{ inv.parent.modified_by }}
+                    </td>
+                    <td>
+                      <div>
+                          <a href="{% url 'invs:inv_edit' pk=inv.parent.pk %}?next1={{ request.get_full_path|urlencode }}"
+                              class="btn btn-warning btn-xs">
+                          <span class="fas fa-pen" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
+                          </a>
+                          <a href="{% url 'invs:inv_remove' pk=inv.parent.pk %}#?next1={{ request.get_full_path|urlencode }}"
+                              class="btn btn-danger btn-xs pull-right">
+                          <span class="fas fa-trash" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
+                          </a>
+                      </div>
+                    </td>
+                </tr>
+
+{% elif inv.inv_parent.all %}
+{% for child in inv.inv_parent.all %}
+
+                <tr class="mylist-meta" style="background-color:#e6e6e6" id="item-c{{ child.pk }}">
+                    <!-- e.g.: #item-7 -->
+                    <td>
+                        <a class="badge badge-secondary" href="{% url 'tasks:tsk_detail' pk=child.pk %}?next1={{ request.get_full_path|urlencode }}">
+                            {{ child.pk }}
+                        </a>
+                    </td>
+                    <td>
+                        Child
+                    </td>
+                    <td>
+                      {{ child.status }}
+                    </td>
+                    <td>
+                      {{ child.created_at|date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                      {{ child.created_by }}
+                    </td>
+                    <td>
+                      {{ child.modified_at|date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                      {{ child.modified_by }}
+                    </td>
+                    <td>
+                      <div>
+                          <a href="{% url 'invs:inv_edit' pk=child.pk %}?next1={{ request.get_full_path|urlencode }}"
+                              class="btn btn-warning btn-sm">
+                          <span class="glyphicon glyphicon-pencil" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
+                          </a>
+                          <a href="{% url 'invs:inv_remove' pk=child.pk %}?next1={{ request.get_full_path|urlencode }}"
+                              class="btn btn-danger btn-sm pull-right">
+                          <span class="glyphicon glyphicon-trash" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
+                          </a>
+                      </div>
+                    </td>
+                </tr>
+
+{% endfor %}
+{% else %}
+          <tr>
+            <td colspan="8" class="text-center bg-warning">No matching record found</td>
+          </tr>
+{% endif %}

@@ -1,0 +1,12 @@
+{% extends 'assets/host_form_template_ajax.html' %}
+{% block modaltitle %}
+    Create Host
+{%endblock modaltitle %}
+{% block modalactionclass %}
+    js-host-create-form
+{% endblock modalactionclass %}
+{% block modalaction %}
+    {% url 'assets:hostaj_create' %}
+{% endblock modalaction %}
+
+

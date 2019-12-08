@@ -1,0 +1,84 @@
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : assets/host_list_tablebody.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.07.27
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.07.29  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+                            {% for host in object_list %}
+                                <tr>
+                                    <td>
+                                        <a class="badge badge-secondary"
+                                           href="{% url 'assets:host_detail' pk=host.pk %}#?next1={{ request.get_full_path|urlencode }}">
+                                            {{ host.pk }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        {{ host.name }}
+                                    </td>
+                                    <td>
+                                        {% for hosts in host.hostname_hosts.all %}
+                                            {{ hosts.name }}
+                                            <br>
+                                        {% endfor%}
+                                    </td>
+                                    <td>
+                                        {% for ips in host.ipaddress_hosts.all %}
+                                            {{ ips.ip }}
+                                            <br>
+                                        {% endfor%}
+                                    </td>
+                                    <td>
+                                        {{ host.created_at|date:"Y/m/d H:i:s" }}
+                                    </td>
+                                    <td>
+                                        {{ host.created_by }}
+                                    </td>
+                                    <td>
+                                        {{ host.modified_at|date:"Y/m/d H:i:s" }}
+                                    </td>
+                                    <td>
+                                        {{ host.modified_by }}
+                                    </td>
+                                    <td>&nbsp;</td>
+                                    <td>&nbsp;</td>
+                                    <td>
+                                        <div>
+<!--                                            <a href="{% url 'assets:host_edit' pk=host.pk %}"-->
+<!--                                               class="btn btn-warning btn-xs">-->
+<!--                                                <span class="fas fa-pen"></span>-->
+<!--                                            </a>-->
+<!--                                            <a href="{% url 'assets:host_remove' pk=host.pk %}" title="delete"-->
+<!--                                               class="btn btn-danger btn-xs">-->
+<!--                                                <span class="fas fa-trash-alt" aria-hidden="true"></span>-->
+<!--                                                <span class="icon-label"></span>-->
+<!--                                            </a>-->
+
+  <button type="button"
+          class="btn btn-warning btn-xs js-update-host"
+          data-url="{% url 'assets:hostaj_update' host.pk %}">
+    <span class="fas fa-pen"></span>
+  </button>
+  <button type="button"
+          class="btn btn-danger btn-xs js-delete-host"
+          data-url="{% url 'assets:hostaj_delete' host.pk %}">
+    <span class="fas fa-trash-alt"></span>
+  </button>
+                                        </div>
+
+
+                                    </td>
+                                </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="11" class="text-center bg-warning">
+                                    No Hosts
+                                </td>
+                            </tr>
+                            {% endfor %}

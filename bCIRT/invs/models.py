@@ -26,6 +26,7 @@ User = get_user_model()
 # This is for the in_group_members check template tag
 register = template.Library()
 
+
 class CurrencyType(models.Model):
     objects = models.Manager()
     currencyname = models.CharField(max_length=20, default="", null=True, blank=True)
@@ -34,6 +35,18 @@ class CurrencyType(models.Model):
 
     def __str__(self):
         return self.currencyshortname
+
+
+# class InvApproval(models.Model):
+#     objects = models.Manager()
+#     usertoreview = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, default=None,
+#                              related_name="invapproval_subjectuser")
+#     reviewer = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, default=None,
+#                              related_name="invapproval_reviewer")
+#     enabled = models.BooleanField(default=True)
+#
+#     def __str__(self):
+#         return "%s - %s" % (self.usertoreview, self.reviewer)
 
 
 class InvStatus(models.Model):
@@ -152,6 +165,14 @@ class Inv(models.Model):
     ticketid = models.CharField(max_length=20, default="", null=True, blank=True)
     status = models.ForeignKey(InvStatus, on_delete=models.SET_DEFAULT, default="1",
                                related_name="inv_status")
+    reviewer1 = models.ForeignKey(User, on_delete=models.SET_NULL, default=None, blank=True, null=True,
+                                  related_name="inv_reviewer1")
+    reviewer2 = models.ForeignKey(User, on_delete=models.SET_NULL, default=None, blank=True, null=True,
+                                  related_name="inv_reviewer2")
+    # reviewer1 = models.CharField(max_length=20, default="Pending")
+    reviewer1comment = models.CharField(max_length=2000, default="", blank=True, null=True)
+    # reviewer2 = models.CharField(max_length=20, default="Pending")
+    reviewer2comment = models.CharField(max_length=2000, default="", blank=True, null=True)
     phase = models.ForeignKey(InvPhase, on_delete=models.SET_DEFAULT, default="1",
                               related_name="inv_phase")
     severity = models.ForeignKey(InvSeverity, on_delete=models.SET_DEFAULT, default="1",
@@ -176,6 +197,10 @@ class Inv(models.Model):
     created_by = models.CharField(max_length=20, default="unknown")
     modified_at = models.DateTimeField(auto_now=True)
     modified_by = models.CharField(max_length=20, default="unknown")
+    reviewed1_at = models.DateTimeField(auto_now_add=False, default=None, blank=True, null=True)
+    reviewed1_by = models.CharField(max_length=20, default=None, blank=True, null=True)
+    reviewed2_at = models.DateTimeField(auto_now_add=False, default=None, blank=True, null=True)
+    reviewed2_by = models.CharField(max_length=20, default=None, blank=True, null=True)
 
     potentialloss = models.PositiveIntegerField(default=0, blank=False, null=False)
     monetaryloss = models.PositiveIntegerField(default=0, blank=False, null=False)
@@ -197,13 +222,14 @@ class Inv(models.Model):
 
     def __str__(self):
         if self.ticketid:
-            outstr = "%s-%s-%s-%s"%(self.pk, self.attackvector.name, self.ticketid, str(self.user)[0:2])
+            outstr = "%s-%s-%s-%s" % (self.pk, self.attackvector.name, self.ticketid, str(self.user)[0:2])
         else:
             outstr = "%s-%s-%s" % (self.pk, self.attackvector.name, str(self.user)[0:2])
         return outstr
 
     def readonly(self):
-        if self.status.name == 'Closed' or self.status.name == 'Archived':
+        if self.status.name == 'Closed' or self.status.name == 'Archived' \
+                or self.status.name == 'Review1' or self.status.name == 'Review2':
             return True
         else:
             return False
@@ -216,7 +242,33 @@ class Inv(models.Model):
                 # status changed do something here
                 # some actions are performed in the "check" method
                 pass
-        if self.status.name == "Closed":
+            elif self.status.name == "Assigned":
+                # status changed to assigned
+                self.reviewed1_at = None
+                self.reviewed2_at = None
+                pass
+            elif self.status.name == "Review1":
+                # status changed to review1
+                # checking if needs review or not
+                if self.needreview(1):
+                    self.getreviewer1()
+                else:
+                    # no review1 is needed
+                    self.autoreview1()
+                if self.needreview(2):
+                    self.getreviewer2()
+                else:
+                    self.autoreview2()
+            elif self.status.name == "Review2":
+                # status changed to review2
+                # checking if needs review or not
+                if self.needreview(2):
+                    self.getreviewer2()
+                else:
+                    # no review is needed
+                    # self.reviewer2 = User.objects.get(pk=1)
+                    self.autoreview2()
+        if self.status.name == "Closed" or self.status.name == "Review1" or self.status.name == "Review2":
             # status changed to closed
             # set investigation close date
             if self.endtime is None:
@@ -238,6 +290,79 @@ class Inv(models.Model):
         # super(Inv, self).save(*args, **kwargs)
         super(Inv, self).save(force_insert, force_update, *args, **kwargs)
         self.__original_status = self.status
+
+    def getreviewer1(self):
+        reviewers1 = User.objects.filter(profile__reviewer1=True)
+        reviewers1list = set()
+        for reviewer1 in reviewers1:
+            reviewers1list.add(reviewer1)
+        randomreviewer1 = reviewers1.order_by("?").first()
+        self.reviewer1 = randomreviewer1
+
+    def getreviewer2(self):
+        reviewers2 = User.objects.filter(profile__reviewer2=True)
+        reviewers2list = set()
+        for reviewer2 in reviewers2:
+            reviewers2list.add(reviewer2)
+        randomreviewer2 = reviewers2.order_by("?").first()
+        self.reviewer2 = randomreviewer2
+
+    def autoreview1(self):
+        self.reviewer1 = User.objects.get(pk=1)
+        self.reviewed1_by = "autoreview"
+        self.reviewed1_at = timezone_now()
+        self.reviewer2 = User.objects.get(pk=1)
+        self.status = InvStatus.objects.get(name="Review2")
+
+    def autoreview2(self):
+        self.reviewed2_by = "autoreview"
+        self.reviewed2_at = timezone_now()
+        self.status = InvStatus.objects.get(name="Closed")
+
+    def needreview(self, revtype=1):
+        # checks if the investigation needs review or not
+        # if a bypass rule is matching, it will be bypassed. bypass rules are the opposite of normal rules
+        bypassreview = False
+        bypasslist = None
+        if revtype == 1:
+            bypasslist = InvReviewRules.objects.filter(bypassreview=True, review1=False)
+        elif revtype == 2:
+            bypasslist = InvReviewRules.objects.filter(bypassreview=True, review2=False)
+        for bypassrule in bypasslist:
+            if bypassrule.bypassreview:
+                if (bypassrule.severity is None or int(bypassrule.severity.pk) >= int(self.severity.pk)) and \
+                    (bypassrule.category is None or bypassrule.category == self.category) and \
+                    (bypassrule.priority is None or bypassrule.priority == self.priority) and \
+                    (bypassrule.attackvector is None or bypassrule.attackvector == self.attackvector) and \
+                    (bypassrule.potentialloss == 0 or bypassrule.potentialloss >= self.potentialloss) and \
+                    (bypassrule.monetaryloss == 0 or bypassrule.monetaryloss >= self.monetaryloss):
+                    bypassreview = True
+
+        # if no bypass rule matched
+        needreview = False
+        if not bypassreview:
+            invruleslist = None
+            if revtype == 1:
+                invruleslist = InvReviewRules.objects.filter(bypassreview=False, review1=True)
+            elif revtype == 2:
+                invruleslist = InvReviewRules.objects.filter(bypassreview=False, review2=True)
+            if invruleslist:
+                for invrule in invruleslist:
+                    if (invrule.severity is None or int(invrule.severity.pk) <= int(self.severity.pk)) and \
+                        (invrule.category is None or invrule.category == self.category) and \
+                        (invrule.priority is None or invrule.priority == self.priority) and \
+                        (invrule.attackvector is None or invrule.attackvector == self.attackvector) and \
+                        (invrule.potentialloss == 0 or invrule.potentialloss <= self.potentialloss) and \
+                        (invrule.monetaryloss == 0 or invrule.monetaryloss <= self.monetaryloss):
+                        needreview = True
+        # retval = False
+        if bypassreview:
+            retval = False
+        elif needreview:
+            retval = True
+        else:
+            retval = False
+        return retval
 
     def invdurationprint(self):
         if self.invduration:
@@ -271,13 +396,21 @@ class Inv(models.Model):
             })
 
     def clean(self):
-        # if self.invid == '':
-            # raise ValidationError(_('You must enter an Investigation ID.'))
-            # self.invid = self.attackvector.name
-        if self.status.name == "Closed":
+        # check if review1 were performed before review2
+        # raise ValidationError(_("xx"+str(self.status)))
+        if self.__original_status.name == "Closed" and (self.status.name == "Review1" or self.status.name == "Review2"):
+            raise ValidationError(_('Cannot select '+self.status.name+' if the previous status was "Closed"!'))
+        if self.status.name == "Closed" or self.status.name == "Review1" or self.status.name == "Review2":
             # check if the numofvictims is defined
             if self.numofvictims is None:
                 raise ValidationError(_('Please define the "Victim Count"!'))
+            if self.status.name == "Closed" and self.reviewed1_by is None:
+                # check if reviews were performed
+                raise ValidationError(_('No review #1 was performed yet!'))
+            if self.status.name == "Closed" and (self.reviewed1_at is None or self.reviewed2_at is None):
+                raise ValidationError(_('No reviews were performed yet!'))
+            if self.reviewed1_at is None and self.reviewed2_at is not None:
+                raise ValidationError(_('First review must happen first!'))
             if self.task_inv.all():
                 # status changed to closed, check if all tasks are closed
                 anyopen = 0
@@ -300,8 +433,31 @@ class Inv(models.Model):
         super(Inv, self).clean()
 
 
-def new_inv(pstatus, ppriority, pdescription, pphase, pseverity, pcategory, pattackvector,pinvid=None,
-            puser="action", pticketid=None, pparent=None, prefid=None, psummary=None, pcomment=None, pstarttime=None, pendtime=None,
+class InvReviewRules(models.Model):
+    objects = models.Manager()
+    bypassreview = models.BooleanField(default=False)
+    rulename = models.CharField(max_length=50, default="", null=False, blank=False)
+    severity = models.ForeignKey(InvSeverity, on_delete=models.SET_NULL, default="", null=True, blank=True,
+                                 related_name="invreviewrules_severity")
+    category = models.ForeignKey(InvCategory, on_delete=models.SET_NULL, default="", null=True, blank=True,
+                                 related_name="invreviewrules_category")
+    priority = models.ForeignKey(InvPriority, on_delete=models.SET_NULL, default="", null=True, blank=True,
+                                 related_name="invreviewrules_priority")
+    attackvector = models.ForeignKey(InvAttackvector, on_delete=models.SET_NULL, default="", null=True, blank=True,
+                                     related_name="invreviewrules_attackvector")
+    potentialloss = models.PositiveIntegerField(default=0, blank=False, null=False)
+    monetaryloss = models.PositiveIntegerField(default=0, blank=False, null=False)
+    review1 = models.BooleanField(default=True)
+    review2 = models.BooleanField(default=True)
+    enabled = models.BooleanField(default=True)
+
+    def __str__(self):
+        return "%s" % self.rulename
+
+
+def new_inv(pstatus, ppriority, pdescription, pphase, pseverity, pcategory, pattackvector, pinvid=None,
+            puser="action", pticketid=None, pparent=None, prefid=None, psummary=None, pcomment=None, pstarttime=None,
+            pendtime=None,
             pinvduration=None, pcreated_at=None, pcreated_by=None, pmodified_at=None, pmodified_by=None,
             pmonetaryloss=None, plosscurrency=None, pnumofvictims=None
             ):

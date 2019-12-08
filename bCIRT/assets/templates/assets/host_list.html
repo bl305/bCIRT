@@ -18,13 +18,12 @@
 {% block asset_buttons %}
                           <div class="btn-group inline pull-left">
                               {% if user.is_authenticated %}
-                                  <a href="{% url 'assets:host_create'  %}"
-                                   class="btn btn-outline-secondary btn-sm">
-                                    <span class="font-weight-bold">
-                                        <i class="fas fa-plus"></i>
-                                    </span>
-                                      New host
-                                  </a>
+                                <button type="button"
+                                        class="btn btn-outline-secondary btn-sm js-create-host"
+                                        data-url="{% url 'assets:hostaj_create' %}">
+                                  <span class="fas fa-plus"></span>
+                                  New host
+                                </button>
                               {% endif %}
                            </div>
 {% endblock asset_buttons %}
@@ -34,42 +33,11 @@
 {% endblock asset_title %}
 
 {% block asset_body %}
-                    <table class="table table-sm table-hover display order-column" id="investigations-invi"
-                           style="min-height:45vh"
-                        data-toggle="table"
-                        data-classes="table table-no-bordered"
-                        data-pagination="true"
-                        data-pagination-h-align="left"
-                        data-search="true"
-                        data-search-align="left"
-                        data-show-refresh="true"
-                        data-show-toggle="true"
-                        data-show-columns="true"
-                        data-minimum-count-columns="2"
-                        data-show-pagination-switch="true"
-                        data-id-field="id"
-                        data-page-list="[10, 25, 50, 100, ALL]"
-                        data-show-footer="false"
-                        data-side-pagination="client"
-                        data-buttons-align="left"
-                    >
-                        <thead>
-                        <tr>
-                            <th data-field="id" data-sortable="true">ID</th>
-                            <th data-field="name" data-sortable="true">Name</th>
-                            <th data-field="hostnames" data-sortable="true">Hostnames</th>
-                            <th data-field="ips" data-sortable="true">IPs</th>
-                            <th data-field="created" data-sortable="true">Created (UTC)</th>
-                            <th data-field="createdby" data-sortable="true">Created by</th>
-                            <th data-field="modified" data-sortable="true">Modified (UTC)</th>
-                            <th data-field="modifiedby" data-sortable="true">Modified by</th>
-                            <th data-field="investigation" data-sortable="true">Investigation</th>
-                            <th data-field="task" data-sortable="true">Task</th>
-                            <th data-field="actions" data-sortable="true">Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
                             {% include 'assets/host_list_table.html' %}
-                        </tbody>
-                    </table>
+<!--<script>-->
+<!--//script to allow TinyMCE in modal-->
+<!--    $('#myModal').on('shown.bs.modal', function() {-->
+<!--    $(document).off('focusin.modal');-->
+<!--});-->
+<!--</script>-->
 {% endblock asset_body %}

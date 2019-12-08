@@ -12,6 +12,9 @@
 }
 
 .invdescription {
+//  height:100%;
+//  width:100%;
+//  position:relative;
   margin:1px;
   word-wrap:break-word;
   overflow-wrap:break-word;
@@ -21,6 +24,7 @@
 .dropdown-submenu {
   position: relative;
 }
+
 .dropdown-submenu > .dropdown-menu {
   top: 0;
   left: 100%;

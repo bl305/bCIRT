@@ -168,14 +168,15 @@ def new_profile(pinv, pusername=None, puserid=None, pemail=None, phost=None, pip
     )
     return newprofile
 
+
 def new_create_profile_from_evattrs(pinv_pk, pevattr_pk, pev_pk, pusername):
     # Creating a new profile based on the attribute calling this function
     invpk = pinv_pk
     invobj = Inv.objects.get(pk=invpk)
     evattrpk = pevattr_pk
+    evattr_obj = None
     if evattrpk:
         evattr_obj = EvidenceAttr.objects.get(pk=evattrpk)
-
     evpk = pev_pk
     attrpklist = list()
     if evpk == 0:

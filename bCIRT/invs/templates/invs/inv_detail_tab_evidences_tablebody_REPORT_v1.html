@@ -1,0 +1,176 @@
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : inv/inv_detail_tab_evidences_tablebody_REPORT_v1.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.11.23
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.11.23  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+{% for invevidence in inv.evidence_inv.all %}
+    <!-- Guardian authentication check -->
+            <!-- |dictsortreversed:"id" -->
+                <tr class="mylist-meta" style="background-color:#e6e6e6" id="item-inve{{ invevidence.pk }}">
+                   <!-- e.g.: #item-7 -->
+                  <td>
+                      {{ invevidence.pk }}
+                  </td>
+                  <td>
+                      {{ invevidence.created_at|date:"Y/m/d H:i:s" }}
+                  </td>
+                  <td>
+                      {{ invevidence.created_by }}
+                  </td>
+                  <td>
+                       {{ invevidence.modified_at|date:"Y/m/d H:i:s" }}
+                  </td>
+                  <td>
+                       {{ invevidence.modified_by }}
+                  </td>
+                  <td>
+                        {% if invevidence.fileRef %}
+                            {{ invevidence.fileName }}
+                        {% else %}
+                        -
+                        {% endif %}
+                  </td>
+                    <td>
+                        <div class="row container mw-100 d-inline-flex justify-content-start flex-row align-items-center align-content-center flex-nowrap">
+
+
+
+
+<!--<div class="dropdown">-->
+<div>
+        <span>
+            {% if invevidence.task %}
+                {{ invevidence.task }}
+                {% if invevidence.task.readonly %}
+                    <!--                            <h6><span class="badge badge-pill badge-secondary"></span></h6>-->
+                    <span> (x)</span>
+                {% endif %}
+            {% else %}
+                -
+            {% endif %}
+        </span>
+</div>
+<!--</div>-->
+                        </div>
+                    </td>
+                    <td>
+                        MITRE&ATTCK: <strong>{{ invevidence.mitretactic }}</strong>
+                        <br>
+                        Parent:
+                        {% if invevidence.parent %}
+                                {{ invevidence.parent }}
+                            {% if invevidence.parentattr %}
+                                {{ invevidence.parentattr }}
+                            {% endif %}
+                        {% endif %}
+                        <br>
+                        Actions:
+                        {% if invevidence.actionq_evidence.all %}
+                            {% for oneaction in invevidence.actionq_evidence.all %}
+                                {{ oneaction }}
+                            {% endfor %}
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr class="invev-detail" id="item-invev-detail{{ invevidence.pk }}">
+                  <td colspan="8">
+
+                        {% if invevidence.evattr_evidence.all %}
+                            <table class="table table-bordered table-sm">
+                                <thead>
+                                <tr>
+                                    <th>Attribute</th>
+                                    <th>Attribute Value</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+
+                                {% for attr in invevidence.evattr_evidence.all %}
+                                    <tr id="item-attr-{{attr.pk}}">
+                                        <td>
+                                            <div class="container mw-100 d-inline-flex justify-content-start flex-row align-items-center align-content-center flex-nowrap">
+                                                <div>
+                                                    {% if attr %}
+                                                        {% if attr.attr_reputation.pk == 1 %}
+                                                        <span>? </span>
+                                                        {% else %}
+                                                            {% if attr.attr_reputation.pk == 2 %}
+                                                                <span style="color:green;">+ </span>
+                                                            {% else %}
+                                                                {% if attr.attr_reputation.pk == 3 %}
+                                                                    <strong>
+                                                                        <span>! </span>
+                                                                    </strong>
+                                                                {% else %}
+                                                                    {% if attr.attr_reputation.pk == 4 %}
+                                                                    <span style="color:red;">!!!</span>
+                                                                    {% else %}
+                                                                    <span>&nbsp;-&nbsp;</span>
+                                                                    {% endif %}
+                                                                {% endif %}
+                                                            {% endif %}
+                                                        {% endif %}
+                                                        {{ attr }}
+                                                    {% else %}
+                                                                    <span data-toggle="tooltip" data-placement="top" title="-">&nbsp;-&nbsp;</span>
+                                                    {% endif %}
+                                                        {{ attr.evattrformat }}
+                                                </div> <!-- .dropdown -->
+                                                <!--Attribute dropdown end-->
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="container mw-100 d-inline-flex justify-content-start flex-row align-items-center align-content-center flex">
+                                                {% if attr.observable %}
+                                                    <span data-toggle="tooltip" data-placement="top" title="Toggle Observable">
+                                                        <i class="fas fa-eye" aria-hidden="true">&nbsp;</i>
+                                                    </span>
+                                                {% else %}
+                                                    <span class="fas fa-eye-slash" data-toggle="tooltip" data-placement="top" title="Toggle Observable">
+                                                        &nbsp;
+                                                    </span>
+                                                {% endif %}
+
+
+                                                {% if attr.evattrvalue %}
+                                                    {{ attr.evattrvalue }}
+                                                {% endif %}
+
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+
+
+
+
+                                </tbody>
+                            </table>
+                        {% endif %}
+                      <div class="invdescription2" style="max-width:1400px">
+                        {% if invevidence.evidenceformat.pk == 2 %}
+                            {{ invevidence.description|safe }}
+                        {% else %}
+                            {% if invevidence.evidenceformat.pk == 1 %}
+                                {{ invevidence.description|linebreaks }}
+                            {% else %}
+                                Uknown evidence format!!!
+                            {% endif %}
+                        {% endif %}
+                      </div>
+<hr class="solid">
+                  </td>
+                </tr>
+        {% empty %}
+          <tr>
+            <td colspan="8" class="text-center bg-warning">No matching record found</td>
+          </tr>
+        {% endfor %}

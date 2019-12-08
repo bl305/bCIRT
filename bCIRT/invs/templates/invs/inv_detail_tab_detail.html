@@ -13,21 +13,21 @@
 # 2019.09.06  Lendvay     2      Print preview in new window
 # **********************************************************************;
 -->
-{% block invdetail_active %}active{% endblock invdetail_active %}
-{% block inv_alert %}
-{% endblock inv_alert %}
 
-{% block inv_buttons %}
+{% block invtmp_alert %}
+{% endblock invtmp_alert %}
+
+{% block invtmp_buttons %}
                             {% if user.is_authenticated %}
                                 <div class="dropdown">
-                                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle" onclick="filterFunctionInv()" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
+                                    <button class="test btn btn-outline-secondary btn-sm dropdown-toggle" onclick="filterFunctionInv()" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
                                         Actions
                                         <span class="caret"></span>
                                     </button>
                                         <ul class="dropdown-menu" role="menu">
                                             {% if inv.status.name != "Closed" %}
                                             <li>
-                                                <a href="{% url 'tasks:ev_create' inv_pk=inv.pk task_pk=0 %}?next1={{ request.get_full_path|urlencode }}"
+                                                <a tabindex="-1" href="{% url 'tasks:ev_create' inv_pk=inv.pk task_pk=0 %}?next1={{ request.get_full_path|urlencode }}"
                                                       class="btn btn-secondary btn-sm btn-block text-left">
                                                   <span class="" data-toggle="tooltip" data-placement="top" title="New Evidence item">
                                                       <i class="fas fa-plus">&nbsp;</i>
@@ -38,7 +38,7 @@
 <!--                                            <li>&nbsp;</li>-->
                                             {% endif %}
                                             <li>
-                                                <a href="{% url 'invs:inv_edit' pk=inv.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                                <a tabindex="-1" href="{% url 'invs:inv_edit' pk=inv.pk %}?next1={{ request.get_full_path|urlencode }}"
                                                   class="btn btn-secondary btn-sm btn-block text-left">
                                                   <span class="" data-toggle="tooltip" data-placement="top" title="Edit Evidence item">
                                                       <i class="fas fa-pencil-alt">&nbsp;</i>
@@ -57,7 +57,7 @@
                                                 </a>
                                                 <ul class="dropdown-menu dropdown-content">
                                                     <li>
-                                                        <a href="{% url 'invs:inv_detail_print' pk=inv.pk %}?next1={{ request.get_full_path|urlencode }}" target="_blank"
+                                                        <a tabindex="-1" href="{% url 'invs:inv_detail_print' pk=inv.pk %}?next1={{ request.get_full_path|urlencode }}" target="_blank"
                                                           class="btn btn-secondary btn-sm btn-block text-left">
                                                           <span data-toggle="tooltip" data-placement="top" title="Edit item">
                                                               <i class="fas fa-print"></i>
@@ -65,12 +65,22 @@
                                                               Print Preview
                                                         </a>
                                                     </li>
+                                                    <li>
+                                                        <a tabindex="-1" href="{% url 'invs:inv_export' pk=inv.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                                          class="btn btn-secondary btn-sm btn-block text-left">
+                                                          <span class="" data-toggle="tooltip" data-placement="top" title="Edit Evidence item">
+                                                              <i class="fas fa-print">&nbsp;</i>
+                                                          </span>
+                                                              ExportDetailsJSON
+                                                        </a>
+                                                    </li>
+
                                                 </ul>
 
                                             </li>
                                             <li>&nbsp;</li>
                                             <li>
-                                                  <a href="{% url 'invs:inv_remove' pk=inv.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                                  <a tabindex="-1" href="{% url 'invs:inv_remove' pk=inv.pk %}?next1={{ request.get_full_path|urlencode }}"
                                                       class="btn btn-secondary btn-sm btn-block">
                                                   <span class="font-weight-bold text-danger" data-toggle="tooltip" data-placement="top" title="Delete item">
                                                       <i class="fas fa-trash-alt"></i>
@@ -81,15 +91,24 @@
                                         </ul>
                                     </div> <!-- .dropdown -->
                             {% endif %}
-{% endblock inv_buttons %}
-{% block inv_title %}
+{% endblock invtmp_buttons %}
+{% block invtmp_title %}
 &nbsp;Investigation Details | #{{ inv.id }} - {{ inv.invid }} | {{ user }} at {% now "Y/m/d H:i:s" %} (UTC)
-{% endblock inv_title %}
+{% endblock invtmp_title %}
 
-{% block inv_body %}
+{% block invtmp_body %}
                     <table class="table table-sm" id="investigations-invh">
                         <tbody>
                             {% include 'invs/inv_detail_tab_detail_table.html' %}
                         </tbody>
                     </table>
-{% endblock inv_body %}
+<script>
+$(document).ready(function(){
+  $('.dropdown-submenu a.test').on("click", function(e){
+    $(this).next('ul').toggle();
+    e.stopPropagation();
+    e.preventDefault();
+  });
+});
+</script>
+{% endblock invtmp_body %}

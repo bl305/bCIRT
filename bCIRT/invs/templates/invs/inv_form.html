@@ -1,4 +1,4 @@
-{% extends "invs/inv_base.html" %}
+{% extends "invs/inv_template.html" %}
 <!--
 # **********************************************************************;
 # Project           : bCIRT
@@ -13,64 +13,52 @@
 # **********************************************************************;
 -->
 
-{% block invslist_active %}active{% endblock invslist_active %}
-
-{% load bootstrap4 %}
-
 <!-- BL start -->
 {{ form.media }}
 <!-- BL end -->
 
-{% block preinvs %}
-	<div class="container myregister">
-    </div>
-{% endblock preinvs %}
+{% block invtmp_alert %}
+{% endblock invtmp_alert %}
 
-{% block invs_content %}
-<div class="smooth-scroll list-unstyled w-100">
-    <div class="container-fluid">
-        <div class="row justify-content-center h-100">
-            <div class="col-sm-2 col-md-10">
-                <div class="card card-primary w-100">
-                    <div class="card-header mycardheader">
-                        <div class="card-title h-100">
-                            <div class="col-6 mx-auto">
-                                <div class="h3 font-weight-bold">
-                                    Edit an Investigation
+{% block invtmp_buttons %}
+{% endblock invtmp_buttons %}
+
+{% block invtmp_title %}
+                        Edit Investigation
                                 {% if inv.pk %}
                                     ({{ inv.pk }})
                                 {% endif %}
-                                </div>
+{% endblock invtmp_title %}
 
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body inv-card-body">
+{% block invtmp_body %}
                         {% if error_message %}
                             <p><strong>{{ error_message }}</strong></p>
                         {% endif %}
+
                         <form class="form-horizontal" role="form" action="" method="post" enctype="multipart/form-data">
                             {% csrf_token %}
-                            {% include 'invs/inv_form_template.html' %}
                             <div class="form-group">
-                                    <button type="submit" class="btn btn-success">Save</button>
+                                    <button type="submit" class="btn btn-success btn-sm">Save</button>
                                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                    <a href="javascript:history.go(-1)" class="btn btn-primary">
-                                        <span class="fas fa-array-left" aria-hidden="true"></span>
-                                        <span>Back</span>
+                                    <a href="javascript:history.go(-1)"
+                                       class="btn btn-primary btn-sm">
+                                        <span class="fas fa-arrow-left" aria-hidden="true"></span>
+                                        <span>Cancel</span>
+                                    </a>
+                            </div>
+
+                            {% include 'invs/inv_form_template.html' %}
+                            <!--To redirect to the previous page-->
+                            <input type="hidden" name="next" value="{{ request.GET.next1 }}">
+
+                            <div class="form-group">
+                                    <button type="submit" class="btn btn-success btn-sm">Save</button>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                    <a href="javascript:history.go(-1)"
+                                       class="btn btn-primary btn-sm">
+                                        <span class="fas fa-arrow-left" aria-hidden="true"></span>
+                                        <span>Cancel</span>
                                     </a>
                             </div>
                         </form>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-10 col-md-2">
-                <div class="card-body">
-                    <h3>Investigation Update?</h3>
-                    <p>Investigation details can be created/updated using this form.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock invs_content %}
+{% endblock invtmp_body %}

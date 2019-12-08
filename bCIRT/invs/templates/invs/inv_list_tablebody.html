@@ -1,0 +1,88 @@
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : inv/inv_list_tablebody.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.11.05
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.11.05  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+{% if object_list %}
+{% for inv in object_list %}
+                <tr>
+                    <td>
+                        <a href="{% url 'invs:inv_detail' pk=inv.pk %}?next1={{ request.get_full_path|urlencode }}">
+                            <h6><span class="badge badge-pill badge-secondary">{{ inv.id }}</span></h6>
+                        </a>
+                    </td>
+                    <td>
+
+                        {{ inv.status }}
+                    </td>
+                    <td>
+                        {{ inv.priority }}
+                    </td>
+                    <td>
+                        {{ inv.ticketid }}
+                    </td>
+                    <td>
+                        {% if inv.refid %}
+                            {{ inv.refid }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="container invdescription" style="max-width:25rem">
+                            {{ inv.description_html|safe }}
+                        </div>
+                    </td>
+                    <td>
+                        {{ inv.invid }}
+                    </td>
+                    <td>
+                        {% if inv.parent %}
+                        <a class="badge badge-secondary" href="{% url 'invs:inv_detail' pk=inv.parent.pk %}?next1={{ request.get_full_path|urlencode }}">
+                            {{ inv.parent }}
+                        </a>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ inv.phase }}
+                    </td>
+                    <td>
+                        {% if inv.user %}
+                            {{ inv.user }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if inv.starttime %}
+                            {{ inv.starttime|date:"Y/m/d H:i:s" }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ inv.created_at|date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                        {{ inv.modified_at|date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                        {{ inv.modified_by }}
+                    </td>
+              </tr>
+{% endfor %}
+{% else %}
+          <tr>
+            <td colspan="14" class="text-center bg-warning">No Investigation</td>
+          </tr>
+{% endif %}

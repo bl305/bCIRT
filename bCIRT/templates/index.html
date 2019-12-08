@@ -12,13 +12,126 @@
 # 2019.07.29  Lendvay     1      Initial file
 # **********************************************************************;
 -->
-
+{% block ptitle %}Home{% endblock %}
 {% block content %}
         <div class="container mw-100 small">
             <div class="row">
                 <div class="col-md-4">
                     <div class="card bg-light mb-3">
-                        <div class="card-header">My Investigations ({{ invs.count }})</div>
+                        <div class="card-header">Review #1 (
+                            {% for reviewer1 in reviewers1 %}
+                                {{ reviewer1 }}
+                            {% endfor %}
+                            ) ({{ reviews1.count }})</div>
+                            <div class="card-body">
+                                <table class="table table-sm table-condensed fittable" style="border-collapse:collapse;">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Attack vector</th>
+                                            <th>Ticket</th>
+                                            <th>Owner</th>
+                                            <th>Modified</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for inv in reviews1 %}
+                                        <tr data-toggle="collapse" data-target="#myinvs{{inv.pk}}" class="accordion-toggle">
+                                            <td>
+                                                <a href="{% url 'invs:inv_detail' pk=inv.pk %}"><h6><span class="badge badge-pill badge-secondary">{{inv.id}}</span></h6></a>
+                                            </td>
+                                            <td>
+                                                {{ inv.attackvector.name }}
+                                            </td>
+                                            <td>
+                                                {{ inv.ticketid }}
+                                            </td>
+                                            <td>
+                                                {{ inv.user }}
+                                            </td>
+                                            <td>
+                                                {{ inv.modified_at|date:"Y/m/d H:i:s" }}
+                                            </td>
+                                        </tr>
+                                        <tr >
+                                            <td colspan="5" class="hiddenRow">
+                                                <div class="accordian-body collapse" id="myinvs{{inv.pk}}">
+                                                    <div class="invdescription2" style="max-width:25vw">
+                                                    {{ inv.description }}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-light mb-3">
+                        <div class="card-header">Review #2 (
+                            {% for reviewer2 in reviewers2 %}
+                                {{ reviewer2 }}
+                            {% endfor %}
+                            ) ({{ reviews2.count }})</div>
+                            <div class="card-body">
+                                <table class="table table-sm table-condensed fittable" style="border-collapse:collapse;">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Attack vector</th>
+                                            <th>Ticket</th>
+                                            <th>Owner</th>
+                                            <th>Modified</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for inv in reviews2 %}
+                                        <tr data-toggle="collapse" data-target="#myinvs{{inv.pk}}" class="accordion-toggle">
+                                            <td>
+                                                <a href="{% url 'invs:inv_detail' pk=inv.pk %}"><h6><span class="badge badge-pill badge-secondary">{{inv.id}}</span></h6></a>
+                                            </td>
+                                            <td>
+                                                {{ inv.attackvector.name }}
+                                            </td>
+                                            <td>
+                                                {{ inv.ticketid }}
+                                            </td>
+                                            <td>
+                                                {{ inv.user }}
+                                            </td>
+                                            <td>
+                                                {{ inv.modified_at|date:"Y/m/d H:i:s" }}
+                                            </td>
+                                        </tr>
+                                        <tr >
+                                            <td colspan="5" class="hiddenRow">
+                                                <div class="accordian-body collapse" id="myinvs{{inv.pk}}">
+                                                    <div class="invdescription2" style="max-width:25vw">
+                                                    {{ inv.description }}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-light mb-3">
+                        <div class="card-header">TBD</div>
+                        <div class="card-body">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card bg-light mb-3">
+                        <div class="card-header">My Investigations TOP10 ({{ invs.count }})</div>
                             <div class="card-body">
                                 <table class="table table-sm table-condensed fittable" style="border-collapse:collapse;">
                                     <thead>
@@ -66,7 +179,7 @@
                 </div>
                 <div class="col-md-4">
                     <div class="card bg-light mb-3">
-                        <div class="card-header">My Manual Tasks ({{ tasks.count }})</div>
+                        <div class="card-header">My Manual Tasks TOP10 ({{ tasks.count }})</div>
                         <div class="card-body">
                             <table class="table table-sm table-condensed fittable" style="border-collapse:collapse;">
                                 <thead>
@@ -94,7 +207,7 @@
                                         </td>
                                     </tr>
                                     <tr >
-                                        <td colspan="3" class="hiddenRow">
+                                        <td colspan="4" class="hiddenRow">
                                             <div class="accordian-body collapse" id="mytasks{{task.pk}}">
                                                 <div class="invdescription2" style="max-width:25vw">
                                                 {{ task.title }}
@@ -110,7 +223,7 @@
                 </div>
                 <div class="col-md-4">
                     <div class="card bg-light mb-3">
-                        <div class="card-header">Recently Closed tasks</div>
+                        <div class="card-header">Recently Closed Tasks TOP10</div>
                         <div class="card-body">
                             <table class="table table-sm table-condensed fittable" style="border-collapse:collapse;">
                                 <thead>
@@ -138,7 +251,7 @@
                                         </td>
                                     </tr>
                                     <tr >
-                                        <td colspan="3" class="hiddenRow">
+                                        <td colspan="4" class="hiddenRow">
                                             <div class="accordian-body collapse" id="myrtasks{{task.pk}}">
                                                 <div class="invdescription2" style="max-width:25vw">
                                                 {{ task.title }}
@@ -157,7 +270,7 @@
             <div class="row">
                 <div class="col-md-4">
                     <div class="card bg-light mb-3">
-                        <div class="card-header">Unassigned Investigations ({{ uinvs.count }})</div>
+                        <div class="card-header">Unassigned Investigations TOP10 ({{ uinvs.count }})</div>
                         <div class="card-body">
                             <table class="table table-sm table-condensed fittable" style="border-collapse:collapse;">
                                 <thead>
@@ -212,7 +325,7 @@
                 </div>
                 <div class="col-md-4">
                     <div class="card bg-light mb-3">
-                        <div class="card-header">Unassigned Manual Tasks ({{ utasks.count }})</div>
+                        <div class="card-header">Unassigned Manual Tasks TOP10 ({{ utasks.count }})</div>
                         <div class="card-body">
                             <table class="table table-sm table-condensed fittable" style="border-collapse:collapse;">
                                 <thead>
@@ -270,7 +383,7 @@
             <div class="row">
                 <div class="col-md-4">
                     <div class="card bg-light mb-3">
-                        <div class="card-header">Other Investigations ({{ oinvs.count }})</div>
+                        <div class="card-header">Other Investigations TOP10 ({{ oinvs.count }})</div>
                         <div class="card-body">
                         <table class="table table-sm table-condensed fittable" style="border-collapse:collapse;">
                             <thead>
@@ -334,7 +447,7 @@
                 </div>
                 <div class="col-md-4">
                     <div class="card bg-light mb-3">
-                        <div class="card-header">Other Manual Tasks ({{ otasks.count }})</div>
+                        <div class="card-header">Other Manual Tasks TOP10 ({{ otasks.count }})</div>
                         <div class="card-body">
                             <table class="table table-sm table-condensed fittable" style="border-collapse:collapse;">
                                 <thead>

@@ -12,17 +12,17 @@
 # 2019.07.29  Lendvay     1      Initial file
 # **********************************************************************;
 -->
-{% block evidence_alert %}
-{% endblock evidence_alert %}
+{% block evidencetmp_alert %}
+{% endblock evidencetmp_alert %}
 
-{% block evidence_buttons %}
-{% endblock evidence_buttons %}
+{% block evidencetmp_buttons %}
+{% endblock evidencetmp_buttons %}
 
-{% block evidence_title %}
+{% block evidencetmp_title %}
                              Evidence Attribute # {{ evidenceattr.pk }} | Evidence #{{ evidenceattr.ev.pk }}
-{% endblock evidence_title %}
+{% endblock evidencetmp_title %}
 
-{% block evidence_body %}
+{% block evidencetmp_body %}
                         <table class="table table-sm table-hover table-striped table-condensed" id="evidences-eve">
                             <thead>
                                 <tr class="mylist-header">
@@ -46,4 +46,4 @@
                             <span class="fas fa-arrow-left" aria-hidden="true"></span>
                             <span>Cancel</span>
                         </a>
-{% endblock evidence_body %}
+{% endblock evidencetmp_body %}
