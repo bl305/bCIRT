@@ -91,6 +91,14 @@ class Get_Report():
         if aend is None:
             self.aend = timezone_now()
 
+    def invs_all(self):
+        retval = Inv.objects.filter(created_at__gte=self.astart)\
+            .filter(created_at__lte=self.aend) \
+            .values('status__name')\
+            .annotate(Count('status'))\
+            .order_by('status__name')
+        return retval
+
     def invs_closed(self):
         retval = Inv.objects.filter(created_at__gte=self.astart)\
             .filter(created_at__lte=self.aend) \
@@ -181,6 +189,14 @@ class Get_Report():
                   'avg': aavg}
         return retval
 
+    def tasks_all(self):
+        retval = Task.objects.filter(created_at__gte=self.astart)\
+            .filter(created_at__lte=self.aend) \
+            .values('status__name')\
+            .annotate(Count('status'))\
+            .order_by('status__name')
+        return retval
+
     def tasks_closed(self):
         retval = Task.objects.filter(created_at__gte=self.astart)\
             .filter(created_at__lte=self.aend) \
@@ -268,6 +284,16 @@ class Get_Report():
 class ReportsDashboardPage(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
     template_name = 'reports/reports_dashboard.html'
     permission_required = ('invs.view_inv', 'tasks.view_task')
+    utc = timezone("UTC")
+    nowtime = datetime.now()
+    # dataendtime = datetime.strftime(rawendtime,newformat)
+    endtime = utc.localize(nowtime)
+    searchendtime = endtime
+    alltime = datetime.now()-timedelta(days=25000)
+    last30days = datetime.now()-timedelta(days=30)
+    last90days = datetime.now()-timedelta(days=90)
+    starttime30 = utc.localize(last30days)
+    starttime90 = utc.localize(last90days)
 
     def __init__(self, *args, **kwargs):
         if LOGLEVEL == 1:
@@ -282,223 +308,83 @@ class ReportsDashboardPage(LoginRequiredMixin, PermissionRequiredMixin, Template
     def get_context_data(self, **kwargs):
         kwargs['user'] = self.request.user
         # Closed investigations
+        kwargs['invs_closed'] = Get_Report(self.alltime, self.searchendtime).invs_all()
+        kwargs['invs_closed_30'] = Get_Report(self.starttime30, self.searchendtime).invs_all()
+        kwargs['invs_closed_90'] = Get_Report(self.starttime90, self.searchendtime).invs_all()
 
-        kwargs['invs_closed'] = Inv.objects.all()\
-            .values('status__name')\
-            .annotate(Count('status'))\
-            .order_by('status__name')
+        invs_closed_stats = Get_Report(self.alltime, self.searchendtime).invduration()
+        kwargs['invs_closed_stats_min'] = invs_closed_stats['min']
+        kwargs['invs_closed_stats_max'] = invs_closed_stats['max']
+        kwargs['invs_closed_stats_avg'] = invs_closed_stats['avg']
 
-        kwargs['invs_closed_30'] = Inv.objects.filter(created_at__gt=timezone_now()-timedelta(days=30))\
-            .values('status__name')\
-            .annotate(Count('status'))\
-            .order_by('status__name')
+        invs_closed_stats30 = Get_Report(self.starttime30, self.searchendtime).invduration()
+        kwargs['invs_closed_stats30_min'] = invs_closed_stats30['min']
+        kwargs['invs_closed_stats30_max'] = invs_closed_stats30['max']
+        kwargs['invs_closed_stats30_avg'] = invs_closed_stats30['avg']
 
-        kwargs['invs_closed_90'] = Inv.objects.filter(created_at__gt=timezone_now()-timedelta(days=30))\
-            .values('status__name')\
-            .annotate(Count('status'))\
-            .order_by('status__name')
+        invs_closed_stats90 = Get_Report(self.starttime90, self.searchendtime).invduration()
+        kwargs['invs_closed_stats90_min'] = invs_closed_stats90['min']
+        kwargs['invs_closed_stats90_max'] = invs_closed_stats90['max']
+        kwargs['invs_closed_stats90_avg'] = invs_closed_stats90['avg']
 
-        invduration_values = Inv.objects.all()\
-            .filter(status=2)\
-            .aggregate(Min('invduration'), Max('invduration'), Avg('invduration'))
-        kwargs['invs_closed_stats_min'] = durationprint(invduration_values['invduration__min'])
-        kwargs['invs_closed_stats_avg'] = durationprint(invduration_values['invduration__avg'])
-        kwargs['invs_closed_stats_max'] = durationprint(invduration_values['invduration__max'])
+        invs_closed_tasks = Get_Report(self.alltime, self.searchendtime).invs_closed_tasks()
+        kwargs['invs_closed_tasks_min'] = invs_closed_tasks['min']
+        kwargs['invs_closed_tasks_max'] = invs_closed_tasks['max']
+        kwargs['invs_closed_tasks_avg'] = invs_closed_tasks['avg']
+        invs_closed_tasks_manual = Get_Report(self.starttime30, self.searchendtime).invs_closed_tasks(atype="Manual")
+        kwargs['invs_closed_tasks_manual_min'] = invs_closed_tasks_manual['min']
+        kwargs['invs_closed_tasks_manual_max'] = invs_closed_tasks_manual['max']
+        kwargs['invs_closed_tasks_manual_avg'] = invs_closed_tasks_manual['avg']
+        invs_closed_tasks_auto = Get_Report(self.starttime90, self.searchendtime).invs_closed_tasks(atype="Auto")
+        kwargs['invs_closed_tasks_auto_min'] = invs_closed_tasks_auto['min']
+        kwargs['invs_closed_tasks_auto_max'] = invs_closed_tasks_auto['max']
+        kwargs['invs_closed_tasks_auto_avg'] = invs_closed_tasks_auto['avg']
 
-        invduration_values_30 = Inv.objects.all()\
-            .filter(status=2)\
-            .aggregate(Min('invduration'), Max('invduration'), Avg('invduration'))
-        kwargs['invs_closed_stats30_min'] = durationprint(invduration_values_30['invduration__min'])
-        kwargs['invs_closed_stats30_avg'] = durationprint(invduration_values_30['invduration__avg'])
-        kwargs['invs_closed_stats30_max'] = durationprint(invduration_values_30['invduration__max'])
+        kwargs['tasks_closed'] = Get_Report(self.alltime, self.searchendtime).tasks_all()
+        kwargs['tasks_closed_30'] = Get_Report(self.starttime30, self.searchendtime).tasks_all()
+        kwargs['tasks_closed_90'] = Get_Report(self.starttime90, self.searchendtime).tasks_all()
 
-        invduration_values_90 = Inv.objects.all()\
-            .filter(status=2)\
-            .aggregate(Min('invduration'), Max('invduration'), Avg('invduration'))
-        kwargs['invs_closed_stats90_min'] = durationprint(invduration_values_90['invduration__min'])
-        kwargs['invs_closed_stats90_avg'] = durationprint(invduration_values_90['invduration__avg'])
-        kwargs['invs_closed_stats90_max'] = durationprint(invduration_values_90['invduration__max'])
+        task_duration = Get_Report(self.alltime, self.searchendtime).taskduration()
+        kwargs['tasks_closed_stats_min'] = task_duration['min']
+        kwargs['tasks_closed_stats_max'] = task_duration['max']
+        kwargs['tasks_closed_stats_avg'] = task_duration['avg']
 
-        # tasks per inv
-        inv_closed_tasks = Inv.objects.all()\
-            .filter(created_at__gt=timezone_now()-timedelta(days=30))\
-            .values('pk')\
-            .annotate(Count('task_inv'))\
-            .order_by('pk') \
-            .aggregate(Min('task_inv__count'), Avg('task_inv__count'), Max('task_inv__count'))
-        if inv_closed_tasks['task_inv__count__min']:
-            kwargs['invs_closed_tasks_min'] = int(inv_closed_tasks['task_inv__count__min'])
-        else:
-            kwargs['invs_closed_tasks_min'] = 0
-        if inv_closed_tasks['task_inv__count__avg']:
-            kwargs['invs_closed_tasks_avg'] = round(inv_closed_tasks['task_inv__count__avg'])
-        else:
-            kwargs['invs_closed_tasks_avg'] = 0
-        if inv_closed_tasks['task_inv__count__max']:
-            kwargs['invs_closed_tasks_max'] = int(inv_closed_tasks['task_inv__count__max'])
-        else:
-            kwargs['invs_closed_tasks_max'] = 0
-        inv_closed_tasks_manual = Inv.objects.filter(task_inv__type=2) \
-            .filter(created_at__gt=timezone_now() - timedelta(days=30)) \
-            .values('pk')\
-            .annotate(Count('task_inv'))\
-            .order_by('pk') \
-            .aggregate(Min('task_inv__count'), Avg('task_inv__count'), Max('task_inv__count'))
-        if inv_closed_tasks_manual['task_inv__count__min']:
-            kwargs['invs_closed_tasks_manual_min'] = int(inv_closed_tasks_manual['task_inv__count__min'])
-        else:
-            kwargs['invs_closed_tasks_manual_min'] = 0
-        if inv_closed_tasks_manual['task_inv__count__avg']:
-            kwargs['invs_closed_tasks_manual_avg'] = round(inv_closed_tasks_manual['task_inv__count__avg'])
-        else:
-            kwargs['invs_closed_tasks_manual_avg'] = 0
-        if inv_closed_tasks_manual['task_inv__count__max']:
-            kwargs['invs_closed_tasks_manual_max'] = int(inv_closed_tasks_manual['task_inv__count__max'])
-        else:
-            kwargs['invs_closed_tasks_manual_max'] = 0
+        task_duration30 = Get_Report(self.starttime30, self.searchendtime).taskduration()
+        kwargs['tasks_closed_stats30_min'] = task_duration30['min']
+        kwargs['tasks_closed_stats30_max'] = task_duration30['max']
+        kwargs['tasks_closed_stats30_avg'] = task_duration30['avg']
 
-        inv_closed_tasks_auto = Inv.objects.filter(task_inv__type=1) \
-            .filter(created_at__gt=timezone_now() - timedelta(days=30)) \
-            .values('pk')\
-            .annotate(Count('task_inv'))\
-            .order_by('pk') \
-            .aggregate(Min('task_inv__count'), Avg('task_inv__count'), Max('task_inv__count'))
-        if inv_closed_tasks_auto['task_inv__count__min']:
-            kwargs['invs_closed_tasks_auto_min'] = int(inv_closed_tasks_auto['task_inv__count__min'])
-        else:
-            kwargs['invs_closed_tasks_auto_min'] = 0
-        if inv_closed_tasks_auto['task_inv__count__avg']:
-            kwargs['invs_closed_tasks_auto_avg'] = round(inv_closed_tasks_auto['task_inv__count__avg'])
-        else:
-            kwargs['invs_closed_tasks_auto_avg'] = 0
-        if inv_closed_tasks_auto['task_inv__count__max']:
-            kwargs['invs_closed_tasks_auto_max'] = int(inv_closed_tasks_auto['task_inv__count__max'])
-        else:
-            kwargs['invs_closed_tasks_auto_max'] = 0
-        #  Tasks
-        kwargs['tasks_closed'] = Task.objects.all()\
-            .values('status__name')\
-            .annotate(Count('status'))\
-            .order_by('status__name')
+        task_duration90 = Get_Report(self.starttime90, self.searchendtime).taskduration()
+        kwargs['tasks_closed_stats90_min'] = task_duration90['min']
+        kwargs['tasks_closed_stats90_max'] = task_duration90['max']
+        kwargs['tasks_closed_stats90_avg'] = task_duration90['avg']
 
-        kwargs['tasks_closed_30'] = Task.objects.all()\
-            .filter(created_at__gt=timezone_now()-timedelta(days=30))\
-            .values('status__name')\
-            .annotate(Count('status'))\
-            .order_by('status__name')
+        kwargs['tasks_manual_closed'] = Get_Report(self.alltime, self.searchendtime).taskduration()
+        kwargs['tasks_manual_closed_30'] = Get_Report(self.starttime30, self.searchendtime).taskduration()
+        kwargs['tasks_manual_closed_90'] = Get_Report(self.starttime90, self.searchendtime).taskduration()
 
-        kwargs['tasks_closed_90'] = Task.objects.all()\
-            .filter(created_at__gt=timezone_now()-timedelta(days=30))\
-            .values('status__name')\
-            .annotate(Count('status'))\
-            .order_by('status__name')
+        taskduration_manual = Get_Report(self.alltime, self.searchendtime).taskduration(atype="Manual")
+        kwargs['tasks_manual_closed_stats_min'] = taskduration_manual['min']
+        kwargs['tasks_manual_closed_stats_max'] = taskduration_manual['max']
+        kwargs['tasks_manual_closed_stats_avg'] = taskduration_manual['avg']
 
-        taskduration_values = Task.objects.all()\
-            .filter(status=2)\
-            .aggregate(Min('taskduration'), Max('taskduration'), Avg('taskduration'))
-        kwargs['tasks_closed_stats_min'] = durationprint(taskduration_values['taskduration__min'])
-        kwargs['tasks_closed_stats_avg'] = durationprint(taskduration_values['taskduration__avg'])
-        kwargs['tasks_closed_stats_max'] = durationprint(taskduration_values['taskduration__max'])
+        taskduration_manual_30 = Get_Report(self.starttime30, self.searchendtime).taskduration(atype="Manual")
+        kwargs['tasks_manual_closed_stats30_min'] = taskduration_manual_30['min']
+        kwargs['tasks_manual_closed_stats30_max'] = taskduration_manual_30['max']
+        kwargs['tasks_manual_closed_stats30_avg'] = taskduration_manual_30['avg']
 
-        taskduration_values_30 = Task.objects.all()\
-            .filter(status=2)\
-            .aggregate(Min('taskduration'), Max('taskduration'), Avg('taskduration'))
-        kwargs['tasks_closed_stats30_min'] = durationprint(taskduration_values_30['taskduration__min'])
-        kwargs['tasks_closed_stats30_avg'] = durationprint(taskduration_values_30['taskduration__avg'])
-        kwargs['tasks_closed_stats30_max'] = durationprint(taskduration_values_30['taskduration__max'])
+        taskduration_manual_90 = Get_Report(self.starttime90, self.searchendtime).taskduration(atype="Manual")
+        kwargs['tasks_manual_closed_stats90_min'] = taskduration_manual_90['min']
+        kwargs['tasks_manual_closed_stats90_max'] = taskduration_manual_90['max']
+        kwargs['tasks_manual_closed_stats90_avg'] = taskduration_manual_90['avg']
 
-        taskduration_values_90 = Task.objects.all()\
-            .filter(status=2)\
-            .aggregate(Min('taskduration'), Max('taskduration'), Avg('taskduration'))
-        kwargs['tasks_closed_stats90_min'] = durationprint(taskduration_values_90['taskduration__min'])
-        kwargs['tasks_closed_stats90_avg'] = durationprint(taskduration_values_90['taskduration__avg'])
-        kwargs['tasks_closed_stats90_max'] = durationprint(taskduration_values_90['taskduration__max'])
+        kwargs['invs_closed_attackvector'] = Get_Report(self.alltime, self.searchendtime).attackvector()
+        kwargs['invs_closed_attackvector_30'] = Get_Report(self.starttime30, self.searchendtime).attackvector()
+        kwargs['invs_closed_attackvector_90'] = Get_Report(self.starttime90, self.searchendtime).attackvector()
 
-        # Manual Tasks
-        kwargs['tasks_manual_closed'] = Task.objects.all() \
-            .filter(type__name='Manual') \
-            .values('status__name') \
-            .annotate(Count('status')) \
-            .order_by('status__name')
-
-        kwargs['tasks_manual_closed_30'] = Task.objects.all() \
-            .filter(type__name='Manual') \
-            .filter(created_at__gt=timezone_now() - timedelta(days=30)) \
-            .values('status__name') \
-            .annotate(Count('status')) \
-            .order_by('status__name')
-
-        kwargs['tasks_manual_closed_90'] = Task.objects.all() \
-            .filter(type__name='Manual') \
-            .filter(created_at__gt=timezone_now() - timedelta(days=30)) \
-            .values('status__name') \
-            .annotate(Count('status')) \
-            .order_by('status__name')
-
-        taskduration_manual_values = Task.objects.all() \
-            .filter(status=2) \
-            .filter(type__name='Manual') \
-            .aggregate(Min('taskduration'), Max('taskduration'), Avg('taskduration'))
-        kwargs['tasks_manual_closed_stats_min'] = durationprint(taskduration_manual_values['taskduration__min'])
-        kwargs['tasks_manual_closed_stats_avg'] = durationprint(taskduration_manual_values['taskduration__avg'])
-        kwargs['tasks_manual_closed_stats_max'] = durationprint(taskduration_manual_values['taskduration__max'])
-
-        taskduration_manual_values_30 = Task.objects.all() \
-            .filter(status=2) \
-            .filter(type__name='Manual') \
-            .aggregate(Min('taskduration'), Max('taskduration'), Avg('taskduration'))
-        kwargs['tasks_manual_closed_stats30_min'] = durationprint(taskduration_manual_values_30['taskduration__min'])
-        kwargs['tasks_manual_closed_stats30_avg'] = durationprint(taskduration_manual_values_30['taskduration__avg'])
-        kwargs['tasks_manual_closed_stats30_max'] = durationprint(taskduration_manual_values_30['taskduration__max'])
-
-        taskduration_manual_values_90 = Task.objects.all() \
-            .filter(status=2) \
-            .filter(type__name='Manual') \
-            .aggregate(Min('taskduration'), Max('taskduration'), Avg('taskduration'))
-        kwargs['tasks_manual_closed_stats90_min'] = durationprint(taskduration_manual_values_90['taskduration__min'])
-        kwargs['tasks_manual_closed_stats90_avg'] = durationprint(taskduration_manual_values_90['taskduration__avg'])
-        kwargs['tasks_manual_closed_stats90_max'] = durationprint(taskduration_manual_values_90['taskduration__max'])
-
-        kwargs['invs_closed_attackvector'] = Inv.objects.all()\
-            .filter(status=2)\
-            .values('attackvector__name')\
-            .annotate(Count('attackvector'))\
-            .order_by('attackvector__name')
-
-        kwargs['invs_closed_attackvector_30'] = Inv.objects.filter(created_at__gt=timezone_now()-timedelta(days=30)) \
-            .filter(status=2) \
-            .values('attackvector__name')\
-            .annotate(Count('attackvector'))\
-            .order_by('attackvector__name')
-
-        kwargs['invs_closed_attackvector_90'] = Inv.objects.filter(created_at__gt=timezone_now()-timedelta(days=30)) \
-            .filter(status=2) \
-            .values('attackvector__name')\
-            .annotate(Count('attackvector'))\
-            .order_by('attackvector__name')
-
-        kwargs['phish_closed_stats'] = Inv.objects.all() \
-            .filter(status=2) \
-            .filter(attackvector__name='Phishing') \
-            .values('pk', 'losscurrency__currencyshortname')\
-            .annotate(potential=Sum('potentialloss'), monetary=Sum('monetaryloss'))\
-            .filter(Q(potential__gt=0) | Q(monetary__gt=0))
-
-        kwargs['phish_closed_stats_30'] = Inv.objects.all() \
-            .filter(created_at__gt=timezone_now()-timedelta(days=30)) \
-            .filter(status=2) \
-            .filter(attackvector__name='Phishing') \
-            .values('pk', 'losscurrency__currencyshortname') \
-            .annotate(potential=Sum('potentialloss'), monetary=Sum('monetaryloss')) \
-            .filter(Q(potential__gt=0) | Q(monetary__gt=0))
-
-        kwargs['phish_closed_stats_90'] = Inv.objects.all() \
-            .filter(created_at__gt=timezone_now()-timedelta(days=90)) \
-            .filter(status=2) \
-            .filter(attackvector__name='Phishing') \
-            .values('pk', 'losscurrency__currencyshortname') \
-            .annotate(potential=Sum('potentialloss'), monetary=Sum('monetaryloss')) \
-            .filter(Q(potential__gt=0) | Q(monetary__gt=0))
+        kwargs['phish_closed_stats'] = Get_Report(self.alltime, self.searchendtime).phishing_stats()
+        kwargs['phish_closed_stats_30'] = Get_Report(self.starttime30, self.searchendtime).phishing_stats()
+        kwargs['phish_closed_stats_90'] = Get_Report(self.starttime90, self.searchendtime).phishing_stats()
 
         return super(ReportsDashboardPage, self).get_context_data(**kwargs)
 

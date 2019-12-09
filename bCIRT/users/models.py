@@ -26,7 +26,7 @@ class Profile(LoginRequiredMixin, models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     reviewer1 = models.BooleanField(default=False)
     reviewer2 = models.BooleanField(default=False)
-    passwordmodified_at = models.DateTimeField(auto_now=False)
+    passwordmodified_at = models.DateTimeField(auto_now=False, default=None, null=True, blank=True)
     usermodified_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
