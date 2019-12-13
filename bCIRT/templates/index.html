@@ -38,7 +38,11 @@
                                         {% for inv in reviews1 %}
                                         <tr data-toggle="collapse" data-target="#myinvs{{inv.pk}}" class="accordion-toggle">
                                             <td>
-                                                <a href="{% url 'invs:inv_detail' pk=inv.pk %}"><h6><span class="badge badge-pill badge-secondary">{{inv.id}}</span></h6></a>
+                                                <a href="{% url 'invs:inv_detail' pk=inv.pk %}">
+                                                    <h6>
+                                                        <span class="badge badge-pill badge-danger">{{inv.id}}</span>
+                                                    </h6>
+                                                </a>
                                             </td>
                                             <td>
                                                 {{ inv.attackvector.name }}
@@ -90,7 +94,11 @@
                                         {% for inv in reviews2 %}
                                         <tr data-toggle="collapse" data-target="#myinvs{{inv.pk}}" class="accordion-toggle">
                                             <td>
-                                                <a href="{% url 'invs:inv_detail' pk=inv.pk %}"><h6><span class="badge badge-pill badge-secondary">{{inv.id}}</span></h6></a>
+                                                <a href="{% url 'invs:inv_detail' pk=inv.pk %}">
+                                                    <h6>
+                                                        <span class="badge badge-pill badge-danger">{{inv.id}}</span>
+                                                    </h6>
+                                                </a>
                                             </td>
                                             <td>
                                                 {{ inv.attackvector.name }}

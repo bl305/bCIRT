@@ -66,6 +66,15 @@
                                                         </a>
                                                     </li>
                                                     <li>
+                                                        <a tabindex="-1" href="{% url 'invs:inv_export_files' pk=inv.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                                          class="btn btn-secondary btn-sm btn-block text-left">
+                                                          <span class="" data-toggle="tooltip" data-placement="top" title="Edit Evidence item">
+                                                              <i class="fas fa-save">&nbsp;</i>
+                                                          </span>
+                                                              Export Report and Files
+                                                        </a>
+                                                    </li>
+                                                    <li>
                                                         <a tabindex="-1" href="{% url 'invs:inv_export' pk=inv.pk %}?next1={{ request.get_full_path|urlencode }}"
                                                           class="btn btn-secondary btn-sm btn-block text-left">
                                                           <span class="" data-toggle="tooltip" data-placement="top" title="Edit Evidence item">

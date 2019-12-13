@@ -26,39 +26,168 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User  # , Permission, Group
 from django.test import TestCase
 from django.test import Client
+from django.contrib.auth.models import Permission, Group
+from django.contrib.contenttypes.models import ContentType
+from assets.models import Host
+
 
 
 class ProfileTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        print("TEST (setUpTestData): Run once to set up non-modified data for all class methods.")
+        print("TEST ASSSET setUpTestData")
         pass
 
     def setUp(self):
-        print("TEST (setUp): Run once for every test method to setup clean data.")
-        # create permissions group
+        print("TEST ASSET setUp")
+
+        self.c = Client()
+        self.user_readonly1 = User.objects.create_user(username="readonly1", email="readonly1@test.com", password="Password1.")
+        self.user_readonly1.save()
+        self.user_readonly2 = User.objects.create_user(username="readonly2", email="readonly2@test.com", password="Password1.")
+        self.user_readonly2.save()
+        self.user_write1 = User.objects.create_user(username="write1", email="write1@test.com", password="Password1.")
+        self.user_write1.save()
+        self.user_write2 = User.objects.create_user(username="write2", email="write2@test.com", password="Password1.")
+        self.user_write2.save()
+        self.user_review1 = User.objects.create_user(username="review1", email="rewview1@test.com", password="Password1.")
+        self.user_review1.save()
+        self.user_review2 = User.objects.create_user(username="review2", email="rewview2@test.com", password="Password1.")
+        self.user_review2.save()
+        self.assertTrue(self.user_readonly1.is_active)
+        self.assertFalse(self.user_readonly1.is_staff)
+        self.assertFalse(self.user_readonly1.is_superuser)
+        self.assertTrue(self.user_readonly2.is_active)
+        self.assertFalse(self.user_readonly2.is_staff)
+        self.assertFalse(self.user_readonly2.is_superuser)
+        self.assertTrue(self.user_write1.is_active)
+        self.assertFalse(self.user_write1.is_staff)
+        self.assertFalse(self.user_write1.is_superuser)
+        self.assertTrue(self.user_write2.is_active)
+        self.assertFalse(self.user_write2.is_staff)
+        self.assertFalse(self.user_write2.is_superuser)
+        self.assertTrue(self.user_review1.is_active)
+        self.assertFalse(self.user_review1.is_staff)
+        self.assertFalse(self.user_review1.is_superuser)
+        self.assertTrue(self.user_review2.is_active)
+        self.assertFalse(self.user_review2.is_staff)
+        self.assertFalse(self.user_review2.is_superuser)
+        # granting permissions
+        appname = "assets"
+        modelname = "host"
+
+        add_host = "%s%s" % ('add_', modelname)
+        add_host_perm = "%s.%s" % (appname, add_host)
+        view_host = "%s%s" % ('view_', modelname)
+        view_host_perm = "%s.%s" % (appname, view_host)
+        change_host = "%s%s" % ('change_', modelname)
+        change_host_perm = "%s.%s" % (appname, change_host)
+        delete_host = "%s%s" % ('delete_', modelname)
+        delete_host_perm = "%s.%s" % (appname, delete_host)
+
+        content_type_host = ContentType.objects.get_for_model(Host)
+
+        permission_view_host = Permission.objects.get(content_type=content_type_host, codename=view_host)
+        permission_add_host = Permission.objects.get(content_type=content_type_host, codename=add_host)
+        permission_change_host = Permission.objects.get(content_type=content_type_host, codename=change_host)
+        permission_delete_host = Permission.objects.get(content_type=content_type_host, codename=delete_host)
+
+        # creating the permission groups
         # group_name = "AssetsAll"
         # self.group = Group(name=group_name)
         # self.group.save()
-        self.c = Client()
-        self.user = User.objects.create_user(username="test", email="test@test.com", password="Password1.")
-        print(self.user)
-        self.user.save()
+        self.group_cirt_member, created = Group.objects.get_or_create(name='CIRT_MEMBER')
+        self.group_cirt_reviewer, created = Group.objects.get_or_create(name='CIRT_REVIEWER')
+        self.group_cirt_readonly, created = Group.objects.get_or_create(name='CIRT_READONLY')
+        # Create new permission
+        # permission = Permission.objects.create(codename='view_XX',
+        #                                        name='Can view XX',
+        #                                        content_type=content_type_host)
+        self.group_cirt_member.permissions.add(permission_view_host)
+        self.group_cirt_member.permissions.add(permission_add_host)
+        self.group_cirt_member.permissions.add(permission_change_host)
+        self.group_cirt_member.permissions.add(permission_delete_host)
+
+        self.group_cirt_reviewer.permissions.add(permission_view_host)
+        self.group_cirt_reviewer.permissions.add(permission_change_host)
+
+        self.group_cirt_readonly.permissions.add(permission_view_host)
+
+        self.user_readonly1.groups.add(self.group_cirt_readonly)
+        self.user_readonly2.groups.add(self.group_cirt_readonly)
+
+        self.user_write1.groups.add(self.group_cirt_member)
+        self.user_write2.groups.add(self.group_cirt_member)
+
+        self.user_review1.groups.add(self.group_cirt_reviewer)
+        self.user_review2.groups.add(self.group_cirt_reviewer)
+
+        # checking permissions
+        # self.user_readonly1.user_permissions.add(permission_view_host)
+        self.assertTrue(self.user_readonly1.has_perm(view_host_perm))
+
+        # self.user_readonly2.user_permissions.add(permission_view_host)
+        self.assertTrue(self.user_readonly2.has_perm(view_host_perm))
+
+        # self.user_write1.user_permissions.add(
+        #     permission_view_host,
+        #     permission_change_host,
+        #     permission_add_host,
+        #     permission_delete_host)
+        self.assertTrue(self.user_write1.has_perm(view_host_perm))
+        self.assertTrue(self.user_write1.has_perm(change_host_perm))
+        self.assertTrue(self.user_write1.has_perm(add_host_perm))
+        self.assertTrue(self.user_write1.has_perm(delete_host_perm))
+
+        # self.user_write2.user_permissions.add(
+        #     permission_view_host,
+        #     permission_change_host,
+        #     permission_add_host,
+        #     permission_delete_host)
+        self.assertTrue(self.user_write2.has_perm(view_host_perm))
+        self.assertTrue(self.user_write2.has_perm(change_host_perm))
+        self.assertTrue(self.user_write2.has_perm(add_host_perm))
+        self.assertTrue(self.user_write2.has_perm(delete_host_perm))
+
+        # self.user_review1.user_permissions.add(permission_view_host)
+        self.assertTrue(self.user_review1.has_perm(view_host_perm))
+
+        # self.user_review2.user_permissions.add(permission_view_host)
+        self.assertTrue(self.user_review2.has_perm(view_host_perm))
+
+        # x=self.user_readonly1.get_all_permissions()
+        # for xx in x:
+        #     print(xx)
+        #clear cache when testing perms
+        # if hasattr(user, '_perm_cache'):
+        #     delattr(user, '_perm_cache')
+
         pass
 
     def tearDown(self):
-        print("TEST (Teardown)")
-        self.user.delete()
+        print("TEST ASSET Teardown")
+        self.user_readonly1.delete()
+        self.user_readonly2.delete()
+        self.user_write1.delete()
+        self.user_write2.delete()
+        self.user_review1.delete()
+        self.user_review2.delete()
+
+        self.group_cirt_member.delete()
+        self.group_cirt_readonly.delete()
+        self.group_cirt_reviewer.delete()
         # self.group.delete()
 
-    def test_create_user(self):
-        print("TEST (Create user)")
-        User = get_user_model()
-        user = User.objects.create_user(username="bcirt", email='bcirt@bcirt.com', password='Password1.')
-        self.assertEqual(user.email, 'bcirt@bcirt.com')
-        self.assertTrue(user.is_active)
-        self.assertFalse(user.is_staff)
-        self.assertFalse(user.is_superuser)
+    # def test_create_user(self):
+    #     print("TEST (Create user)")
+    #     User = get_user_model()
+    #     user = User.objects.create_user(username="bcirt", email='bcirt@bcirt.com', password='Password1.')
+    #     user.save()
+    #     self.assertEqual(user.email, 'bcirt@bcirt.com')
+    #     self.assertTrue(user.is_active)
+    #     self.assertFalse(user.is_staff)
+    #     self.assertFalse(user.is_superuser)
+
         # try:
             # username is None for the AbstractUser option
             # username does not exist for the AbstractBaseUser option
@@ -73,14 +202,15 @@ class ProfileTest(TestCase):
         # with self.assertRaises(ValueError):
         #     User.objects.create_user(username='bcirt', email='', password="AlmaFa1.")
 
-    def test_create_superuser(self):
-        print("TEST (Create superuser)")
-        User = get_user_model()
-        admin_user = User.objects.create_superuser(username='admin', email='admin@bcirt.com', password='Password1.')
-        self.assertEqual(admin_user.email, 'admin@bcirt.com')
-        self.assertTrue(admin_user.is_active)
-        self.assertTrue(admin_user.is_staff)
-        self.assertTrue(admin_user.is_superuser)
+    # def test_create_superuser(self):
+    #     print("TEST (Create superuser)")
+    #     User = get_user_model()
+    #     admin_user = User.objects.create_superuser(username='admintest', email='admin@bcirt.com', password='Password1.')
+    #     user.save()
+    #     self.assertEqual(admin_user.email, 'admin@bcirt.com')
+    #     self.assertTrue(admin_user.is_active)
+    #     self.assertTrue(admin_user.is_staff)
+    #     self.assertTrue(admin_user.is_superuser)
 
 
         # self.c.login(username='admin', password='Password1.')
@@ -99,10 +229,11 @@ class ProfileTest(TestCase):
         #         username='admin', email='admin@bcirt.com', password='AlmaFa1.', is_superuser=False)
 
     def test_user_can_access(self):
-        print("TEST (User can access)")
+        print("TEST ASSET User can access")
         #     self.user.groups.add(self.group)
         #     self.user.save()
-        self.c.login(username='test', password='Password1.')
+        self.c.login(username='readonly1', password='Password1.')
+
         response = self.c.get(reverse('assets:host_list'))
         # login = self.client.login(username='admin', password='Password1.')
         # self.assertTrue(login)

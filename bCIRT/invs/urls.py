@@ -43,6 +43,7 @@ urlpatterns = [
     url(r'^export/pdf/(?P<pk>\d+)', views.MyPDFView.as_view(), name='inv_pdf'),
     url(r"^detailprint/(?P<pk>\d+)/$", views.InvDetailPrintView.as_view(), name="inv_detail_print"),
     url(r'^exportinv/(?P<pk>\d+)', views.ExportInvView.as_view(), name='inv_export'),
+    url(r'^exportinvfiles/(?P<pk>\d+)', views.ExportInvFilesView.as_view(), name='inv_export_files'),
     # url(r"^detailexport/$", views.exportreviewrules, name="inv_detail_export"),
     # url(r'^simpleupload/$', views.simple_upload, name='simple_upload'),
     url(r'^newsuspiciousemail/$', views.InvSuspiciousEmailCreateView.as_view(), name='inv_suspiciousemail'),

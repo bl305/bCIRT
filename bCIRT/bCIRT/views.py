@@ -17,6 +17,7 @@ from django.contrib.auth.mixins import (
     LoginRequiredMixin,
     PermissionRequiredMixin,
 )
+from tasks.models import PlaybookTemplate
 from invs.models import Inv
 from tasks.models import Task
 # check remaining session time
@@ -36,18 +37,26 @@ class HomePage(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
         kwargs['user'] = self.request.user
         reviewers1 = User.objects.filter(profile__reviewer1=True)
         reviewers1list = set()
+        amireviewer1 = False
         for reviewer1 in reviewers1:
+            if reviewer1 == self.request.user:
+                amireviewer1 = True
             reviewers1list.add(reviewer1)
         reviewers2 = User.objects.filter(profile__reviewer2=True)
         reviewers2list = set()
+        amireviewer2 = False
         for reviewer2 in reviewers2:
+            if reviewer2 == self.request.user:
+                amireviewer2 = True
             reviewers2list.add(reviewer2)
         kwargs['reviewers1'] = reviewers1list
         kwargs['reviewers2'] = reviewers2list
         kwargs['invs'] = Inv.objects.filter(user=self.request.user, status=3)[:10]
-        kwargs['reviews1'] = Inv.objects.filter(reviewer1=self.request.user, status=5)
-        kwargs['reviews2'] = Inv.objects.filter(reviewer2=self.request.user, status=6)
-        kwargs['uinvs'] = Inv.objects.exclude(status=3).exclude(status=2)[:10]
+        if amireviewer1:
+            kwargs['reviews1'] = Inv.objects.filter(status=5)
+        if amireviewer2:
+            kwargs['reviews2'] = Inv.objects.filter(status=6)
+        kwargs['uinvs'] = Inv.objects.exclude(status=3).exclude(status=2).exclude(status=5).exclude(status=6)[:10]
         kwargs['oinvs'] = Inv.objects.filter(status=3).exclude(user=self.request.user)[:10]
         kwargs['tasks'] = Task.objects.filter(user=self.request.user)\
             .exclude(status=2)\
@@ -65,5 +74,5 @@ class HomePage(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
             .exclude(status=3)\
             .exclude(status=5)\
             .order_by('-modified_at')[:10]
-
+        kwargs['suspiciousemailplaybook'] = PlaybookTemplate.objects.filter(name="Suspicious Email")
         return super(HomePage, self).get_context_data(**kwargs)

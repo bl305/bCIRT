@@ -1419,7 +1419,11 @@ class EvidenceForm(forms.ModelForm):
                 inv_obj = Inv.objects.get(pk=inv_pk)
             else:
                 inv_obj = curr_obj.inv
-            self.fields['task'].queryset = inv_obj.task_inv.exclude(pk=current_pk)
+            if inv_obj:
+                self.fields['task'].queryset = inv_obj.task_inv.exclude(pk=current_pk)
+            else:
+                self.fields['task'].queryset = Task.objects.all()
+
         elif inv_pk == '0' or inv_pk == 0:
             self.fields['task'].queryset = Task.objects.all()
         else:

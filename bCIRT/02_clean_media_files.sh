@@ -4,3 +4,4 @@ find ./media/ -not -name *.png -type f -delete
 > ./log/logs.txt
 > ./log/debug.txt
 find ./media/uploads/evidences/ -type f -delete
+find ./media/graphs -name *.png -type f -delete

@@ -34,7 +34,7 @@
 {% endblock inv_title %}
 
 {% block inv_body %}
-                    <form method="post" enctype="multipart/form-data">
+                    <form id="submitForm" method="post" enctype="multipart/form-data">
                         {% csrf_token %}
 
                             <label>Description:</label>

@@ -20,12 +20,14 @@ from django.utils.timezone import now as timezone_now
 # from tasks.models import Task, Playbook
 import os
 import shutil
+from io import BytesIO
 from django.core.files import File
 import tempfile
-from zipfile import ZipFile
+# from zipfile import ZipFile
+import zipfile
 from bCIRT.settings import MEDIA_ROOT
 from shutil import copyfile
-from django.shortcuts import redirect, reverse  # , get_object_or_404  # ,render,
+from django.shortcuts import redirect, reverse, get_object_or_404  # ,render,
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 # from django.views.decorators.csrf import csrf_exempt
@@ -64,9 +66,9 @@ logger = logging.getLogger('log_file_verbose')
 
 # Create your views here.
 class MyPDFView(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailView):
-    # context = {"title": "Task evidences"}  # data that has to be rendered to pdf templete
+    # context = {"title": "Task evidences"}  # data that has to be rendered to pdf template
     model = Inv
-    permission_required = ('invs.view_inv', 'tasks.view_evidence', 'tasks:view_task', 'tasks:view_playbook')
+    permission_required = ('invs.view_inv', 'tasks.view_evidence', 'tasks.view_task', 'tasks.view_playbook')
     context = {"title": "Investigation evidences"}
 
     def __init__(self, *args, **kwargs):
@@ -139,10 +141,13 @@ class InvDetailPrintView(LoginRequiredMixin, PermissionRequiredMixin, generic.De
         # Checks pass, let http method handlers process the request
         return super(InvDetailPrintView, self).dispatch(request, *args, **kwargs)
 
+
 # TESTING EXPORT
-#https://simpleisbetterthancomplex.com/packages/2016/08/11/django-import-export.html
+# https://simpleisbetterthancomplex.com/packages/2016/08/11/django-import-export.html
 from django.http import HttpResponse
 from .resources import InvResource
+
+
 #
 # def exportreviewrules(request):
 #     invreviewrules_resource = InvReviewRulesResource()
@@ -155,7 +160,7 @@ class ExportInvView(LoginRequiredMixin, PermissionRequiredMixin, generic.View):
 
     # context = {"title": "Task evidences"}  # data that has to be rendered to pdf template
     # model = InvReviewRules
-    permission_required = ('invs.view_inv', 'tasks.view_evidence', 'tasks:view_task', 'tasks:view_playbook')
+    permission_required = ('invs.view_inv', 'tasks.view_evidence', 'tasks.view_task', 'tasks.view_playbook')
     context = {"title": "Investigation Export"}
 
     def __init__(self, *args, **kwargs):
@@ -170,19 +175,102 @@ class ExportInvView(LoginRequiredMixin, PermissionRequiredMixin, generic.View):
 
     def get(self, request, *args, **kwargs):
         # self.context['invrule'] = self.get_object()
-        # self.context['user'] = self.request.user.get_username()xxx
+        # self.context['user'] = self.request.user.get_username()
         inv_resource = InvResource()
         # to filter enable the following lines below
         inv_pk = self.kwargs.get('pk')
         queryset = Inv.objects.filter(pk=inv_pk)
         dataset = inv_resource.export(queryset)
-        #filter end
-        #nofilter
+        # filter end
+        # nofilter
         # dataset = invreviewrules_resource.export()
         response = HttpResponse(dataset.json, content_type='application/json')
         response['Content-Disposition'] = 'attachment; filename="inv_'+str(inv_pk)+'.json"'
         return response
 
+
+class ExportInvFilesView(LoginRequiredMixin, PermissionRequiredMixin, generic.View):
+    # Exports the Inv table details into JSON
+
+    # context = {"title": "Task evidences"}  # data that has to be rendered to pdf template
+    # model = InvReviewRules
+    permission_required = ('invs.view_inv', 'tasks.view_evidence', 'tasks.view_task', 'tasks.view_playbook')
+    context = {"title": "Investigation Export"}
+
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
+            logger.info(logmsg)
+        super(ExportInvFilesView, self).__init__(*args, **kwargs)
+
+    def download_dir_zipped(self, p_dir):
+        in_memory = BytesIO()
+        os.chdir(os.path.dirname(p_dir))
+        with zipfile.ZipFile(in_memory,
+                             "w",
+                             zipfile.ZIP_DEFLATED,
+                             allowZip64=True) as zf:
+            for root, _, filenames in os.walk(os.path.basename(p_dir)):
+                for name in filenames:
+                    name = os.path.join(root, name)
+                    name = os.path.normpath(name)
+                    zf.write(name, name)
+        return in_memory
+
+    def get(self, request, *args, **kwargs):
+
+        inv_pk = self.kwargs.get('pk')
+        # queryset = Inv.objects.filter(pk=inv_pk)
+        inv_obj = Inv.objects.get(pk=inv_pk)
+        # inv_tasklist = inv_obj.tasklist()
+        inv_evidencelist = inv_obj.evidence_inv.exclude(fileRef="")
+        # fullfilepath = None
+
+        # 1. create a temp folder
+        # generate a random folder with some prefix:
+        tempfile.tempdir = os.path.join(MEDIA_ROOT, "tmp")
+        myprefix = "BCIRT-" + str(inv_pk)
+        myprefix1 = myprefix + "-"
+        myouttempdir1 = tempfile.TemporaryDirectory(prefix=myprefix1)
+        #  make the tempdir the temp root
+        tempfile.tempdir = myouttempdir1.name
+        destoutdirpath = tempfile.gettempdir()
+
+        for evitem in inv_evidencelist:
+            # 2. copy the files into the temp folder
+            # fullfilepath = os.path.join(MEDIA_ROOT, str(evitem.fileRef))
+            destoutdirfilename = os.path.join(destoutdirpath, str(evitem.pk)+"_"+str(evitem.fileName))
+            oldfile = os.path.join(MEDIA_ROOT, str(evitem.fileRef))
+            # adding exception handling
+            try:
+                copyfile(oldfile, destoutdirfilename)
+            except IOError as e:
+                print("Unable to copy file. %s" % e)
+            except Exception:
+                print("Unexpected error:", Exception)
+
+        destdir = myouttempdir1.name
+
+        # report filename
+        indexfilename = 'index.html'
+        indexfilepath = os.path.join(destdir, indexfilename)
+        context = {'pk': inv_pk, 'user': 'admin', 'inv': inv_obj}
+        open(indexfilepath, "w").write(render_to_string('invs/inv_detail_REPORT_v1.html', context))
+
+        # files zipping
+        zipfile_memory = self.download_dir_zipped(destdir)
+        zip_filename = "Export-Investigation-" + str(inv_pk) + ".zip"
+        # Grab ZIP file from in-memory, make response with correct MIME-type
+        resp = HttpResponse(content_type="application/x-zip-compressed")
+        # ..and correct content-disposition
+        resp['Content-Disposition'] = 'attachment; filename=%s' % zip_filename
+        zipfile_memory.seek(0)
+        resp.write(zipfile_memory.read())
+        return resp
 
 
 # #############################################################################3
@@ -780,7 +868,8 @@ class InvSuspiciousEmailCreateView(LoginRequiredMixin, PermissionRequiredMixin, 
         )
 
         cfileext = os.path.basename(str(cfileref)).split(".")[-1]
-        if (cfileext.lower() == 'eml') or (cfileext.lower() == 'msg'):
+        if ((cfileext.lower() == 'eml') or (cfileext.lower() == 'msg')) \
+                and PlaybookTemplate.objects.filter(name="Suspicious Email"):
             # use the file as an evidence, assign it to the first task
             # Need to create a playbook and tasks within it using the suspicious email template
             playbooktemplate_obj = PlaybookTemplate.objects.get(name="Suspicious Email")
@@ -860,7 +949,7 @@ class InvSuspiciousEmailCreateView(LoginRequiredMixin, PermissionRequiredMixin, 
 
             my_dir = destoutdirpath
             my_zip = destoutdirfilename
-            with ZipFile(my_zip) as zip_file:
+            with zipfile.ZipFile(my_zip) as zip_file:
                 for member in zip_file.namelist():
                     filename = os.path.basename(member)
                     # skip directories
@@ -1093,6 +1182,7 @@ class InvCreateAjaxView(LoginRequiredMixin, PermissionRequiredMixin, generic.Cre
     context_object_name = 'object_list'
 
     def __init__(self, *args, **kwargs):
+        self.object = None
         if LOGLEVEL == 1:
             pass
         elif LOGLEVEL == 2:

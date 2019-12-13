@@ -132,7 +132,9 @@ mybuttonbottom = document.getElementById("myBtnBottom");
                     <li class="nav-item dropdown {% block invs_active %}{% endblock invs_active%}">
                         <a class="nav-link dropdown-toggle" href="#" id="dropdownInv" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-folder-open"></i> Investigations</a>
                         <div class="dropdown-menu" aria-labelledby="dropdowninv">
-                            <a class="dropdown-item" href="{% url 'invs:inv_suspiciousemail' %}"><i class="fas fa-envelope">&nbsp;</i>Suspicious Email</a>
+                            {% if suspiciousemailplaybook %}
+                                <a class="dropdown-item" href="{% url 'invs:inv_suspiciousemail' %}"><i class="fas fa-envelope">&nbsp;</i>Suspicious Email</a>
+                            {% endif %}
                             <a class="dropdown-item" href="{% url 'invs:inv_create' %}"><i class="fas fa-folder-plus">&nbsp;</i>New Investigation</a>
                             <a class="dropdown-item" href="{% url 'invs:inv_list' %}"><i class="fas fa-list-ol">&nbsp;</i>Investigations</a>
                         </div>

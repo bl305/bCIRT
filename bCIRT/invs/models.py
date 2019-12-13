@@ -387,6 +387,10 @@ class Inv(models.Model):
         retval = self.task_inv.exclude(status__name='Completed').exclude(status__name='Skipped')
         return retval
 
+    def tasklist(self):
+        retval = self.task_inv.all()
+        return retval
+
     def get_absolute_url(self):
         return reverse(
             "invs:inv_detail",

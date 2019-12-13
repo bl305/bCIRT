@@ -3958,8 +3958,10 @@ class InvEvidenceUpdateAjaxView(LoginRequiredMixin, PermissionRequiredMixin, gen
         # return super(InvEvidenceUpdateAjaxView, self).get_context_data(**kwargs)
         context = super(InvEvidenceUpdateAjaxView, self).get_context_data(**kwargs)
         pk = self.kwargs.get('pk')
-        inv = Evidence.objects.get(pk=pk).inv
-        context['inv'] = inv
+        ev_obj = Evidence.objects.get(pk=pk)
+        inv_obj = ev_obj.inv
+        context['inv'] = inv_obj
+        context['evformat'] = ev_obj.evidenceformat.pk
         return context
 
     def get(self, request, *args, **kwargs):
