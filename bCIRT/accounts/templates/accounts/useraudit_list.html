@@ -1,0 +1,64 @@
+{% extends "configuration/configuration_template.html" %}
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : accounts/useraudit_list.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.12.17
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.12.17  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+{% block configuration_alert %}
+{% endblock configuration_alert %}
+
+{% block configuration_buttons %}
+                              {% if user.is_authenticated %}
+                              {% endif %}
+{% endblock configuration_buttons %}
+
+{% block configuration_title %}
+                        UserAudit for {{ user }} at {% now "Y/m/d H:i:s" %} (UTC)
+{% endblock configuration_title %}
+
+{% block configuration_body %}
+                    <table class="table table-sm table-hover display order-column" id="evidences-evi"
+                           style="min-height:45vh;"
+                        data-toggle="table"
+                        data-classes="table table-no-bordered"
+                        data-pagination="true"
+                        data-pagination-h-align="left"
+                        data-search="true"
+                        data-search-align="left"
+                        data-show-refresh="true"
+                        data-show-toggle="true"
+                        data-show-columns="true"
+                        data-minimum-count-columns="2"
+                        data-show-pagination-switch="true"
+                        data-id-field="id"
+                        data-page-list="[10, 25, 50, 100, ALL]"
+                        data-show-footer="false"
+                        data-side-pagination="client"
+                        data-buttons-align="left"
+                    >
+                        <thead>
+                        <tr>
+                            <th data-field="id" data-sortable="true">ID</th>
+                            <th data-field="ip" data-sortable="true">IP</th>
+                            <th data-field="action" data-sortable="true">Action</th>
+                            <th data-field="username" data-sortable="true">UserName</th>
+                            <th data-field="user_id" data-sortable="true">UserID</th>
+                            <th data-field="event_time" data-sortable="true">EventTime(UTC)</th>
+                            <th data-field="host" data-sortable="true">Host</th>
+                            <th data-field="session_id" data-sortable="true">SessionID</th>
+                            <th data-field="eventtype" data-sortable="true">Eventtype</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            {% include 'accounts/useraudit_list_table.html' %}
+                        </tbody>
+                    </table>
+{% endblock configuration_body %}

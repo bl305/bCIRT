@@ -58,56 +58,56 @@ from bCIRT.settings import ALLOWED_HOSTS
 # from datetime import datetime, timezone
 # check remaining session time
 from django.template.loader import get_template
-from wkhtmltopdf.views import PDFTemplateResponse
+# from wkhtmltopdf.views import PDFTemplateResponse
 from django.contrib.auth import get_user_model
 User = get_user_model()
 logger = logging.getLogger('log_file_verbose')
 
 
 # Create your views here.
-class MyPDFView(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailView):
-    # context = {"title": "Task evidences"}  # data that has to be rendered to pdf template
-    model = Inv
-    permission_required = ('invs.view_inv', 'tasks.view_evidence', 'tasks.view_task', 'tasks.view_playbook')
-    context = {"title": "Investigation evidences"}
-
-    def __init__(self, *args, **kwargs):
-        if LOGLEVEL == 1:
-            pass
-        elif LOGLEVEL == 2:
-            pass
-        elif LOGLEVEL == 3:
-            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
-            logger.info(logmsg)
-        super(MyPDFView, self).__init__(*args, **kwargs)
-
-    def get(self, request, *args, **kwargs):
-        self.context['inv'] = self.get_object()
-        self.context['user'] = self.request.user.get_username()
-
-        html_template = get_template('invs/inv_detail_REPORT_v1.html')
-
-        # rendered_html = html_template.render(self.context)
-        #
-        # css_path = custom_params.PROJECT_ROOT + '/static/bCIRT/bootstrap-3.3.7/css/bootstrap.min.css'
-        # pdf_file = HTML(string=rendered_html).write_pdf(stylesheets=[CSS(css_path)])
-        # # pdf_file = HTML(string=rendered_html).write_pdf()
-
-        # http_response = HttpResponse(pdf_file, content_type='application/pdf')
-        # http_response['Content-Disposition'] = 'filename="report_investigation.pdf"'
-        response = PDFTemplateResponse(request=request,
-                                       template=html_template,
-                                       filename="investigation_report_" + str(self.get_object().pk) + ".pdf",
-                                       context=self.context,
-                                       show_content_in_browser=False,
-                                       cmd_options={'margin-top': 10,
-                                                    "zoom": 1,
-                                                    "viewport-size": "1366 x 513",
-                                                    'javascript-delay': 1000,
-                                                    'footer-center': '[page]/[topage]',
-                                                    "no-stop-slow-scripts": True},
-                                       )
-        return response
+# class MyPDFView(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailView):
+#     # context = {"title": "Task evidences"}  # data that has to be rendered to pdf template
+#     model = Inv
+#     permission_required = ('invs.view_inv', 'tasks.view_evidence', 'tasks.view_task', 'tasks.view_playbook')
+#     context = {"title": "Investigation evidences"}
+#
+#     def __init__(self, *args, **kwargs):
+#         if LOGLEVEL == 1:
+#             pass
+#         elif LOGLEVEL == 2:
+#             pass
+#         elif LOGLEVEL == 3:
+#             logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
+#             logger.info(logmsg)
+#         super(MyPDFView, self).__init__(*args, **kwargs)
+#
+#     def get(self, request, *args, **kwargs):
+#         self.context['inv'] = self.get_object()
+#         self.context['user'] = self.request.user.get_username()
+#
+#         html_template = get_template('invs/inv_detail_REPORT_v1.html')
+#
+#         # rendered_html = html_template.render(self.context)
+#         #
+#         # css_path = custom_params.PROJECT_ROOT + '/static/bCIRT/bootstrap-3.3.7/css/bootstrap.min.css'
+#         # pdf_file = HTML(string=rendered_html).write_pdf(stylesheets=[CSS(css_path)])
+#         # # pdf_file = HTML(string=rendered_html).write_pdf()
+#
+#         # http_response = HttpResponse(pdf_file, content_type='application/pdf')
+#         # http_response['Content-Disposition'] = 'filename="report_investigation.pdf"'
+#         response = PDFTemplateResponse(request=request,
+#                                        template=html_template,
+#                                        filename="investigation_report_" + str(self.get_object().pk) + ".pdf",
+#                                        context=self.context,
+#                                        show_content_in_browser=False,
+#                                        cmd_options={'margin-top': 10,
+#                                                     "zoom": 1,
+#                                                     "viewport-size": "1366 x 513",
+#                                                     'javascript-delay': 1000,
+#                                                     'footer-center': '[page]/[topage]',
+#                                                     "no-stop-slow-scripts": True},
+#                                        )
+#         return response
 
 
 class InvDetailPrintView(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailView):

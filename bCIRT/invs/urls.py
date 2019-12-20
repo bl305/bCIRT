@@ -40,7 +40,7 @@ urlpatterns = [
     url(r'^create/$', views.InvCreateAjaxView.as_view(), name='invaj_create'),
     # url(r'^update/$', views.InvUpdateAjaxView.as_view(), name='invaj_update'),
 
-    url(r'^export/pdf/(?P<pk>\d+)', views.MyPDFView.as_view(), name='inv_pdf'),
+    # url(r'^export/pdf/(?P<pk>\d+)', views.MyPDFView.as_view(), name='inv_pdf'),
     url(r"^detailprint/(?P<pk>\d+)/$", views.InvDetailPrintView.as_view(), name="inv_detail_print"),
     url(r'^exportinv/(?P<pk>\d+)', views.ExportInvView.as_view(), name='inv_export'),
     url(r'^exportinvfiles/(?P<pk>\d+)', views.ExportInvFilesView.as_view(), name='inv_export_files'),

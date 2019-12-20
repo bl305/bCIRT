@@ -13,6 +13,12 @@
 # **********************************************************************;
 from __future__ import unicode_literals
 # password change imports
+from django.views.generic import TemplateView, CreateView, ListView, DetailView, UpdateView, DeleteView
+from django.contrib.auth.mixins import (
+    LoginRequiredMixin,
+    PermissionRequiredMixin,
+)
+from .models import UserAudit
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
@@ -82,3 +88,20 @@ def change_password(request):
         'form': form
     })
 
+
+class UserAuditListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    model = UserAudit
+    permission_required = ('configuration.view_useraudit',)
+
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
+            logger.info(logmsg)
+        super(UserAuditListView, self).__init__(*args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        return super(UserAuditListView, self).get_context_data(**kwargs)

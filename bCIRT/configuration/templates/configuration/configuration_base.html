@@ -89,14 +89,39 @@
                       List Updates
                     </a>
                 </li>
+
+                <li>
+                    <a href="{% url 'configuration:conf_systemupdates' %}"
+                       class="btn btn-secondary btn-sm btn-block text-left">
+                      <span class="fas fa-list"></span>
+                      System Updates
+                    </a>
+                </li>
+
             </ul>
         </li>
 <!--            Updates end-->
-        <li class="dropdown">
-            <a class="btn btn-outline-secondary" href="{% url 'configuration:conf_logging' %}">
-                Logging
-            </a>
-        </li>
+            <li class="dropdown">
+                <a class="dropdown-toggle btn btn-outline-secondary" data-toggle="dropdown" href="#">
+                    Audit
+                    <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a href="{% url 'configuration:conf_logging' %}"
+                           class="btn btn-secondary btn-sm btn-block text-left">
+                        <span class="fas fa-list"></span>
+                        Logging
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'accounts:useraudit_list' %}"
+                           class="btn btn-secondary btn-sm btn-block text-left">
+                        <span class="fas fa-list"></span>
+                        UserAudit Logs
+                        </a>
+                    </li>
+                </ul>
+            </li>
 
         <li class="dropdown">
             <a class="btn btn-outline-secondary" href="{% url 'configuration:conf_about' %}">About</a>

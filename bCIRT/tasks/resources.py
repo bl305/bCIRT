@@ -15,7 +15,7 @@ from .models import Task, TaskCategory, TaskPriority, TaskStatus, TaskType,\
     TaskTemplate, TaskVar, TaskVarCategory, TaskVarType, \
     Playbook, PlaybookTemplate, PlaybookTemplateItem,\
     Evidence, EvidenceFormat, EvidenceAttr, EvidenceAttrFormat, \
-    Action, ScriptType, ScriptOs, ScriptCategory, ScriptOutput, OutputTarget, ScriptInput,\
+    Action, Automation, ScriptType, ScriptOs, ScriptCategory, ScriptOutput, OutputTarget, ScriptInput,\
     Type, ActionQ, ActionQStatus, MitreAttck_Tactics, MitreAttck_Techniques,\
     ActionGroup, ActionGroupMember
 
@@ -43,6 +43,11 @@ class EvidenceAttrFormatResource(resources.ModelResource):
 class ActionResource(resources.ModelResource):
     class Meta:
         model = Action
+
+
+class AutomationResource(resources.ModelResource):
+    class Meta:
+        model = Automation
 
 
 class ActionGroupResource(resources.ModelResource):

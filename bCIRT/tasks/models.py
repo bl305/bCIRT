@@ -420,7 +420,7 @@ class Task(models.Model):
     #     super(Task, self).save(*args, **kwargs)
 
     def readonly(self):
-        print(self.status.name)
+        # print(self.status.name)
         if self.status.name == 'Completed' or self.status.name == 'Skipped':
             return True
         else:
@@ -1193,7 +1193,7 @@ class Action(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.automationid:
-            print(self.automationid)
+            # print(self.automationid)
             self.enabled = False
 
         self.description_html = misaka.html(self.description)
@@ -1479,7 +1479,7 @@ class PlaybookTemplateItem(models.Model):
 def playbooktemplateitem_check_delete_condition(ptmpitem_pk):
     reftaskout = list()
     ptmpitem_obj = PlaybookTemplateItem.objects.get(pk=ptmpitem_pk)
-    print(ptmpitem_obj.playbooktemplateid.playbooktemplateitem_playbooktemplate)
+    # print(ptmpitem_obj.playbooktemplateid.playbooktemplateitem_playbooktemplate)
     if ptmpitem_obj.playbooktemplateid.playbooktemplateitem_playbooktemplate.filter(prevtask=ptmpitem_pk):
         reftasks = ptmpitem_obj.playbooktemplateid.playbooktemplateitem_playbooktemplate.filter(prevtask=ptmpitem_pk)
         for i in reftasks:
@@ -1517,7 +1517,7 @@ def generate_graph_PlaybookTemplate(sender, instance, **kwargs):
         pngfile = "pbtmp_%s.png"%(curr_pk)
         pngfilepath = path.join(MEDIA_ROOT, "graphs", pngfile)
         graph.write_png(pngfilepath)
-        print("H1")
+        # print("H1")
     except Exception:
         errormsg = "Graphcreate exception %s" % (str(Exception))
         logger.error(errormsg)

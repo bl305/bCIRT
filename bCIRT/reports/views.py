@@ -87,9 +87,11 @@ class Get_Report():
         self.astart = astart
         if astart is None:
             self.astart = timezone_now() - timedelta(days=30)
+            # self.astart = datetime.now() - timedelta(days=30)
         self.aend = aend
         if aend is None:
             self.aend = timezone_now()
+            # self.aend = datetime.now()
 
     def invs_all(self):
         retval = Inv.objects.filter(created_at__gte=self.astart)\
@@ -289,11 +291,17 @@ class ReportsDashboardPage(LoginRequiredMixin, PermissionRequiredMixin, Template
     # dataendtime = datetime.strftime(rawendtime,newformat)
     endtime = utc.localize(nowtime)
     searchendtime = endtime
-    alltime = datetime.now()-timedelta(days=25000)
-    last30days = datetime.now()-timedelta(days=30)
-    last90days = datetime.now()-timedelta(days=90)
-    starttime30 = utc.localize(last30days)
-    starttime90 = utc.localize(last90days)
+    # alltime = datetime.now()-timedelta(days=25000)
+    # last30days = datetime.now()-timedelta(days=30)
+    # last90days = datetime.now()-timedelta(days=90)
+
+    alltime = endtime-timedelta(days=25000)
+    last30days = endtime-timedelta(days=30)
+    last90days = endtime-timedelta(days=90)
+    # starttime30 = utc.localize(last30days)
+    # starttime90 = utc.localize(last90days)
+    starttime30 = last30days
+    starttime90 = last90days
 
     def __init__(self, *args, **kwargs):
         if LOGLEVEL == 1:

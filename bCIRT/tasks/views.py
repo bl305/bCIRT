@@ -53,7 +53,7 @@ from datetime import datetime
 import zipfile
 from django.http import HttpResponse
 from .resources import PlaybookTemplateResource, PlaybookTemplateItemResource, TaskTemplateResource, TaskVarResource,\
-    ActionResource
+    ActionResource, AutomationResource
 from bCIRT.settings import MEDIA_ROOT
 from shutil import copy
 import tempfile
@@ -206,6 +206,21 @@ class PlaybookTemplateExportView(LoginRequiredMixin, PermissionRequiredMixin, ge
         # generate the dataset for export
         act_dataset = action_resource.export(act_objset)
         self.save_to_file(a_dir=destdir, a_filename='Action.json', a_content=act_dataset.json)
+
+        # getting the automations
+        auto_objset = Automation.objects.none()
+        auto_resource = AutomationResource()
+        if act_objset:
+            for act_objitem in act_objset:
+                if act_objitem.automationid:
+                    auto_obj = Automation.objects.filter(pk=act_objitem.automationid.pk)
+                    auto_objset = auto_objset | auto_obj
+                    if auto_obj[0].fileRef:
+                        srcfile = os.path.join(str(MEDIA_ROOT), str(auto_obj[0].fileRef))
+                        destfile = os.path.join(destactdir, os.path.basename(str(auto_obj[0].fileRef)))
+                        copy(srcfile, destfile)
+        auto_dataset = auto_resource.export(auto_objset)
+        self.save_to_file(a_dir=destdir, a_filename='Automation.json', a_content=auto_dataset.json)
 
         # Exporting values Action
         # response = HttpResponse(act_dataset.json, content_type='application/json')

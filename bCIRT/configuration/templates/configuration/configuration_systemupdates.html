@@ -1,0 +1,33 @@
+{% extends "configuration/configuration_template.html" %}
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : configuration/configuration_systemupdates.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.12.17
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.12.17  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+
+{% block configuration_alert %}
+{% endblock configuration_alert %}
+
+{% block configuration_buttons %}
+{% endblock configuration_buttons %}
+
+{% block configuration_title %}
+			System Updates Dashboard
+{% endblock configuration_title %}
+
+{% block configuration_body %}
+		<p><strong>Operating system version:</strong> {{ osversion }}</p>
+		<p><strong>Operating system updates available:</strong>
+				{{ osupdates | linebreaks}}</p>
+		<p><strong>Python Virtual Environment updates available:</strong>
+				{{ pythonvenvupdates | linebreaks}}</p>
+{% endblock configuration_body %}
+

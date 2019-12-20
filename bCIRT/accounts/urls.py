@@ -23,6 +23,10 @@ urlpatterns = [
     url(r"^logout/$", auth_views.LogoutView.as_view(), name="logout"),
     url(r"^register/$", views.RegisterAccountPage.as_view(), name="register"),
     url(r'^passwordchange/$', views.change_password, name='change_password'),
+
+    url(r"^useraudit/list$", views.UserAuditListView.as_view(),
+        name='useraudit_list'),
+
     #url(r'^passwordchange/$', auth_views.PasswordChangeView.as_view() , name='change_password'),
 
     # url(r'^passwordchange/done/$', views.PasswordChangeDoneView.as_view(), name='change_password_done'),

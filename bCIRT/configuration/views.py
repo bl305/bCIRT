@@ -75,6 +75,69 @@ class ConfigurationAboutPage(LoginRequiredMixin, TemplateView):
             logger.info(logmsg)
         super(ConfigurationAboutPage, self).__init__(*args, **kwargs)
 
+from tasks.scriptmanager.run_script import run_script_class
+class SystemUpdatesPage(LoginRequiredMixin, TemplateView):
+    template_name = 'configuration/configuration_systemupdates.html'
+
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
+            logger.info(logmsg)
+
+        cmd="grep PRETTY_NAME /etc/os-release | sed 's/PRETTY_NAME=//g' | tr -d '=\"'"
+        argument=""
+        timeout=30
+        results = run_script_class("", cmd, argument, timeout).runcmd()
+        # rescommand = results.get('command')
+        # reserror = results.get('error')
+        # resstatus = results.get('status')
+        resoutput = results.get('output')
+        # respid = results.get('pid')
+        self.osversion = resoutput
+
+
+        cmd="apt list --upgradeable"
+        argument=""
+        timeout=30
+        results = run_script_class("", cmd, argument, timeout).runcmd()
+        # rescommand = results.get('command')
+        # reserror = results.get('error')
+        # resstatus = results.get('status')
+        resoutput = results.get('output')
+        # respid = results.get('pid')
+        self.osupdates = resoutput
+        # self.osupdates
+        # Getting OS update info
+
+
+        cmd="pip3 list -o --format columns"
+        argument=""
+        timeout=30
+        results = run_script_class("", cmd, argument, timeout).runcmd()
+        # rescommand = results.get('command')
+        # reserror = results.get('error')
+        # resstatus = results.get('status')
+        resoutput = results.get('output')
+        # respid = results.get('pid')
+        self.pythonvenvudates = resoutput
+        # self.osupdates
+        # Getting OS update info
+
+
+
+        super(SystemUpdatesPage, self).__init__(*args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        kwargs['user'] = self.request.user
+        kwargs['osupdates'] = self.osupdates
+        kwargs['osversion'] = self.osversion
+        kwargs['pythonvenvupdates'] = self.pythonvenvudates
+        return super(SystemUpdatesPage, self).get_context_data(**kwargs)
+
 
 class UpdatePackageListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     model = UpdatePackage

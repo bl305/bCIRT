@@ -1,0 +1,62 @@
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : accounts/useraudit_list_table.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.12.17
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.12.17  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+{% if object_list %}
+{% for useraudititem in object_list %}
+                <tr id="ev_{{useraudititem.pk}}">
+                    <td>
+                        <div class="dropdown" onclick="incrow({{useraudititem.pk}},'ev_','300px')">
+                            <!--<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Dropdown <span class="caret"></span></a>-->
+                            <!--<button class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">-->
+                                <!--Dropdown -->
+                                <!--<span class="caret"></span>-->
+                            <!--</button>-->
+
+                            <button class="btn btn-default btn-sm dropdown-toggle" onclick="filterFunction()" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
+                                {{ useraudititem.pk }}
+                                <span class="caret"></span>
+                            </button>
+                        </div> <!-- .dropdown -->
+
+                    </td>
+                    <td>
+                        {{ useraudititem.ip }}
+                    </td>
+                    <td>
+                        {{ useraudititem.action }}
+                    </td>
+                    <td>
+                        {{ useraudititem.username }}
+                    </td>
+                    <td>
+                        {{ useraudititem.user_id }}
+                    </td>
+                    <td>
+                        {{ useraudititem.event_time|date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                        {{ useraudititem.host }}
+                    </td>
+                    <td>
+                        {{ useraudititem.session_id }}
+                    </td>
+                    <td>
+                        {{ useraudititem.eventtype }}
+                    </td>
+              </tr>
+{% endfor %}
+{% else %}
+          <tr>
+            <td colspan="9" class="text-center bg-warning">No UserAudit logs</td>
+          </tr>
+{% endif %}
