@@ -11,18 +11,19 @@
 # 2019.07.29  Lendvay     1      Initial file
 # **********************************************************************;
 from import_export import resources
-from .models import InvAttackvector, \
+from .models import InvAttackVector, \
     InvCategory,\
     InvPriority,\
     InvPhase,\
     InvSeverity,\
     InvStatus,\
     Inv,\
-    InvReviewRules
+    InvReviewRules,\
+    CurrencyType
 
-class InvAttackvectorResource(resources.ModelResource):
+class InvAttackVectorResource(resources.ModelResource):
     class Meta:
-        model = InvAttackvector
+        model = InvAttackVector
 
 
 class InvCategoryResource(resources.ModelResource):
@@ -51,9 +52,18 @@ class InvStatusResource(resources.ModelResource):
 
 
 class InvResource(resources.ModelResource):
+    # def before_import(self, dataset, using_transactions, dry_run, **kwargs):
+        # .sort(parent)
+        # print(dataset.sort(2))
+        # pass
+
     class Meta:
         model = Inv
 
 class InvReviewRulesResource(resources.ModelResource):
     class Meta:
         model = InvReviewRules
+
+class CurrencyTypeResource(resources.ModelResource):
+    class Meta:
+        model = CurrencyType

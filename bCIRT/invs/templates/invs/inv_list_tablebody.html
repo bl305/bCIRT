@@ -27,7 +27,11 @@
                         {{ inv.priority }}
                     </td>
                     <td>
-                        {{ inv.ticketid }}
+                        {% if inv.ticketid %}
+                            {{ inv.ticketid }}
+                        {% else %}
+                            -
+                        {% endif %}
                     </td>
                     <td>
                         {% if inv.refid %}
@@ -42,7 +46,11 @@
                         </div>
                     </td>
                     <td>
-                        {{ inv.invid }}
+                        {% if inv.invid %}
+                            {{ inv.invid }}
+                        {% else %}
+                            -
+                        {% endif %}
                     </td>
                     <td>
                         {% if inv.parent %}

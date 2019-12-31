@@ -9,6 +9,7 @@
 # Revision History  : v1
 # Date        Author      Ref    Description
 # 2019.07.29  Lendvay     1      Initial file
+# 2019.12.26  Lendvay     1      Updated with all tables
 # **********************************************************************;
 from django.core.management.base import BaseCommand, CommandError
 import tablib
@@ -25,7 +26,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         # parser.add_argument('-a', '--all', action='store_true', help='Run all')
         parser.add_argument('-d', '--dir', type=str, help='Import from this directory')
-        parser.add_argument('-f', '--format', type=str, help='Import from this format: "json"')
+        parser.add_argument('-f', '--format', type=str, help='Import from this format: "json/csv"')
 
     def __init__(self, *args, **kwargs):
         super(Command, self).__init__(*args, **kwargs)
@@ -36,16 +37,11 @@ class Command(BaseCommand):
         self.p_dir = str(options['dir'])
         self.p_format = str(options['format'])
         # self.p_dir = str(p_dir)
-        if self.p_dir is not None and self.p_format == 'json':
-            self.import_evidenceformat(self.p_format)
-            self.import_evidenceattrformat(self.p_format)
-            self.import_evidence(self.p_format)
-            self.import_evidenceattr(self.p_format)
+        if self.p_dir is not None and self.p_format: # == 'json':
+            self.import_user(self.p_format)
+            self.import_group(self.p_format)
 
-            self.import_host(self.p_format)
-            self.import_hostname(self.p_format)
-            self.import_ipaddress(self.p_format)
-            self.import_profile(self.p_format)
+            self.import_updatepackage(self.p_format)
 
             self.import_invseverity(self.p_format)
             self.import_invstatus(self.p_format)
@@ -53,21 +49,24 @@ class Command(BaseCommand):
             self.import_invphase(self.p_format)
             self.import_invpriority(self.p_format)
             self.import_invattackvector(self.p_format)
-            self.import_inv(self.p_format)
+            self.import_currencytype(self.p_format)
+            self.import_invreviewrules(self.p_format)
 
-            self.import_taskstatus(self.p_format)
-            self.import_taskcategory(self.p_format)
-            self.import_taskpriority(self.p_format)
-            self.import_tasktype(self.p_format)
-            self.import_task(self.p_format)
-            self.import_tasktemplate(self.p_format)
-            self.import_playbook(self.p_format)
-            self.import_playbooktemplate(self.p_format)
-            self.import_playbooktemplateitem(self.p_format)
+            self.import_host(self.p_format)
+            self.import_hostname(self.p_format)
+            self.import_ipaddress(self.p_format)
+            self.import_connectionitem(self.p_format)
+            self.import_connectionitemfield(self.p_format)
 
-            self.import_taskvarcategory(self.p_format)
-            self.import_taskvartype(self.p_format)
-            self.import_taskvar(self.p_format)
+            self.import_useraudit(self.p_format)
+
+            self.import_automation(self.p_format)
+
+            self.import_evidenceformat(self.p_format)
+            self.import_evidenceattrformat(self.p_format)
+            self.import_evreputation(self.p_format)
+            self.import_mitreattck_techniques(self.p_format)
+            self.import_mitreattck_tactics(self.p_format)
 
             self.import_actscriptos(self.p_format)
             self.import_actscriptcategory(self.p_format)
@@ -75,24 +74,88 @@ class Command(BaseCommand):
             self.import_actscriptoutput(self.p_format)
             self.import_actoutputtarget(self.p_format)
             self.import_acttype(self.p_format)
-            self.import_actionqstatus(self.p_format)
-            self.import_actionq(self.p_format)
             self.import_action(self.p_format)
 
-            self.import_updatepackage(self.p_format)
+            self.import_taskstatus(self.p_format)
+            self.import_taskcategory(self.p_format)
+            self.import_taskpriority(self.p_format)
+            self.import_tasktype(self.p_format)
+
+            self.import_taskvarcategory(self.p_format)
+            self.import_taskvartype(self.p_format)
+
+            self.import_actionqstatus(self.p_format)
+            self.import_actiongroup(self.p_format)
+            self.import_actiongroupmember(self.p_format)
+
+            self.import_inv(self.p_format)
+            self.import_profile(self.p_format)
+            self.import_task(self.p_format)
+            self.import_tasktemplate(self.p_format)
+            self.import_taskvar(self.p_format)
+            self.import_playbook(self.p_format)
+            self.import_playbooktemplate(self.p_format)
+            self.import_playbooktemplateitem(self.p_format)
+            self.import_evidence(self.p_format)
+            self.import_evidenceattr(self.p_format)
+            self.import_actionq(self.p_format)
 
             print("Database import from " + self.p_dir + " finished.")
         else:
             print(r"""
-usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
+usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json/csv] [--version]
         [-v {0,1,2,3}] [--settings SETTINGS]
         [--pythonpath PYTHONPATH] [--traceback] [--no-color]
             """)
         pass
 
+    def import_user(self, p_format):
+        tablename = "User"
+        print("[*] Importing "+tablename)
+        fname = os.path.join(self.p_dir, tablename+'.'+p_format)
+        fname_readable = os.access(fname, os.R_OK)
+        if fname_readable:
+            try:
+                from users.resources import UserResource
+                aresource = UserResource()
+                dataset = tablib.Dataset().load(open(fname).read())
+                result = aresource.import_data(dataset, dry_run=True)
+                if not result.has_errors():
+                    aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
+            except Exception:
+                raise CommandError('[!] ' + tablename + " table could not be imported!")
+        else:
+            print('[-]' + fname+" is not readable!")
+
+    def import_group(self, p_format):
+        tablename = "Group"
+        print("[*] Importing "+tablename)
+        fname = os.path.join(self.p_dir, tablename+'.'+p_format)
+        fname_readable = os.access(fname, os.R_OK)
+        if fname_readable:
+            try:
+                from users.resources import GroupResource
+                aresource = GroupResource()
+                dataset = tablib.Dataset().load(open(fname).read())
+                result = aresource.import_data(dataset, dry_run=True)
+                if not result.has_errors():
+                    aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
+            except Exception:
+                raise CommandError('[!] ' + tablename + " table could not be imported!")
+        else:
+            print('[-]' + fname+" is not readable!")
+
     def import_evidenceformat(self, p_format):
         tablename = "EvidenceFormat"
-        print("Importing "+tablename)
+        print("[*] Importing "+tablename)
         fname = os.path.join(self.p_dir, tablename+'.'+p_format)
         fname_readable = os.access(fname, os.R_OK)
         if fname_readable:
@@ -100,18 +163,21 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 from tasks.resources import EvidenceFormatResource
                 aresource = EvidenceFormatResource()
                 dataset = tablib.Dataset().load(open(fname).read())
-                result = aresource.import_data(dataset, dry_run=True)
+                result = aresource.import_data(dataset, dry_run=True, raise_errors=True)
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
-                    print(tablename + " imported successfully")
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
             except Exception:
-                raise CommandError(tablename + " table could not be imported!")
+                raise CommandError('[!] ' + tablename + " table could not be imported!")
         else:
-            print(fname+" is not readable!")
+            print('[-]' + fname+" is not readable!")
 
     def import_evidenceattrformat(self, p_format):
         tablename = "EvidenceAttrFormat"
-        print("Importing "+tablename)
+        print("[*] Importing "+tablename)
         fname = os.path.join(self.p_dir, tablename+'.'+p_format)
         fname_readable = os.access(fname, os.R_OK)
         if fname_readable:
@@ -122,15 +188,40 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 result = aresource.import_data(dataset, dry_run=True)
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
-                    print(tablename + " imported successfully")
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
             except Exception:
-                raise CommandError(tablename + " table could not be imported!")
+                raise CommandError('[!] ' + tablename + " table could not be imported!")
         else:
-            print(fname+" is not readable!")
+            print('[-]' + fname+" is not readable!")
+
+    def import_evreputation(self, p_format):
+        tablename = "EvReputation"
+        print("[*] Importing "+tablename)
+        fname = os.path.join(self.p_dir, tablename+'.'+p_format)
+        fname_readable = os.access(fname, os.R_OK)
+        if fname_readable:
+            try:
+                from tasks.resources import EvReputationResource
+                aresource = EvReputationResource()
+                dataset = tablib.Dataset().load(open(fname).read())
+                result = aresource.import_data(dataset, dry_run=True)
+                if not result.has_errors():
+                    aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
+            except Exception:
+                raise CommandError('[!] ' + tablename + " table could not be imported!")
+        else:
+            print('[-]' + fname+" is not readable!")
 
     def import_evidence(self, p_format):
         tablename = "Evidence"
-        print("Importing "+tablename)
+        print("[*] Importing "+tablename)
         fname = os.path.join(self.p_dir, tablename+'.'+p_format)
         fname_readable = os.access(fname, os.R_OK)
         if fname_readable:
@@ -141,15 +232,18 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 result = aresource.import_data(dataset, dry_run=True)
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
-                    print(tablename + " imported successfully")
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
             except Exception:
-                raise CommandError(tablename + " table could not be imported!")
+                raise CommandError('[!] ' + tablename + " table could not be imported!")
         else:
-            print(fname+" is not readable!")
+            print('[-]' + fname+" is not readable!")
 
     def import_evidenceattr(self, p_format):
         tablename = "EvidenceAttr"
-        print("Importing "+tablename)
+        print("[*] Importing "+tablename)
         fname = os.path.join(self.p_dir, tablename+'.'+p_format)
         fname_readable = os.access(fname, os.R_OK)
         if fname_readable:
@@ -160,15 +254,18 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 result = aresource.import_data(dataset, dry_run=True)
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
-                    print(tablename + " imported successfully")
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
             except Exception:
-                raise CommandError(tablename + " table could not be imported!")
+                raise CommandError('[!] ' + tablename + " table could not be imported!")
         else:
-            print(fname+" is not readable!")
+            print('[-]' + fname+" is not readable!")
 
     def import_host(self, p_format):
         tablename = "Host"
-        print("Importing "+tablename)
+        print("[*] Importing "+tablename)
         fname = os.path.join(self.p_dir, tablename+'.'+p_format)
         fname_readable = os.access(fname, os.R_OK)
         if fname_readable:
@@ -179,15 +276,18 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 result = aresource.import_data(dataset, dry_run=True)
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
-                    print(tablename + " imported successfully")
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
             except Exception:
-                raise CommandError(tablename + " table could not be imported!")
+                raise CommandError('[!] ' + tablename + " table could not be imported!")
         else:
-            print(fname+" is not readable!")
+            print('[-]' + fname+" is not readable!")
 
     def import_hostname(self, p_format):
-        tablename = "HostName"
-        print("Importing "+tablename)
+        tablename = "Hostname"
+        print("[*] Importing "+tablename)
         fname = os.path.join(self.p_dir, tablename+'.'+p_format)
         fname_readable = os.access(fname, os.R_OK)
         if fname_readable:
@@ -198,15 +298,18 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 result = aresource.import_data(dataset, dry_run=True)
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
-                    print(tablename + " imported successfully")
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
             except Exception:
-                raise CommandError(tablename + " table could not be imported!")
+                raise CommandError('[!] ' + tablename + " table could not be imported!")
         else:
-            print(fname+" is not readable!")
+            print('[-]' + fname+" is not readable!")
 
     def import_ipaddress(self, p_format):
-        tablename = "IpAddress"
-        print("Importing "+tablename)
+        tablename = "Ipaddress"
+        print("[*] Importing "+tablename)
         fname = os.path.join(self.p_dir, tablename+'.'+p_format)
         fname_readable = os.access(fname, os.R_OK)
         if fname_readable:
@@ -217,15 +320,18 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 result = aresource.import_data(dataset, dry_run=True)
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
-                    print(tablename + " imported successfully")
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
             except Exception:
-                raise CommandError(tablename + " table could not be imported!")
+                raise CommandError('[!] ' + tablename + " table could not be imported!")
         else:
-            print(fname+" is not readable!")
+            print('[-]' + fname+" is not readable!")
 
     def import_profile(self, p_format):
         tablename = "Profile"
-        print("Importing "+tablename)
+        print("[*] Importing "+tablename)
         fname = os.path.join(self.p_dir, tablename+'.'+p_format)
         fname_readable = os.access(fname, os.R_OK)
         if fname_readable:
@@ -236,15 +342,18 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 result = aresource.import_data(dataset, dry_run=True)
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
-                    print(tablename + " imported successfully")
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
             except Exception:
-                raise CommandError(tablename + " table could not be imported!")
+                raise CommandError('[!] ' + tablename + " table could not be imported!")
         else:
-            print(fname+" is not readable!")
+            print('[-]' + fname+" is not readable!")
 
     def import_invstatus(self, p_format):
         tablename = "InvStatus"
-        print("Importing "+tablename)
+        print("[*] Importing "+tablename)
         fname = os.path.join(self.p_dir, tablename+'.'+p_format)
         fname_readable = os.access(fname, os.R_OK)
         if fname_readable:
@@ -255,15 +364,18 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 result = aresource.import_data(dataset, dry_run=True)
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
-                    print(tablename + " imported successfully")
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
             except Exception:
-                raise CommandError(tablename + " table could not be imported!")
+                raise CommandError('[!] ' + tablename + " table could not be imported!")
         else:
-            print(fname+" is not readable!")
+            print('[-]' + fname+" is not readable!")
 
     def import_invseverity(self, p_format):
         tablename = "InvSeverity"
-        print("Importing "+tablename)
+        print("[*] Importing "+tablename)
         fname = os.path.join(self.p_dir, tablename+'.'+p_format)
         fname_readable = os.access(fname, os.R_OK)
         if fname_readable:
@@ -274,15 +386,18 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 result = aresource.import_data(dataset, dry_run=True)
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
-                    print(tablename + " imported successfully")
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
             except Exception:
-                raise CommandError(tablename + " table could not be imported!")
+                raise CommandError('[!] ' + tablename + " table could not be imported!")
         else:
-            print(fname+" is not readable!")
+            print('[-]' + fname+" is not readable!")
 
     def import_invpriority(self, p_format):
         tablename = "InvPriority"
-        print("Importing "+tablename)
+        print("[*] Importing "+tablename)
         fname = os.path.join(self.p_dir, tablename+'.'+p_format)
         fname_readable = os.access(fname, os.R_OK)
         if fname_readable:
@@ -293,15 +408,18 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 result = aresource.import_data(dataset, dry_run=True)
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
-                    print(tablename + " imported successfully")
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
             except Exception:
-                raise CommandError(tablename + " table could not be imported!")
+                raise CommandError('[!] ' + tablename + " table could not be imported!")
         else:
-            print(fname+" is not readable!")
+            print('[-]' + fname+" is not readable!")
 
     def import_invphase(self, p_format):
         tablename = "InvPhase"
-        print("Importing "+tablename)
+        print("[*] Importing "+tablename)
         fname = os.path.join(self.p_dir, tablename+'.'+p_format)
         fname_readable = os.access(fname, os.R_OK)
         if fname_readable:
@@ -312,15 +430,18 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 result = aresource.import_data(dataset, dry_run=True)
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
-                    print(tablename + " imported successfully")
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
             except Exception:
-                raise CommandError(tablename + " table could not be imported!")
+                raise CommandError('[!] ' + tablename + " table could not be imported!")
         else:
-            print(fname+" is not readable!")
+            print('[-]' + fname+" is not readable!")
 
     def import_invcategory(self, p_format):
         tablename = "InvCategory"
-        print("Importing "+tablename)
+        print("[*] Importing "+tablename)
         fname = os.path.join(self.p_dir, tablename+'.'+p_format)
         fname_readable = os.access(fname, os.R_OK)
         if fname_readable:
@@ -331,53 +452,129 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 result = aresource.import_data(dataset, dry_run=True)
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
-                    print(tablename + " imported successfully")
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
             except Exception:
-                raise CommandError(tablename + " table could not be imported!")
+                raise CommandError('[!] ' + tablename + " table could not be imported!")
         else:
-            print(fname+" is not readable!")
+            print('[-]' + fname+" is not readable!")
 
     def import_invattackvector(self, p_format):
         tablename = "InvAttackVector"
-        print("Importing "+tablename)
+        print("[*] Importing "+tablename)
         fname = os.path.join(self.p_dir, tablename+'.'+p_format)
         fname_readable = os.access(fname, os.R_OK)
         if fname_readable:
             try:
-                from invs.resources import InvAttackvectorResource
-                aresource = InvAttackvectorResource()
+                from invs.resources import InvAttackVectorResource
+                aresource = InvAttackVectorResource()
                 dataset = tablib.Dataset().load(open(fname).read())
                 result = aresource.import_data(dataset, dry_run=True)
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
-                    print(tablename + " imported successfully")
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
             except Exception:
-                raise CommandError(tablename + " table could not be imported!")
+                raise CommandError('[!] ' + tablename + " table could not be imported!")
         else:
-            print(fname+" is not readable!")
+            print('[-]' + fname+" is not readable!")
+
+    def import_currencytype(self, p_format):
+        tablename = "CurrencyType"
+        print("[*] Importing "+tablename)
+        fname = os.path.join(self.p_dir, tablename+'.'+p_format)
+        fname_readable = os.access(fname, os.R_OK)
+        if fname_readable:
+            try:
+                from invs.resources import CurrencyTypeResource
+                aresource = CurrencyTypeResource()
+                dataset = tablib.Dataset().load(open(fname).read())
+                result = aresource.import_data(dataset, dry_run=True)
+                if not result.has_errors():
+                    aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
+            except Exception:
+                raise CommandError('[!] ' + tablename + " table could not be imported!")
+        else:
+            print('[-]' + fname+" is not readable!")
+
+    def import_mitreattck_techniques(self, p_format):
+        tablename = "MitreAttck_Techniques"
+        print("[*] Importing "+tablename)
+        fname = os.path.join(self.p_dir, tablename + '.' + p_format)
+        fname_readable = os.access(fname, os.R_OK)
+        if fname_readable:
+            try:
+                from tasks.resources import MitreAttck_TechniquesResource
+                aresource = MitreAttck_TechniquesResource()
+                dataset = tablib.Dataset().load(open(fname).read())
+                result = aresource.import_data(dataset, dry_run=True)
+                if not result.has_errors():
+                    aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
+            except Exception:
+                raise CommandError('[!] ' + tablename + " table could not be imported!")
+        else:
+            print(fname + " is not readable!")
+
+    def import_mitreattck_tactics(self, p_format):
+        tablename = "MitreAttck_Tactics"
+        print("[*] Importing "+tablename)
+        fname = os.path.join(self.p_dir, tablename + '.' + p_format)
+        fname_readable = os.access(fname, os.R_OK)
+        if fname_readable:
+            try:
+                from tasks.resources import MitreAttck_TacticsResource
+                aresource = MitreAttck_TacticsResource()
+                dataset = tablib.Dataset().load(open(fname).read())
+                result = aresource.import_data(dataset, dry_run=True)
+                if not result.has_errors():
+                    aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
+            except Exception:
+                raise CommandError('[!] ' + tablename + " table could not be imported!")
+        else:
+            print(fname + " is not readable!")
 
     def import_inv(self, p_format):
         tablename = "Inv"
-        print("Importing "+tablename)
+        print("[*] Importing "+tablename)
         fname = os.path.join(self.p_dir, tablename+'.'+p_format)
         fname_readable = os.access(fname, os.R_OK)
         if fname_readable:
-            try:
-                from invs.resources import InvResource
-                aresource = InvResource()
-                dataset = tablib.Dataset().load(open(fname).read())
-                result = aresource.import_data(dataset, dry_run=True)
-                if not result.has_errors():
-                    aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
-                    print(tablename + " imported successfully")
-            except Exception:
-                raise CommandError(tablename + " table could not be imported!")
+            # try:
+            from invs.resources import InvResource
+            aresource = InvResource()
+            dataset = tablib.Dataset().load(open(fname).read())
+            result = aresource.import_data(dataset, dry_run=True, raise_errors=True)
+            print(str(result))
+            if not result.has_errors():
+                aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
+                print('[+] ' + tablename + " imported successfully")
+            else:
+                print('[-] ' + tablename + " ERROR importing")
+                raise CommandError('[!] ' + tablename + " table could not be imported!")
+            # except Exception:
+            #     raise CommandError('[!] ' + tablename + " table could not be imported!")
         else:
-            print(fname+" is not readable!")
+            print('[-]' + fname+" is not readable!")
 
     def import_actscriptos(self, p_format):
         tablename = "ActScriptOs"
-        print("Importing "+tablename)
+        print("[*] Importing "+tablename)
         fname = os.path.join(self.p_dir, tablename+'.'+p_format)
         fname_readable = os.access(fname, os.R_OK)
         if fname_readable:
@@ -388,15 +585,18 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 result = aresource.import_data(dataset, dry_run=True)
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
-                    print(tablename + " imported successfully")
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
             except Exception:
-                raise CommandError(tablename + " table could not be imported!")
+                raise CommandError('[!] ' + tablename + " table could not be imported!")
         else:
-            print(fname+" is not readable!")
+            print('[-]' + fname+" is not readable!")
 
     def import_actscriptcategory(self, p_format):
         tablename = "ActScriptCategory"
-        print("Importing "+tablename)
+        print("[*] Importing "+tablename)
         fname = os.path.join(self.p_dir, tablename+'.'+p_format)
         fname_readable = os.access(fname, os.R_OK)
         if fname_readable:
@@ -407,15 +607,18 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 result = aresource.import_data(dataset, dry_run=True)
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
-                    print(tablename + " imported successfully")
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
             except Exception:
-                raise CommandError(tablename + " table could not be imported!")
+                raise CommandError('[!] ' + tablename + " table could not be imported!")
         else:
-            print(fname+" is not readable!")
+            print('[-]' + fname+" is not readable!")
 
     def import_actscripttype(self, p_format):
         tablename = "ActScriptType"
-        print("Importing "+tablename)
+        print("[*] Importing "+tablename)
         fname = os.path.join(self.p_dir, tablename+'.'+p_format)
         fname_readable = os.access(fname, os.R_OK)
         if fname_readable:
@@ -426,15 +629,18 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 result = aresource.import_data(dataset, dry_run=True)
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
-                    print(tablename + " imported successfully")
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
             except Exception:
-                raise CommandError(tablename + " table could not be imported!")
+                raise CommandError('[!] ' + tablename + " table could not be imported!")
         else:
-            print(fname+" is not readable!")
+            print('[-]' + fname+" is not readable!")
 
     def import_actoutputtarget(self, p_format):
         tablename = "ActOutputTarget"
-        print("Importing "+tablename)
+        print("[*] Importing "+tablename)
         fname = os.path.join(self.p_dir, tablename+'.'+p_format)
         fname_readable = os.access(fname, os.R_OK)
         if fname_readable:
@@ -445,15 +651,18 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 result = aresource.import_data(dataset, dry_run=True)
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
-                    print(tablename + " imported successfully")
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
             except Exception:
-                raise CommandError(tablename + " table could not be imported!")
+                raise CommandError('[!] ' + tablename + " table could not be imported!")
         else:
-            print(fname+" is not readable!")
+            print('[-]' + fname+" is not readable!")
 
     def import_actscriptoutput(self, p_format):
         tablename = "ActScriptOutput"
-        print("Importing "+tablename)
+        print("[*] Importing "+tablename)
         fname = os.path.join(self.p_dir, tablename+'.'+p_format)
         fname_readable = os.access(fname, os.R_OK)
         if fname_readable:
@@ -464,15 +673,18 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 result = aresource.import_data(dataset, dry_run=True)
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
-                    print(tablename + " imported successfully")
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
             except Exception:
-                raise CommandError(tablename + " table could not be imported!")
+                raise CommandError('[!] ' + tablename + " table could not be imported!")
         else:
-            print(fname+" is not readable!")
+            print('[-]' + fname+" is not readable!")
 
     def import_acttype(self, p_format):
         tablename = "ActType"
-        print("Importing "+tablename)
+        print("[*] Importing "+tablename)
         fname = os.path.join(self.p_dir, tablename+'.'+p_format)
         fname_readable = os.access(fname, os.R_OK)
         if fname_readable:
@@ -483,15 +695,18 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 result = aresource.import_data(dataset, dry_run=True)
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
-                    print(tablename + " imported successfully")
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
             except Exception:
-                raise CommandError(tablename + " table could not be imported!")
+                raise CommandError('[!] ' + tablename + " table could not be imported!")
         else:
-            print(fname+" is not readable!")
+            print('[-]' + fname+" is not readable!")
 
     def import_taskcategory(self, p_format):
         tablename = "TaskCategory"
-        print("Importing "+tablename)
+        print("[*] Importing "+tablename)
         fname = os.path.join(self.p_dir, tablename+'.'+p_format)
         fname_readable = os.access(fname, os.R_OK)
         if fname_readable:
@@ -502,15 +717,18 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 result = aresource.import_data(dataset, dry_run=True)
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
-                    print(tablename + " imported successfully")
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
             except Exception:
-                raise CommandError(tablename + " table could not be imported!")
+                raise CommandError('[!] ' + tablename + " table could not be imported!")
         else:
-            print(fname+" is not readable!")
+            print('[-]' + fname+" is not readable!")
 
     def import_taskpriority(self, p_format):
         tablename = "TaskPriority"
-        print("Importing "+tablename)
+        print("[*] Importing "+tablename)
         fname = os.path.join(self.p_dir, tablename+'.'+p_format)
         fname_readable = os.access(fname, os.R_OK)
         if fname_readable:
@@ -521,15 +739,18 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 result = aresource.import_data(dataset, dry_run=True)
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
-                    print(tablename+" imported successfully")
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
             except Exception:
                 raise CommandError(tablename+" table could not be imported!")
         else:
-            print(fname+" is not readable!")
+            print('[-]' + fname+" is not readable!")
 
     def import_taskstatus(self, p_format):
         tablename = "TaskStatus"
-        print("Importing "+tablename)
+        print("[*] Importing "+tablename)
         fname = os.path.join(self.p_dir, tablename+'.'+p_format)
         fname_readable = os.access(fname, os.R_OK)
         if fname_readable:
@@ -540,15 +761,18 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 result = aresource.import_data(dataset, dry_run=True)
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
-                    print(tablename+" imported successfully")
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
             except Exception:
                 raise CommandError(tablename+" table could not be imported!")
         else:
-            print(fname+" is not readable!")
+            print('[-]' + fname+" is not readable!")
 
     def import_tasktype(self, p_format):
         tablename = "TaskType"
-        print("Importing "+tablename)
+        print("[*] Importing "+tablename)
         fname = os.path.join(self.p_dir, tablename+'.'+p_format)
         fname_readable = os.access(fname, os.R_OK)
         if fname_readable:
@@ -559,15 +783,18 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 result = aresource.import_data(dataset, dry_run=True)
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
-                    print(tablename+" imported successfully")
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
             except Exception:
                 raise CommandError(tablename+" table could not be imported!")
         else:
-            print(fname+" is not readable!")
+            print('[-]' + fname+" is not readable!")
 
     def import_task(self, p_format):
         tablename = "Task"
-        print("Importing "+tablename)
+        print("[*] Importing "+tablename)
         fname = os.path.join(self.p_dir, tablename+'.'+p_format)
         fname_readable = os.access(fname, os.R_OK)
         if fname_readable:
@@ -578,15 +805,18 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 result = aresource.import_data(dataset, dry_run=True)
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
-                    print(tablename+" imported successfully")
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
             except Exception:
                 raise CommandError(tablename+" table could not be imported!")
         else:
-            print(fname+" is not readable!")
+            print('[-]' + fname+" is not readable!")
 
     def import_tasktemplate(self, p_format):
         tablename = "TaskTemplate"
-        print("Importing "+tablename)
+        print("[*] Importing "+tablename)
         fname = os.path.join(self.p_dir, tablename+'.'+p_format)
         fname_readable = os.access(fname, os.R_OK)
         if fname_readable:
@@ -597,15 +827,18 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 result = aresource.import_data(dataset, dry_run=True)
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
-                    print(tablename+" imported successfully")
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
             except Exception:
                 raise CommandError(tablename+" table could not be imported!")
         else:
-            print(fname+" is not readable!")
+            print('[-]' + fname+" is not readable!")
 
     def import_taskvar(self, p_format):
         tablename = "TaskVar"
-        print("Importing "+tablename)
+        print("[*] Importing "+tablename)
         fname = os.path.join(self.p_dir, tablename+'.'+p_format)
         fname_readable = os.access(fname, os.R_OK)
         if fname_readable:
@@ -616,15 +849,18 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 result = aresource.import_data(dataset, dry_run=True)
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
-                    print(tablename+" imported successfully")
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
             except Exception:
                 raise CommandError(tablename+" table could not be imported!")
         else:
-            print(fname+" is not readable!")
+            print('[-]' + fname+" is not readable!")
 
     def import_playbook(self, p_format):
         tablename = "Playbook"
-        print("Importing "+tablename)
+        print("[*] Importing "+tablename)
         fname = os.path.join(self.p_dir, tablename+'.'+p_format)
         fname_readable = os.access(fname, os.R_OK)
         if fname_readable:
@@ -635,15 +871,18 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 result = aresource.import_data(dataset, dry_run=True)
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
-                    print(tablename+" imported successfully")
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
             except Exception:
                 raise CommandError(tablename+" table could not be imported!")
         else:
-            print(fname+" is not readable!")
+            print('[-]' + fname+" is not readable!")
 
     def import_playbooktemplate(self, p_format):
         tablename = "PlaybookTemplate"
-        print("Importing "+tablename)
+        print("[*] Importing "+tablename)
         fname = os.path.join(self.p_dir, tablename+'.'+p_format)
         fname_readable = os.access(fname, os.R_OK)
         if fname_readable:
@@ -654,15 +893,18 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 result = aresource.import_data(dataset, dry_run=True)
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
-                    print(tablename+" imported successfully")
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
             except Exception:
                 raise CommandError(tablename+" table could not be imported!")
         else:
-            print(fname+" is not readable!")
+            print('[-]' + fname+" is not readable!")
 
     def import_playbooktemplateitem(self, p_format):
         tablename = "PlaybookTemplateItem"
-        print("Importing "+tablename)
+        print("[*] Importing "+tablename)
         fname = os.path.join(self.p_dir, tablename+'.'+p_format)
         fname_readable = os.access(fname, os.R_OK)
         if fname_readable:
@@ -673,15 +915,18 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 result = aresource.import_data(dataset, dry_run=True)
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
-                    print(tablename+" imported successfully")
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
             except Exception:
                 raise CommandError(tablename+" table could not be imported!")
         else:
-            print(fname+" is not readable!")
+            print('[-]' + fname+" is not readable!")
 
     def import_taskvarcategory(self, p_format):
         tablename = "TaskVarCategory"
-        print("Importing "+tablename)
+        print("[*] Importing "+tablename)
         fname = os.path.join(self.p_dir, tablename+'.'+p_format)
         fname_readable = os.access(fname, os.R_OK)
         if fname_readable:
@@ -692,15 +937,18 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 result = aresource.import_data(dataset, dry_run=True)
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
-                    print(tablename+" imported successfully")
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
             except Exception:
                 raise CommandError(tablename+" table could not be imported!")
         else:
-            print(fname+" is not readable!")
+            print('[-]' + fname+" is not readable!")
 
     def import_taskvartype(self, p_format):
         tablename = "TaskVarType"
-        print("Importing "+tablename)
+        print("[*] Importing "+tablename)
         fname = os.path.join(self.p_dir, tablename+'.'+p_format)
         fname_readable = os.access(fname, os.R_OK)
         if fname_readable:
@@ -711,15 +959,18 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 result = aresource.import_data(dataset, dry_run=True)
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
-                    print(tablename+" imported successfully")
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
             except Exception:
                 raise CommandError(tablename+" table could not be imported!")
         else:
-            print(fname+" is not readable!")
+            print('[-]' + fname+" is not readable!")
 
     def import_action(self, p_format):
         tablename = "Action"
-        print("Importing "+tablename)
+        print("[*] Importing "+tablename)
         fname = os.path.join(self.p_dir, tablename+'.'+p_format)
         fname_readable = os.access(fname, os.R_OK)
         if fname_readable:
@@ -730,15 +981,18 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 result = aresource.import_data(dataset, dry_run=True)
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
-                    print(tablename+" imported successfully")
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
             except Exception:
                 raise CommandError(tablename+" table could not be imported!")
         else:
-            print(fname+" is not readable!")
+            print('[-]' + fname+" is not readable!")
 
     def import_actionqstatus(self, p_format):
         tablename = "ActionQStatus"
-        print("Importing "+tablename)
+        print("[*] Importing "+tablename)
         fname = os.path.join(self.p_dir, tablename+'.'+p_format)
         fname_readable = os.access(fname, os.R_OK)
         if fname_readable:
@@ -749,15 +1003,18 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 result = aresource.import_data(dataset, dry_run=True)
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
-                    print(tablename+" imported successfully")
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
             except Exception:
                 raise CommandError(tablename+" table could not be imported!")
         else:
-            print(fname+" is not readable!")
+            print('[-]' + fname+" is not readable!")
 
     def import_actionq(self, p_format):
         tablename = "ActionQ"
-        print("Importing "+tablename)
+        print("[*] Importing "+tablename)
         fname = os.path.join(self.p_dir, tablename+'.'+p_format)
         fname_readable = os.access(fname, os.R_OK)
         if fname_readable:
@@ -768,27 +1025,187 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json] [--version]
                 result = aresource.import_data(dataset, dry_run=True)
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
-                    print(tablename+" imported successfully")
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
             except Exception:
                 raise CommandError(tablename+" table could not be imported!")
         else:
-            print(fname+" is not readable!")
+            print('[-]' + fname+" is not readable!")
 
     def import_updatepackage(self, p_format):
         tablename = "UpdatePackage"
-        print("Importing "+tablename)
+        print("[*] Importing "+tablename)
         fname = os.path.join(self.p_dir, tablename+'.'+p_format)
         fname_readable = os.access(fname, os.R_OK)
         if fname_readable:
             try:
-                from tasks.resources import UpdatePackageResource
+                from configuration.resources import UpdatePackageResource
                 aresource = UpdatePackageResource()
                 dataset = tablib.Dataset().load(open(fname).read())
                 result = aresource.import_data(dataset, dry_run=True)
                 if not result.has_errors():
                     aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
-                    print(tablename+" imported successfully")
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
             except Exception:
                 raise CommandError(tablename+" table could not be imported!")
         else:
-            print(fname+" is not readable!")
+            print('[-]' + fname+" is not readable!")
+
+    def import_invreviewrules(self, p_format):
+        tablename = "InvReviewRules"
+        print("[*] Importing "+tablename)
+        fname = os.path.join(self.p_dir, tablename+'.'+p_format)
+        fname_readable = os.access(fname, os.R_OK)
+        if fname_readable:
+            try:
+                from invs.resources import InvReviewRulesResource
+                aresource = InvReviewRulesResource()
+                dataset = tablib.Dataset().load(open(fname).read())
+                result = aresource.import_data(dataset, dry_run=True)
+                if not result.has_errors():
+                    aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
+            except Exception:
+                raise CommandError('[!] ' + tablename + " table could not be imported!")
+        else:
+            print('[-]' + fname+" is not readable!")
+            
+    def import_actiongroup(self, p_format):
+        tablename = "ActionGroup"
+        print("[*] Importing "+tablename)
+        fname = os.path.join(self.p_dir, tablename+'.'+p_format)
+        fname_readable = os.access(fname, os.R_OK)
+        if fname_readable:
+            try:
+                from tasks.resources import ActionGroupResource
+                aresource = ActionGroupResource()
+                dataset = tablib.Dataset().load(open(fname).read())
+                result = aresource.import_data(dataset, dry_run=True)
+                if not result.has_errors():
+                    aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
+            except Exception:
+                raise CommandError('[!] ' + tablename + " table could not be imported!")
+        else:
+            print('[-]' + fname+" is not readable!")
+            
+    def import_actiongroupmember(self, p_format):
+        tablename = "ActionGroupMember"
+        print("[*] Importing "+tablename)
+        fname = os.path.join(self.p_dir, tablename+'.'+p_format)
+        fname_readable = os.access(fname, os.R_OK)
+        if fname_readable:
+            try:
+                from tasks.resources import ActionGroupMemberResource
+                aresource = ActionGroupMemberResource()
+                dataset = tablib.Dataset().load(open(fname).read())
+                result = aresource.import_data(dataset, dry_run=True)
+                if not result.has_errors():
+                    aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
+            except Exception:
+                raise CommandError('[!] ' + tablename + " table could not be imported!")
+        else:
+            print('[-]' + fname+" is not readable!")
+
+    def import_connectionitem(self, p_format):
+        tablename = "ConnectionItem"
+        print("[*] Importing "+tablename)
+        fname = os.path.join(self.p_dir, tablename+'.'+p_format)
+        fname_readable = os.access(fname, os.R_OK)
+        if fname_readable:
+            try:
+                from configuration.resources import ConnectionItemResource
+                aresource = ConnectionItemResource()
+                dataset = tablib.Dataset().load(open(fname).read())
+                result = aresource.import_data(dataset, dry_run=True)
+                if not result.has_errors():
+                    aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
+            except Exception:
+                raise CommandError('[!] ' + tablename + " table could not be imported!")
+        else:
+            print('[-]' + fname+" is not readable!")
+
+    def import_connectionitemfield(self, p_format):
+        tablename = "ConnectionItemField"
+        print("[*] Importing "+tablename)
+        fname = os.path.join(self.p_dir, tablename+'.'+p_format)
+        fname_readable = os.access(fname, os.R_OK)
+        if fname_readable:
+            try:
+                from configuration.resources import ConnectionItemFieldResource
+                aresource = ConnectionItemFieldResource()
+                dataset = tablib.Dataset().load(open(fname).read())
+                result = aresource.import_data(dataset, dry_run=True)
+                if not result.has_errors():
+                    aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
+            except Exception:
+                raise CommandError('[!] ' + tablename + " table could not be imported!")
+        else:
+            print('[-]' + fname+" is not readable!")
+
+    def import_useraudit(self, p_format):
+        tablename = "UserAudit"
+        print("[*] Importing "+tablename)
+        fname = os.path.join(self.p_dir, tablename+'.'+p_format)
+        fname_readable = os.access(fname, os.R_OK)
+        if fname_readable:
+            try:
+                from accounts.resources import UserAuditResource
+                aresource = UserAuditResource()
+                dataset = tablib.Dataset().load(open(fname).read())
+                result = aresource.import_data(dataset, dry_run=True)
+                if not result.has_errors():
+                    aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
+            except Exception:
+                raise CommandError('[!] ' + tablename + " table could not be imported!")
+        else:
+            print('[-]' + fname+" is not readable!")
+
+    def import_automation(self, p_format):
+        tablename = "Automation"
+        print("[*] Importing "+tablename)
+        fname = os.path.join(self.p_dir, tablename+'.'+p_format)
+        fname_readable = os.access(fname, os.R_OK)
+        if fname_readable:
+            try:
+                from tasks.resources import AutomationResource
+                aresource = AutomationResource()
+                dataset = tablib.Dataset().load(open(fname).read())
+                result = aresource.import_data(dataset, dry_run=True)
+                if not result.has_errors():
+                    aresource.import_data(dataset, dry_run=False, use_transactions=True)  # Actually import now
+                    print('[+] ' + tablename + " imported successfully")
+                else:
+                    print('[-] ' + tablename + " ERROR importing")
+                    raise CommandError('[!] ' + tablename + " table could not be imported!")
+            except Exception:
+                raise CommandError('[!] ' + tablename + " table could not be imported!")
+        else:
+            print('[-]' + fname+" is not readable!")

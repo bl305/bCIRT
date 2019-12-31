@@ -254,7 +254,7 @@ class Playbook(models.Model):
     objects = models.Manager()
     name = models.CharField(max_length=50, default="", blank=False, null=False)
     version = models.CharField(max_length=20, default="", blank=True, null=True)
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="playbook_users")
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, default=None, null=True, related_name="playbook_users")
     inv = models.ForeignKey(Inv, on_delete=models.CASCADE, default=None, null=True, blank=True,
                             related_name="playbook_inv")
     created_at = models.DateTimeField(auto_now_add=True)
@@ -368,15 +368,15 @@ def new_playbook(pplaybooktemplate, pname, pversion, puser, pinv, pdescription, 
 
 class Task(models.Model):
     objects = models.Manager()
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="task_users")
-    parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name="task_parent")
-    inputfrom = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True,
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, default=None, null=True, blank=True, related_name="task_users")
+    parent = models.ForeignKey('self', on_delete=models.SET_NULL, default=None, null=True, blank=True, related_name="task_parent")
+    inputfrom = models.ForeignKey('self', on_delete=models.SET_NULL, default=None, null=True, blank=True,
                                   related_name="task_inputfrom")
-    inv = models.ForeignKey(Inv, on_delete=models.CASCADE, null=True, blank=True, related_name="task_inv")
+    inv = models.ForeignKey(Inv, on_delete=models.CASCADE, default=None, null=True, blank=True, related_name="task_inv")
     #  this is circular reference...could cause issues...lazy relationship
     action = models.ForeignKey('tasks.Action', on_delete=models.SET_NULL, default=None, null=True, blank=True,
                                related_name="task_action")
-    actiontarget = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True,
+    actiontarget = models.ForeignKey('self', on_delete=models.SET_NULL, default=None,  null=True, blank=True,
                                      related_name="task_actiontarget")
     playbook = models.ForeignKey(Playbook, on_delete=models.CASCADE, default=None, null=True, blank=True,
                                  related_name="task_playbook")
@@ -648,13 +648,13 @@ class EvidenceFormat(models.Model):
 
 class Evidence(models.Model):
     objects = models.Manager()
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="evidence_users")
-    task = models.ForeignKey(Task, on_delete=models.CASCADE, null=True, blank=True, related_name="evidence_task")
-    inv = models.ForeignKey(Inv, on_delete=models.CASCADE, null=True, blank=True, related_name="evidence_inv")
-    parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name="evidence_parent")
-    parentattr = models.ForeignKey('EvidenceAttr', on_delete=models.SET_NULL, null=True, blank=True,
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, default=None, null=True, related_name="evidence_users")
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, default=None, null=True, blank=True, related_name="evidence_task")
+    inv = models.ForeignKey(Inv, on_delete=models.CASCADE, default=None, null=True, blank=True, related_name="evidence_inv")
+    parent = models.ForeignKey('self', on_delete=models.SET_NULL, default=None, null=True, blank=True, related_name="evidence_parent")
+    parentattr = models.ForeignKey('EvidenceAttr', on_delete=models.SET_NULL, default=None, null=True, blank=True,
                                    related_name="evidence_parentattr")
-    prevev = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name="evidence_prevev")
+    prevev = models.ForeignKey('self', on_delete=models.SET_NULL, default=None, null=True, blank=True, related_name="evidence_prevev")
 
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.CharField(max_length=20, default="unknown")
@@ -795,8 +795,8 @@ class EvReputation(models.Model):
 
 class EvidenceAttr(models.Model):
     objects = models.Manager()
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="evattr_users")
-    ev = models.ForeignKey(Evidence, on_delete=models.CASCADE, null=True, blank=True, related_name="evattr_evidence")
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, default=None, null=True, related_name="evattr_users")
+    ev = models.ForeignKey(Evidence, on_delete=models.CASCADE, default=None, null=True, blank=True, related_name="evattr_evidence")
     evattrvalue = models.CharField(max_length=2048)
     observable = models.BooleanField(default=False, null=False, blank=False)
 
@@ -807,7 +807,7 @@ class EvidenceAttr(models.Model):
     evattrformat = models.ForeignKey(EvidenceAttrFormat, on_delete=models.SET_DEFAULT, default=1, null=False,
                                      blank=False, related_name="evattr_evidenceattrformat")
     attr_automatic = models.BooleanField(default=None, null=True, blank=True)
-    attr_reputation = models.ForeignKey(EvReputation, on_delete=models.SET_NULL, null=True, blank=True, related_name="evattr_evreputation")
+    attr_reputation = models.ForeignKey(EvReputation, on_delete=models.SET_NULL, default=None, null=True, blank=True, related_name="evattr_evreputation")
 
     def __str__(self):
         return str(self.pk)
@@ -1098,8 +1098,8 @@ class OutputTarget(models.Model):
 class Automation(models.Model):
     objects = models.Manager()
     enabled = models.BooleanField(default=True)
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="automation_users")
-    type = models.ForeignKey(Type, on_delete=models.SET_NULL, blank=False, null=True, related_name="automation_type")
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, default=None, null=True, related_name="automation_users")
+    type = models.ForeignKey(Type, on_delete=models.SET_NULL, default=None, blank=False, null=True, related_name="automation_type")
     name = models.CharField(max_length=50, blank=False, null=False)
     version = models.CharField(max_length=20, default=None, null=True)
     script_type = models.ForeignKey(ScriptType, on_delete=models.SET_DEFAULT, default='1', blank=False, null=False,
@@ -1149,7 +1149,7 @@ class Automation(models.Model):
 class Action(models.Model):
     objects = models.Manager()
     enabled = models.BooleanField(default=True)
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="action_users")
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, default=None, null=True, related_name="action_users")
     title = models.CharField(max_length=50, blank=False, null=False)
     version = models.CharField(max_length=20, default=None, null=True)
     automationid = models.ForeignKey(Automation, on_delete=models.SET_NULL, default=None, blank=False, null=True,
@@ -1262,7 +1262,7 @@ class TaskTemplate(models.Model):
     tasktemplatename = models.CharField(max_length=50, blank=False, null=False)
     enabled = models.BooleanField(default=True)
     # fields from Task model
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True,
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, default=None, null=True, blank=True,
                              related_name="tasktemplate_users")
     title = models.CharField(max_length=50, blank=False, null=False)
     status = models.ForeignKey(TaskStatus, on_delete=models.SET_DEFAULT, default="1",
@@ -1275,7 +1275,7 @@ class TaskTemplate(models.Model):
                              related_name="tasktemplate_type")
     action = models.ForeignKey(Action, on_delete=models.SET_NULL, default=None, null=True, blank=True,
                                related_name="tasktemplate_action")
-    actiontarget = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True,
+    actiontarget = models.ForeignKey('self', on_delete=models.SET_NULL, default=None, null=True, blank=True,
                                      related_name="tasktemplate_actiontarget")
     description = HTMLField()
     # description_html = models.TextField(editable=True, default='', blank=True)
@@ -1315,12 +1315,12 @@ class TaskTemplate(models.Model):
 
 class TaskVar(models.Model):
     objects = models.Manager()
-    category = models.ForeignKey(TaskVarCategory, on_delete=models.SET_NULL, null=True, blank=True,
+    category = models.ForeignKey(TaskVarCategory, on_delete=models.SET_NULL, default=None, null=True, blank=True,
                                  related_name="taskvar_taskvarcategory")
-    type = models.ForeignKey(TaskVarType, on_delete=models.SET_NULL, null=True, blank=True,
+    type = models.ForeignKey(TaskVarType, on_delete=models.SET_NULL, default=None, null=True, blank=True,
                              related_name="taskvar_taskvartype")
-    task = models.ForeignKey(Task, on_delete=models.CASCADE, null=True, blank=True, related_name="taskvar_task")
-    tasktemplate = models.ForeignKey(TaskTemplate, on_delete=models.CASCADE, null=True, blank=True,
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, default=None, null=True, blank=True, related_name="taskvar_task")
+    tasktemplate = models.ForeignKey(TaskTemplate, on_delete=models.CASCADE, default=None, null=True, blank=True,
                                      related_name="taskvar_tasktemplate")
 
     name = models.CharField(max_length=20)
@@ -1371,7 +1371,7 @@ class PlaybookTemplate(models.Model):
     name = models.CharField(max_length=50, default="", blank=False, null=False)
     enabled = models.BooleanField(default=True)
     version = models.CharField(max_length=20, default="", blank=True, null=True)
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="playbooktemplate_users")
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, default=None, null=True, related_name="playbooktemplate_users")
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.CharField(max_length=20, default="unknown")
     modified_at = models.DateTimeField(auto_now=True)
@@ -1406,17 +1406,17 @@ class PlaybookTemplate(models.Model):
 
 class PlaybookTemplateItem(models.Model):
     objects = models.Manager()
-    playbooktemplateid = models.ForeignKey(PlaybookTemplate, on_delete=models.CASCADE, null=False, blank=False,
-                                           related_name="playbooktemplateitem_playbooktemplate")
+    playbooktemplateid = models.ForeignKey(PlaybookTemplate, on_delete=models.CASCADE, default=None, null=False,
+                                           blank=False, related_name="playbooktemplateitem_playbooktemplate")
     enabled = models.BooleanField(default=True)
-    acttask = models.ForeignKey(TaskTemplate, on_delete=models.SET_NULL, null=True, blank=True,
+    acttask = models.ForeignKey(TaskTemplate, on_delete=models.SET_NULL, default=None, null=True, blank=True,
                                 related_name="playbooktemplateitem_tasktemplate_act")
-    nexttask = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True,
+    nexttask = models.ForeignKey('self', on_delete=models.SET_NULL, default=None, null=True, blank=True,
                                  related_name="playbooktemplateitem_playbooktemplateitem_next")
-    prevtask = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True,
+    prevtask = models.ForeignKey('self', on_delete=models.SET_NULL, default=None, null=True, blank=True,
                                  related_name="playbooktemplateitem_playbooktemplateitem_prev")
     itemorder = models.SmallIntegerField(default=0, blank=False, null=False)
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="playbooktemplateitem_users")
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, default=None, null=True, related_name="playbooktemplateitem_users")
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.CharField(max_length=20, default="unknown")
     modified_at = models.DateTimeField(auto_now=True)
@@ -1440,8 +1440,9 @@ class PlaybookTemplateItem(models.Model):
 
     def save(self, *args, **kwargs):
         self.description_html = misaka.html(self.description)
-        # PlaybookTemplate.objects.filter(pk=self.playbooktemplateid.pk).update(modified_at=timezone_now(), modified_by=self.modified_by)
-        playbooktemplate_obj = PlaybookTemplate.objects.filter(pk=self.playbooktemplateid.pk)
+        # PlaybookTemplate.objects.filter(pk=self.playbooktemplateid.pk).update(modified_at=timezone_now(),
+        # smodified_by=self.modified_by)
+        playbooktemplate_obj = PlaybookTemplate.objects.filter(pk=self.playbooktemplateid.id)
         playbooktemplate_obj.update(modified_at=timezone_now(), modified_by=self.modified_by)
         playbooktemplate_obj[0].save()
         # PlaybookTemplate.objects.get(pk=self.playbooktemplateid.pk).save()
@@ -1504,7 +1505,10 @@ def generate_graph_PlaybookTemplate(sender, instance, **kwargs):
             prevtask = pbtmpitem.prevtask.pk
         else:
             prevtask = "Start"
-        taskinfo = "%d - %s" % (pbtmpitem.pk, pbtmpitem.acttask.title)
+        if pbtmpitem.acttask:
+            taskinfo = "%d - %s" % (pbtmpitem.pk, pbtmpitem.acttask.title)
+        else:
+            taskinfo = "%d - %s" % (pbtmpitem.pk, "N/A")
         # print("%s - %d - %d"%(taskinfo,pbtmpitem.itemorder,prevtask))
         alabel = "  %d [label=\"#%d: %s\"]\n" % (pbtmpitem.pk, pbtmpitem.itemorder, taskinfo)
         aitem = "  %s -> %s\n" % (prevtask, pbtmpitem.pk)
@@ -2438,7 +2442,7 @@ class ActionQ(models.Model):
                                 related_name="actionq_oldevidence")
     invid = models.ForeignKey(Inv, on_delete=models.SET_NULL, default=None, blank=True, null=True,
                               related_name="actionq_inv")
-    parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name="actionq_parent")
+    parent = models.ForeignKey('self', on_delete=models.SET_NULL, default=None, null=True, blank=True, related_name="actionq_parent")
     title = models.CharField(max_length=50, default=None, blank=True, null=True)
     scripttype = models.CharField(max_length=60, blank=False, null=False)
     command = models.CharField(max_length=2048, blank=False, null=False)

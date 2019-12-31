@@ -12,7 +12,7 @@
 # **********************************************************************;
 
 from django.core.management.base import BaseCommand, CommandError
-# from invs.models import InvStatus, InvPriority, InvAttackvector, InvCategory, InvPhase, InvSeverity
+# from invs.models import InvStatus, InvPriority, InvAttackVector, InvCategory, InvPhase, InvSeverity
 # from tasks.models import TaskVarType, TaskVarCategory, TaskType, TaskCategory, TaskStatus, TaskPriority
 # from tasks.models import ScriptOs, ScriptType, ScriptCategory, Action, Type, ActionQStatus, OutputTarget, ScriptOutput
 # from tasks.models import EvidenceFormat, EvidenceAttr, EvidenceAttrFormat
@@ -29,7 +29,7 @@ class Command(BaseCommand):
         # parser.add_argument('-a', '--all', action='store_true', help='Run all')
         parser.add_argument('-a', '--all', action='store_true', help='Export the whole database')
         parser.add_argument('-i', '--table_name', type=str, help='Export the specified module tables')
-        parser.add_argument('-f', '--format', type=str, help='Export in this format: "json"')
+        parser.add_argument('-f', '--format', type=str, help='Export in this format: "json/csv"')
         parser.add_argument('-d', '--dir', type=str, help='Export to this directory')
 
     def __init__(self, *args, **kwargs):
@@ -43,11 +43,17 @@ class Command(BaseCommand):
         p_format = options['format']
         p_dir = options['dir']
         self.p_dir = str(p_dir)
-        if p_all and p_dir is not None and p_format == "json":
+        if p_all and p_dir is not None and p_format: # == "json":
+            self.export_user(p_format)
+            self.export_group(p_format)
+
             self.export_evidenceformat(p_format)
             self.export_evidenceattrformat(p_format)
+            self.export_evreputation(p_format)
             self.export_evidence(p_format)
             self.export_evidenceattr(p_format)
+            self.export_mitreattck_techniques(p_format)
+            self.export_mitreattck_tactics(p_format)
 
             self.export_updatepackage(p_format)
 
@@ -62,6 +68,8 @@ class Command(BaseCommand):
             self.export_invphase(p_format)
             self.export_invpriority(p_format)
             self.export_invattackvector(p_format)
+            self.export_currencytype(p_format)
+            self.export_invreviewrules(p_format)
             self.export_inv(p_format)
 
             self.export_taskstatus(p_format)
@@ -86,9 +94,19 @@ class Command(BaseCommand):
             self.export_acttype(p_format)
             self.export_actionqstatus(p_format)
             self.export_actionq(p_format)
+            self.export_actiongroup(p_format)
+            self.export_actiongroupmember(p_format)
             self.export_action(p_format)
+
+            self.export_connectionitem(p_format)
+            self.export_connectionitemfield(p_format)
+
+            self.export_useraudit(p_format)
+
+            self.export_automation(p_format)
+
             print("Database export to " + p_dir + " finished.")
-        elif p_table and p_dir is not None and p_format == "json":
+        elif p_table and p_dir is not None and p_format: # == "json":
             if p_table == "investigations":
                 self.export_invseverity(p_format)
                 self.export_invstatus(p_format)
@@ -96,11 +114,16 @@ class Command(BaseCommand):
                 self.export_invphase(p_format)
                 self.export_invpriority(p_format)
                 self.export_invattackvector(p_format)
+                self.export_mitreattck_techniques(p_format)
+                self.export_mitreattck_tactics(p_format)
+                self.export_invreviewrules(p_format)
+                self.export_currencytype(p_format)
                 self.export_inv(p_format)
                 print("Database export to " + p_dir + " finished.")
             elif p_table == "evidences":
                 self.export_evidenceformat(p_format)
                 self.export_evidenceattrformat(p_format)
+                self.export_evreputation(p_format)
                 self.export_evidence(p_format)
                 self.export_evidenceattr(p_format)
                 print("Database export to " + p_dir + " finished.")
@@ -135,17 +158,33 @@ class Command(BaseCommand):
                 self.export_acttype(p_format)
                 self.export_actionqstatus(p_format)
                 self.export_actionq(p_format)
+                self.export_actiongroup(p_format)
+                self.export_actiongroupmember(p_format)
                 self.export_action(p_format)
                 print("Database export to " + p_dir + " finished.")
             elif p_table == "configuration":
                 self.export_updatepackage(p_format)
                 print("Database export to " + p_dir + " finished.")
+            elif p_table == "connection":
+                self.export_connectionitem(p_format)
+                self.export_connectionitemfield(p_format)
+                print("Database export to " + p_dir + " finished.")
+            elif p_table == "audit":
+                self.export_useraudit(p_format)
+                print("Database export to " + p_dir + " finished.")
+            elif p_table == "automation":
+                self.export_automation(p_format)
+                print("Database export to " + p_dir + " finished.")
+            elif p_table == "user":
+                self.export_user(p_format)
+                self.export_group(p_format)
+                print("Database export to " + p_dir + " finished.")
             else:
                 print("Wrong parameter! Options:\ninvestigations / tasks / taskvars / actions / evidences / "
-                      "configuration\n")
+                      "configuration / connection / audit / automation / user\n")
         else:
             print(r"""
-usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--version]
+usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json/csv] [-d OUTDIR] [--version]
         [-v {0,1,2,3}] [--settings SETTINGS]
         [--pythonpath PYTHONPATH] [--traceback] [--no-color]
             """)
@@ -159,6 +198,38 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
             outfile.close()
         except IOError:
             print('Error occured while trying to write file: ' + destpath)
+
+    def export_user(self, p_format):
+        try:
+            print("Exporting User")
+            from users.resources import UserResource
+            aresource = UserResource()
+            dataset = aresource.export()
+            tablename = 'User'
+            if p_format == "json":
+                self.save_to_file(a_filename=tablename+'.json',
+                                  a_content=dataset.json)
+            elif p_format == "csv":
+                self.save_to_file(a_filename=tablename+'.csv',
+                                  a_content=dataset.csv)
+        except Exception:
+            raise CommandError("User table could not be exported!")
+
+    def export_group(self, p_format):
+        try:
+            print("Exporting Group")
+            from users.resources import GroupResource
+            aresource = GroupResource()
+            dataset = aresource.export()
+            tablename = 'Group'
+            if p_format == "json":
+                self.save_to_file(a_filename=tablename+'.json',
+                                  a_content=dataset.json)
+            elif p_format == "csv":
+                self.save_to_file(a_filename=tablename+'.csv',
+                                  a_content=dataset.csv)
+        except Exception:
+            raise CommandError("Group table could not be exported!")
 
     def export_evidenceformat(self, p_format):
         try:
@@ -195,6 +266,54 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
         except Exception:
             raise CommandError("EvidenceAttrFormat table could not be exported!")
 
+    def export_evreputation(self, p_format):
+        try:
+            print("Exporting EvReputation")
+            from tasks.resources import EvReputationResource
+            aresource = EvReputationResource()
+            dataset = aresource.export()
+            tablename = 'EvReputation'
+            if p_format == "json":
+                self.save_to_file(a_filename=tablename+'.json',
+                                  a_content=dataset.json)
+            elif p_format == "csv":
+                self.save_to_file(a_filename=tablename+'.csv',
+                                  a_content=dataset.csv)
+        except Exception:
+            raise CommandError("EvReputation table could not be exported!")
+
+    def export_mitreattck_techniques(self, p_format):
+        try:
+            print("Exporting MitreAttck_Techniques")
+            from tasks.resources import MitreAttck_TechniquesResource
+            aresource = MitreAttck_TechniquesResource()
+            dataset = aresource.export()
+            tablename = 'MitreAttck_Techniques'
+            if p_format == "json":
+                self.save_to_file(a_filename=tablename+'.json',
+                                  a_content=dataset.json)
+            elif p_format == "csv":
+                self.save_to_file(a_filename=tablename+'.csv',
+                                  a_content=dataset.csv)
+        except Exception:
+            raise CommandError("MitreAttck_Techinques table could not be exported!")
+
+    def export_mitreattck_tactics(self, p_format):
+        try:
+            print("Exporting MitreAttck_Tactics")
+            from tasks.resources import MitreAttck_TacticsResource
+            aresource = MitreAttck_TacticsResource()
+            dataset = aresource.export()
+            tablename = 'MitreAttck_Tactics'
+            if p_format == "json":
+                self.save_to_file(a_filename=tablename+'.json',
+                                  a_content=dataset.json)
+            elif p_format == "csv":
+                self.save_to_file(a_filename=tablename+'.csv',
+                                  a_content=dataset.csv)
+        except Exception:
+            raise CommandError("MitreAttck_Tactics table could not be exported!")
+
     def export_evidence(self, p_format):
         try:
             # self.stdout.write("Exporting EvidenceFormat")
@@ -203,7 +322,10 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
             aresource = EvidenceResource()
             # queryset = EvidenceFormat.objects.filter(pk=1)
             # dataset = aresource.export(queryset)
-            dataset = aresource.export()
+            from tasks.models import Evidence
+            queryset = Evidence.objects.all().order_by('parent').reverse()
+            dataset = aresource.export(queryset)
+            # dataset = aresource.export()
             tablename = 'Evidence'
             if p_format == "json":
                 self.save_to_file(a_filename=tablename+'.json',
@@ -256,8 +378,8 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
         try:
             # self.stdout.write("Exporting EvidenceFormat")
             print("Exporting Hostname")
-            from assets.resources import HostNameResource
-            aresource = HostNameResource()
+            from assets.resources import HostnameResource
+            aresource = HostnameResource()
             # queryset = EvidenceFormat.objects.filter(pk=1)
             # dataset = aresource.export(queryset)
             dataset = aresource.export()
@@ -275,8 +397,8 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
         try:
             # self.stdout.write("Exporting EvidenceFormat")
             print("Exporting Ipaddress")
-            from assets.resources import IpAddressResource
-            aresource = IpAddressResource()
+            from assets.resources import IpaddressResource
+            aresource = IpaddressResource()
             # queryset = EvidenceFormat.objects.filter(pk=1)
             # dataset = aresource.export(queryset)
             dataset = aresource.export()
@@ -392,8 +514,8 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
     def export_invattackvector(self, p_format):
         try:
             print("Exporting InvAttackVector")
-            from invs.resources import InvAttackvectorResource
-            aresource = InvAttackvectorResource()
+            from invs.resources import InvAttackVectorResource
+            aresource = InvAttackVectorResource()
             dataset = aresource.export()
             tablename = 'InvAttackVector'
             if p_format == "json":
@@ -405,12 +527,48 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
         except Exception:
             raise CommandError("InvAttackVector table could not be exported!")
 
+    def export_invreviewrules(self, p_format):
+        try:
+            print("Exporting InvReviewRules")
+            from invs.resources import InvReviewRulesResource
+            aresource = InvReviewRulesResource()
+            dataset = aresource.export()
+            tablename = 'InvReviewRules'
+            if p_format == "json":
+                self.save_to_file(a_filename=tablename+'.json',
+                                  a_content=dataset.json)
+            elif p_format == "csv":
+                self.save_to_file(a_filename=tablename+'.csv',
+                                  a_content=dataset.csv)
+        except Exception:
+            raise CommandError("InvReviewRules table could not be exported!")
+
+    def export_currencytype(self, p_format):
+        try:
+            print("Exporting CurrencyType")
+            from invs.resources import CurrencyTypeResource
+            aresource = CurrencyTypeResource()
+            dataset = aresource.export()
+            tablename = 'CurrencyType'
+            if p_format == "json":
+                self.save_to_file(a_filename=tablename+'.json',
+                                  a_content=dataset.json)
+            elif p_format == "csv":
+                self.save_to_file(a_filename=tablename+'.csv',
+                                  a_content=dataset.csv)
+        except Exception:
+            raise CommandError("CurrencyType table could not be exported!")
+
     def export_inv(self, p_format):
         try:
             print("Exporting Inv")
             from invs.resources import InvResource
             aresource = InvResource()
-            dataset = aresource.export()
+            # dataset = aresource.export()
+            from invs.models import Inv
+            queryset = Inv.objects.all().order_by('parent').reverse()
+            dataset = aresource.export(queryset)
+
             tablename = 'Inv'
             if p_format == "json":
                 self.save_to_file(a_filename=tablename+'.json',
@@ -423,11 +581,11 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
 
     def export_actscriptos(self, p_format):
         try:
-            print("Exporting ActScriptOs")
+            print("Exporting ScriptOs")
             from tasks.resources import ScriptOsResource
             aresource = ScriptOsResource()
             dataset = aresource.export()
-            tablename = 'ActScriptOs'
+            tablename = 'ScriptOs'
             if p_format == "json":
                 self.save_to_file(a_filename=tablename+'.json',
                                   a_content=dataset.json)
@@ -435,15 +593,15 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
                 self.save_to_file(a_filename=tablename+'.csv',
                                   a_content=dataset.csv)
         except Exception:
-            raise CommandError("ActionScriptOs table could not be exported!")
+            raise CommandError("ScriptOs table could not be exported!")
 
     def export_actscriptcategory(self, p_format):
         try:
-            print("Exporting ActScriptCategory")
+            print("Exporting ScriptCategory")
             from tasks.resources import ScriptCategoryResource
             aresource = ScriptCategoryResource()
             dataset = aresource.export()
-            tablename = 'ActScriptCategory'
+            tablename = 'ScriptCategory'
             if p_format == "json":
                 self.save_to_file(a_filename=tablename+'.json',
                                   a_content=dataset.json)
@@ -451,15 +609,15 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
                 self.save_to_file(a_filename=tablename+'.csv',
                                   a_content=dataset.csv)
         except Exception:
-            raise CommandError("ActionScriptCategory table could not be exported!")
+            raise CommandError("ScriptCategory table could not be exported!")
 
     def export_actscripttype(self, p_format):
         try:
-            print("Exporting ActScriptType")
+            print("Exporting ScriptType")
             from tasks.resources import ScriptTypeResource
             aresource = ScriptTypeResource()
             dataset = aresource.export()
-            tablename = 'ActScriptType'
+            tablename = 'ScriptType'
             if p_format == "json":
                 self.save_to_file(a_filename=tablename+'.json',
                                   a_content=dataset.json)
@@ -467,15 +625,15 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
                 self.save_to_file(a_filename=tablename+'.csv',
                                   a_content=dataset.csv)
         except Exception:
-            raise CommandError("ActionScriptType table could not be exported!")
+            raise CommandError("ScriptType table could not be exported!")
 
     def export_actoutputtarget(self, p_format):
         try:
-            print("Exporting ActOutputTarget")
+            print("Exporting OutputTarget")
             from tasks.resources import OutputTargetResource
             aresource = OutputTargetResource()
             dataset = aresource.export()
-            tablename = 'ActOutputTarget'
+            tablename = 'OutputTarget'
             if p_format == "json":
                 self.save_to_file(a_filename=tablename+'.json',
                                   a_content=dataset.json)
@@ -483,15 +641,15 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
                 self.save_to_file(a_filename=tablename+'.csv',
                                   a_content=dataset.csv)
         except Exception:
-            raise CommandError("ActionOutputTarget table could not be exported!")
+            raise CommandError("OutputTarget table could not be exported!")
 
     def export_actscriptoutput(self, p_format):
         try:
-            print("Exporting ActScriptOutput")
+            print("Exporting ScriptOutput")
             from tasks.resources import ScriptOutputResource
             aresource = ScriptOutputResource()
             dataset = aresource.export()
-            tablename = 'ActScriptOutput'
+            tablename = 'ScriptOutput'
             if p_format == "json":
                 self.save_to_file(a_filename=tablename+'.json',
                                   a_content=dataset.json)
@@ -499,15 +657,15 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
                 self.save_to_file(a_filename=tablename+'.csv',
                                   a_content=dataset.csv)
         except Exception:
-            raise CommandError("ActionScriptOutput table could not be exported!")
+            raise CommandError("ScriptOutput table could not be exported!")
 
     def export_acttype(self, p_format):
         try:
-            print("Exporting ActType")
+            print("Exporting Type")
             from tasks.resources import TypeResource
             aresource = TypeResource()
             dataset = aresource.export()
-            tablename = 'ActType'
+            tablename = 'Type'
             if p_format == "json":
                 self.save_to_file(a_filename=tablename+'.json',
                                   a_content=dataset.json)
@@ -515,7 +673,7 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
                 self.save_to_file(a_filename=tablename+'.csv',
                                   a_content=dataset.csv)
         except Exception:
-            raise CommandError("ActionType table could not be exported!")
+            raise CommandError("Type table could not be exported!")
 
     def export_taskcategory(self, p_format):
         try:
@@ -586,7 +744,11 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
             print("Exporting Task")
             from tasks.resources import TaskResource
             aresource = TaskResource()
-            dataset = aresource.export()
+            from tasks.models import Task
+            queryset = Task.objects.all().order_by('parent').reverse()
+            dataset = aresource.export(queryset)
+            # dataset = aresource.export()
+
             tablename = 'Task'
             if p_format == "json":
                 self.save_to_file(a_filename=tablename+'.json',
@@ -602,7 +764,11 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
             print("Exporting TaskTemplate")
             from tasks.resources import TaskTemplateResource
             aresource = TaskTemplateResource()
-            dataset = aresource.export()
+            from tasks.models import TaskTemplate
+            queryset = TaskTemplate.objects.all().order_by('actiontarget').reverse()
+            dataset = aresource.export(queryset)
+            # dataset = aresource.export()
+
             tablename = 'TaskTemplate'
             if p_format == "json":
                 self.save_to_file(a_filename=tablename+'.json',
@@ -666,7 +832,10 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
             print("Exporting PlaybookTemplateItem")
             from tasks.resources import PlaybookTemplateItemResource
             aresource = PlaybookTemplateItemResource()
-            dataset = aresource.export()
+            from tasks.models import PlaybookTemplateItem
+            queryset = PlaybookTemplateItem.objects.all().order_by('prevtask','nexttask')
+            dataset = aresource.export(queryset)
+            # dataset = aresource.export()
             tablename = 'PlaybookTemplateItem'
             if p_format == "json":
                 self.save_to_file(a_filename=tablename+'.json',
@@ -741,6 +910,38 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
         except Exception:
             raise CommandError("ActionQStatus table could not be exported!")
 
+    def export_actiongroup(self, p_format):
+        try:
+            print("Exporting ActionGroup")
+            from tasks.resources import ActionGroupResource
+            aresource = ActionGroupResource()
+            dataset = aresource.export()
+            tablename = 'ActionGroup'
+            if p_format == "json":
+                self.save_to_file(a_filename=tablename+'.json',
+                                  a_content=dataset.json)
+            elif p_format == "csv":
+                self.save_to_file(a_filename=tablename+'.csv',
+                                  a_content=dataset.csv)
+        except Exception:
+            raise CommandError("ActionGroup table could not be exported!")
+
+    def export_actiongroupmember(self, p_format):
+        try:
+            print("Exporting ActionGroupMember")
+            from tasks.resources import ActionGroupMemberResource
+            aresource = ActionGroupMemberResource()
+            dataset = aresource.export()
+            tablename = 'ActionGroupMember'
+            if p_format == "json":
+                self.save_to_file(a_filename=tablename+'.json',
+                                  a_content=dataset.json)
+            elif p_format == "csv":
+                self.save_to_file(a_filename=tablename+'.csv',
+                                  a_content=dataset.csv)
+        except Exception:
+            raise CommandError("ActionGroupMember table could not be exported!")
+
     def export_actionq(self, p_format):
         try:
             print("Exporting ActionQ")
@@ -772,3 +973,83 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json] [-d OUTDIR] [--ver
                                   a_content=dataset.csv)
         except Exception:
             raise CommandError("UpdatePackage table could not be exported!")
+
+    def export_connectionitem(self, p_format):
+        try:
+            print("Exporting ConnectionItem")
+            from configuration.resources import ConnectionItemResource
+            aresource = ConnectionItemResource()
+            dataset = aresource.export()
+            tablename = 'ConnectionItem'
+            if p_format == "json":
+                self.save_to_file(a_filename=tablename + '.json',
+                                  a_content=dataset.json)
+            elif p_format == "csv":
+                self.save_to_file(a_filename=tablename + '.csv',
+                                  a_content=dataset.csv)
+        except Exception:
+            raise CommandError("ConnectionItem table could not be exported!")
+
+    def export_connectionitemfield(self, p_format):
+        try:
+            print("Exporting ConnectionItemField")
+            from configuration.resources import ConnectionItemFieldResource
+            aresource = ConnectionItemFieldResource()
+            dataset = aresource.export()
+            tablename = 'ConnectionItemField'
+            if p_format == "json":
+                self.save_to_file(a_filename=tablename + '.json',
+                                  a_content=dataset.json)
+            elif p_format == "csv":
+                self.save_to_file(a_filename=tablename + '.csv',
+                                  a_content=dataset.csv)
+        except Exception:
+            raise CommandError("ConnectionItemField table could not be exported!")
+
+    def export_useraudit(self, p_format):
+        try:
+            print("Exporting UserAudit")
+            from accounts.resources import UserAuditResource
+            aresource = UserAuditResource()
+            dataset = aresource.export()
+            tablename = 'UserAudit'
+            if p_format == "json":
+                self.save_to_file(a_filename=tablename + '.json',
+                                  a_content=dataset.json)
+            elif p_format == "csv":
+                self.save_to_file(a_filename=tablename + '.csv',
+                                  a_content=dataset.csv)
+        except Exception:
+            raise CommandError("UserAudit table could not be exported!")
+
+    def export_automation(self, p_format):
+        try:
+            print("Exporting Automation")
+            from tasks.resources import AutomationResource
+            aresource = AutomationResource()
+            dataset = aresource.export()
+            tablename = 'Automation'
+            if p_format == "json":
+                self.save_to_file(a_filename=tablename + '.json',
+                                  a_content=dataset.json)
+            elif p_format == "csv":
+                self.save_to_file(a_filename=tablename + '.csv',
+                                  a_content=dataset.csv)
+        except Exception:
+            raise CommandError("Automation table could not be exported!")
+
+    # def export_XXX(self, p_format):
+    #     try:
+    #         print("Exporting XXX")
+    #         from configuration.resources import XXXResource
+    #         aresource = XXXResource()
+    #         dataset = aresource.export()
+    #         tablename = 'XXX'
+    #         if p_format == "json":
+    #             self.save_to_file(a_filename=tablename + '.json',
+    #                               a_content=dataset.json)
+    #         elif p_format == "csv":
+    #             self.save_to_file(a_filename=tablename + '.csv',
+    #                               a_content=dataset.csv)
+    #     except Exception:
+    #         raise CommandError("XXX table could not be exported!")

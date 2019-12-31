@@ -19,7 +19,7 @@ from django.contrib import admin
 
 
 class GroupMemberInline(admin.TabularInline):
-    model = models.InvAttackvector
+    model = models.InvAttackVector
     model = models.InvCategory
     model = models.InvPriority
     model = models.InvPhase
@@ -30,7 +30,7 @@ class GroupMemberInline(admin.TabularInline):
     model = models.CurrencyType
 
 # admin.site.register(models.Inv)
-# admin.site.register(models.InvAttackvector)
+# admin.site.register(models.InvAttackVector)
 # admin.site.register(models.InvCategory)
 # admin.site.register(models.InvPriority)
 # admin.site.register(models.InvPhase)
@@ -43,8 +43,8 @@ class CurrencyTypeAdmin(ImportExportModelAdmin):
     pass
 
 
-@admin.register(models.InvAttackvector)
-class InvAttackvectorAdmin(ImportExportModelAdmin):
+@admin.register(models.InvAttackVector)
+class InvAttackVectorAdmin(ImportExportModelAdmin):
     pass
 
 

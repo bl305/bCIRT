@@ -114,7 +114,7 @@ class Profile(models.Model):
     location = models.CharField(blank=True, null=True, default='', max_length=30)
     department = models.CharField(blank=True, null=True, default='', max_length=30)
     location_contact = models.CharField(blank=True, null=True, default='', max_length=30)
-    inv = models.ForeignKey(Inv, on_delete=models.SET_NULL, null=True, blank=True, related_name="profile_inv")
+    inv = models.ForeignKey(Inv, on_delete=models.SET_NULL, default=None, null=True, blank=True, related_name="profile_inv")
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.CharField(max_length=20, default="unknown")
     modified_at = models.DateTimeField(auto_now=True)

@@ -40,7 +40,7 @@ from django.template.loader import render_to_string
 ##############
 
 from .forms import InvForm, InvSuspiciousEmailForm, InvReviewer1Form, InvReviewer2Form
-from .models import Inv, InvStatus, new_inv, InvCategory, InvAttackvector, InvPhase, InvSeverity, CurrencyType,\
+from .models import Inv, InvStatus, new_inv, InvCategory, InvAttackVector, InvPhase, InvSeverity, CurrencyType,\
     InvPriority  # , InvReviewRules
 # from django.shortcuts import redirect, reverse    # ,render, get_object_or_404
 from django.contrib import messages
@@ -833,7 +833,7 @@ class InvSuspiciousEmailCreateView(LoginRequiredMixin, PermissionRequiredMixin, 
                           pseverity=InvSeverity.objects.get(pk=2),
                           pcategory=InvCategory.objects.get(pk=6),
                           ppriority=InvPriority.objects.get(pk=1),
-                          pattackvector=InvAttackvector.objects.get(name="Phishing"),
+                          pattackvector=InvAttackVector.objects.get(name="Phishing"),
                           pdescription=cdescription,
                           psummary="Suspicious email",
                           pcomment=None,

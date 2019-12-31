@@ -13,7 +13,7 @@
 from .widgets import JQueryDateTimePickerInput
 
 from django import forms
-from .models import Inv, InvStatus, InvSeverity, InvPhase, InvCategory, InvAttackvector, InvPriority, \
+from .models import Inv, InvStatus, InvSeverity, InvPhase, InvCategory, InvAttackVector, InvPriority, \
     CurrencyType, InvReviewRules
 import logging
 from tinymce import TinyMCE
@@ -160,7 +160,7 @@ class InvForm(forms.ModelForm):
 
     attackvector = forms.ModelChoiceField(
         label='Attack vector*',
-        queryset=InvAttackvector.objects.filter(enabled=True),
+        queryset=InvAttackVector.objects.filter(enabled=True),
         empty_label="--Select--",
         required=True,
         widget=forms.Select(
@@ -406,7 +406,7 @@ class InvReviewRulesForm(forms.ModelForm):
 
     attackvector = forms.ModelChoiceField(
         label='Attack vector*',
-        queryset=InvAttackvector.objects.filter(enabled=True),
+        queryset=InvAttackVector.objects.filter(enabled=True),
         empty_label="--Select--",
         required=True,
         widget=forms.Select(
@@ -456,7 +456,7 @@ class InvReviewRulesForm(forms.ModelForm):
 
 class InvSuspiciousEmailForm(forms.Form):
     invid = forms.CharField(
-        label='Investigation',
+        label='Investigation*',
         max_length=20,
         required=False,
         widget=forms.Textarea(attrs={
@@ -469,7 +469,7 @@ class InvSuspiciousEmailForm(forms.Form):
             )
     )
     description = forms.CharField(
-        label='Investigation Description',
+        label='Investigation Description*',
         max_length=50,
         required=False,
         widget=forms.Textarea(attrs={
@@ -482,7 +482,7 @@ class InvSuspiciousEmailForm(forms.Form):
             )
     )
     ticket = forms.CharField(
-        label='Ticket',
+        label='Ticket*',
         max_length=50,
         widget=forms.TextInput(attrs={
             'size': 20,
@@ -500,7 +500,7 @@ class InvSuspiciousEmailForm(forms.Form):
             'class': 'form-control'}
         )
     )
-    fileRef = forms.FileField(label='Attachment')
+    fileRef = forms.FileField(label='Attachment*')
 
 
 class InvReviewer1Form(forms.ModelForm):

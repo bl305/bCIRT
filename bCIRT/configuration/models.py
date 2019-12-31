@@ -49,7 +49,7 @@ def upload_to_updates(instance, filename):
 # Create your models here.
 class UpdatePackage(models.Model):
     objects = models.Manager()
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="update_users")
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, default=None, null=True, related_name="update_users")
     updateversion = models.CharField(max_length=15, null=False, blank=False)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.CharField(max_length=20, default="unknown")

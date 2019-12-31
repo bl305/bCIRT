@@ -14,11 +14,10 @@ from import_export import resources
 from .models import Task, TaskCategory, TaskPriority, TaskStatus, TaskType,\
     TaskTemplate, TaskVar, TaskVarCategory, TaskVarType, \
     Playbook, PlaybookTemplate, PlaybookTemplateItem,\
-    Evidence, EvidenceFormat, EvidenceAttr, EvidenceAttrFormat, \
-    Action, Automation, ScriptType, ScriptOs, ScriptCategory, ScriptOutput, OutputTarget, ScriptInput,\
-    Type, ActionQ, ActionQStatus, MitreAttck_Tactics, MitreAttck_Techniques,\
-    ActionGroup, ActionGroupMember
-
+    Evidence, EvidenceFormat, EvidenceAttr, EvidenceAttrFormat, EvReputation, \
+    Action, Automation, ActionGroup, ActionGroupMember, \
+    ScriptType, ScriptOs, ScriptCategory, ScriptOutput, OutputTarget, ScriptInput,\
+    Type, ActionQ, ActionQStatus, MitreAttck_Tactics, MitreAttck_Techniques
 
 class EvidenceResource(resources.ModelResource):
     class Meta:
@@ -26,6 +25,28 @@ class EvidenceResource(resources.ModelResource):
 
 
 class EvidenceFormatResource(resources.ModelResource):
+    def xxxbefore_import(self, dataset, using_transactions, dry_run, **kwargs):
+        pass
+        # print(dataset)
+
+    def xxxbefore_export(self, queryset, *args, **kwargs):
+        fieldnames = queryset.get_export_headers()
+        myfields = queryset.get_fields()
+        myvalues = queryset.get_export_fields()
+        for ii in myfields:
+            print(ii)
+        print("x")
+        print(queryset.get_field_name(myvalues[0]))
+        print("X")
+
+        print(queryset.get_queryset())
+        print(queryset)
+
+    # def export(queryset=None, *args, **kwargs):
+        # print(queryset.get_queryset())
+        # print(queryset.get_export_fields()[0])
+        # print(queryset.get_user_visible_fields())
+        # pass
     class Meta:
         model = EvidenceFormat
 
@@ -33,6 +54,11 @@ class EvidenceFormatResource(resources.ModelResource):
 class EvidenceAttrResource(resources.ModelResource):
     class Meta:
         model = EvidenceAttr
+
+
+class EvReputationResource(resources.ModelResource):
+    class Meta:
+        model = EvReputation
 
 
 class EvidenceAttrFormatResource(resources.ModelResource):
@@ -43,6 +69,16 @@ class EvidenceAttrFormatResource(resources.ModelResource):
 class ActionResource(resources.ModelResource):
     class Meta:
         model = Action
+
+
+class ActionGroupResource(resources.ModelResource):
+    class Meta:
+        model = ActionGroup
+
+
+class ActionGroupMemberResource(resources.ModelResource):
+    class Meta:
+        model = ActionGroupMember
 
 
 class AutomationResource(resources.ModelResource):
@@ -161,6 +197,12 @@ class PlaybookTemplateResource(resources.ModelResource):
 
 
 class PlaybookTemplateItemResource(resources.ModelResource):
+    def before_import(self, dataset, using_transactions, dry_run, **kwargs):
+        pbtmp = PlaybookTemplate.objects.first()
+        pbtmpi=PlaybookTemplateItem.objects.get_or_create(pk=pbtmp)
+        print(pbtmpi)
+        pass
+
     class Meta:
         model = PlaybookTemplateItem
 

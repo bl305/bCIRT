@@ -13,7 +13,7 @@
 # 2019.12.13  Lendvay     1      Fixes
 # **********************************************************************;
 from django.core.management.base import BaseCommand, CommandError
-from invs.models import InvStatus, InvPriority, InvCategory, InvPhase, InvSeverity, InvAttackvector, CurrencyType
+from invs.models import InvStatus, InvPriority, InvCategory, InvPhase, InvSeverity, InvAttackVector, CurrencyType
 from tasks.models import MitreAttck_Tactics, MitreAttck_Techniques
 from tasks.models import TaskVarType, TaskVarCategory, TaskType, TaskCategory, TaskStatus, TaskPriority
 from tasks.models import ScriptOs, ScriptType, ScriptCategory, Action, Type, ActionQStatus, OutputTarget, ScriptOutput
@@ -592,7 +592,7 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
         try:
             self.stdout.write("Initiating InvAttackVecotr")
             for invattackvectoritem in invattackvector:
-                InvAttackvector.objects.create(
+                InvAttackVector.objects.create(
                     name=invattackvectoritem['name'],
                     enabled=invattackvectoritem['enabled'],
                     description=invattackvectoritem['description']

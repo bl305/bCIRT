@@ -126,7 +126,7 @@ class InvPriority(models.Model):
         super(InvPriority, self).save(*args, **kwargs)
 
 
-class InvAttackvector(models.Model):
+class InvAttackVector(models.Model):
     objects = models.Manager()
     name = models.CharField(max_length=40)
     enabled = models.BooleanField(default=True)
@@ -138,7 +138,7 @@ class InvAttackvector(models.Model):
 
     def save(self, *args, **kwargs):
         self.description_html = misaka.html(self.description)
-        super(InvAttackvector, self).save(*args, **kwargs)
+        super(InvAttackVector, self).save(*args, **kwargs)
 
 
 def timediff(pdate1, pdate2):
@@ -156,9 +156,9 @@ def timediff(pdate1, pdate2):
 # Create your models here.
 class Inv(models.Model):
     objects = models.Manager()
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True,
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, default=None, null=True, blank=True,
                              related_name="inv_users")
-    parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True,
+    parent = models.ForeignKey('self', on_delete=models.SET_NULL, default=None,null=True, blank=True,
                                related_name="inv_parent")
     invid = models.CharField(max_length=20, default="", null=True, blank=True)
     refid = models.CharField(max_length=20, default="", null=True, blank=True)
@@ -181,7 +181,7 @@ class Inv(models.Model):
                                  related_name="inv_category")
     priority = models.ForeignKey(InvPriority, on_delete=models.SET_NULL, null=True, default=None,
                                  related_name="inv_priority")
-    attackvector = models.ForeignKey(InvAttackvector, on_delete=models.SET_DEFAULT, default="1", blank=False,
+    attackvector = models.ForeignKey(InvAttackVector, on_delete=models.SET_DEFAULT, default="1", blank=False,
                                      null=False, related_name="inv_attackvector")
     # description = models.CharField(max_length=200, default="")
     # description_html = models.TextField(editable=True, default='', blank=True)
@@ -441,13 +441,13 @@ class InvReviewRules(models.Model):
     objects = models.Manager()
     bypassreview = models.BooleanField(default=False)
     rulename = models.CharField(max_length=50, default="", null=False, blank=False)
-    severity = models.ForeignKey(InvSeverity, on_delete=models.SET_NULL, default="", null=True, blank=True,
+    severity = models.ForeignKey(InvSeverity, on_delete=models.SET_NULL, default=None, null=True, blank=True,
                                  related_name="invreviewrules_severity")
-    category = models.ForeignKey(InvCategory, on_delete=models.SET_NULL, default="", null=True, blank=True,
+    category = models.ForeignKey(InvCategory, on_delete=models.SET_NULL, default=None, null=True, blank=True,
                                  related_name="invreviewrules_category")
-    priority = models.ForeignKey(InvPriority, on_delete=models.SET_NULL, default="", null=True, blank=True,
+    priority = models.ForeignKey(InvPriority, on_delete=models.SET_NULL, default=None, null=True, blank=True,
                                  related_name="invreviewrules_priority")
-    attackvector = models.ForeignKey(InvAttackvector, on_delete=models.SET_NULL, default="", null=True, blank=True,
+    attackvector = models.ForeignKey(InvAttackVector, on_delete=models.SET_NULL, default=None, null=True, blank=True,
                                      related_name="invreviewrules_attackvector")
     potentialloss = models.PositiveIntegerField(default=0, blank=False, null=False)
     monetaryloss = models.PositiveIntegerField(default=0, blank=False, null=False)

@@ -25,11 +25,11 @@ class HostResource(resources.ModelResource):
         model = Host
 
 
-class HostNameResource(resources.ModelResource):
+class HostnameResource(resources.ModelResource):
     class Meta:
         model = Hostname
 
 
-class IpAddressResource(resources.ModelResource):
+class IpaddressResource(resources.ModelResource):
     class Meta:
         model = Ipaddress
