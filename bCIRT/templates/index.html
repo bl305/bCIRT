@@ -130,8 +130,54 @@
                 </div>
                 <div class="col-md-4">
                     <div class="card bg-light mb-3">
-                        <div class="card-header">TBD</div>
+                        <div class="card-header">Under Review TOP 10 ({{ reviewlist.count }})</div>
                         <div class="card-body">
+                            <table class="table table-sm table-condensed fittable" style="border-collapse:collapse;">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Attack vector</th>
+                                            <th>Ticket</th>
+                                            <th>Status</th>
+                                            <th>Modified</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for invrev in reviewlist %}
+                                        <tr data-toggle="collapse" data-target="#myinvs{{invrev.pk}}" class="accordion-toggle">
+                                            <td>
+                                                <a href="{% url 'invs:inv_detail' pk=invrev.pk %}">
+                                                    <h6>
+                                                        <span class="badge badge-pill badge-warning">{{invrev.id}}</span>
+                                                    </h6>
+                                                </a>
+                                            </td>
+                                            <td>
+                                                {{ invrev.attackvector.name }}
+                                            </td>
+                                            <td>
+                                                {{ invrev.ticketid }}
+                                            </td>
+                                            <td>
+                                                {{ invrev.status }}
+                                            </td>
+                                            <td>
+                                                {{ invrev.modified_at|date:"Y/m/d H:i:s" }}
+                                            </td>
+                                        </tr>
+                                        <tr >
+                                            <td colspan="5" class="hiddenRow">
+                                                <div class="accordian-body collapse" id="myinvs{{invrev.pk}}">
+                                                    <div class="invdescription2" style="max-width:25vw">
+                                                    {{ invrev.description }}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+
                         </div>
                     </div>
                 </div>

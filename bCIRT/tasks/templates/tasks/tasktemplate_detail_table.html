@@ -43,8 +43,8 @@
         <td><strong>Modified by</strong><br> {{ tasktemplate.modified_by }} </td>
     </tr>
     <tr>
- <td colspan="4">
-            <strong>Action <span class="glyphicon glyphicon-arrow-right"></span> Target Task </strong>
+ <td colspan="3">
+            <strong>Action <span class="fas fa-arrow-right"></span> Target Task </strong>
             <tooltip data-toggle="tooltip" data-placement="top"
                      title="Action will be executed on the target tasktemplate:
 1. by default on the first evidence in the target tasktemplate
@@ -87,6 +87,13 @@
             {% else %}
                 -
             {% endif %}
+        </td>
+        <td><strong>Req. Evidence</strong><br>
+        {% if tasktemplate.requiresevidence %}
+            {{ tasktemplate.requiresevidence }}
+        {% else %}
+            -
+        {% endif %}
         </td>
         <td><strong>Created on</strong><br> {{ tasktemplate.created_at|date:"Y/m/d H:i:s" }} </td>
         <td><strong>Created by</strong><br> {{ tasktemplate.created_by }} </td>

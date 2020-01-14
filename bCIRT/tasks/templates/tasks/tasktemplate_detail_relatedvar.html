@@ -1,0 +1,43 @@
+
+
+        <!-- Right Investigation Info -->
+        <div class="col-sm-12 col-md-12">
+            <div class="panel panel-primary">
+                <div class = "panel-heading">
+                    <div class="panel-title text-center">
+                         <div class="btn-group inline pull-left">
+                          </div>
+                         <strong>&nbsp;Related Variables | {{ tasktemplate.taskvar_tasktemplate.all.count }} item(s)</strong>
+                    </div>
+                </div>
+                <div class="panel-body">
+
+                    {% if error_message %}
+                        <p><strong>{{ error_message }}</strong></p>
+                    {% endif %}
+
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>TaskVarID</th>
+                            <th>Category</th>
+                            <th>Type</th>
+                            <th>Name</th>
+                            <th>Value</th>
+                            <th>Required</th>
+                            <th>Enabled</th>
+                            <th>Task</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                             {% include 'tasks/tasktemplate_detail_relatedvar_table.html' %}
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>

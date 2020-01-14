@@ -22,17 +22,21 @@ body {
 
 .navbar-brand {
     height: 20px;
-    font-family: "Courier New";
+//    font-family: "Courier New";
+    font-family: FreeMono;
     font-weight: bold;
 }
 
 .nav-item {
-    font-family: Consolas;
+//    font-family: Consolas;
+    font-family: FreeMono;
     font-weight: bold;
 }
 
 .dropdown-item {
-    font-family: Consolas;
+//    font-family: Consolas;
+    font-family: FreeMono;
+
 }
 
 //.myfooter {
@@ -47,7 +51,8 @@ body {
 //}
 
 .mytext {
-    font-family: Consolas;
+//    font-family: Consolas;
+    font-family: FreeMono;
     font-weight: bold;
 }
 

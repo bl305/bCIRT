@@ -674,12 +674,13 @@ class InvReview1CompleteView(LoginRequiredMixin, PermissionRequiredMixin, generi
         inv_pk = self.kwargs.get('pk')
         inv_obj = Inv.objects.get(pk=inv_pk)
         # Checks pass, let http method handlers process the request
-        Inv.objects.filter(pk=inv_pk).update(user=self.request.user)
         assigned_obj = InvStatus.objects.get(name='Review2')
-        Inv.objects.filter(pk=inv_pk).update(reviewer1=self.request.user)
-        Inv.objects.filter(pk=inv_pk).update(reviewed1_by=self.request.user.get_username())
-        Inv.objects.filter(pk=inv_pk).update(reviewed1_at=timezone_now())
-        Inv.objects.filter(pk=inv_pk).update(status=assigned_obj)
+
+        # Inv.objects.filter(pk=inv_pk).update(user=self.request.user)
+        # Inv.objects.filter(pk=inv_pk).update(reviewer1=self.request.user)
+        # Inv.objects.filter(pk=inv_pk).update(reviewed1_by=self.request.user.get_username())
+        # Inv.objects.filter(pk=inv_pk).update(reviewed1_at=timezone_now())
+        # Inv.objects.filter(pk=inv_pk).update(status=assigned_obj)
         try:
             inv_obj.full_clean()
             reviewers2 = User.objects.filter(profile__reviewer2=True)
@@ -687,7 +688,17 @@ class InvReview1CompleteView(LoginRequiredMixin, PermissionRequiredMixin, generi
             for reviewer2 in reviewers2:
                 reviewers2list.add(reviewer2)
             randomreviewer2 = reviewers2.order_by("?").first()
-            Inv.objects.filter(pk=inv_pk).update(reviewer2=randomreviewer2)
+            # Inv.objects.filter(pk=inv_pk).update(reviewer2=randomreviewer2)
+
+
+            # inv_obj.user=self.request.user
+            inv_obj.reviewer1=self.request.user
+            inv_obj.reviewed1_by=self.request.user.get_username()
+            inv_obj.reviewed1_at=timezone_now()
+            inv_obj.status=assigned_obj
+            inv_obj.reviewer2=randomreviewer2
+            inv_obj.save()
+
         except ValidationError as e:
             messages.error(self.request, "No permission to change a record !!!")
             return redirect('invs:inv_detail', pk=inv_pk)
@@ -732,19 +743,22 @@ class InvReview2CompleteView(LoginRequiredMixin, PermissionRequiredMixin, generi
         assigned_obj = InvStatus.objects.get(name='Closed')
         # Inv.objects.filter(pk=inv_pk).update(status=assigned_obj)
         inv_obj = Inv.objects.get(pk=inv_pk)
-        Inv.objects.filter(pk=inv_pk).update(reviewer2=self.request.user)
-        Inv.objects.filter(pk=inv_pk).update(reviewed2_by=self.request.user.get_username())
-        Inv.objects.filter(pk=inv_pk).update(reviewed2_at=timezone_now())
-        inv_obj.status = assigned_obj
-        Inv.objects.filter(pk=inv_pk).update(status=assigned_obj)
+        # Inv.objects.filter(pk=inv_pk).update(reviewer2=self.request.user)
+        # Inv.objects.filter(pk=inv_pk).update(reviewed2_by=self.request.user.get_username())
+        # Inv.objects.filter(pk=inv_pk).update(reviewed2_at=timezone_now())
+        # Inv.objects.filter(pk=inv_pk).update(status=assigned_obj)
         try:
             inv_obj.full_clean()
+            inv_obj.reviewer2 = self.request.user
+            inv_obj.reviewed2_by = self.request.user.get_username()
+            inv_obj.reviewed2_at = timezone_now()
+            inv_obj.status = assigned_obj
+            inv_obj.save()
         except ValidationError as e:
             messages.error(self.request, "No permission to change a record !!!")
             return redirect('invs:inv_detail', pk=inv_pk)
             # raise ValidationError(_('First review must happen first!'))
         # https://goodcode.io/articles/django-assert-raises-validationerror/
-        inv_obj.save()
 
         # return redirect(self.success_url)
         return super(InvReview2CompleteView, self).dispatch(request, *args, **kwargs)

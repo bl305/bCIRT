@@ -62,7 +62,7 @@
                                             </a>
                                         </li>
                                         <li>
-                                            {% if task.action.automation and task.status.pk != 2 %}
+                                            {% if task.action.automation and task.status.name != 'Completed' %}
                                                 {% if task.actev %}
                                                     {% if task.action.scriptinput.pk == 2 and task.actiontarget.evidence_task.all.first.fileName or task.action.scriptinput.pk == 1 %}
                                                         {% if task.inv %}
@@ -121,7 +121,7 @@
                         </td>
                         <td>
                             <div class="dropdown">
-                                {% if task.status.name == "Completed" or task.status.name == "Skipped" %}
+                                {% if task.readonly %}
                                 <button class="btn btn-success btn-sm dropdown-toggle" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
                                     {{ task.status }}
                                     <span class="caret"></span>
@@ -140,7 +140,7 @@
                                 {% endif %}
                                 {% if task.inv.status.name != "Closed" %}
                                     <ul class="dropdown-menu" role="menu">
-                                        {% if task.status.pk != 2 %}
+                                        {% if task.status.name != "Completed" %}
                                         <li>
                                             <a href="{% url 'tasks:tsk_addticketandclose' task_pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
                                                class="btn btn-secondary btn-block btn-sm text-left">
@@ -150,7 +150,7 @@
                                                 Add Ticket
                                             </a>
                                         </li>
-                                                                                    <li>
+                                        <li>
                                                 {% if task.inv %}
                                                 <a href="{% url 'tasks:ev_create' inv_pk=task.inv.pk task_pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
                                                    class="btn btn-secondary btn-sm w-100 text-left">
@@ -198,23 +198,43 @@
                                         </li>
 
                                         {% if task.status.name != 'Completed' %}
-                                        {% if task.evidence_task.all %}
+                                            {% if task.evidence_task.all or not task.requiresevidence %}
+    <!--                                        <li>&nbsp;</li>-->
+                                            <li>
+                                                <a href="{% url 'tasks:tsk_close' pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                                    class="btn btn-secondary btn-sm btn-block text-left">
+                                                    Complete
+                                                </a>
+                                            </li>
+                                            {% else %}
 <!--                                        <li>&nbsp;</li>-->
-                                        <li>
-                                            <a href="{% url 'tasks:tsk_close' pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                                class="btn btn-secondary btn-sm btn-block text-left">
-                                                Complete
-                                            </a>
-                                        </li>
-                                        {% else %}
-<!--                                        <li>&nbsp;</li>-->
-
-
                                             {% endif %}
-                                            {% endif %}
+                                        {% endif %}
                                     </ul>
                                 {% endif %}
+<div class="btn-group" role="group" aria-label="Basic example">
+<a href="{% url 'tasks:tsk_wait' pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
+  class="btn btn-warning btn-xs text-left"
+  title="Wait">
+    <span><i class="fas fa-hourglass-half">&nbsp;</i></span>
+</a>
+<a href="{% url 'tasks:tsk_skip' pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
+  class="btn btn-success btn-xs text-left"
+  title="Skip">
+      <span><i class="fas fa-times">&nbsp;</i></span>
+</a>
+<a href="{% url 'tasks:tsk_close' pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
+   class="btn btn-success btn-xs text-left"
+  title="Complete">
+    <span><i class="fas fa-check-square">&nbsp;</i></span>
+</a>
+</div>
+
                             </div> <!-- .dropdown -->
+
+
+
+
                         </td>
                         <td>
                             {% if task.playbook %}

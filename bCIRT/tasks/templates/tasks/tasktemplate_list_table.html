@@ -36,6 +36,8 @@
                             <th data-field="id" data-sortable="true">Template ID</th>
                             <th data-field="name" data-sortable="true">Template Name</th>
                             <th data-field="title" data-sortable="true">Template Title</th>
+                            <th data-field="type" data-sortable="true">Type</th>
+                            <th data-field="requiresevidence" data-sortable="true">Req.Evid.</th>
                             <th data-field="enabled" data-sortable="true">Enabled</th>
                             <th data-field="category" data-sortable="true">Category</th>
                             <th data-field="created" data-sortable="true">Created (UTC)</th>
@@ -93,6 +95,12 @@
                         {{ tasktemplate.title }}
                     </td>
                     <td>
+                        {{ tasktemplate.type }}
+                    </td>
+                    <td>
+                        {{ tasktemplate.requiresevidence }}
+                    </td>
+                    <td>
                         {{ tasktemplate.enabled }}
                     </td>
                     <td>
@@ -112,7 +120,7 @@
                     </td>
                 </tr>
                 <tr class="hiddenRow">
-                    <td colspan="9">
+                    <td colspan="11">
                         <div class="accordian-body collapse" id="mytasktemplates{{tasktemplate.pk}}">
                             <div class="invdescription2" style="max-width:25vw">
                             {{ tasktemplate.description|safe }}
@@ -125,7 +133,7 @@
 {% endfor %}
 {% else %}
           <tr>
-            <td colspan="9" class="text-center bg-warning">No Task Templates</td>
+            <td colspan="11" class="text-center bg-warning">No Task Templates</td>
           </tr>
 {% endif %}
                         </tbody>

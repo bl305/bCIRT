@@ -1,0 +1,76 @@
+{% extends "tasks/task_template_nonav.html" %}
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : tasks/tasktemplate_detail_main.html
+# Author            : Balazs Lendvay
+# Date created      : 2020.01.08
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2020.01.08  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+
+{% block task_alert %}
+
+{% endblock task_alert %}
+
+{% block task_buttons %}
+
+                            <div class="dropdown">
+                                 <button class="btn btn-outline-secondary btn-sm dropdown-toggle" onclick="filterFunctionTask()" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
+                                    Actions
+                                     <span class="caret"></span>
+                                </button>
+
+                                    <ul class="dropdown-menu" role="menu">
+                                        <li>
+                                            <a href="{% url 'tasks:tmp_create' %}?next1={{ request.get_full_path|urlencode }}"
+                                               class="btn btn-secondary btn-sm btn-block text-left">
+                                                <span class="fas fa-plus"></span>
+                                                New TaskTemplate
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="{% url 'tasks:tvar_create' task_pk=0 tasktmp_pk=tasktemplate.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                               class="btn btn-secondary btn-sm btn-block text-left">
+                                                <span class="fas fa-plus"></span>
+                                                New Variable
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="{% url 'tasks:tmp_edit' pk=tasktemplate.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                              class="btn btn-secondary btn-sm btn-block text-left">
+                                              <span class="fas fa-pen" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
+                                              Edit&nbsp;
+                                            </a>
+                                        </li>
+
+                                        <li>&nbsp;</li>
+                                        <li>
+                                              <a href="{% url 'tasks:tmp_remove' pk=tasktemplate.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                                  class="btn btn-secondary btn-sm btn-block text-danger font-weight-bold">
+                                                  <span data-toggle="tooltip" data-placement="top" title="Delete item">
+                                                      <i class="fas fa-trash-alt"></i>
+                                                  </span>
+                                                  Delete
+                                              </a>
+                                        </li>
+                                    </ul>
+                            </div> <!-- .dropdown -->
+
+{% endblock task_buttons %}
+
+{% block task_title %}
+                        Task Template Details | #{{ tasktemplate.pk }} | {{ user }} at {% now "Y/m/d H:i:s" %} (UTC)
+{% endblock task_title %}
+
+{% block task_body %}
+                    <table class="table" id="investigations-invh">
+                        <tbody>
+                            {% include 'tasks/tasktemplate_detail_table.html' %}
+                        </tbody>
+                    </table>
+{% endblock task_body %}

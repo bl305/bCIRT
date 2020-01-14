@@ -56,6 +56,8 @@ class HomePage(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
             kwargs['reviews1'] = Inv.objects.filter(status=5)
         if amireviewer2:
             kwargs['reviews2'] = Inv.objects.filter(status=6)
+        kwargs['reviewlist'] = Inv.objects.filter(user=self.request.user, status=5)[:10]\
+                               | Inv.objects.filter(user=self.request.user, status=6)[:10]
         kwargs['uinvs'] = Inv.objects.exclude(status=3).exclude(status=2).exclude(status=5).exclude(status=6)[:10]
         kwargs['oinvs'] = Inv.objects.filter(status=3).exclude(user=self.request.user)[:10]
         kwargs['tasks'] = Task.objects.filter(user=self.request.user)\
@@ -74,5 +76,5 @@ class HomePage(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
             .exclude(status=3)\
             .exclude(status=5)\
             .order_by('-modified_at')[:10]
-        kwargs['suspiciousemailplaybook'] = PlaybookTemplate.objects.filter(name="Suspicious Email")
+        # kwargs['suspiciousemailplaybook'] = PlaybookTemplate.objects.filter(name="Suspicious Email")
         return super(HomePage, self).get_context_data(**kwargs)

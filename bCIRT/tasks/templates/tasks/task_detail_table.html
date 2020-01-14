@@ -132,7 +132,14 @@
     </tr>
     <tr>
         <td colspan="4"><strong></strong><br> </td>
-        <td colspan="1"></td>
+        <td><strong>Req. Evidence</strong><br>
+        {% if task.requiresevidence %}
+            {{ task.requiresevidence }}
+        {% else %}
+            -
+        {% endif %}
+        </td>
+
         <td><strong>Created on</strong><br> {{ task.created_at|date:"Y/m/d H:i:s" }} </td>
         <td><strong>Created by</strong><br> {{ task.created_by }} </td>
     </tr>

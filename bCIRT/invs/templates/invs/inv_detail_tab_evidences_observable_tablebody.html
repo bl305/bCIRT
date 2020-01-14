@@ -11,6 +11,7 @@
 # 2019.11.23  Lendvay     1      Initial file
 # **********************************************************************;
 -->
+
 {% if inv.evidence_inv %}
  {% for invevidence in inv.evidence_inv.all %}
  {% for attr in invevidence.evattr_evidence.all %}
@@ -76,6 +77,28 @@
                     </a>
                 </td>
                 <td>
+                    {% if attr.get_sameitems_inv %}
+                        <div class="dropdown">
+                                <button class="btn btn-warning btn-xs dropdown-toggle" type="button" data-toggle="dropdown">
+                                        {{ attr.get_sameitems_inv|length }}
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-content" id="myDropdownRelated">
+                                        {% for sameitem in attr.get_sameitems_inv %}
+                                            <li>
+                                                    <a class="" href="{% url 'invs:inv_evidencetab' pk=sameitem.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                                       target="_blank"
+                                                    >
+                                                        <span class="badge badge-pill badge-warning">{{ sameitem.pk }} {{ sameitem.user}}</span>
+                                                    </a>
+                                            </li>
+                                        {% endfor %}
+                            <!--</div>-->
+                                </ul>
+                        </div>
+                    {% endif %}
+                </td>
+                <td>
                     {{ inv.modified_at|date:"Y/m/d H:i:s" }}
                 </td>
                 <td>
@@ -90,7 +113,7 @@
 {% else %}
 <!-- empty %}-->
           <tr>
-            <td colspan="7" class="text-center bg-warning">No matching record found</td>
+            <td colspan="8" class="text-center bg-warning">No matching record found</td>
           </tr>
 {% endif %}
 <!-- endfor %}-->

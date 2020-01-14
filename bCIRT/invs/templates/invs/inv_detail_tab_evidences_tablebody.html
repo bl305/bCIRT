@@ -303,6 +303,7 @@
                                 <tr>
                                     <th>Attribute</th>
                                     <th>Attribute Value</th>
+                                    <th>Already Seen</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -465,7 +466,30 @@
                                                 </a>
                                                 {% endif %}
 
+
                                             </div>
+                                        </td>
+                                        <td>
+                                            {% if attr.get_sameitems_inv %}
+                                                <div class="dropdown">
+                                                        <button class="btn btn-warning btn-xs dropdown-toggle" type="button" data-toggle="dropdown">
+                                                                {{ attr.get_sameitems_inv|length }}
+                                                            <span class="caret"></span>
+                                                        </button>
+                                                        <ul class="dropdown-menu dropdown-content" id="myDropdownRelated">
+                                                                {% for sameitem in attr.get_sameitems_inv %}
+                                                                    <li>
+                                                                            <a class="" href="{% url 'invs:inv_evidencetab' pk=sameitem.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                                                               target="_blank"
+                                                                            >
+                                                                                <span class="badge badge-pill badge-warning">{{ sameitem.pk }} {{ sameitem.user}}</span>
+                                                                            </a>
+                                                                    </li>
+                                                                {% endfor %}
+                                                    <!--</div>-->
+                                                        </ul>
+                                                    </div>
+                                            {% endif %}
                                         </td>
                                     </tr>
                                 {% endfor %}
@@ -492,6 +516,6 @@
                 </tr>
         {% empty %}
           <tr>
-            <td colspan="8" class="text-center bg-warning">No matching record found</td>
+            <td colspan="9" class="text-center bg-warning">No matching record found</td>
           </tr>
         {% endfor %}

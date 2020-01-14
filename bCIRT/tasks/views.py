@@ -1861,6 +1861,10 @@ class TaskTemplateAddView(LoginRequiredMixin, PermissionRequiredMixin, generic.R
             new_type = TaskType.objects.get(pk=tmp_obj.type.pk)
         else:
             new_type = None
+        if tmp_obj.requiresevidence:
+            new_requiresevidence = True
+        else:
+            new_requiresevidence = False
         task_instance = add_task_from_template(
             atitle=str(tmp_obj.title),
             astatus=new_status,
@@ -1875,6 +1879,7 @@ class TaskTemplateAddView(LoginRequiredMixin, PermissionRequiredMixin, generic.R
             atype=new_type,
             asummary=str(tmp_obj.summary),
             adescription=str(tmp_obj.description),
+            arequiresevidence=new_requiresevidence,
             amodified_by=str(self.request.user),
             acreated_by=str(self.request.user),
             )

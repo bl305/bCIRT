@@ -585,6 +585,7 @@ class TaskForm(forms.ModelForm):
                   'actiontarget',
                   'summary',
                   'description',
+                  'requiresevidence',
                   'starttime',
                   'endtime')
         labels = {
@@ -592,6 +593,7 @@ class TaskForm(forms.ModelForm):
             'user': "Assigned to",
             'summary': "Summary",
             'description': 'Description*',
+            'requiresevidence': 'Requires evidence*'
         }
         widgets = {
             'title': forms.TextInput(attrs={
@@ -757,12 +759,14 @@ class TaskTemplateForm(forms.ModelForm):
                   'actiontarget',
                   'summary',
                   'description',
+                  'requiresevidence',
                   )
         labels = {
             'tasktemplatename': "Template Name*",
             'user': "Assigned to",
             'summary': "Summary",
             'description': 'Description*',
+            'requiresevidence': 'Requires evidence*',
             'title': 'Title*',
         }
         widgets = {

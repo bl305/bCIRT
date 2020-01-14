@@ -34,6 +34,11 @@
                       {% endif %}
                   </td>
                     <td>
+                          {% if playbooktemplateitem.acttask.requiresevidence %}
+                          Required
+                          {% endif %}
+                    </td>
+                    <td>
                         {{ playbooktemplateitem.acttask.type }}
                     </td>
                   <td>
@@ -87,12 +92,12 @@
                 </tr>
 
                 <tr class="invev-detail">
-                  <td colspan="10">{{ playbooktemplateitem.description|safe }}</td>
+                  <td colspan="11">{{ playbooktemplateitem.description|safe }}</td>
                 </tr>
 {% endfor %}
 {% else %}
           <tr>
-            <td colspan="10" class="text-center bg-warning">No matching record found</td>
+            <td colspan="11" class="text-center bg-warning">No matching record found</td>
           </tr>
 {% endif %}
 

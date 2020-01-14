@@ -154,7 +154,11 @@
         <td colspan="7">
             <div class="container invdescription" >
                 <strong>Review Comments #1</strong><br>
-                {{ inv.reviewer1comment|safe }}
+                {% if inv.reviewer1comment %}
+                    <p class="text-warning">{{ inv.reviewer1comment|safe }}</p>
+                {% else %}
+                    -
+                {% endif %}
             </div>
         </td>
     </tr>
@@ -162,7 +166,11 @@
         <td colspan="7">
             <div class="container invdescription" >
                 <strong>Review Comments #2</strong><br>
-                {{ inv.reviewer2comment|safe }}
+                {% if inv.reviewer2comment %}
+                    <p class="text-warning">{{ inv.reviewer2comment|safe }}</p>
+                {% else %}
+                    -
+                {% endif %}
             </div>
         </td>
     </tr>

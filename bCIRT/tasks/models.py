@@ -328,7 +328,7 @@ def new_playbook(pplaybooktemplate, pname, pversion, puser, pinv, pdescription, 
         # else:
         #     tmp_item_prevtask = None
         # tmp_item_prevtask = None
-        # logger.info("31 NEW TASK:%s" % (tmp_item_prevtask))
+        # logger.info("31 NEW TASK:%s" % (tmp_item_prevtask))xxx
         new_task = add_task_from_template(
             atitle=tmp_to_copy.title,
             astatus=tmp_to_copy.status,
@@ -343,6 +343,7 @@ def new_playbook(pplaybooktemplate, pname, pversion, puser, pinv, pdescription, 
             atype=tmp_to_copy.type,
             asummary=tmp_to_copy.summary,
             adescription=tmp_to_copy.description,
+            arequiresevidence=tmp_to_copy.requiresevidence,
             amodified_by=str(puser),
             acreated_by=str(puser)
         )
@@ -391,6 +392,9 @@ class Task(models.Model):
     description = HTMLField()
     # description_html = models.TextField(editable=True, default='', blank=True)
     description_html = HTMLField()
+
+    requiresevidence = models.BooleanField(default=False, null=False, blank=False)
+
     summary = models.CharField(max_length=2000, default="", blank=True, null=True)
     starttime = models.DateTimeField(auto_now=False, blank=True, null=True)
     endtime = models.DateTimeField(auto_now=False, blank=True, null=True)
@@ -430,7 +434,7 @@ class Task(models.Model):
         #  this is to check if the status record has been changed or not
         if self.status != self.__original_status:
             if self.status.name == "Completed":
-                if not self.evidence_task.all() and self.type == 2:
+                if self.requiresevidence and (not self.evidence_task.all() and self.type == 2):
                     raise ValidationError(_('You must create an evidence to be able to close the task.'))
 
                 # if status changed do something here
@@ -560,7 +564,7 @@ class Task(models.Model):
         self.__original_status = self.status
 
     def clean(self):
-        if self.inv.readonly():
+        if self.inv and self.inv.readonly():
             raise ValidationError(_('The Investigation is Read-Only!'))
 
     def taskdurationprint(self):
@@ -836,6 +840,29 @@ class EvidenceAttr(models.Model):
                 inv_pk = Evidence.objects.get(pk=self.ev.pk).inv.pk
                 Inv.objects.filter(pk=inv_pk).update(modified_at=timezone_now(), modified_by=self.modified_by)
         super(EvidenceAttr, self).save(*args, **kwargs)
+
+    def get_sameitems_inv(self):
+        # similar_evattr = EvidenceAttr.objects.filter(evattrvalue__icontains=self.evattrvalue).exclude(ev__pk=self.ev.pk)
+        similar_evattr = EvidenceAttr.objects.filter(evattrvalue=self.evattrvalue)\
+            .exclude(ev=self.ev)\
+            .exclude(evattrvalue='d41d8cd98f00b204e9800998ecf8427e')\
+            .exclude(evattrvalue='da39a3ee5e6b4b0d3255bfef95601890afd80709')\
+            .exclude(evattrvalue='e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855')
+
+        similar_evs = set()
+        # print(similar_evattr)
+        for similar_evattritem in similar_evattr:
+            similar_evs.add(similar_evattritem.ev)
+        similar_invs = set()
+        for similar_evinv in similar_evs:
+            if similar_evinv.inv:
+                similar_invs.add(similar_evinv.inv)
+        # print(list(similar_invs)[0])
+        # print(similar_invs)
+
+
+
+        return similar_invs
 
     def clean(self):
         # if self.inv is None and self.task is None:
@@ -1280,6 +1307,9 @@ class TaskTemplate(models.Model):
     description = HTMLField()
     # description_html = models.TextField(editable=True, default='', blank=True)
     description_html = HTMLField()
+
+    requiresevidence = models.BooleanField(default=False, null=False, blank=False)
+
     summary = models.CharField(max_length=2000, default="", blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.CharField(max_length=20, default="unknown")
@@ -1308,9 +1338,9 @@ class TaskTemplate(models.Model):
 
     def clean(self):
         pass
-        # Don't allow draft entries to have a pub_date.
-        # if self.taskid == '':
-        #     raise ValidationError(_('You must enter an Investigation ID.'))
+        # Don't allow automated tasks without an action.
+        if self.type.pk == 1 and self.action is None: # or self.actiontarget is None):
+            raise ValidationError(_('You must povide an action for an Automated task.'))
 
 
 class TaskVar(models.Model):
@@ -1567,7 +1597,7 @@ def generate_graph_Playbook(sender, instance, **kwargs):
 
 
 def add_task_from_template(atitle, astatus, aplaybook, auser, ainv, aaction, aactiontarget,
-                           acategory, apriority, atype, asummary, adescription,
+                           acategory, apriority, atype, asummary, adescription, arequiresevidence,
                            amodified_by, acreated_by):
     obj = Task.objects.create(
         title=atitle,
@@ -1582,6 +1612,7 @@ def add_task_from_template(atitle, astatus, aplaybook, auser, ainv, aaction, aac
         type=atype,
         summary=asummary,
         description=adescription,
+        requiresevidence=arequiresevidence,
         modified_by=amodified_by,
         created_by=acreated_by,
     )

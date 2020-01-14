@@ -99,19 +99,48 @@ class SystemUpdatesPage(LoginRequiredMixin, TemplateView):
         # respid = results.get('pid')
         self.osversion = resoutput
 
+        if "CentOS" in resoutput:
+            cmd = "yum list updates -y"
+            argument = ""
+            timeout = 30
+            results = run_script_class("", cmd, argument, timeout).runcmd()
+            # rescommand = results.get('command')
+            # reserror = results.get('error')
+            # resstatus = results.get('status')
+            resoutput = results.get('output')
+            # respid = results.get('pid')
+            self.osupdates = resoutput
+            # self.osupdates
+            # Getting OS update info
+        elif "Debian" in resoutput:
+            cmd = "apt list --upgradeable"
+            argument = ""
+            timeout = 30
+            results = run_script_class("", cmd, argument, timeout).runcmd()
+            # rescommand = results.get('command')
+            # reserror = results.get('error')
+            # resstatus = results.get('status')
+            resoutput = results.get('output')
+            # respid = results.get('pid')
+            self.osupdates = resoutput
+            # self.osupdates
+            # Getting OS update info
+        elif "Ubuntu" in resoutput:
+            cmd = "apt list --upgradeable"
+            argument = ""
+            timeout = 30
+            results = run_script_class("", cmd, argument, timeout).runcmd()
+            # rescommand = results.get('command')
+            # reserror = results.get('error')
+            # resstatus = results.get('status')
+            resoutput = results.get('output')
+            # respid = results.get('pid')
+            self.osupdates = resoutput
+            # self.osupdates
+            # Getting OS update info
+        else:
+            print("UNSUPPORTED OS")
 
-        cmd="apt list --upgradeable"
-        argument=""
-        timeout=30
-        results = run_script_class("", cmd, argument, timeout).runcmd()
-        # rescommand = results.get('command')
-        # reserror = results.get('error')
-        # resstatus = results.get('status')
-        resoutput = results.get('output')
-        # respid = results.get('pid')
-        self.osupdates = resoutput
-        # self.osupdates
-        # Getting OS update info
 
 
         cmd="pip3 list -o --format columns"

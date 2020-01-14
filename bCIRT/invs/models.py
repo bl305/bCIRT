@@ -236,6 +236,7 @@ class Inv(models.Model):
 
     # def save(self, *args, **kwargs):
     def save(self, force_insert=False, force_update=False, *args, **kwargs):
+        # print("SAVING")
         #  this is to check if the status record has been changed or not
         if self.status != self.__original_status:
             if self.status.name == "Closed":
@@ -250,21 +251,30 @@ class Inv(models.Model):
             elif self.status.name == "Review1":
                 # status changed to review1
                 # checking if needs review or not
+                # print("1REV1")
                 if self.needreview(1):
+                    # print("1REV1 REQ")
                     self.getreviewer1()
                 else:
                     # no review1 is needed
+                    # print("1REV1 XXX")
                     self.autoreview1()
-                if self.needreview(2):
-                    self.getreviewer2()
-                else:
-                    self.autoreview2()
+                    # print("1REV2")
+                    if self.needreview(2):
+                        # print("1REV2 REQ")
+                        self.getreviewer2()
+                    else:
+                        # print("1REV2 XXX")
+                        self.autoreview2()
             elif self.status.name == "Review2":
+                # print("2REV1")
                 # status changed to review2
                 # checking if needs review or not
                 if self.needreview(2):
+                    # print("2REV1 REQ")
                     self.getreviewer2()
                 else:
+                    # print("2REV1 XXX")
                     # no review is needed
                     # self.reviewer2 = User.objects.get(pk=1)
                     self.autoreview2()
@@ -434,6 +444,7 @@ class Inv(models.Model):
             raise ValidationError(_('If status is "Assigned", an "Assigned to" user must be selected.'))
         if self.status.name == "Open" and self.user is not None:
             raise ValidationError(_('If status is "Open", the "Assigned to" user must be empty too.'))
+
         super(Inv, self).clean()
 
 
