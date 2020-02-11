@@ -96,15 +96,17 @@ INSTALLED_APPS = [
     'tinymce',
     'accounts',
     'configuration',
-    'users',
+    # 'users',
     'invs',
     'tasks',
     'assets',
     'reports',
     'import_export',
+    'users.apps.UsersConfig',  # new
 ]
 IMPORT_EXPORT_USE_TRANSACTIONS = True
 
+AUTH_USER_MODEL = 'users.User'  # new
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -334,7 +336,7 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 # Redirect to home URL after login (Default redirects to /accounts/profile/)
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "home"
-INTERNAL_IPS = ['127.0.0.1']
+INTERNAL_IPS = ['127.0.0.1','localhost']
 
 # Session timeout
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
@@ -428,3 +430,32 @@ INVESTIGATIONS_URL = '/inv/'
 TASKS_ROOT = os.path.join(BASE_DIR, 'tasks')
 TASKS_URL = '/task/'
 FILE_UPLOAD_MAX_MEMORY_SIZE = 262144000  # =250 MB
+
+if DEBUG:
+    # INTERNAL_IPS = ('127.0.0.1', 'localhost',)
+    MIDDLEWARE += (
+       'debug_toolbar.middleware.DebugToolbarMiddleware',
+    )
+
+    INSTALLED_APPS += (
+       'debug_toolbar',
+    )
+
+    DEBUG_TOOLBAR_PANELS = [
+       'debug_toolbar.panels.versions.VersionsPanel',
+       'debug_toolbar.panels.timer.TimerPanel',
+       'debug_toolbar.panels.settings.SettingsPanel',
+       'debug_toolbar.panels.headers.HeadersPanel',
+       'debug_toolbar.panels.request.RequestPanel',
+       'debug_toolbar.panels.sql.SQLPanel',
+       'debug_toolbar.panels.staticfiles.StaticFilesPanel',
+       'debug_toolbar.panels.templates.TemplatesPanel',
+       'debug_toolbar.panels.cache.CachePanel',
+       'debug_toolbar.panels.signals.SignalsPanel',
+       'debug_toolbar.panels.logging.LoggingPanel',
+       'debug_toolbar.panels.redirects.RedirectsPanel',
+    ]
+
+    DEBUG_TOOLBAR_CONFIG = {
+       'INTERCEPT_REDIRECTS': False,
+    }

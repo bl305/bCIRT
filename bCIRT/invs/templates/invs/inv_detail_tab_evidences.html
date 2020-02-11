@@ -38,7 +38,9 @@
 {% endblock invtmp_buttons %}
 
 {% block invtmp_title %}
-                                &nbsp;Evidences |  {{ inv.evidence_inv.count }} item{{ inv.evidence_inv.count|pluralize }} | {{ user }} at {% now "Y/m/d H:i:s" %} (UTC)
+    {% with inv.evidence_inv.count as inv_ev_count %}
+                                &nbsp;Evidences |  {{ inv_ev_count }} item{{ inv_ev_count|pluralize }} | {{ user }} at {% now "Y/m/d H:i:s" %} (UTC)
+    {% endwith %}
 {% endblock invtmp_title %}
 
 {% block invtmp_body %}

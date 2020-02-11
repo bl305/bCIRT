@@ -37,6 +37,49 @@ class TinyMCEWidget(TinyMCE):
         return False
 
 
+# the forms generate too many DB queries, this class is to replace db queries with a list
+# https://stackoverflow.com/questions/32082945/django-multiple-forms-with-modelchoicefield-too-many-queries
+class ListModelChoiceField(forms.ChoiceField):
+    """
+    special field using list instead of queryset as choices
+    """
+    def __init__(self, model, *args, **kwargs):
+        self.model = model
+        super(ListModelChoiceField, self).__init__(*args, **kwargs)
+
+    def to_python(self, value):
+        if value in self.empty_values:
+            return None
+        try:
+            value = self.model.objects.get(id=value)
+        except self.model.DoesNotExist:
+             # XXXXXX(self.error_messages['invalid_choice'], code='invalid_choice')
+            print("Wrong Model Name")
+        return value
+
+
+    def valid_value(self, value):
+        "Check to see if the provided value is a valid choice"
+        # if self.choices[0][0] == "":
+        #     return True
+        if any(choice[0] == "" or value.id == int(choice[0]) for choice in self.choices):
+            return True
+        # if any(value.id == int(choice[0]) for choice in self.choices):
+        #     return True
+        return False
+
+    def to_choicelist(self):
+        value = None
+        if value in self.empty_values:
+            return None
+        try:
+            value = self.model.objects.all()
+        except self.model.DoesNotExist:
+             # XXXXXX(self.error_messages['invalid_choice'], code='invalid_choice')
+            print("Wrong Model Name")
+            value = self.model.objects.none()
+        return value
+
 # class CustomClearableFileInput(ClearableFileInput):
 #     template_name = 'invs/customclearablefileinput.html'
 class ActionForm(forms.ModelForm):
@@ -330,50 +373,166 @@ class TaskForm(forms.ModelForm):
 
     def __init__(self, inv_pk=0, *args, **kwargs):
         user = kwargs.pop("user", None)
-
+        invlist = kwargs.pop("invlist", None)
+        taskstatuslist = kwargs.pop("taskstatuslist", None)
+        actiontargetlist = kwargs.pop("actiontargetlist", None)
+        actionlist = kwargs.pop("actionlist", None)
+        parentlist = kwargs.pop("parentlist", None)
+        inputfromlist = kwargs.pop("inputfromlist", None)
         super(TaskForm, self).__init__(*args, **kwargs)
         logger.info("TaskForm - "+str(user))
-        self.fields['inv'].initial = inv_pk
-        if kwargs.get('instance'):
-            curr_obj = kwargs.get('instance')
-            current_pk = curr_obj.pk
-            if inv_pk and inv_pk != '0' and inv_pk != 0:
-                inv_obj = Inv.objects.get(pk=inv_pk)
-                self.fields['parent'].queryset = inv_obj.task_inv.exclude(pk=current_pk)
-                self.fields['inputfrom'].queryset = inv_obj.task_inv.exclude(pk=current_pk)
-            elif inv_pk != '0' and inv_pk != 0:
-                inv_obj = curr_obj.inv
-                self.fields['parent'].queryset = inv_obj.task_inv.exclude(pk=current_pk)
-                self.fields['inputfrom'].queryset = inv_obj.task_inv.exclude(pk=current_pk)
-            else:
-                self.fields['parent'].queryset = Task.objects.all()
-                self.fields['inputfrom'].queryset = Task.objects.all()
-
-        elif inv_pk and inv_pk != '0' and inv_pk != 0:
-            inv_obj = Inv.objects.get(pk=inv_pk)
-            self.fields['parent'].queryset = inv_obj.task_inv.all()
-            self.fields['inputfrom'].queryset = inv_obj.task_inv.all()
-        else:
-            self.fields['parent'].queryset = Task.objects.filter(pk=0)
-            self.fields['inputfrom'].queryset = Task.objects.filter(pk=0)
+        # self.fields['inv'].initial = inv_pk
+        # if kwargs.get('instance'):
+        #     curr_obj = kwargs.get('instance')
+        #     current_pk = curr_obj.pk
+        #     if inv_pk and inv_pk != '0' and inv_pk != 0:
+        #         inv_obj = Inv.objects.get(pk=inv_pk)
+        #         self.fields['parent'].queryset = inv_obj.task_inv.exclude(pk=current_pk)
+        #         self.fields['inputfrom'].queryset = inv_obj.task_inv.exclude(pk=current_pk)
+        #     elif inv_pk != '0' and inv_pk != 0:
+        #         inv_obj = curr_obj.inv
+        #         self.fields['parent'].queryset = inv_obj.task_inv.exclude(pk=current_pk)
+        #         self.fields['inputfrom'].queryset = inv_obj.task_inv.exclude(pk=current_pk)
+        #     else:
+        #         self.fields['parent'].queryset = Task.objects.all()
+        #         self.fields['inputfrom'].queryset = Task.objects.all()
+        #
+        # elif inv_pk and inv_pk != '0' and inv_pk != 0:
+        #     inv_obj = Inv.objects.get(pk=inv_pk)
+        #     self.fields['parent'].queryset = inv_obj.task_inv.all()
+        #     self.fields['inputfrom'].queryset = inv_obj.task_inv.all()
+        # else:
+        #     self.fields['parent'].queryset = Task.objects.filter(pk=0)
+        #     self.fields['inputfrom'].queryset = Task.objects.filter(pk=0)
         self.fields['user'].initial = user
         self.fields['status'].initial = 3
         self.fields['priority'].initial = 1
+        self.fields['status'] = ListModelChoiceField(TaskStatus,
+                                                  choices=taskstatuslist,
+                                                  label='Status*',
+                                                  # empty_label="--Select--",
+                                                  # queryset overwritten above
+                                                  # queryset=Inv.objects.all(),
+                                                  required=False,
+                                                  initial=inv_pk,
+                                                  widget=forms.Select(
+                                                      attrs={
+                                                          'class': 'selectpicker show-tick form-control',  # form-control
+                                                          'data-live-search': 'true',
+                                                          'data-width': 'auto',
+                                                          'data-style': 'btn-secondary btn-sm',
+                                                          'style': 'width:50%',
+                                                      }
+                                                  )
+                                                  )
+        self.fields['inv'] = ListModelChoiceField(Inv,
+                                                  choices=invlist,
+                                                  label='Investigation',
+                                                  # empty_label="--Select--",
+                                                  # queryset overwritten above
+                                                  # queryset=Inv.objects.all(),
+                                                  required=False,
+                                                  initial=inv_pk,
+                                                  widget=forms.Select(
+                                                      attrs={
+                                                          'class': 'selectpicker show-tick form-control',  # form-control
+                                                          'data-live-search': 'true',
+                                                          'data-width': 'auto',
+                                                          'data-style': 'btn-outline-secondary btn-sm',
+                                                          'style': 'width:50%',
+                                                      }
+                                                  )
+                                                  )
+        self.fields['actiontarget'] = ListModelChoiceField(Task,
+                                                  choices=actiontargetlist,
+                                                  label='Action Target Task',
+                                                  # empty_label="--Select--",
+                                                  # queryset overwritten above
+                                                  # queryset=Inv.objects.all(),
+                                                  required=False,
+                                                  # initial=,
+                                                  widget=forms.Select(
+                                                      attrs={
+                                                          'class': 'selectpicker show-tick form-control',  # form-control
+                                                          'data-live-search': 'true',
+                                                          'data-width': 'auto',
+                                                          'data-style': 'btn-outline-secondary btn-sm',
+                                                          'style': 'width:50%',
+                                                      }
+                                                  )
+                                                  )
 
-    status = forms.ModelChoiceField(
-        label='Status*',
-        queryset=TaskStatus.objects.filter(enabled=True),
-        empty_label="--Select--",
-        widget=forms.Select(
-            attrs={
-                'class': 'selectpicker show-tick form-control',  # form-control
-                'data-live-search': 'true',
-                'data-width': 'auto',
-                'data-style': 'btn-outline-secondary btn-sm',
-                'style': 'width:50%',
-            }
-        )
-    )
+        self.fields['action'] = ListModelChoiceField(Action,
+                                                  choices=actionlist,
+                                                  label='Action',
+                                                  # empty_label="--Select--",
+                                                  # queryset overwritten above
+                                                  # queryset=Inv.objects.all(),
+                                                  required=False,
+                                                  # initial=,
+                                                  widget=forms.Select(
+                                                      attrs={
+                                                          'class': 'selectpicker show-tick form-control',  # form-control
+                                                          'data-live-search': 'true',
+                                                          'data-width': 'auto',
+                                                          'data-style': 'btn-outline-secondary btn-sm',
+                                                          'style': 'width:50%',
+                                                      }
+                                                  )
+                                                  )
+
+        self.fields['parent'] = ListModelChoiceField(Task,
+                                                  choices=parentlist,
+                                                  label='Parent Task',
+                                                  # empty_label="--Select--",
+                                                  # queryset overwritten above
+                                                  # queryset=Inv.objects.all(),
+                                                  required=False,
+                                                  # initial=,
+                                                  widget=forms.Select(
+                                                      attrs={
+                                                          'class': 'selectpicker show-tick form-control',  # form-control
+                                                          'data-live-search': 'true',
+                                                          'data-width': 'auto',
+                                                          'data-style': 'btn-outline-secondary btn-sm',
+                                                          'style': 'width:50%',
+                                                      }
+                                                  )
+                                                  )
+        self.fields['inputfrom'] = ListModelChoiceField(Task,
+                                                  choices=inputfromlist,
+                                                  label='Input Task',
+                                                  # empty_label="--Select--",
+                                                  # queryset overwritten above
+                                                  # queryset=Inv.objects.all(),
+                                                  required=False,
+                                                  # initial=,
+                                                  widget=forms.Select(
+                                                      attrs={
+                                                          'class': 'selectpicker show-tick form-control',  # form-control
+                                                          'data-live-search': 'true',
+                                                          'data-width': 'auto',
+                                                          'data-style': 'btn-outline-secondary btn-sm',
+                                                          'style': 'width:50%',
+                                                      }
+                                                  )
+                                                  )
+
+
+    # status = forms.ModelChoiceField(
+    #     label='Status*',
+    #     queryset=TaskStatus.objects.filter(enabled=True),
+    #     empty_label="--Select--",
+    #     widget=forms.Select(
+    #         attrs={
+    #             'class': 'selectpicker show-tick form-control',  # form-control
+    #             'data-live-search': 'true',
+    #             'data-width': 'auto',
+    #             'data-style': 'btn-secondary btn-sm',
+    #             'style': 'width:50%',
+    #         }
+    #     )
+    # )
 
     user = forms.ModelChoiceField(
         label='Assigned to',
@@ -391,89 +550,89 @@ class TaskForm(forms.ModelForm):
         )
     )
 
-    action = forms.ModelChoiceField(
-        label='Action',
-        #  queryset overwritten in init
-        queryset=Action.objects.filter(enabled=True),
-        required=False,
-        empty_label="--Select--",
-        widget=forms.Select(
-            attrs={
-                'class': 'selectpicker show-tick form-control',  # form-control
-                'data-live-search': 'true',
-                'data-width': 'auto',
-                'data-style': 'btn-outline-secondary btn-sm',
-                'style': 'width:50%',
-            }
-        )
-    )
+    # action = forms.ModelChoiceField(
+    #     label='Action',
+    #     #  queryset overwritten in init
+    #     queryset=Action.objects.filter(enabled=True),
+    #     required=False,
+    #     empty_label="--Select--",
+    #     widget=forms.Select(
+    #         attrs={
+    #             'class': 'selectpicker show-tick form-control',  # form-control
+    #             'data-live-search': 'true',
+    #             'data-width': 'auto',
+    #             'data-style': 'btn-outline-secondary btn-sm',
+    #             'style': 'width:50%',
+    #         }
+    #     )
+    # )
 
-    actiontarget = forms.ModelChoiceField(
-        label='Action Target Task',
-        #  queryset overwritten in init
-        queryset=Task.objects.all(),
-        required=False,
-        empty_label="--Select--",
-        widget=forms.Select(
-            attrs={
-                'class': 'selectpicker show-tick form-control',  # form-control
-                'data-live-search': 'true',
-                'data-width': 'auto',
-                'data-style': 'btn-outline-secondary btn-sm',
-                'style': 'width:50%',
-            }
-        )
-    )
+    # actiontarget = forms.ModelChoiceField(
+    #     label='Action Target Task',
+    #     #  queryset overwritten in init
+    #     queryset=Task.objects.all(),
+    #     required=False,
+    #     empty_label="--Select--",
+    #     widget=forms.Select(
+    #         attrs={
+    #             'class': 'selectpicker show-tick form-control',  # form-control
+    #             'data-live-search': 'true',
+    #             'data-width': 'auto',
+    #             'data-style': 'btn-outline-secondary btn-sm',
+    #             'style': 'width:50%',
+    #         }
+    #     )
+    # )
 
-    parent = forms.ModelChoiceField(
-        label='Parent',
-        #  queryset overwritten in init
-        queryset=Task.objects.all(),
-        required=False,
-        empty_label="--Select--",
-        widget=forms.Select(
-            attrs={
-                'class': 'selectpicker show-tick form-control',  # form-control
-                'data-live-search': 'true',
-                'data-width': 'auto',
-                'data-style': 'btn-outline-secondary btn-sm',
-                'style': 'width:50%',
-            }
-        )
-    )
+    # parent = forms.ModelChoiceField(
+    #     label='Parent',
+    #     #  queryset overwritten in init
+    #     queryset=Task.objects.all(),
+    #     required=False,
+    #     empty_label="--Select--",
+    #     widget=forms.Select(
+    #         attrs={
+    #             'class': 'selectpicker show-tick form-control',  # form-control
+    #             'data-live-search': 'true',
+    #             'data-width': 'auto',
+    #             'data-style': 'btn-outline-secondary btn-sm',
+    #             'style': 'width:50%',
+    #         }
+    #     )
+    # )
+    #
+    # inputfrom = forms.ModelChoiceField(
+    #     label='Input Task',
+    #     #  queryset overwritten in init
+    #     queryset=Task.objects.all(),
+    #     required=False,
+    #     empty_label="--Select--",
+    #     widget=forms.Select(
+    #         attrs={
+    #             'class': 'selectpicker show-tick form-control',  # form-control
+    #             'data-live-search': 'true',
+    #             'data-width': 'auto',
+    #             'data-style': 'btn-outline-secondary btn-sm',
+    #             'style': 'width:50%',
+    #         }
+    #     )
+    # )
 
-    inputfrom = forms.ModelChoiceField(
-        label='Input Task',
-        #  queryset overwritten in init
-        queryset=Task.objects.all(),
-        required=False,
-        empty_label="--Select--",
-        widget=forms.Select(
-            attrs={
-                'class': 'selectpicker show-tick form-control',  # form-control
-                'data-live-search': 'true',
-                'data-width': 'auto',
-                'data-style': 'btn-outline-secondary btn-sm',
-                'style': 'width:50%',
-            }
-        )
-    )
-
-    inv = forms.ModelChoiceField(
-        label='Investigation',
-        queryset=Inv.objects.exclude(status='2'),
-        required=False,
-        empty_label="--Select--",
-        widget=forms.Select(
-            attrs={
-                'class': 'selectpicker show-tick form-control',  # form-control
-                'data-live-search': 'true',
-                'data-width': 'auto',
-                'data-style': 'btn-outline-secondary btn-sm',
-                'style': 'width:50%',
-            }
-        )
-    )
+    # inv = forms.ModelChoiceField(
+    #     label='Investigation',
+    #     queryset=Inv.objects.exclude(status='2'),
+    #     required=False,
+    #     empty_label="--Select--",
+    #     widget=forms.Select(
+    #         attrs={
+    #             'class': 'selectpicker show-tick form-control',  # form-control
+    #             'data-live-search': 'true',
+    #             'data-width': 'auto',
+    #             'data-style': 'btn-outline-secondary btn-sm',
+    #             'style': 'width:50%',
+    #         }
+    #     )
+    # )
 
     category = forms.ModelChoiceField(
         label='Category*',
@@ -484,7 +643,7 @@ class TaskForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-outline-secondary btn-sm',
+                'data-style': 'btn-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -499,7 +658,7 @@ class TaskForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-outline-secondary btn-sm',
+                'data-style': 'btn-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -514,7 +673,7 @@ class TaskForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-outline-secondary btn-sm',
+                'data-style': 'btn-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -1069,10 +1228,10 @@ class PlaybookTemplateItemForm(forms.ModelForm):
                         actual_playbook_obj = actual_playbooktemplateitem_obj.playbooktemplateid
                         prevtask = actual_playbook_obj.playbooktemplateitem_playbooktemplate.\
                             filter(itemorder__lt=actual_playbooktemplateitem_obj.itemorder).exclude(pk=currentitem_pk)
-                        print(prevtask)
+                        # print(prevtask)
                         nexttask = actual_playbook_obj.playbooktemplateitem_playbooktemplate.\
                             exclude(pk=currentitem_pk)
-                        print(nexttask)
+                        # print(nexttask)
                         self.fields['prevtask'].queryset = prevtask
                         self.fields['nexttask'].queryset = nexttask
                 except Exception:
@@ -1408,31 +1567,71 @@ class EvidenceForm(forms.ModelForm):
     # evidenceformat=2
     def __init__(self, inv_pk=0, task_pk=0, *args, **kwargs):
         user = kwargs.pop("user", None)
+        invlist = kwargs.pop("invlist", None)
+        tasklist = kwargs.pop("tasklist", None)
+        # inv_pk = kwargs.pop("inv_pk", None)
+        # task_pk = kwargs.pop("task_pk", None)
         super(EvidenceForm, self).__init__(*args, **kwargs)
         logger.info("EvidenceForm - "+str(user))
         self.fields['user'].initial = user
+        # self.fields['inv'].initial = inv_pk
+        self.fields['inv'] = ListModelChoiceField(Inv,
+                                                  choices=invlist,
+                                                  label='Related Investigation',
+                                                  # empty_label="--Select--",
+                                                  # queryset overwritten above
+                                                  # queryset=Inv.objects.all(),
+                                                  required=False,
+                                                  initial=inv_pk,
+                                                  widget=forms.Select(
+                                                      attrs={
+                                                          'class': 'selectpicker show-tick form-control',  # form-control
+                                                          'data-live-search': 'true',
+                                                          'data-width': 'auto',
+                                                          'data-style': 'btn-secondary btn-sm',
+                                                          'style': 'width:50%',
+                                                      }
+                                                  )
+                                                  )
+        # self.fields['task'].initial = task_pk
+        self.fields['task'] = ListModelChoiceField(Task,
+                                                   choices=tasklist,
+                                                   label='Related Task',
+                                                   # empty_label="--Select--",
+                                                   # queryset overwritten above
+                                                   # queryset=Inv.objects.all(),
+                                                   initial=task_pk,
+                                                   required=False,
+                                                   widget=forms.Select(
+                                                       attrs={
+                                                           'class': 'selectpicker show-tick form-control',  # form-control
+                                                           'data-live-search': 'true',
+                                                           'data-width': 'auto',
+                                                           'data-style': 'btn-secondary btn-sm',
+                                                           'style': 'width:50%',
+                                                       }
+                                                   )
 
-        self.fields['inv'].initial = inv_pk
-        self.fields['task'].initial = task_pk
+                                                   )
 
 ###############
-        if kwargs.get('instance'):
-            curr_obj = kwargs.get('instance')
-            current_pk = curr_obj.pk
-            if inv_pk:
-                inv_obj = Inv.objects.get(pk=inv_pk)
-            else:
-                inv_obj = curr_obj.inv
-            if inv_obj:
-                self.fields['task'].queryset = inv_obj.task_inv.exclude(pk=current_pk)
-            else:
-                self.fields['task'].queryset = Task.objects.all()
-
-        elif inv_pk == '0' or inv_pk == 0:
-            self.fields['task'].queryset = Task.objects.all()
-        else:
-            inv_obj = Inv.objects.get(pk=inv_pk)
-            self.fields['task'].queryset = inv_obj.task_inv.all()
+        # if kwargs.get('instance'):
+        #     curr_obj = kwargs.get('instance')
+        #     current_pk = curr_obj.pk
+        #     if inv_pk:
+        #         inv_obj = Inv.objects.get(pk=inv_pk)
+        #     else:
+        #         inv_obj = curr_obj.inv
+        #     if inv_obj:
+        #         self.fields['task'].queryset = inv_obj.task_inv.exclude(pk=current_pk).select_related('status')
+        #     else:
+        #         self.fields['task'].queryset = Task.objects.all().select_related('status')
+        #
+        # elif inv_pk == '0' or inv_pk == 0:
+        #     self.fields['task'].queryset = Task.objects.all().select_related('status')
+        # else:
+        #     inv_obj = Inv.objects.get(pk=inv_pk)
+        #     self.fields['task'].queryset = inv_obj.task_inv.all().select_related('status')
         #     self.fields['task'].queryset = Task.objects.all()
 
 ###############
@@ -1444,7 +1643,7 @@ class EvidenceForm(forms.ModelForm):
 
     user = forms.ModelChoiceField(
         label='Owner*',
-        queryset=User.objects.all(),
+        queryset=User.objects.filter(is_active=True),
         empty_label="--Select--",
         widget=forms.Select(
             attrs={
@@ -1457,39 +1656,39 @@ class EvidenceForm(forms.ModelForm):
         )
     )
 
-    inv = forms.ModelChoiceField(
-        label="Related Investigation",
-        # queryset=Inv.objects.exclude(status='2'),  # CLOSED
-        queryset=Inv.objects.exclude(status=2),
-        empty_label="--None--",
-        required=False,
-        widget=forms.Select(
-            attrs={
-                'class': 'selectpicker show-tick form-control',  # form-control
-                'data-live-search': 'true',
-                'data-width': 'auto',
-                'data-style': 'btn-secondary btn-sm',
-                'style': 'width:50%',
-            }
-        )
-    )
-
-    task = forms.ModelChoiceField(
-        label="Related Task",
-        # queryset=Task.objects.exclude(status='2'),  #  exclude closed task
-        queryset=Task.objects.exclude(status=2),
-        empty_label="--None--",
-        required=False,
-        widget=forms.Select(
-            attrs={
-                'class': 'selectpicker show-tick form-control',  # form-control
-                'data-live-search': 'true',
-                'data-width': 'auto',
-                'data-style': 'btn-secondary btn-sm',
-                'style': 'width:50%',
-            }
-        )
-    )
+    # inv = forms.ModelChoiceField(
+    #     label="Related Investigation",
+    #     # queryset=Inv.objects.exclude(status='2'),  # CLOSED
+    #     queryset=Inv.objects.exclude(status=2).exclude(status=4),
+    #     empty_label="--None--",
+    #     required=False,
+    #     widget=forms.Select(
+    #         attrs={
+    #             'class': 'selectpicker show-tick form-control',  # form-control
+    #             'data-live-search': 'true',
+    #             'data-width': 'auto',
+    #             'data-style': 'btn-secondary btn-sm',
+    #             'style': 'width:50%',
+    #         }
+    #     )
+    # )
+    #
+    # task = forms.ModelChoiceField(
+    #     label="Related Task",
+    #     # queryset=Task.objects.exclude(status='2'),  #  exclude closed task
+    #     queryset=Task.objects.none(),
+    #     empty_label="--None--",
+    #     required=False,
+    #     widget=forms.Select(
+    #         attrs={
+    #             'class': 'selectpicker show-tick form-control',  # form-control
+    #             'data-live-search': 'true',
+    #             'data-width': 'auto',
+    #             'data-style': 'btn-secondary btn-sm',
+    #             'style': 'width:50%',
+    #         }
+    #     )
+    # )
 
     parent = forms.ModelChoiceField(
         label='Parent',

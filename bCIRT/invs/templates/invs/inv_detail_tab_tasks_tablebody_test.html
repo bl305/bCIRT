@@ -1,0 +1,464 @@
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : inv/inv_detail_tab_tasks_tablebody.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.11.23
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.11.24  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+{% load taskstatuscheck %}
+{% if invtaskscount > 0 %}
+<!-- if inv.task_inv.count > 0 %}-->
+<!-- for task in inv.task_inv.all %}-->
+{% for task in invtasks %}
+{% with task.status__name as taskstatus %}
+
+
+A: {{task.xxx}} B: {{actiontarget}} C: {{task.actiontarget__evidence_task}}
+
+
+                    <tr data-toggle="collapse" data-target="#mytasks{{task.pk}}" class="accordion-toggle"
+                        id="item-task-{{ task.pk }}">
+                        <td>
+                            <div class="dropdown" onclick="incrow({{task.pk}},'item-task-','150px')">
+                                <div>
+                                <div class="btn-group">
+                                 <button class="btn btn-outline-secondary btn-sm dropdown-toggle dropdown-toggle-split"
+                                         onclick="filterFunctionTask()" type="button" data-toggle="dropdown"
+                                         role="button" aria-expanded="false">
+                                    {{ task.pk }}<span class="caret"></span>
+                                </button>
+                                    {% if not taskstatus|istaskcompleted %}
+                                    <ul class="dropdown-menu" role="menu">
+                                            <li>
+                                                <a href="{% url 'tasks:ev_create' inv_pk=inv.pk task_pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                                   class="btn btn-secondary btn-sm w-100 text-left">
+                                                    <span>
+                                                        <i class="fas fa-plus">&nbsp;</i>
+                                                        New Evidence
+                                                    </span>
+                                                </a>
+                                            </li>
+                                        <li>
+                                            <a href="{% url 'tasks:tsk_detail' pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                                class="btn btn-secondary btn-sm btn-block text-left">
+                                                <span data-toggle="tooltip" data-placement="top" title="Open item">
+                                                    <i class="fas fa-eye">&nbsp;</i>
+                                                    View
+                                                </span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="{% url 'tasks:tsk_edit' pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                              class="btn btn-secondary btn-sm btn-block text-left">
+                                              <span data-toggle="tooltip" data-placement="top" title="Edit item">
+                                                  <i class="fas fa-pencil-alt">&nbsp;</i>
+                                                  Edit
+                                              </span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            {% if task.action__automation and not taskstatus|istaskcompleted %}
+                                                {% if task.actev %}
+                                                    {% if task.action__scriptinput__pk == 2 and task.actiontarget.evidence_task.all.first.fileName or task.action__scriptinput__pk == 1 %}
+                                                            <a href="{% url 'tasks:act_exec_script' pk=task.action__pk inv_pk=inv.pk task_pk=task.pk ev_pk=task.actev evattr_pk=0 %}"
+                                                               class="btn btn-secondary btn-sm btn-block text-left">
+                                                                <span>
+                                                                    Run&nbsp;
+                                                                    <i class="fas fa-play"></i>
+                                                                </span>
+                                                            </a>
+                                                    {% else %}
+                                                        (No file)
+                                                    {% endif %}
+                                                {% else %}
+                                                    <a href="#"
+                                                        class="btn btn-secondary btn-sm btn-block text-left">
+                                                        <span class="" data-toggle="tooltip" data-placement="top" title="Toggle Observable item">
+                                                            <i class="fas fa-ban">&nbsp;</i>
+                                                            Action
+                                                        </span>
+                                                    </a>
+                                                {% endif %}
+                                            {% endif %}
+                                        </li>
+                                        <li>&nbsp;</li>
+                                        <li>
+                                              <a href="{% url 'tasks:tsk_remove' pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                                  class="btn btn-secondary btn-sm btn-block text-left">
+                                                <span class="font-weight-bold text-danger" data-toggle="tooltip" data-placement="top" title="Delete item">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                    Delete
+                                                </span>
+                                              </a>
+                                        </li>
+                                    </ul>
+                                    {% endif %}
+                                    </div>
+                                </div>
+                            </div> <!-- .dropdown -->
+
+                        </td>
+                        <td>
+                            <a href="{% url 'tasks:tsk_detail' pk=task.pk %}?next1={{ request.get_full_path|urlencode }}">
+                            <h6><span class="badge badge-pill badge-secondary">{{ task.title }} ({{ task.evidencecount }})</span></h6>
+                            </a>
+
+                        </td>
+                        <td>
+                            <div class="dropdown">
+                                {% if taskstatus|istaskreadonly %}
+                                <button class="btn btn-success btn-sm dropdown-toggle" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
+                                    {{ taskstatus }}
+                                    <span class="caret"></span>
+                                </button>
+                                {% elif taskstatus == "Waiting" %}
+                                <button class="btn btn-warning btn-sm dropdown-toggle" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
+                                    {{ taskstatus }}
+                                    <span class="caret"></span>
+                                </button>
+                                {% else %}
+                                <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
+                                    {{ taskstatus }}
+                                    <span class="caret"></span>
+                                </button>
+
+                                {% endif %}
+                                {% if inv.status.name != "Closed" %}
+                                    <ul class="dropdown-menu" role="menu">
+                                        {% if not taskstatus|istaskcompleted %}
+                                        <li>
+                                            <a href="{% url 'tasks:tsk_addticketandclose' task_pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                               class="btn btn-secondary btn-block btn-sm text-left">
+                                                <span class="font-weight-bold">
+                                                    <i class="fas fa-plus"></i>
+                                                </span>
+                                                Add Ticket
+                                            </a>
+                                        </li>
+                                        <li>
+                                                <a href="{% url 'tasks:ev_create' inv_pk=inv.pk task_pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                                   class="btn btn-secondary btn-sm w-100 text-left">
+                                                    <span>
+                                                        <i class="fas fa-plus">&nbsp;</i>
+                                                        New Evidence
+                                                    </span>
+                                                </a>
+                                            </li>
+                                        {% endif %}
+                                        <li>
+                                              <a href="{% url 'tasks:tsk_open' pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                                  class="btn btn-secondary btn-sm btn-block text-left">
+                                                  Open
+                                              </a>
+                                        </li>
+<!--                                        <li>&nbsp;</li>-->
+                                        <li>
+                                              <a href="{% url 'tasks:tsk_assign' pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                                  class="btn btn-secondary btn-sm btn-block text-left">
+                                                  Assign
+                                              </a>
+                                        </li>
+<!--                                        <li>&nbsp;</li>-->
+                                        <li>
+                                              <a href="{% url 'tasks:tsk_skip' pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                                  class="btn btn-secondary btn-sm btn-block text-left">
+                                                  Skip
+                                              </a>
+                                        </li>
+                                        <li>
+                                              <a href="{% url 'tasks:tsk_wait' pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                                  class="btn btn-secondary btn-sm btn-block text-left">
+                                                  Waiting
+                                              </a>
+                                        </li>
+
+                                        {% if not taskstatus|istaskcompleted %}
+                                            {% if task.evidence_task.all or not task.requiresevidence %}
+    <!--                                        <li>&nbsp;</li>-->
+                                            <li>
+                                                <a href="{% url 'tasks:tsk_close' pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                                    class="btn btn-secondary btn-sm btn-block text-left">
+                                                    Complete
+                                                </a>
+                                            </li>
+                                            {% else %}
+<!--                                        <li>&nbsp;</li>-->
+                                            {% endif %}
+                                        {% endif %}
+                                    </ul>
+                                {% endif %}
+<div class="btn-group" role="group" aria-label="Basic example">
+<a href="{% url 'tasks:tsk_wait' pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
+  class="btn btn-warning btn-xs text-left"
+  title="Wait">
+    <span><i class="fas fa-hourglass-half">&nbsp;</i></span>
+</a>
+<a href="{% url 'tasks:tsk_skip' pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
+  class="btn btn-success btn-xs text-left"
+  title="Skip">
+      <span><i class="fas fa-times">&nbsp;</i></span>
+</a>
+<a href="{% url 'tasks:tsk_close' pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
+   class="btn btn-success btn-xs text-left"
+  title="Complete">
+    <span><i class="fas fa-check-square">&nbsp;</i></span>
+</a>
+</div>
+
+                            </div> <!-- .dropdown -->
+
+
+
+
+                        </td>
+                        <td>
+                            {% if task.playbook__pk %}
+                            <a href="{% url 'tasks:play_detail' pk=task.playbook__pk %}?next1={{ request.get_full_path|urlencode }}">
+                                <h6><span class="badge badge-pill badge-secondary">{{ task.playbook__pk }}</span></h6>
+                            </a>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ task.type__name }}
+                        </td>
+                        <td>
+                            {{ task.created_at|date:"Y/m/d H:i:s" }}
+                        </td>
+                        <td>
+                            {{ task.created_by }}
+                        </td>
+                        <td>
+                            {{ task.modified_at|date:"Y/m/d H:i:s" }}
+                        </td>
+                        <td>
+                            {{ task.modified_by }}
+                        </td>
+                    </tr>
+                    <tr >
+                        <td colspan="9" class="hiddenRow">
+                            <div class="accordian-body collapse" id="mytasks{{task.pk}}">
+                                <!--<table class="invdescription2" style="max-width:100vw">-->
+                                <table class="table" style="max-width:100vw">
+                                    {% for taskev in task.evidence_task.all %}
+                                        <tr style="border-top: 2px dashed gray;">
+                                            <td>
+                                                <a class="badge badge-secondary" href="{% url 'tasks:ev_detail' pk=taskev.pk %}?next1={{ request.get_full_path|urlencode }}">
+                                                    {{ taskev.pk }}
+                                                </a>
+                                            </td>
+                                            <td>
+                                                {% if taskev.evidenceformat.pk == 2 %}
+                                                    {{ taskev.description|safe }}
+                                                {% else %}
+                                                    {% if taskev.evidenceformat.pk == 1 %}
+                                                        {{ taskev.description|linebreaks }}
+                                                    {% else %}
+                                                        Uknown evidence format!!!
+                                                    {% endif %}
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                        {% if taskev.evattr_evidence.all %}
+                            <table class="table table-bordered table-sm">
+                                <thead>
+                                <tr>
+                                    <th>Attribute</th>
+                                    <th>Attribute Value</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+
+                                {% for attr in taskev.evattr_evidence.all %}
+                                    <tr id="item-attr-{{attr.pk}}">
+                                        <td>
+                                            <div class="container mw-100 d-inline-flex justify-content-start flex-row align-items-center align-content-center flex-nowrap">
+                                                <div class="btn btn-sm">
+                                                    {% if attr %}
+                                                        {% if attr.attr_reputation.pk == 1 %}
+                                                        <span class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="Unknown"></span>
+                                                        {% else %}
+                                                            {% if attr.attr_reputation.pk == 2 %}
+                                                                <span style="color:green;" class="fa fa-check-circle" data-toggle="tooltip" data-placement="top" title="Clean"></span>
+                                                            {% else %}
+                                                                {% if attr.attr_reputation.pk == 3 %}
+                                                                    <strong>
+                                                                        <span class="fa fa-exclamation-circle text-danger" data-toggle="tooltip" data-placement="top" title="Suspicious"></span>
+                                                                    </strong>
+                                                                {% else %}
+                                                                    {% if attr.attr_reputation.pk == 4 %}
+                                                                    <span class="fa fa-bomb text-danger" data-toggle="tooltip" data-placement="top" title="Malicious"></span>
+                                                                    {% else %}
+                                                                    <span data-toggle="tooltip" data-placement="top" title="-">&nbsp;-&nbsp;</span>
+                                                                    {% endif %}
+                                                                {% endif %}
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    {% else %}
+                                                                    <span data-toggle="tooltip" data-placement="top" title="-">&nbsp;-&nbsp;</span>
+                                                    {% endif %}
+                                                </div>
+                                                    <!--Attribute dropdown-->
+                                                <div class="dropdown" onclick="incrow({{attr.pk}},'item-attr-','200px')">
+                                                    <button class="btn btn-default btn-sm dropdown-toggle" onclick="filterFunctionEvAttr()" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
+                                                        {{ attr.evattrformat }}
+                                                        <span class="caret"></span>
+                                                    </button>
+                                                    <ul class="dropdown-menu" role="menu">
+                                                            {% if not inv.readonly and not taskstatus|istaskreadonly %}
+                                                            <li>
+                                                                <a href="{% url 'tasks:evattr_create' pk=task.pk %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ task.pk }}"
+                                                                    class="btn btn-secondary btn-sm btn-block text-left">
+                                                                        <span data-toggle="tooltip" data-placement="top" title="Attribute item">
+                                                                            &nbsp;<i class="fas fa-plus"></i>&nbsp;
+                                                                            Attribute
+                                                                        </span>
+                                                                </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="{% url 'tasks:evattr_edit' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ task.pk }}"
+                                                                    class="btn btn-secondary btn-sm btn-block text-left">
+                                                                    <span data-toggle="tooltip" data-placement="top" title="Attribute item">
+                                                                        &nbsp;<i class="fas fa-pencil-alt"></i>&nbsp;
+                                                                        Edit
+                                                                    </span>
+                                                                </a>
+                                                            </li>
+                                                        {% else %}
+                                                        <li>&nbsp;</li><li>&nbsp;</li>
+                                                        {% endif %}
+                                                    <li class="dropdown-submenu">
+                                                        <a tabindex="-1" href="#" class="btn btn-secondary btn-sm btn-block text-left">
+                                                            Actions <span class="fa fa-chevron-right"></span>
+                                                        </a>
+                                                        <ul class="dropdown-menu dropdown-content" id="myDropdownEvAttr">
+                                                            <input type="text" placeholder="Search.." id="myInputEvAttr" onkeyup="filterFunctionEvAttr()">
+                                                            <li>
+                                                                {% if attr.evattrformat.name == "UserName" or attr.evattrformat.name == "UserID" or attr.evattrformat.name == "Email" or attr.evattrformat.name == "HostName" or attr.evattrformat.name == "IPv4" or attr.evattrformat.name == "IPv6" %}
+                                                                    <a href="{% url 'assets:profile_autoadd' inv_pk=inv.pk evattr_pk=attr.pk ev_pk=0 %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ task.pk }}"
+                                                                    class="btn btn-secondary btn-sm btn-block text-left">
+                                                                          I - Add To Profile
+                                                                    </a>
+                                                                {% endif %}
+                                                            </li>
+                                                            <li>
+                                                              {% for actiongroup in actiongroups_attr %}
+                                                                        <!--Used to keep the new evidences under the same task, but it caused issues with locked tasks, and makes more sense to allow new evidences to be edited.-->
+<!--                                                                         if task.task %}-->
+<!--                                                                            <a href=" url 'tasks:act_exec_scriptgroup' pk=actiongroup.pk inv_pk=inv.pk task_pk=task.task.pk ev_pk=task.pk evattr_pk=attr.pk %}?attr={{attr.pk}}&next1={{ request.get_full_path|urlencode }}#item-inve{{ task.pk }}"-->
+<!--                                                                            class="btn btn-secondary btn-sm btn-block text-left">-->
+<!--                                                                                <span></span>-->
+<!--                                                                                G actiongroup.pk}} -  actiongroup }}-->
+<!--                                                                            </a>-->
+<!--                                                                         else %}-->
+                                                                            <a href="{% url 'tasks:act_exec_scriptgroup' pk=actiongroup.pk inv_pk=inv.pk task_pk=0 ev_pk=task.pk evattr_pk=attr.pk %}?attr={{attr.pk}}&next1={{ request.get_full_path|urlencode }}#item-inve{{ task.pk }}"
+                                                                            class="btn btn-secondary btn-sm btn-block text-left">
+                                                                                <span></span>
+                                                                                G{{ actiongroup.pk}} - {{ actiongroup }}
+                                                                            </a>
+<!--                                                                         endif %}-->
+                                                              {% empty %}
+
+                                                              {% endfor %}
+                                                            </li>
+                                                            {% for actid in actions %}
+                                                                <li>
+                                                                    {% if actid.scriptinput.pk == 3 %}
+                                                                        {% if attr.evattrformat.pk == actid.scriptinputattrtype.pk or actid.scriptinputattrtype.pk is None %}
+                                                                            <!--Used to keep the new evidences under the same task, but it caused issues with locked tasks, and makes more sense to allow new evidences to be edited.-->
+<!--                                                                             if task.task == "x" %}-->
+<!--                                                                                <a href=" url 'tasks:act_exec_script' pk=actid.pk inv_pk=inv.pk task_pk=task.task.pk ev_pk=task.pk evattr_pk=attr.pk %}?attr={{attr.pk}}&next1={{ request.get_full_path|urlencode }}#item-inve{{ task.pk }}"-->
+<!--                                                                                   class="btn btn-secondary btn-sm btn-block text-left">-->
+<!--                                                                                    <span></span>-->
+<!--                                                                                     actid.pk }} -  actid.title }} ( actid.outputtarget.shortname }})-->
+<!--                                                                                </a>-->
+<!--                                                                            % else %}-->
+                                                                                <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=inv.pk task_pk=0 ev_pk=task.pk evattr_pk=attr.pk %}?attr={{attr.pk}}&next1={{ request.get_full_path|urlencode }}#item-inve{{ task.pk }}"
+                                                                                   class="btn btn-secondary btn-sm btn-block text-left">
+                                                                                    <span></span>
+                                                                                    {{ actid.pk }} - {{ actid.title }} ({{ actid.outputtarget.shortname }})
+                                                                                </a>
+<!--                                                                             endif %}-->
+                                                                        {% endif %}
+                                                                    {% endif %}
+                                                                </li>
+                                                              <!--<li class="divider"></li>-->
+                                                            {% endfor %}
+                                                <!--</div>-->
+                                                        </ul>
+                                                    </li>
+                                                    <li>&nbsp;</li>
+                                                    <li>
+                                                          <a href="{% url 'tasks:evattr_remove' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ task.pk }}"
+                                                              class="btn btn-secondary btn-sm btn-block">
+                                                          <span class="font-weight-bold text-danger" data-toggle="tooltip" data-placement="top" title="Delete item">
+                                                              <i class="fas fa-trash-alt"></i>
+                                                              Delete
+                                                          </span>
+                                                          </a>
+                                                    </li>
+                                                  </ul>
+                                                </div> <!-- .dropdown -->
+                                                <!--Attribute dropdown end-->
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="container mw-100 d-inline-flex justify-content-start flex-row align-items-center align-content-center flex">
+                                                <a href="{% url 'tasks:evattr_observabletoggle' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ task.pk }}"
+                                                >
+                                                {% if attr.observable %}
+                                                    <span data-toggle="tooltip" data-placement="top" title="Toggle Observable">
+                                                        <i class="fas fa-eye" aria-hidden="true">&nbsp;</i>
+                                                    </span>
+                                                {% else %}
+                                                    <span class="fas fa-eye-slash" data-toggle="tooltip" data-placement="top" title="Toggle Observable">
+                                                        &nbsp;
+                                                    </span>
+                                                {% endif %}
+                                                </a>
+
+
+                                                {% if attr.evattrvalue %}
+                                                <a href="{% url 'tasks:evattr_detail' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ task.pk }}"
+                                                style="max-width: 1100px;overflow: auto;text-overflow: word-wrap;overflow-wrap: break-word;">
+        <!--                                            style="max-width: 1100px;overflow: auto;">-->
+        <!--                                        style=" word-wrap: break-word; width: 200px; display: block; "-->
+                                                    <h6><span class="badge badge-pill badge-secondary">{{ attr.evattrvalue }}</span></h6>
+                                                </a>
+                                                {% endif %}
+
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+
+
+
+
+                                </tbody>
+                            </table>
+                        {% endif %}
+                                            </td>
+
+                                        </tr>
+                                    {% endfor %}
+
+                                    {{ task.description|safe }}
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
+{% endwith %}
+{% endfor %}
+{% else %}
+          <tr>
+            <td colspan="9" class="text-center bg-warning">No matching record found</td>
+          </tr>
+{% endif %}

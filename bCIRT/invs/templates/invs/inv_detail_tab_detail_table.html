@@ -150,9 +150,9 @@
         <td><strong>Created on</strong><br> {{ inv.created_at|date:"Y/m/d H:i:s" }} </td>
         <td><strong>Created by</strong><br> {{ inv.created_by }} </td>
     </tr>
-    <tr>
+    <tr style="">
         <td colspan="7">
-            <div class="container invdescription" >
+            <div class="container invdescription mw-100">
                 <strong>Review Comments #1</strong><br>
                 {% if inv.reviewer1comment %}
                     <p class="text-warning">{{ inv.reviewer1comment|safe }}</p>
@@ -164,7 +164,7 @@
     </tr>
     <tr>
         <td colspan="7">
-            <div class="container invdescription" >
+            <div class="container invdescription mw-100" >
                 <strong>Review Comments #2</strong><br>
                 {% if inv.reviewer2comment %}
                     <p class="text-warning">{{ inv.reviewer2comment|safe }}</p>
@@ -176,7 +176,7 @@
     </tr>
     <tr>
         <td colspan="7">
-            <div class="container invdescription" >
+            <div class="container invdescription mw-100" >
                 <strong>Incident Description</strong><br>
                 {{ inv.description_html|safe }}
             </div>
@@ -184,7 +184,7 @@
     </tr>
     <tr>
         <td colspan="7">
-            <div class="container invdescription" >
+            <div class="container invdescription mw-100" >
                 <strong>Executive Summary</strong><br>
                 {% if inv.summary  %}
                     {{ inv.summary|safe }}
@@ -196,7 +196,7 @@
     </tr>
     <tr>
         <td colspan="7">
-            <div class="container invdescription">
+            <div class="container invdescription mw-100">
                 <strong>Process Improvements</strong><br>
                 {{ inv.processimprovement|safe }}
             </div>

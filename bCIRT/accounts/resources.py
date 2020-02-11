@@ -11,7 +11,9 @@
 # 2019.07.29  Lendvay     1      Initial file
 # **********************************************************************;
 from import_export import resources
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import Group
+from django.contrib.auth import get_user_model
+User = get_user_model()
 from .models import UserAudit
 
 

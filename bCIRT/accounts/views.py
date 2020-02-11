@@ -29,8 +29,10 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView
 from django.dispatch import receiver
 from django.db.models.signals import pre_save
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
 from . import forms
+from django.contrib.auth import get_user_model
+User = get_user_model()
 from bCIRT.custom_variables import LOGLEVEL, LOGSEPARATOR
 import logging
 logger = logging.getLogger('log_file_verbose')

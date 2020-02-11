@@ -101,6 +101,32 @@
             </ul>
         </li>
 <!--            Updates end-->
+<!--Settings            -->
+        <li class="dropdown">
+            <a class="dropdown-toggle btn btn-outline-secondary" data-toggle="dropdown" href="#">
+                Settings
+                <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+                <li>
+                    <a href="{% url 'configuration:settingsuser_list' %}"
+                       class="btn btn-secondary btn-sm btn-block text-left">
+                      <span class="fas fa-list"></span>
+                      User Settings
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'configuration:settingssystem_list' %}"
+                       class="btn btn-secondary btn-sm btn-block text-left">
+                      <span class="fas fa-list"></span>
+                      System Settings
+                    </a>
+                </li>
+            </ul>
+        </li>
+<!--            Settings end-->
+
+
             <li class="dropdown">
                 <a class="dropdown-toggle btn btn-outline-secondary" data-toggle="dropdown" href="#">
                     Audit

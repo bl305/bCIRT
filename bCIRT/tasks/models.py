@@ -13,9 +13,11 @@
 # 2019.08.30  Lendvay     1      Added playbooktemplate graph
 # 2019.09.03  Lendvay     1      Fixed add new playbook
 # **********************************************************************;
+from django.conf import settings
 from django.db import models
 from django.urls import reverse
 import tempfile
+from django.db import transaction
 # HTML renderer
 import misaka
 from invs.models import Inv
@@ -29,6 +31,7 @@ import ipaddress
 import re
 import pydot
 from tasks.scripts.String_Parser import StringParser
+from django.db import transaction
 
 # import pathlib
 # from bCIRT.settings import PROJECT_ROOT
@@ -254,7 +257,7 @@ class Playbook(models.Model):
     objects = models.Manager()
     name = models.CharField(max_length=50, default="", blank=False, null=False)
     version = models.CharField(max_length=20, default="", blank=True, null=True)
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, default=None, null=True, related_name="playbook_users")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, default=None, null=True, related_name="playbook_users")
     inv = models.ForeignKey(Inv, on_delete=models.CASCADE, default=None, null=True, blank=True,
                             related_name="playbook_inv")
     created_at = models.DateTimeField(auto_now_add=True)
@@ -289,6 +292,7 @@ class Playbook(models.Model):
         pass
 
 
+@transaction.atomic
 def new_playbook(pplaybooktemplate, pname, pversion, puser, pinv, pdescription, pmodified_by, pcreated_by):
 
     playbook_obj = Playbook.objects.create(
@@ -328,7 +332,7 @@ def new_playbook(pplaybooktemplate, pname, pversion, puser, pinv, pdescription, 
         # else:
         #     tmp_item_prevtask = None
         # tmp_item_prevtask = None
-        # logger.info("31 NEW TASK:%s" % (tmp_item_prevtask))xxx
+        # logger.info("31 NEW TASK:%s" % (tmp_item_prevtask))
         new_task = add_task_from_template(
             atitle=tmp_to_copy.title,
             astatus=tmp_to_copy.status,
@@ -369,7 +373,7 @@ def new_playbook(pplaybooktemplate, pname, pversion, puser, pinv, pdescription, 
 
 class Task(models.Model):
     objects = models.Manager()
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, default=None, null=True, blank=True, related_name="task_users")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, default=None, null=True, blank=True, related_name="task_users")
     parent = models.ForeignKey('self', on_delete=models.SET_NULL, default=None, null=True, blank=True, related_name="task_parent")
     inputfrom = models.ForeignKey('self', on_delete=models.SET_NULL, default=None, null=True, blank=True,
                                   related_name="task_inputfrom")
@@ -430,6 +434,7 @@ class Task(models.Model):
         else:
             return False
 
+    @transaction.atomic
     def save(self, force_insert=False, force_update=False, *args, **kwargs):
         #  this is to check if the status record has been changed or not
         if self.status != self.__original_status:
@@ -617,7 +622,7 @@ class Task(models.Model):
             retval = None
         return retval
 
-
+@transaction.atomic
 def task_close(ptaskpk, ptaskmoduser):
     if Task.objects.filter(pk=ptaskpk).exists():
         task_obj = Task.objects.get(pk=ptaskpk)
@@ -652,7 +657,7 @@ class EvidenceFormat(models.Model):
 
 class Evidence(models.Model):
     objects = models.Manager()
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, default=None, null=True, related_name="evidence_users")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, default=None, null=True, related_name="evidence_users")
     task = models.ForeignKey(Task, on_delete=models.CASCADE, default=None, null=True, blank=True, related_name="evidence_task")
     inv = models.ForeignKey(Inv, on_delete=models.CASCADE, default=None, null=True, blank=True, related_name="evidence_inv")
     parent = models.ForeignKey('self', on_delete=models.SET_NULL, default=None, null=True, blank=True, related_name="evidence_parent")
@@ -694,6 +699,7 @@ class Evidence(models.Model):
                 "pk": self.pk
             })
 
+    @transaction.atomic
     def save(self, *args, **kwargs):
         # this removes the filename if a file is not attached
         if not self.fileRef:
@@ -765,6 +771,9 @@ class Evidence(models.Model):
                 raise ValidationError(_('Investigation cannot be closed!'))
         super(Evidence, self).clean()
 
+    def myattributes(self):
+        retval = EvidenceAttr.objects.filter(ev=self).select_related('attr_reputation')
+        return retval
 
 class EvidenceAttrFormat(models.Model):
     objects = models.Manager()
@@ -799,7 +808,7 @@ class EvReputation(models.Model):
 
 class EvidenceAttr(models.Model):
     objects = models.Manager()
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, default=None, null=True, related_name="evattr_users")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, default=None, null=True, related_name="evattr_users")
     ev = models.ForeignKey(Evidence, on_delete=models.CASCADE, default=None, null=True, blank=True, related_name="evattr_evidence")
     evattrvalue = models.CharField(max_length=2048)
     observable = models.BooleanField(default=False, null=False, blank=False)
@@ -826,6 +835,7 @@ class EvidenceAttr(models.Model):
                 "pk": self.pk
             })
 
+    @transaction.atomic
     def save(self, *args, **kwargs):
         # if the attribute is malicious, make the attribute an observable
         if self.attr_reputation:
@@ -859,9 +869,30 @@ class EvidenceAttr(models.Model):
                 similar_invs.add(similar_evinv.inv)
         # print(list(similar_invs)[0])
         # print(similar_invs)
+        return similar_invs
 
+    def get_sameitems_inv_values(self):
+        # similar_evattr = EvidenceAttr.objects.filter(evattrvalue__icontains=self.evattrvalue).exclude(ev__pk=self.ev.pk)
+        similar_evattr = EvidenceAttr.objects.filter(evattrvalue=self.evattrvalue)\
+            .exclude(ev=self.ev)\
+            .exclude(evattrvalue='d41d8cd98f00b204e9800998ecf8427e')\
+            .exclude(evattrvalue='da39a3ee5e6b4b0d3255bfef95601890afd80709')\
+            .exclude(evattrvalue='e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855')\
+            .select_related('user')\
+            .select_related('ev')\
+            .select_related('inv')
+            # .values('pk', 'user__username', 'ev', 'ev__pk')
 
-
+        similar_evs = set()
+        # print(similar_evattr)
+        for similar_evattritem in similar_evattr:
+            similar_evs.add(similar_evattritem.ev)
+        similar_invs = set()
+        for similar_evinv in similar_evs:
+            if similar_evinv.inv:
+                similar_invs.add(similar_evinv.inv)
+        # print(list(similar_invs)[0])
+        # print(similar_invs)
         return similar_invs
 
     def clean(self):
@@ -877,7 +908,41 @@ class EvidenceAttr(models.Model):
                 raise ValidationError(_('Investigation cannot be closed!'))
         pass
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['evattrvalue'], name='evattrvalue_idx'),
+        ]
 
+def get_evidencesameitems_inv_values(pk):
+    # similar_evattr = EvidenceAttr.objects.filter(evattrvalue__icontains=self.evattrvalue).exclude(ev__pk=self.ev.pk)
+    myattrvalue = EvidenceAttr.objects.filter(pk=pk).values('evattrvalue')[:1]
+    similar_evattr = EvidenceAttr.objects.exclude(pk=pk) \
+        .filter(evattrvalue=myattrvalue)\
+        .exclude(evattrvalue='d41d8cd98f00b204e9800998ecf8427e') \
+        .exclude(evattrvalue='da39a3ee5e6b4b0d3255bfef95601890afd80709') \
+        .exclude(evattrvalue='e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855')\
+        .select_related('user__username')\
+        .select_related('attr_reputation__pk') \
+        .select_related('evattrformat__name') \
+        .select_related('evattrformat__pk') \
+        .select_related('ev__inv__pk') \
+        .values('pk', 'attr_reputation__pk', 'evattrformat__name', 'evattrformat__pk', 'observable', 'evattrvalue',
+                'user__username', 'ev__inv__pk')
+
+    # similar_evs = set()
+    # # print(similar_evattr)
+    # for similar_evattritem in similar_evattr:
+    #     similar_evs.add(similar_evattritem.ev)
+    # similar_invs = set()
+    # for similar_evinv in similar_evs:
+    #     if similar_evinv.inv:
+    #         similar_invs.add(similar_evinv.inv)
+    # # print(list(similar_invs)[0])
+    # # print(similar_invs)
+    return similar_evattr
+
+
+@transaction.atomic
 def evidenceattrobservabletoggle(pattrpk):
     evattr_obj = EvidenceAttr.objects.get(pk=pattrpk)
     evattr_obj.observable = not evattr_obj.observable
@@ -921,7 +986,9 @@ class ExtractAttr():
 
     def find_email(self, str1):
         #  ipattern = re.compile('([^[({@|\s]+@[^@]+\.[^])}@|\s]+)')
-        ipattern = re.compile('([^@":[>|<\s]+@[^@]+\.[^]>"<)\}@|\s]+)')
+        # ipattern = re.compile('([^@":[>|<\s]+@[^@]+\.[^]>"<)\}@|\s]+)')
+        #https://www.regular-expressions.info/refunicode.html
+        ipattern = re.compile(r'([\\p{L}\\p{M}\\p{S}\\p{N}\\p{P}a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)', re.UNICODE)
         imatches = re.findall(ipattern, str1)
         imatches = sorted(list(set(imatches)))
         return imatches
@@ -1125,7 +1192,7 @@ class OutputTarget(models.Model):
 class Automation(models.Model):
     objects = models.Manager()
     enabled = models.BooleanField(default=True)
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, default=None, null=True, related_name="automation_users")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, default=None, null=True, related_name="automation_users")
     type = models.ForeignKey(Type, on_delete=models.SET_NULL, default=None, blank=False, null=True, related_name="automation_type")
     name = models.CharField(max_length=50, blank=False, null=False)
     version = models.CharField(max_length=20, default=None, null=True)
@@ -1176,7 +1243,7 @@ class Automation(models.Model):
 class Action(models.Model):
     objects = models.Manager()
     enabled = models.BooleanField(default=True)
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, default=None, null=True, related_name="action_users")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, default=None, null=True, related_name="action_users")
     title = models.CharField(max_length=50, blank=False, null=False)
     version = models.CharField(max_length=20, default=None, null=True)
     automationid = models.ForeignKey(Automation, on_delete=models.SET_NULL, default=None, blank=False, null=True,
@@ -1218,6 +1285,7 @@ class Action(models.Model):
     def __str__(self):
         return str(self.title)+" ("+str(self.scriptinput.shortname)+"->"+str(self.outputtarget.shortname)+")"
 
+    @transaction.atomic
     def save(self, *args, **kwargs):
         if not self.automationid:
             # print(self.automationid)
@@ -1244,6 +1312,7 @@ class Action(models.Model):
         pass
 
 
+@transaction.atomic
 def clone_action(paction_pk):
     cloneobj = Action.objects.get(pk=paction_pk)
     if cloneobj:
@@ -1283,13 +1352,45 @@ class ActionGroupMember(models.Model):
     def __str__(self):
         return str(self.actionid)
 
+def actiongroupmember_items():
+    actiongroups_file = set()
+    actiongroups_desc = set()
+    actiongroups_attr = set()
+    actiongroupmember_all = ActionGroupMember.objects.all() \
+        .select_related('actionid')
+    # .select_related('actionid__scriptinput')\
+    # .values('pk', 'actionid__enabled', 'actionid__scriptinput', 'actiongroupid')
+    if actiongroupmember_all:
+        for actgrpmember in actiongroupmember_all:
+            # input is description scriptinput=1:
+            if actgrpmember.actionid.enabled is True and actgrpmember.actionid.scriptinput.pk == 1:
+                # actiongrmember_desc.add(actgrpmember.actionid)
+                actiongroups_desc.add(actgrpmember.actiongroupid)
+            # input is file scriptinput=2:
+            elif actgrpmember.actionid.enabled is True and actgrpmember.actionid.scriptinput.pk == 2:
+                # actiongrmember_file.add(actgrpmember.actionid)
+                actiongroups_file.add(actgrpmember.actiongroupid)
+            # input is attribute scriptinput=1:
+            elif actgrpmember.actionid.enabled is True and actgrpmember.actionid.scriptinput.pk == 3:
+                # actiongrmember_attr.add(actgrpmember.actionid)
+                actiongroups_attr.add(actgrpmember.actiongroupid)
+            # input is none of the above:
+            else:
+                # print(actgrpmember.actionid.scriptinput.pk)
+                pass
+    retval = dict()
+    retval['actiongroups_desc'] = actiongroups_desc
+    retval['actiongroups_file'] = actiongroups_file
+    retval['actiongroups_attr'] = actiongroups_attr
+    return retval
+
 
 class TaskTemplate(models.Model):
     objects = models.Manager()
     tasktemplatename = models.CharField(max_length=50, blank=False, null=False)
     enabled = models.BooleanField(default=True)
     # fields from Task model
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, default=None, null=True, blank=True,
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, default=None, null=True, blank=True,
                              related_name="tasktemplate_users")
     title = models.CharField(max_length=50, blank=False, null=False)
     status = models.ForeignKey(TaskStatus, on_delete=models.SET_DEFAULT, default="1",
@@ -1401,7 +1502,7 @@ class PlaybookTemplate(models.Model):
     name = models.CharField(max_length=50, default="", blank=False, null=False)
     enabled = models.BooleanField(default=True)
     version = models.CharField(max_length=20, default="", blank=True, null=True)
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, default=None, null=True, related_name="playbooktemplate_users")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, default=None, null=True, related_name="playbooktemplate_users")
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.CharField(max_length=20, default="unknown")
     modified_at = models.DateTimeField(auto_now=True)
@@ -1446,7 +1547,7 @@ class PlaybookTemplateItem(models.Model):
     prevtask = models.ForeignKey('self', on_delete=models.SET_NULL, default=None, null=True, blank=True,
                                  related_name="playbooktemplateitem_playbooktemplateitem_prev")
     itemorder = models.SmallIntegerField(default=0, blank=False, null=False)
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, default=None, null=True, related_name="playbooktemplateitem_users")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, default=None, null=True, related_name="playbooktemplateitem_users")
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.CharField(max_length=20, default="unknown")
     modified_at = models.DateTimeField(auto_now=True)
@@ -1468,6 +1569,7 @@ class PlaybookTemplateItem(models.Model):
                 "pk": self.pk
             })
 
+    @transaction.atomic
     def save(self, *args, **kwargs):
         self.description_html = misaka.html(self.description)
         # PlaybookTemplate.objects.filter(pk=self.playbooktemplateid.pk).update(modified_at=timezone_now(),
@@ -1478,6 +1580,7 @@ class PlaybookTemplateItem(models.Model):
         # PlaybookTemplate.objects.get(pk=self.playbooktemplateid.pk).save()
         super(PlaybookTemplateItem, self).save(*args, **kwargs)
 
+    @transaction.atomic
     def delete(self, *args, **kwargs):
         if self.playbooktemplateid.playbooktemplateitem_playbooktemplate.filter(prevtask=self.pk):
             reftasks = self.playbooktemplateid.playbooktemplateitem_playbooktemplate.filter(prevtask=self.pk)
@@ -1519,6 +1622,7 @@ def playbooktemplateitem_check_delete_condition(ptmpitem_pk):
 
 
 @receiver(models.signals.post_save, sender=PlaybookTemplate)
+@transaction.atomic
 def generate_graph_PlaybookTemplate(sender, instance, **kwargs):
     """
     Generate playbooktemplate graph
@@ -1558,12 +1662,14 @@ def generate_graph_PlaybookTemplate(sender, instance, **kwargs):
 
 
 @receiver(models.signals.post_delete, sender=PlaybookTemplateItem)
+@transaction.atomic
 def auto_save_PlaybookTemplate(sender, instance, **kwargs):
     playbooktemplate_obj=instance.playbooktemplateid
     playbooktemplate_obj.save()
 
 
 @receiver(models.signals.post_save, sender=Playbook)
+@transaction.atomic
 def generate_graph_Playbook(sender, instance, **kwargs):
     """
     Generate playbooktemplate graph
@@ -1620,6 +1726,7 @@ def add_task_from_template(atitle, astatus, aplaybook, auser, ainv, aaction, aac
     return obj
 
 
+@transaction.atomic
 def new_evidence(puser, ptask, pinv, pcreated_by, pmodified_by, pdescription, pfilename=None, pfileref=None,
                  pevformat=None, pforce=False, pparent=None, pparentattr=None):
     newev = None
@@ -1756,6 +1863,7 @@ def auto_delete_file_on_delete(sender, instance, **kwargs):
 
 
 @receiver(models.signals.post_save, sender=Evidence)
+@transaction.atomic
 def auto_make_readonly(sender, instance, **kwargs):
     """
     Make evidences read-only on the filesystem
@@ -1843,6 +1951,7 @@ def auto_make_readonly(sender, instance, **kwargs):
 
 
 @receiver(models.signals.pre_save, sender=Evidence)
+@transaction.atomic
 def auto_delete_file_on_change(sender, instance, **kwargs):
     """Deletes file from filesystem
     when corresponding `InvestigationDetails` object is changed.
@@ -1892,6 +2001,7 @@ def remove_html_markup(s):
     return out
 
 
+@transaction.atomic
 def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pinv_pk, pargdyn, pattr):
     actuser = pactuser  # self.request.user
     actusername = pactusername  # self.request.user.get_username()
@@ -2461,7 +2571,7 @@ def new_actionq(pactuser, pactionid, ptaskid, pinvid, poldevid, pparent, ptitle,
 
 class ActionQ(models.Model):
     objects = models.Manager()
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, default=None, blank=True, null=True,
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, default=None, blank=True, null=True,
                              related_name="actionq_users")
     actionid = models.ForeignKey(Action, on_delete=models.SET_NULL, default=None, blank=True, null=True,
                                  related_name="actionq_action")
@@ -2490,6 +2600,51 @@ class ActionQ(models.Model):
 
     def __str__(self):
         return str(self.pk)
+
+class TasksInvDetailTabEvidences():
+
+    def inv_tab_evidences_actions(self):
+        retval = Action.objects.exclude(enabled=False) \
+            .exclude(automationid__isnull=True) \
+            .select_related('scriptinput') \
+            .select_related('outputtarget') \
+            .select_related('scriptinputattrtype') \
+            .order_by('title')
+        return retval
+
+    def inv_tab_evidences_taskreadonly(self, ev_pk):
+        retval = False
+        if Evidence.objects.filter(pk=ev_pk).task:
+            if Evidence.objects.filter(pk=ev_pk).task.pk:
+                retval = True
+        return retval
+
+
+def get_actionq_list_by_evidence(ev):
+    retval = ActionQ.objects.none()
+    if ev:
+        retval = ActionQ.objects.filter(evid=ev)
+    return retval
+
+def get_attribute_list_by_evidence(ev):
+    retval = EvidenceAttr.objects.none()
+    if ev:
+        retval = EvidenceAttr.objects.filter(ev__pk=ev)\
+            .select_related('attr_reputation')\
+            .select_related('evattrformat')
+    return retval
+
+
+def get_attribute_list_by_evidence_values(ev):
+    retval = EvidenceAttr.objects.none()
+    if ev:
+        retval = EvidenceAttr.objects.filter(ev__pk=ev)\
+            .select_related('attr_reputation__pk')\
+            .select_related('evattrformat__pk')\
+            .select_related('evattrformat__name')\
+            .values('pk', 'attr_reputation__pk', 'evattrformat__pk', 'evattrformat__name', 'observable',
+                    'evattrvalue', 'ev__pk', 'modified_at')
+    return retval
 
 
 class FileHashCalc():
@@ -2544,3 +2699,77 @@ def handle_uploaded_file_chunks(pfile, ppath):
     with open(ppath, 'wb+') as destination:
         for chunk in pfile.chunks():
             destination.write(chunk)
+
+def taskreadonly(task_str):
+    if task_str == 'Completed' or task_str == 'Skipped':
+        return True
+    else:
+        return False
+
+def taskcompleted(task_str):
+    if task_str == 'Completed':
+        return True
+    else:
+        return False
+
+def evidencereadonly(ev_pk):
+    # evtask = Evidence.objects.filter(pk=int(ev_pk)) #.select_related('task__status__name').values('task__status__name')
+    # print(type(evtask['task__status__name']))
+    evtask = Evidence.objects.filter(pk=ev_pk).select_related('task__status__name').values('task__status__name')
+    if evtask:
+        retval = taskreadonly(evtask.first()['task__status__name'])
+    else:
+        retval = False
+    return retval
+
+class TaskList():
+    def get_tasklist(self, pinv, pexcltask, pallownull=False, porder_by='pk'):
+        task_obj = None
+        if pinv != '0':
+            if pexcltask:
+                task_objs = Task.objects.filter(inv__pk=pinv)\
+                    .exclude(pk=pexcltask)\
+                    .select_related('inv__pk') \
+                    .values_list('pk', 'inv__pk', 'title').order_by(porder_by)
+            else:
+                task_objs = Task.objects.filter(inv__pk=pinv)\
+                    .select_related('inv__pk') \
+                    .values_list('pk', 'inv__pk', 'title').order_by(porder_by)
+        else:
+            if pexcltask:
+                task_objs = Task.objects.exclude(pk=pexcltask)\
+                    .select_related('inv__pk') \
+                    .values_list('pk', 'inv__pk', 'title').order_by(porder_by)
+            else:
+                task_objs = Task.objects.select_related('inv__pk') \
+                    .values_list('pk', 'inv__pk', 'title').order_by(porder_by)
+        outlist = list()
+        if pallownull:
+            outlist.append(('', 'None'))
+        NoneType = type(None)
+        if task_objs.exists():
+            for task in task_objs:
+                if type(task[1]) == NoneType:
+                    outstr = "%s-%s (%s)" % (int(task[0]), str(task[2]), "NA")
+                else:
+                    outstr = "%s-%s (%s)" % (int(task[0]), str(task[2]), str(task[1]))
+                outlist.append((task[0], outstr))
+        return outlist
+
+    def get_taskstatuslist(self):
+        retval = TaskStatus.objects.values_list('pk', 'name').order_by('pk')
+        return retval
+
+    def get_actionlist(self, pallownull=True, porderby='title'):
+        act_objs = Action.objects.filter(enabled=True).select_related('scriptinput__shortname')\
+            .select_related('outputtarget__shortname')\
+            .values_list('pk', 'title', 'scriptinput__shortname', 'outputtarget__shortname', 'automationid')\
+            .order_by(porderby)
+        outlist = list()
+        if pallownull:
+            outlist.append(('', 'None'))
+        if act_objs.exists():
+            for act in act_objs:
+                outstr = "%s (%s: %s->%s)" % (str(act[1]), str(act[0]), str(act[2]), str(act[3]))
+                outlist.append((act[0], outstr))
+        return outlist

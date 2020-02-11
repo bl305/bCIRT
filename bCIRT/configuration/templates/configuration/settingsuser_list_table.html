@@ -1,0 +1,50 @@
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : configuration/settingsuser_list_table.html
+# Author            : Balazs Lendvay
+# Date created      : 2020.02.10
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2020.02.10  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+{% if object_list %}
+{% for asetting in object_list %}
+                <tr>
+                    <td>
+                        <a class="badge badge-secondary" href="#?next1={{ request.get_full_path|urlencode }}">
+                            {{ asetting.pk }}
+                        </a>
+                    </td>
+                    <td>
+                        {{ asetting.settingname }}
+                    </td>
+                    <td>
+                        {{ asetting.settingvalue }}
+                    </td>
+                    <td>
+                        {{ asetting.settingcategory }}
+                    </td>
+                    <td>
+                        {{ asetting.enabled }}
+                    </td>
+                    <td>
+	                	{% if user.is_authenticated %}
+                        <div>
+                            <a href="{% url 'configuration:settingsuser_edit' pk=asetting.pk %}"
+                               class="btn btn-warning btn-xs">
+                                <span class="fas fa-pen"></span>
+                            </a>
+                        </div>
+                        {% endif %}
+                    </td>
+              </tr>
+{% endfor %}
+{% else %}
+          <tr>
+              <td colspan="6" class="text-center bg-warning">No Settings found</td>
+          </tr>
+{% endif %}

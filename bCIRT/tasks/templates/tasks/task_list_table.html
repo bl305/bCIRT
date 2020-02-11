@@ -9,10 +9,12 @@
 # Revision History  : v1
 # Date        Author      Ref    Description
 # 2019.07.29  Lendvay     1      Initial file
+# 2020.02.09  Lendvay     1      Optimized query
 # **********************************************************************;
 -->
 {% if object_list %}
 {% for task in object_list %}
+{% with task.status.name as task_status_name %}
                 <tr data-toggle="collapse" data-target="#mytasks{{task.pk}}" class="accordion-toggle" id="item-task-{{task.pk}}">
                     <td>
                         <div class="dropdown" onclick="incrow({{task.pk}},'item-task-','150px')">
@@ -27,10 +29,10 @@
                             </button>
 
                                 <ul class="dropdown-menu" role="menu">
-                                    {% if task.status.name != "Completed" %}
+                                    {% if task.status__name != "Completed" %}
                                         <li>
-                                            {% if task.inv %}
-                                            <a href="{% url 'tasks:ev_create' inv_pk=task.inv.pk task_pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                            {% if task.inv__pk %}
+                                            <a href="{% url 'tasks:ev_create' inv_pk=task.inv__pk task_pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
                                                 class="btn btn-secondary btn-sm btn-block text-left">
                                                 <span class="fas fa-plus" data-toggle="tooltip" data-placement="top" title="View item"></span>
                                                 New Evidence
@@ -58,35 +60,41 @@
                                           Edit&nbsp;
                                         </a>
                                     </li>
-                                    <li>
-                                        {% if task.action.automation %}
-                                            {% if task.actev %}
-                                                {% if task.action.scriptinput.pk == 2 and task.actiontarget.evidence_task.all.first.fileName or task.action.scriptinput.pk == 1 %}
-                                                    {% if task.inv %}
-                                                        <a href="{% url 'tasks:act_exec_script' pk=task.action.pk inv_pk=task.inv.pk task_pk=task.pk ev_pk=task.actev evattr_pk=0 %}"
-                                                           class="btn btn-success btn-xs">
-                                                                Run
-                                                            <span class="fas fa-play"></span>
-                                                        </a>
+                                        <li>
+                                            {% if task.action__automationid and task_status_name != 'Completed' %}
+                                                {% if task.actev %}
+                                                    {% if task.action.scriptinput.pk == 2 and task.actiontarget.evidence_task.all.first.fileName or task.action.scriptinput.pk == 1 %}
+                                                        {% if inv %}
+                                                            <a href="{% url 'tasks:act_exec_script' pk=task.action.pk inv_pk=inv.pk task_pk=task.pk ev_pk=task.actev evattr_pk=0 %}"
+                                                               class="btn btn-secondary btn-sm btn-block text-left">
+                                                                <span>
+                                                                    Run&nbsp;
+                                                                    <i class="fas fa-play"></i>
+                                                                </span>
+                                                            </a>
+                                                        {% else %}
+                                                            <a href="{% url 'tasks:act_exec_script' pk=task.action.pk inv_pk=0 task_pk=task.pk ev_pk=task.actev evattr_pk=0 %}"
+                                                               class="btn btn-secondary btn-sm btn-block text-left">
+                                                                <span class="glyphicon glyphicon-play">
+                                                                    Run&nbsp;
+                                                                    <i class="fas fa-play"></i>
+                                                                </span>
+                                                            </a>
+                                                        {% endif %}
                                                     {% else %}
-                                                        <a href="{% url 'tasks:act_exec_script' pk=task.action.pk inv_pk=0 task_pk=task.pk ev_pk=task.actev evattr_pk=0 %}"
-                                                           class="btn btn-success btn-xs">
-                                                                Run
-                                                            <span class="fas fa-play"></span>
-                                                        </a>
+                                                        (No file)
                                                     {% endif %}
                                                 {% else %}
-                                                    (No file)
+                                                    <a href="#"
+                                                        class="btn btn-secondary btn-sm btn-block text-left">
+                                                        <span class="" data-toggle="tooltip" data-placement="top" title="Toggle Observable item">
+                                                            <i class="fas fa-ban">&nbsp;</i>
+                                                            Action
+                                                        </span>
+                                                    </a>
                                                 {% endif %}
-                                            {% else %}
-                                                <a href="#"
-                                                    class="btn btn-disabled btn-xs">
-                                                    Action
-                                                    <span class="fas fa-ban-circle" data-toggle="tooltip" data-placement="top" title="Open item"></span>
-                                                </a>
                                             {% endif %}
-                                        {% endif %}
-                                    </li>
+                                        </li>
                                     <li>&nbsp;</li>
                                     <li>
                                           <a href="{% url 'tasks:tsk_remove' pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
@@ -115,7 +123,7 @@
                     <td>
                         <div class="dropdown">
                             <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
-                                {{ task.status }}
+                                {{ task.status__name }}
                                 <span class="caret"></span>
                             </button>
                                 <ul class="dropdown-menu" role="menu">
@@ -148,19 +156,19 @@
 
                     </td>
                     <td>
-                        {{ task.priority }}
+                        {{ task.priority__name }}
                     </td>
                     <td>
-                        {% if task.user %}
-                            {{ task.user }}
+                        {% if task.user__username %}
+                            {{ task.user__username }}
                         {% else %}
                             -
                         {% endif %}
                     </td>
                     <td>
-                        {% if task.playbook %}
-                        <a class="badge badge-secondary" href="{% url 'tasks:play_detail' pk=task.playbook.pk %}?next1={{ request.get_full_path|urlencode }}">
-                            {{ task.playbook }}
+                        {% if task.playbook__name %}
+                        <a class="badge badge-secondary" href="{% url 'tasks:play_detail' pk=task.playbook__pk %}?next1={{ request.get_full_path|urlencode }}">
+                            {{ task.playbook__pk }} - {{ task.playbook__name }}
                         </a>
                         {% else %}
                             -
@@ -190,6 +198,7 @@
                         {% endif %}
                     </td>
                 </tr>
+{% endwith %}
 {% endfor %}
 {% else %}
           <tr>

@@ -11,7 +11,10 @@
 # 2019.12.29  Lendvay     1      Initial file
 # **********************************************************************;
 from import_export import resources
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import Group
+from django.conf import settings
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 class UserResource(resources.ModelResource):
     class Meta:

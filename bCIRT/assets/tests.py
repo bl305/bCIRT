@@ -23,7 +23,9 @@ from django.urls import reverse
 
 # models test
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import User  # , Permission, Group
+# from django.contrib.auth.models import User  # , Permission, Group
+from django.contrib.auth import get_user_model
+User = get_user_model()
 from django.test import TestCase
 from django.test import Client
 from django.contrib.auth.models import Permission, Group

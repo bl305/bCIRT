@@ -20,7 +20,10 @@ from django.contrib.auth.admin import UserAdmin, GroupAdmin
 from import_export.admin import ImportExportModelAdmin
 # from import_export.admin import ImportExportModelAdmin
 from django.contrib import admin
-from django.contrib.auth.models import User, Group
+# from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import Group
+from django.contrib.auth import get_user_model
+User = get_user_model()
 from accounts.resources import UserResource, GroupResource
 
 
@@ -38,10 +41,11 @@ class GroupAdmin(ImportExportMixin, GroupAdmin):
     pass
 
 
-admin.site.unregister(User)
-admin.site.register(User, UserAdmin)
+# admin.site.unregister(User)
+# admin.site.register(User, UserAdmin)
 admin.site.unregister(Group)
 admin.site.register(Group, GroupAdmin)
+
 
 @admin.register(models.UserAudit)
 class UserAuditAdmin(ImportExportModelAdmin):

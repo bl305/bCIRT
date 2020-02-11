@@ -20,11 +20,10 @@
                         </a>
                     </td>
                     <td>
-
-                        {{ inv.status }}
+                        {{ inv.status__name }}
                     </td>
                     <td>
-                        {{ inv.priority }}
+                        {{ inv.priority__name }}
                     </td>
                     <td>
                         {% if inv.ticketid %}
@@ -53,20 +52,21 @@
                         {% endif %}
                     </td>
                     <td>
-                        {% if inv.parent %}
-                        <a class="badge badge-secondary" href="{% url 'invs:inv_detail' pk=inv.parent.pk %}?next1={{ request.get_full_path|urlencode }}">
-                            {{ inv.parent }}
+                        {% if inv.parent__pk %}
+                        <a class="badge badge-secondary"
+                           href="{% url 'invs:inv_detail' pk=inv.parent__pk %}?next1={{ request.get_full_path|urlencode }}">
+                            {{ inv.parent__pk }}
                         </a>
                         {% else %}
                             -
                         {% endif %}
                     </td>
                     <td>
-                        {{ inv.phase }}
+                        {{ inv.phase__name }}
                     </td>
                     <td>
-                        {% if inv.user %}
-                            {{ inv.user }}
+                        {% if inv.user__username %}
+                            {{ inv.user__username }}
                         {% else %}
                             -
                         {% endif %}

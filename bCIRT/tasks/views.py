@@ -12,9 +12,11 @@
 # 2019.09.06  Lendvay     2      Added session security
 # **********************************************************************;
 from .models import Task, TaskTemplate, TaskType, TaskPriority, TaskCategory, TaskStatus
-from .models import TaskVar  # , TaskVarType, TaskVarCategory
-from .models import Playbook, PlaybookTemplate, PlaybookTemplateItem, new_playbook
-from .models import Inv
+from .models import TaskVar, TaskList  # , TaskVarType, TaskVarCategory
+from .models import Playbook, PlaybookTemplate, PlaybookTemplateItem, new_playbook, actiongroupmember_items
+from invs.models import InvDetailTabEvidences, Inv, InvList
+from .models import TasksInvDetailTabEvidences
+# from .models import Inv
 from .models import Evidence, EvidenceAttr  # , EvidenceAttrFormat, EvidenceFormat
 from .models import add_task_from_template, run_action, evidenceattrobservabletoggle, clone_action, new_evidence
 from .models import Action, ActionQ, ActionGroup, ActionGroupMember, Automation
@@ -281,7 +283,7 @@ class GetFileRawView(LoginRequiredMixin, PermissionRequiredMixin, generic.Detail
             # date_time = now.strftime("%Y%m%d-%H%M%S")
             if filepath is not None:
                 http_response = FileResponse(open(fullpath, "rb"))
-                http_response['Content-Disposition'] = 'attachment; filename=%s' % origfilename
+                http_response['Content-Disposition'] = 'attachment; filename="%s"' % origfilename
                 # self.download_file_zipped("Evidence_"+ev_pk+"_"+date_time, fullpath, origfilename)
 
         # http_response = HttpResponse("Result:"+fullpath, content_type="text/plain")
@@ -359,7 +361,7 @@ class GetFileZippedView(LoginRequiredMixin, PermissionRequiredMixin, generic.Det
         # Grab ZIP file from in-memory, make response with correct MIME-type
         resp = HttpResponse(content_type="application/x-zip-compressed")
         # ..and correct content-disposition
-        resp['Content-Disposition'] = 'attachment; filename=%s' % zip_filename
+        resp['Content-Disposition'] = 'attachment; filename="%s"' % zip_filename
         in_memory.seek(0)
         resp.write(in_memory.read())
 
@@ -1375,9 +1377,26 @@ class TaskListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView
             logger.info(logmsg)
         super(TaskListView, self).__init__(*args, **kwargs)
 
+    def get_queryset(self):
+        retval = Task.objects.all()\
+            .select_related('status__name')\
+            .select_related('priority__name')\
+            .select_related('user__username')\
+            .select_related('playbook__pk') \
+            .select_related('playbook__name') \
+            .select_related('inv__pk') \
+            .select_related('parent__pk') \
+            .select_related('action__automationid') \
+            .values('id', 'pk', 'title', 'description_html', 'inv__pk', 'status__name', 'priority__name',
+                    'user__username', 'playbook__pk', 'playbook__name', 'created_at', 'modified_at', 'modified_by',
+                    'parent', 'action__automationid', 'starttime')
+        return retval
+
     def get_context_data(self, **kwargs):
         # create_task()
-        kwargs['templatecategories'] = TaskTemplate.objects.filter(enabled=True)
+        kwargs['templatecategories'] = TaskTemplate.objects.filter(enabled=True).select_related('category__catid')\
+            .select_related('category__name')\
+            .values('pk', 'category__catid', 'category__name', 'title')
         return super(TaskListView, self).get_context_data(**kwargs)
 
 
@@ -1437,11 +1456,20 @@ class TaskCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Create
         # Update the kwargs with the user_id
         inv_pk = self.kwargs.get('inv_pk')
         if inv_pk:
+        #     kwargs['invlist'] = InvList.get_invlist(Inv.objects.none(), pexcl=inv_pk, allownull=True)
             pass
         else:
+        #     kwargs['invlist'] = InvList.get_invlist(Inv.objects.none(), pexcl=None, allownull=True)
             inv_pk = 0
-
+        kwargs['invlist'] = InvList.get_invlist(Inv.objects.none(), pexcl=None, allownull=True)
+        kwargs['taskstatuslist'] = TaskList.get_taskstatuslist(TaskStatus.objects.none())
         kwargs['inv_pk'] = inv_pk
+        thetasklist = TaskList.get_tasklist(Task.objects.none(), pinv=inv_pk, pexcltask=None, pallownull=True,
+                                            porder_by='pk')
+        kwargs['actiontargetlist'] = thetasklist
+        kwargs['parentlist'] = thetasklist
+        kwargs['inputfromlist'] = thetasklist
+        kwargs['actionlist'] = TaskList.get_actionlist(Action.objects.none())
         kwargs['user'] = self.request.user
         return kwargs
 
@@ -1528,6 +1556,23 @@ class TaskUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Update
             arguments."""
         # grab the current set of form #kwargs
         kwargs = super(TaskUpdateView, self).get_form_kwargs()
+        task_pk = self.object.pk
+        inv_pk = self.object.inv.pk
+        if inv_pk:
+        #     kwargs['invlist'] = InvList.get_invlist(Inv.objects.none(), pexcl=inv_pk, allownull=True)
+            pass
+        else:
+        #     kwargs['invlist'] = InvList.get_invlist(Inv.objects.none(), pexcl=None, allownull=True)
+            inv_pk = 0
+        kwargs['invlist'] = InvList.get_invlist(Inv.objects.none(), pexcl=None, allownull=True)
+        kwargs['inv_pk'] = inv_pk
+        kwargs['actionlist'] = TaskList.get_actionlist(Action.objects.none())
+        kwargs['taskstatuslist'] = TaskList.get_taskstatuslist(TaskStatus.objects.none())
+        thetasklist = TaskList.get_tasklist(Task.objects.none(), pinv=inv_pk, pexcltask=task_pk, pallownull=True,
+                                            porder_by='pk')
+        kwargs['actiontargetlist'] = thetasklist
+        kwargs['parentlist'] = thetasklist
+        kwargs['inputfromlist'] = thetasklist
         # Update the kwargs with the user_id
         kwargs['user'] = self.request.user
         return kwargs
@@ -3045,6 +3090,7 @@ class EvidenceListView(LoginRequiredMixin, PermissionRequiredMixin, generic.List
         query = self.request.GET.get("q")
         if query:
             queryset_list = queryset_list.filter(
+                    Q(pk__icontains=query) |
                     Q(fileName__icontains=query) |
                     Q(modified_by__icontains=query) |
                     Q(description__icontains=query) |
@@ -3145,16 +3191,18 @@ class EvidenceCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Cr
         inv_pk = self.kwargs.get('inv_pk')
         task_pk = self.kwargs.get('task_pk')
         if inv_pk:
-            # self.inv_pk = inv_pk
+        #     kwargs['invlist'] = InvList.get_invlist(Inv.objects.none(), pexcl=inv_pk, allownull=True)
             pass
         else:
+        #     kwargs['invlist'] = InvList.get_invlist(Inv.objects.none(), pexcl=None, allownull=True)
             inv_pk = 0
+        kwargs['invlist'] = InvList.get_invlist(Inv.objects.none(), pexcl=None, allownull=True)
         if task_pk:
-            # self.task_pk = task_pk
             pass
         else:
             task_pk = 0
-
+        kwargs['tasklist'] = TaskList.get_tasklist(Task.objects.none(), pinv=inv_pk, pexcltask=None, pallownull=True,
+                                                   porder_by='pk')
         kwargs['inv_pk'] = inv_pk
         kwargs['task_pk'] = task_pk
         kwargs['user'] = self.request.user
@@ -3263,8 +3311,8 @@ class EvidenceUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Up
         kwargs = super(EvidenceUpdateView, self).get_form_kwargs()
         # Update the kwargs with the user_id
         kwargs['user'] = self.request.user
-        # inv_pk = self.kwargs.get('inv_pk')
-        # task_pk = self.kwargs.get('task_pk')
+        inv_pk = self.kwargs.get('inv_pk')
+        task_pk = self.kwargs.get('task_pk')
         # if inv_pk:
         #     pass
         # else:
@@ -3276,6 +3324,21 @@ class EvidenceUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Up
         #
         # kwargs['inv_pk'] = inv_pk
         # kwargs['task_pk'] = task_pk
+        if inv_pk:
+            kwargs['invlist'] = InvList.get_invlist(Inv.objects.none(), pexcl=inv_pk, allownull=True)
+            pass
+        else:
+            kwargs['invlist'] = InvList.get_invlist(Inv.objects.none(), pexcl=None, allownull=True)
+            inv_pk = 0
+        if task_pk:
+            pass
+        else:
+            task_pk = 0
+        kwargs['tasklist'] = TaskList.get_tasklist(Task.objects.none(), pinv=inv_pk, pexcltask=None, pallownull=True,
+                                                   porder_by='pk')
+        kwargs['inv_pk'] = inv_pk
+        kwargs['task_pk'] = task_pk
+        # print("XXX: %s %s"%(inv_pk, task_pk))
         return kwargs
 
 
@@ -3330,6 +3393,62 @@ class EvidenceRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generic.De
 
         # Checks pass, let http method handlers process the request
         return super(EvidenceRemoveView, self).dispatch(request, *args, **kwargs)
+
+
+class EvidenceAssignTaskView(LoginRequiredMixin, PermissionRequiredMixin, generic.RedirectView):
+
+    # model = TaskTemplate
+    permission_required = ('tasks.view_task', 'tasks.change_task', 'tasks.view_evidence', 'tasks.change_evidence')
+    # url = reverse_lazy('tasks:ev_list')
+    success_url = 'tasks:tsk_list'
+
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
+            logger.info(logmsg)
+        super(EvidenceAssignTaskView, self).__init__(*args, **kwargs)
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            # This will redirect to the login view
+            return self.handle_no_permission()
+        elif not self.request.user.has_perm('tasks.change_task') or \
+                not self.request.user.has_perm('tasks.change_evidence'):
+            messages.error(self.request, "No permission to change a record !!!")
+            return redirect('tasks:tsk_list')
+        ev_pk = self.kwargs.get('pk')
+        task_pk = self.kwargs.get('task_pk')
+        if task_pk == 0 or task_pk == "0":
+            task_pk = None
+        # Checks pass, let http method handlers process the request
+        # Task.objects.filter(pk=task_pk).update(user=self.request.user)
+        # Task.objects.filter(pk=task_pk).update(status=3)
+        ev_obj = Evidence.objects.get(pk=ev_pk)
+        if task_pk:
+            task_obj = Task.objects.get(pk=task_pk)
+        else:
+            task_obj = None
+        ev_obj.task = task_obj
+        ev_obj.save()
+
+        # return redirect(self.success_url)
+        return super(EvidenceAssignTaskView, self).dispatch(request, *args, **kwargs)
+
+    def get_redirect_url(self, *args, **kwargs):
+        if 'next1' in self.request.GET:
+            redirect_to = self.request.GET['next1']
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
+                return reverse(self.success_url)
+        else:
+            return reverse(self.success_url)
+        return redirect_to
+        # return reverse('tasks:tsk_list')
+        # return super().get_redirect_url(*args, **kwargs)
+
 
 
 # ############ Attributes
@@ -3689,8 +3808,8 @@ class AddTicketAndCloseView(LoginRequiredMixin, PermissionRequiredMixin, generic
         cleandata = form.cleaned_data
         auser = self.request.user.get_username()
         auser_obj = self.request.user
-        cdescription = cleandata['ticket']
-        cstatus = cleandata['status']
+        cdescription = cleandata.get('ticket')
+        cstatus = cleandata.get('status')
         task_pk = self.kwargs.get('task_pk')
         task_obj_list = Task.objects.filter(pk=task_pk)
         task_obj = task_obj_list[0]
@@ -3879,8 +3998,66 @@ class InvEvidenceCreateAjaxView(LoginRequiredMixin, PermissionRequiredMixin, gen
         # return super(InvEvidenceCreateAjaxView, self).get_context_data(**kwargs)
         context = super(InvEvidenceCreateAjaxView, self).get_context_data(**kwargs)
         inv_pk = self.kwargs.get('inv_pk')
-        inv = Inv.objects.get(pk=inv_pk)
-        context['inv'] = inv
+        # inv = Inv.objects.get(pk=inv_pk)
+        # context['inv'] = inv
+        #
+        # invevidences = inv.evidence_inv.all()\
+        #     .select_related('task') \
+        #     .select_related('evidenceformat')\
+        #     .select_related('mitretactic') \
+        #     .select_related('parent') \
+        #     .select_related('parentattr')
+        # invevidences2 = invevidences
+        # context['invevidences'] = invevidences.iterator()
+        # # kwargs['invevidences2_exist'] = invevidences.exists()
+        # context['invevidences2'] = invevidences2.iterator()
+
+        # inv = Inv.objects.filter(pk=inv_pk) \
+        #     .select_related('status')[0].order_by('pk')
+        # invevidences = invs.evidence_inv.all()\
+        #     .select_related('task') \
+        #     .select_related('evidenceformat')\
+        #     .select_related('mitretactic') \
+        #     .select_related('parent') \
+        #     .select_related('parentattr')
+        # invevidences = invs.evidences_table()
+        # invevidences2 = invevidences
+        # kwargs['inv'] = invs
+        # invevidences = Inv.objects.filter(pk=inv_pk) \
+        #     .select_related('evidence_inv__pk') \
+        #     .select_related('evidence_inv__fileRef') \
+        #     .select_related('evidence_inv__fileName') \
+        #     .select_related('evidence_inv__task__pk') \
+        #     .select_related('evidence_inv__task__title') \
+        #     .select_related('evidence_inv__created_at') \
+        #     .select_related('evidence_inv__created_by') \
+        #     .select_related('evidence_inv__modified_at') \
+        #     .select_related('evidence_inv__modified_by') \
+        #     .select_related('evidence_inv__mitretactic__name') \
+        #     .select_related('evidence_inv__parent__pk') \
+        #     .select_related('evidence_inv__parentattr__pk') \
+        #     .select_related('evidence_inv__evidenceformat__pk') \
+        #     .select_related('evidence_inv__description') \
+        #     .values('pk', 'evidence_inv__pk', 'evidence_inv__fileRef', 'evidence_inv__fileName',
+        #             'evidence_inv__task__pk', 'evidence_inv__task__title', 'evidence_inv__created_at',
+        #             'evidence_inv__created_by', 'evidence_inv__modified_at', 'evidence_inv__modified_by',
+        #             'evidence_inv__mitretactic__name', 'evidence_inv__parent__pk', 'evidence_inv__parentattr__pk',
+        #             'evidence_inv__evidenceformat__pk', 'evidence_inv__description')
+        invevidences = InvDetailTabEvidences().inv_tab_evidences_invevidences(inv_pk)
+        invevidences2 = invevidences
+        context['inv'] = InvDetailTabEvidences().inv_tab_evidences_inv(inv_pk)
+        context['invevidences'] = invevidences
+        context['invevidences2'] = invevidences2
+        # context['actions'] = Action.objects.filter(enabled=True) \
+        #     .select_related('scriptinput')\
+        #     .select_related('outputtarget')\
+        #     .select_related('scriptinputattrtype')
+        context['actions'] = TasksInvDetailTabEvidences().inv_tab_evidences_actions()
+
+        actgrpitems = actiongroupmember_items()
+        context['actiongroups_desc'] = actgrpitems['actiongroups_desc']
+        context['actiongroups_file'] = actgrpitems['actiongroups_file']
+        context['actiongroups_attr'] = actgrpitems['actiongroups_attr']
         return context
 
     def get(self, request, *args, **kwargs):
@@ -3937,21 +4114,50 @@ class InvEvidenceCreateAjaxView(LoginRequiredMixin, PermissionRequiredMixin, gen
         # grab the current set of form #kwargs
         kwargs = super(InvEvidenceCreateAjaxView, self).get_form_kwargs()
         # Update the kwargs with the user_id
+        # inv_pk = self.kwargs.get('inv_pk')
+        # task_pk = self.kwargs.get('task_pk')
+        # if inv_pk:
+        #     # self.inv_pk = inv_pk
+        #     pass
+        # else:
+        #     inv_pk = 0
+        # if task_pk:
+        #     # self.task_pk = task_pk
+        #     pass
+        # else:
+        #     task_pk = 0
+        #
+        # kwargs['inv_pk'] = inv_pk
+        # kwargs['task_pk'] = task_pk
         inv_pk = self.kwargs.get('inv_pk')
         task_pk = self.kwargs.get('task_pk')
-        if inv_pk:
-            # self.inv_pk = inv_pk
-            pass
-        else:
-            inv_pk = 0
+        # if inv_pk:
+        #     pass
+        # else:
+        #     inv_pk = 0
+        # if task_pk:
+        #     pass
+        # else:
+        #     task_pk = 0
+        #
+        # kwargs['inv_pk'] = inv_pk
+        # kwargs['task_pk'] = task_pk
+        # if inv_pk:
+        #     kwargs['invlist'] = InvList.get_invlist(Inv.objects.none(), pexcl=inv_pk, allownull=True)
+        #     pass
+        # else:
+        #     kwargs['invlist'] = InvList.get_invlist(Inv.objects.none(), pexcl=None, allownull=True)
+        #     inv_pk = 0
         if task_pk:
-            # self.task_pk = task_pk
             pass
         else:
             task_pk = 0
-
+        kwargs['invlist'] = InvList.get_invlist(Inv.objects.none(), pexcl=None, allownull=True)
+        kwargs['tasklist'] = TaskList.get_tasklist(Task.objects.none(), pinv=inv_pk, pexcltask=None, pallownull=True,
+                                                   porder_by='pk')
         kwargs['inv_pk'] = inv_pk
         kwargs['task_pk'] = task_pk
+
         kwargs['user'] = self.request.user
         return kwargs
 
@@ -3982,6 +4188,24 @@ class InvEvidenceUpdateAjaxView(LoginRequiredMixin, PermissionRequiredMixin, gen
         inv_obj = ev_obj.inv
         context['inv'] = inv_obj
         context['evformat'] = ev_obj.evidenceformat.pk
+
+
+
+        inv_pk = inv_obj.pk
+        invevidences = InvDetailTabEvidences().inv_tab_evidences_invevidences(inv_pk)
+        invevidences2 = invevidences
+        context['inv'] = InvDetailTabEvidences().inv_tab_evidences_inv(inv_pk)
+        context['invevidences'] = invevidences
+        context['invevidences2'] = invevidences2
+        context['actions'] = TasksInvDetailTabEvidences().inv_tab_evidences_actions()
+        actgrpitems = actiongroupmember_items()
+        context['actiongroups_desc'] = actgrpitems['actiongroups_desc']
+        context['actiongroups_file'] = actgrpitems['actiongroups_file']
+        context['actiongroups_attr'] = actgrpitems['actiongroups_attr']
+
+
+
+
         return context
 
     def get(self, request, *args, **kwargs):
@@ -4051,19 +4275,56 @@ class InvEvidenceUpdateAjaxView(LoginRequiredMixin, PermissionRequiredMixin, gen
         # task_pk = self.kwargs.get('task_pk')
         pk = self.kwargs.get('pk')
         ev = Evidence.objects.get(pk=pk)
-        inv_pk = ev.inv
-        task_pk = ev.task
-        if inv_pk:
-            inv_pk = inv_pk.pk
+        # inv_pk = ev.inv.pk
+        # task_pk = ev.task.pk
+        if ev.inv:
+            inv_pk = ev.inv.pk
             pass
         else:
             inv_pk = 0
-        if task_pk:
-            task_pk = task_pk
+        if ev.task:
+            task_pk = ev.task.pk
             pass
         else:
             task_pk = 0
-
+        #
+        # kwargs['inv_pk'] = inv_pk
+        # kwargs['task_pk'] = task_pk
+        # inv_pk = self.kwargs.get('inv_pk')
+        # task_pk = self.kwargs.get('task_pk')
+        # if inv_pk:
+        #     pass
+        # else:
+        #     inv_pk = 0
+        # if task_pk:
+        #     pass
+        # else:
+        #     task_pk = 0
+        #
+        # kwargs['inv_pk'] = inv_pk
+        # kwargs['task_pk'] = task_pk
+        # if inv_pk:
+        #     kwargs['invlist'] = InvList.get_invlist(Inv.objects.none(), pexcl=inv_pk, allownull=True)
+        #     pass
+        # else:
+        #     kwargs['invlist'] = InvList.get_invlist(Inv.objects.none(), pexcl=None, allownull=True)
+        #     inv_pk = 0
+        if task_pk:
+            pass
+        else:
+            task_pk = 0
+        kwargs['invlist'] = InvList.get_invlist(Inv.objects.none(), pexcl=None, allownull=True)
+        kwargs['tasklist'] = TaskList.get_tasklist(Task.objects.none(), pinv=inv_pk, pexcltask=None, pallownull=True,
+                                                   porder_by='pk')
+        # print("UPDATE: %s %s"%(inv_pk, task_pk))
+        # if kwargs['invlist']:
+        #     print("INVLIST OK")
+        # else:
+        #     print("INVLIST FAIL")
+        # if kwargs['tasklist']:
+        #     print("TASKLIST OK")
+        # else:
+        #     print("TASKLIST FAIL")
         kwargs['inv_pk'] = inv_pk
         kwargs['task_pk'] = task_pk
         kwargs['user'] = self.request.user

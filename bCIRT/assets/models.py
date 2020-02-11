@@ -15,6 +15,7 @@ from django.db import models
 from django.urls import reverse
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
+from django.db import transaction
 from invs.models import Inv
 from tasks.models import EvidenceAttr
 # HTML renderer
@@ -168,7 +169,7 @@ def new_profile(pinv, pusername=None, puserid=None, pemail=None, phost=None, pip
     )
     return newprofile
 
-
+@transaction.atomic
 def new_create_profile_from_evattrs(pinv_pk, pevattr_pk, pev_pk, pusername):
     # Creating a new profile based on the attribute calling this function
     invpk = pinv_pk

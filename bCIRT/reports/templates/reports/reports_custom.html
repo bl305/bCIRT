@@ -27,7 +27,13 @@
 		<div class="col-md-12">
 			<div class="card card-body bg-light">
                 <form method="POST">
+                    {% csrf_token %}
+                    <button type="submit" id="month" class="btn btn-primary">Month</button>
+                     <input type="hidden" id="custId" name="month" value="1">
+                </form>
 
+
+                <form method="POST">
                 {% csrf_token %}
                 {% for field in form %}
                     <div class="form-group">
@@ -167,6 +173,34 @@
                             </td>
                             <td>
                                 {{ inv_closed.status__count }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+			</div>
+		</div>
+	</div>
+<hr class="thick">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card card-body bg-light">
+                <p><strong>Investigations closed by User Custom</strong></p>
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for inv_closed_by_user in invs_closed_by_user %}
+                        <tr data-toggle="collapse" data-target="#myinvs{{inv_closed_by_user.pk}}" class="accordion-toggle">
+                            <td>
+                                {{ inv_closed_by_user.user__username }}
+                            </td>
+                            <td>
+                                {{ inv_closed_by_user.user__count }}
                             </td>
                         </tr>
                         {% endfor %}
@@ -463,7 +497,7 @@
                         <tr>
                             <th>Summary</th>
                             <th>ID</th>
-                            <th>Date</th>
+                            <th>Created Date</th>
                         </tr>
                     </thead>
                     <tbody>

@@ -10,6 +10,10 @@
 # Date        Author      Ref    Description
 # 2019.12.29  Lendvay     1      Initial file
 # **********************************************************************;
+# TBD
+# add settingsuser, settingssystem, settingscategory
+
+
 # https://github.com/django-import-export/django-import-export/issues/397
 #
 # NEED TO TRY TO CREATE THE RECORDS IN ADVANCE??? CAN THIS BE PERFORMED BECAUSE OF FOREIGN KEYS?
@@ -64,7 +68,7 @@ automations_models_package = 'tasks.resources'
 automations_models_class_name = ['Automation']
 
 actions_models_package = 'tasks.resources'
-actions_models_class_name = ['ScriptOs', 'ScriptCategory', 'ScriptType', 'ScriptOutput', 'OutputTarget',
+actions_models_class_name = ['ScriptOs', 'ScriptCategory', 'ScriptType', 'ScriptOutput', 'ScriptInput', 'OutputTarget',
                              'Type', 'Action']
 
 actiongroups_models_package = 'tasks.resources'
@@ -176,6 +180,8 @@ usage: manage.py dbimport [-h] [-d IMPORTDIR] [-f json/csv] [--version]
         fname = os.path.join(self.p_dir, class_name + '.' + p_format)
         fname_readable = os.access(fname, os.R_OK)
         if fname_readable:
+            print('[i] Importing ' + class_name)
+
             # try:
             imported_model = self.dynamic_import(package, class_name_resource)
             aresource = imported_model()

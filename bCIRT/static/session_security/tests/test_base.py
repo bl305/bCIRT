@@ -2,7 +2,9 @@ import os
 import time
 import atexit
 
-from django.contrib.auth.models import User
+#from django.contrib.auth.models import User
+from django.conf import settings
+User = get_user_model()
 
 from sbo_selenium import SeleniumTestCase
 

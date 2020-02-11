@@ -10,6 +10,8 @@
 # Date        Author      Ref    Description
 # 2019.07.29  Lendvay     1      Initial file
 # **********************************************************************;
+# TBD:
+# add settingsuser, settingssystem, settingscategory
 
 from django.core.management.base import BaseCommand, CommandError
 # from invs.models import InvStatus, InvPriority, InvAttackVector, InvCategory, InvPhase, InvSeverity
@@ -90,6 +92,7 @@ class Command(BaseCommand):
             self.export_actscriptcategory(p_format)
             self.export_actscripttype(p_format)
             self.export_actscriptoutput(p_format)
+            self.export_actscriptinput(p_format)
             self.export_actoutputtarget(p_format)
             self.export_acttype(p_format)
             self.export_actionqstatus(p_format)
@@ -154,6 +157,7 @@ class Command(BaseCommand):
                 self.export_actscriptcategory(p_format)
                 self.export_actscripttype(p_format)
                 self.export_actscriptoutput(p_format)
+                self.export_actscriptinput(p_format)
                 self.export_actoutputtarget(p_format)
                 self.export_acttype(p_format)
                 self.export_actionqstatus(p_format)
@@ -658,6 +662,24 @@ usage: manage.py dbexport [-h] [-a]\[-i TABLE_NAME] [-f json/csv] [-d OUTDIR] [-
                                   a_content=dataset.csv)
         except Exception:
             raise CommandError("ScriptOutput table could not be exported!")
+
+
+    def export_actscriptinput(self, p_format):
+        try:
+            print("Exporting ScriptInput")
+            from tasks.resources import ScriptInputResource
+            aresource = ScriptInputResource()
+            dataset = aresource.export()
+            tablename = 'ScriptInput'
+            if p_format == "json":
+                self.save_to_file(a_filename=tablename+'.json',
+                                  a_content=dataset.json)
+            elif p_format == "csv":
+                self.save_to_file(a_filename=tablename+'.csv',
+                                  a_content=dataset.csv)
+        except Exception:
+            raise CommandError("ScriptInput table could not be exported!")
+
 
     def export_acttype(self, p_format):
         try:

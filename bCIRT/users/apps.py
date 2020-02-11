@@ -15,3 +15,6 @@ from django.apps import AppConfig
 
 class UsersConfig(AppConfig):
     name = 'users'
+    # name = 'full.python.path.to.your.app.foo'
+    # label = 'my.foo'  # <-- this is the important line - change it to anything other than the default, which is the module name ('foo' in this case)
+    # label = 'myusers'

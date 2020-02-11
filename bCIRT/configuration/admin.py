@@ -35,3 +35,18 @@ class ConnectionItemFieldAdmin(ImportExportModelAdmin):
 @admin.register(models.UpdatePackage)
 class UpdatePackageAdmin(ImportExportModelAdmin):
     pass
+
+
+@admin.register(models.SettingsCategory)
+class SettingsCategoryAdmin(ImportExportModelAdmin):
+    pass
+
+
+@admin.register(models.SettingsUser)
+class SettingsUserAdmin(ImportExportModelAdmin):
+    pass
+
+
+@admin.register(models.SettingsSystem)
+class SettingsSystemAdmin(ImportExportModelAdmin):
+    pass

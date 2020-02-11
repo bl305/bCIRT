@@ -18,7 +18,7 @@ from django.contrib.auth.mixins import (
 )
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
-from .models import UpdatePackage, ConnectionItem, ConnectionItemField
+from .models import UpdatePackage, ConnectionItem, ConnectionItemField, SettingsCategory, SettingsUser, SettingsSystem
 from django.views import generic
 from django.utils.http import is_safe_url
 from django.shortcuts import reverse, redirect
@@ -26,12 +26,15 @@ from bCIRT.settings import ALLOWED_HOSTS
 # from django.contrib.sessions.models import Session
 # from datetime import datetime, timezone
 from django.contrib import messages
-from .forms import UpdatePackageForm, ConnectionItemForm, ConnectionItemFieldForm
+from .forms import UpdatePackageForm, ConnectionItemForm, ConnectionItemFieldForm, SettingsUserForm, SettingsSystemForm
 # Create your views here.
 from os import path
 from bCIRT.custom_variables import LOGLEVEL, LOGSEPARATOR
 import logging
+from django.contrib.auth import get_user_model
+
 logger = logging.getLogger('log_file_verbose')
+User = get_user_model()
 
 
 class ConfigurationPage(LoginRequiredMixin, TemplateView):
@@ -806,3 +809,98 @@ class ConnectionItemFieldRemoveView(LoginRequiredMixin, PermissionRequiredMixin,
             return redirect('configuration:connitemf_detail', pk=self.kwargs.get('pk'))
         # Checks pass, let http method handlers process the request
         return super(ConnectionItemFieldRemoveView, self).dispatch(request, *args, **kwargs)
+
+
+class SettingsUserListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    model = SettingsUser
+    form_class = SettingsUserForm
+    permission_required = ('configuration.view_settingsuser',)
+
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
+            logger.info(logmsg)
+        super(SettingsUserListView, self).__init__(*args, **kwargs)
+
+    def get_queryset(self):
+        retval = SettingsUser.objects.filter(user=self.request.user)
+        return retval
+
+    def get_context_data(self, **kwargs):
+        return super(SettingsUserListView, self).get_context_data(**kwargs)
+
+
+class SettingsUserUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
+    login_url = '/'
+    # redirect_field_name = 'tasks/evidence_detail.html'
+    form_class = SettingsUserForm
+    model = SettingsUser
+    permission_required = ('configuration.change_settingsuser',)
+    success_url = 'configuration:settingsuser_list'
+
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
+            logger.info(logmsg)
+        super(SettingsUserUpdateView, self).__init__(*args, **kwargs)
+
+    def get_success_url(self):
+        if 'next1' in self.request.GET:
+            redirect_to = self.request.GET['next1']
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
+                return reverse(self.success_url)
+        else:
+            return reverse(self.success_url)
+        return redirect_to
+
+    def get_context_data(self, **kwargs):
+        return super(SettingsUserUpdateView, self).get_context_data(**kwargs)
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            # This will redirect to the login view
+            return self.handle_no_permission()
+        elif not self.request.user.has_perm('configuration.change_settingsuser'):
+            messages.error(self.request, "No permission to change a record !!!")
+            return redirect('configuration:settingsuser_detail', pk=self.kwargs.get('pk'))
+        # Checks pass, let http method handlers process the request
+        return super(SettingsUserUpdateView, self).dispatch(request, *args, **kwargs)
+
+    # def form_valid(self, form):
+    #     self.object = form.save(commit=False)
+    #     self.object.save()
+    #     return super(ConnectionItemUpdateView, self).form_valid(form)
+
+    def get_form_kwargs(self):
+        # grab the current set of form #kwargs
+        kwargs = super(SettingsUserUpdateView, self).get_form_kwargs()
+        # Update the kwargs with the user_id
+        kwargs['user'] = self.request.user
+        return kwargs
+
+
+class SettingsSystemListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    model = SettingsSystem
+    form_class = SettingsSystemForm
+    permission_required = ('configuration.view_settingssystem',)
+
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
+            logger.info(logmsg)
+        super(SettingsSystemListView, self).__init__(*args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        return super(SettingsSystemListView, self).get_context_data(**kwargs)

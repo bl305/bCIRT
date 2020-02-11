@@ -11,8 +11,13 @@
 # 2019.11.24  Lendvay     1      Initial file
 # **********************************************************************;
 -->
-{% if inv.task_inv.count > 0 %}
-{% for task in inv.task_inv.all %}
+<!-- if inv.task_inv.count > 0 %}-->
+<!-- for task in inv.task_inv.all %}-->
+{% with actions as actions_with %}
+{% if invtasks.count > 0 %}
+<!-- for task in invtasks %}-->
+{% for task in inv.tasks_table %}
+{% with task.status.name as task_status_name %}
                     <tr data-toggle="collapse" data-target="#mytasks{{task.pk}}" class="accordion-toggle" id="item-task-{{ task.pk }}">
                         <td>
                             <div class="dropdown" onclick="incrow({{task.pk}},'item-task-','150px')">
@@ -21,11 +26,11 @@
                                  <button class="btn btn-outline-secondary btn-sm dropdown-toggle dropdown-toggle-split" onclick="filterFunctionTask()" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
                                     {{ task.pk }}<span class="caret"></span>
                                 </button>
-                                    {% if task.status.name != "Completed" %}
+                                    {% if task_status_name != "Completed" %}
                                     <ul class="dropdown-menu" role="menu">
                                             <li>
-                                                {% if task.inv %}
-                                                <a href="{% url 'tasks:ev_create' inv_pk=task.inv.pk task_pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                                {% if inv %}
+                                                <a href="{% url 'tasks:ev_create' inv_pk=inv.pk task_pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
                                                    class="btn btn-secondary btn-sm w-100 text-left">
                                                     <span>
                                                         <i class="fas fa-plus">&nbsp;</i>
@@ -62,11 +67,11 @@
                                             </a>
                                         </li>
                                         <li>
-                                            {% if task.action.automation and task.status.name != 'Completed' %}
+                                            {% if task.action.automation and task_status_name != 'Completed' %}
                                                 {% if task.actev %}
                                                     {% if task.action.scriptinput.pk == 2 and task.actiontarget.evidence_task.all.first.fileName or task.action.scriptinput.pk == 1 %}
-                                                        {% if task.inv %}
-                                                            <a href="{% url 'tasks:act_exec_script' pk=task.action.pk inv_pk=task.inv.pk task_pk=task.pk ev_pk=task.actev evattr_pk=0 %}"
+                                                        {% if inv %}
+                                                            <a href="{% url 'tasks:act_exec_script' pk=task.action.pk inv_pk=inv.pk task_pk=task.pk ev_pk=task.actev evattr_pk=0 %}"
                                                                class="btn btn-secondary btn-sm btn-block text-left">
                                                                 <span>
                                                                     Run&nbsp;
@@ -123,24 +128,24 @@
                             <div class="dropdown">
                                 {% if task.readonly %}
                                 <button class="btn btn-success btn-sm dropdown-toggle" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
-                                    {{ task.status }}
+                                    {{ task_status_name }}
                                     <span class="caret"></span>
                                 </button>
-                                {% elif task.status.name == "Waiting" %}
+                                {% elif task_status_name == "Waiting" %}
                                 <button class="btn btn-warning btn-sm dropdown-toggle" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
-                                    {{ task.status }}
+                                    {{ task_status_name }}
                                     <span class="caret"></span>
                                 </button>
                                 {% else %}
                                 <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
-                                    {{ task.status }}
+                                    {{ task_status_name }}
                                     <span class="caret"></span>
                                 </button>
 
                                 {% endif %}
-                                {% if task.inv.status.name != "Closed" %}
+                                {% if inv.status__name != "Closed" %}
                                     <ul class="dropdown-menu" role="menu">
-                                        {% if task.status.name != "Completed" %}
+                                        {% if task_status_name != "Completed" %}
                                         <li>
                                             <a href="{% url 'tasks:tsk_addticketandclose' task_pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
                                                class="btn btn-secondary btn-block btn-sm text-left">
@@ -151,8 +156,8 @@
                                             </a>
                                         </li>
                                         <li>
-                                                {% if task.inv %}
-                                                <a href="{% url 'tasks:ev_create' inv_pk=task.inv.pk task_pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
+                                                {% if inv %}
+                                                <a href="{% url 'tasks:ev_create' inv_pk=inv.pk task_pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
                                                    class="btn btn-secondary btn-sm w-100 text-left">
                                                     <span>
                                                         <i class="fas fa-plus">&nbsp;</i>
@@ -197,7 +202,7 @@
                                               </a>
                                         </li>
 
-                                        {% if task.status.name != 'Completed' %}
+                                        {% if task_status_name != 'Completed' %}
                                             {% if task.evidence_task.all or not task.requiresevidence %}
     <!--                                        <li>&nbsp;</li>-->
                                             <li>
@@ -285,7 +290,8 @@
                                                 {% endif %}
                                             </td>
                                             <td>
-                        {% if taskev.evattr_evidence.all %}
+{% with taskev.evattr_evidence.all as taskev_evattr_evidence_all %}
+                        {% if taskev_evattr_evidence_all %}
                             <table class="table table-bordered table-sm">
                                 <thead>
                                 <tr>
@@ -295,7 +301,7 @@
                                 </thead>
                                 <tbody>
 
-                                {% for attr in taskev.evattr_evidence.all %}
+                                {% for attr in taskev_evattr_evidence_all %}
                                     <tr id="item-attr-{{attr.pk}}">
                                         <td>
                                             <div class="container mw-100 d-inline-flex justify-content-start flex-row align-items-center align-content-center flex-nowrap">
@@ -331,7 +337,7 @@
                                                         <span class="caret"></span>
                                                     </button>
                                                     <ul class="dropdown-menu" role="menu">
-                                                            {% if not task.inv.readonly and not task.task.readonly %}
+                                                            {% if not inv.readonly and not task.task.readonly %}
                                                             <li>
                                                                 <a href="{% url 'tasks:evattr_create' pk=task.pk %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ task.pk }}"
                                                                     class="btn btn-secondary btn-sm btn-block text-left">
@@ -368,7 +374,8 @@
                                                                 {% endif %}
                                                             </li>
                                                             <li>
-                                                              {% for actiongroup in actiongroups_attr %}
+{% with actiongroups_attr as actiongroups_attr_with %}
+                                                              {% for actiongroup in actiongroups_attr_with %}
                                                                         <!--Used to keep the new evidences under the same task, but it caused issues with locked tasks, and makes more sense to allow new evidences to be edited.-->
 <!--                                                                         if task.task %}-->
 <!--                                                                            <a href=" url 'tasks:act_exec_scriptgroup' pk=actiongroup.pk inv_pk=inv.pk task_pk=task.task.pk ev_pk=task.pk evattr_pk=attr.pk %}?attr={{attr.pk}}&next1={{ request.get_full_path|urlencode }}#item-inve{{ task.pk }}"-->
@@ -386,11 +393,12 @@
                                                               {% empty %}
 
                                                               {% endfor %}
+{% endwith %}
                                                             </li>
-                                                            {% for actid in actions %}
+                                                            {% for actid in actions_with %}
                                                                 <li>
-                                                                    {% if actid.scriptinput.pk == 3 %}
-                                                                        {% if attr.evattrformat.pk == actid.scriptinputattrtype.pk or actid.scriptinputattrtype.pk is None %}
+                                                                    {% if actid.scriptinput__pk == 3 %}
+                                                                        {% if attr.evattrformat.pk == actid.scriptinputattrtype__pk or actid.scriptinputattrtype__pk is None %}
                                                                             <!--Used to keep the new evidences under the same task, but it caused issues with locked tasks, and makes more sense to allow new evidences to be edited.-->
 <!--                                                                             if task.task == "x" %}-->
 <!--                                                                                <a href=" url 'tasks:act_exec_script' pk=actid.pk inv_pk=inv.pk task_pk=task.task.pk ev_pk=task.pk evattr_pk=attr.pk %}?attr={{attr.pk}}&next1={{ request.get_full_path|urlencode }}#item-inve{{ task.pk }}"-->
@@ -402,7 +410,7 @@
                                                                                 <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=inv.pk task_pk=0 ev_pk=task.pk evattr_pk=attr.pk %}?attr={{attr.pk}}&next1={{ request.get_full_path|urlencode }}#item-inve{{ task.pk }}"
                                                                                    class="btn btn-secondary btn-sm btn-block text-left">
                                                                                     <span></span>
-                                                                                    {{ actid.pk }} - {{ actid.title }} ({{ actid.outputtarget.shortname }})
+                                                                                    {{ actid.pk }} - {{ actid.title }} ({{ actid.outputtarget__shortname }})
                                                                                 </a>
 <!--                                                                             endif %}-->
                                                                         {% endif %}
@@ -464,6 +472,7 @@
                                 </tbody>
                             </table>
                         {% endif %}
+{% endwith %}
                                             </td>
 
                                         </tr>
@@ -474,9 +483,11 @@
                             </div>
                         </td>
                     </tr>
+{% endwith %}
 {% endfor %}
 {% else %}
           <tr>
             <td colspan="9" class="text-center bg-warning">No matching record found</td>
           </tr>
 {% endif %}
+{% endwith %}

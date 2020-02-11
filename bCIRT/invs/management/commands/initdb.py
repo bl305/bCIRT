@@ -12,6 +12,9 @@
 # 2019.08.19  Lendvay     1      Added domain to the attributes
 # 2019.12.13  Lendvay     1      Fixes
 # **********************************************************************;
+# TBD
+# add settingsuser, settingssystem, settingscategory
+
 from django.core.management.base import BaseCommand, CommandError
 from invs.models import InvStatus, InvPriority, InvCategory, InvPhase, InvSeverity, InvAttackVector, CurrencyType
 from tasks.models import MitreAttck_Tactics, MitreAttck_Techniques

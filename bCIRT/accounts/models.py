@@ -12,12 +12,13 @@
 # **********************************************************************;
 from __future__ import unicode_literals
 from django.db import models
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
 # from datetime import date, timedelta
 
 from django.contrib.auth.signals import user_logged_in, user_logged_out, user_login_failed
 from django.dispatch import receiver
 import logging
+from django.conf import settings
 logger = logging.getLogger('log_file_verbose')
 # from django.utils.timezone import now as timezone_now
 
@@ -25,9 +26,10 @@ logger = logging.getLogger('log_file_verbose')
 # from django.db import models
 
 # Create your models here.
+
 class UserAudit(models.Model):
     objects = models.Manager()
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, default=None, null=True, blank=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, default=None, null=True, blank=True)
     username = models.CharField(max_length=256, default=None, null=True, blank=True)
     eventtype = models.CharField(max_length=20, default="na", null=False, blank=False)
     session_id = models.CharField(max_length=100, default=None, null=True, blank=True)

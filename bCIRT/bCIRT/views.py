@@ -51,30 +51,70 @@ class HomePage(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
             reviewers2list.add(reviewer2)
         kwargs['reviewers1'] = reviewers1list
         kwargs['reviewers2'] = reviewers2list
-        kwargs['invs'] = Inv.objects.filter(user=self.request.user, status=3)[:10]
+        kwargs['invs'] = Inv.objects.filter(user=self.request.user, status=3)\
+            .select_related('attackvector__name')\
+            .select_related('user__username') \
+            .select_related('status__name') \
+            .values('pk', 'id', 'attackvector__name', 'ticketid', 'user__username', 'status__name', 'modified_at', 'description')[:10]
         if amireviewer1:
-            kwargs['reviews1'] = Inv.objects.filter(status=5)
+            kwargs['reviews1'] = Inv.objects.filter(status=5)\
+                .select_related('attackvector__name')\
+                .select_related('user__username')\
+                .values('pk', 'id', 'attackvector__name', 'ticketid', 'user__username', 'modified_at', 'description')
         if amireviewer2:
-            kwargs['reviews2'] = Inv.objects.filter(status=6)
-        kwargs['reviewlist'] = Inv.objects.filter(user=self.request.user, status=5)[:10]\
-                               | Inv.objects.filter(user=self.request.user, status=6)[:10]
-        kwargs['uinvs'] = Inv.objects.exclude(status=3).exclude(status=2).exclude(status=5).exclude(status=6)[:10]
-        kwargs['oinvs'] = Inv.objects.filter(status=3).exclude(user=self.request.user)[:10]
+            kwargs['reviews2'] = Inv.objects.filter(status=6)\
+                .select_related('attackvector__name')\
+                .select_related('user__username')\
+                .values('pk', 'id', 'attackvector__name', 'ticketid', 'user__username', 'modified_at', 'description')
+        kwargs['reviewlist'] = Inv.objects.filter(user=self.request.user, status=5)\
+                                  .select_related('attackvector__name') \
+                                  .select_related('user__username') \
+                                  .values('pk', 'id', 'attackvector__name', 'ticketid', 'user__username', 'modified_at',
+                                          'description')[:10]\
+                               | Inv.objects.filter(user=self.request.user, status=6) \
+                                    .select_related('attackvector__name') \
+                                    .select_related('user__username') \
+                                    .values('pk', 'id', 'attackvector__name', 'ticketid', 'user__username', 'modified_at',
+                                            'description')[:10]
+        kwargs['uinvs'] = Inv.objects.exclude(status=3)\
+                             .exclude(status=2)\
+                             .exclude(status=5)\
+                             .exclude(status=6)\
+                             .select_related('attackvector__name') \
+                             .select_related('status__name') \
+                             .values('id', 'pk', 'attackvector__name', 'ticketid', 'status__name',
+                                     'modified_at', 'description')[:10]
+        kwargs['oinvs'] = Inv.objects.filter(status=3).exclude(user=self.request.user) \
+                             .select_related('attackvector__name') \
+                             .select_related('status__name') \
+                             .select_related('user__username') \
+                             .values('id', 'pk', 'attackvector__name', 'ticketid', 'status__name', 'user__username',
+                                     'modified_at', 'description')[:10]
+
         kwargs['tasks'] = Task.objects.filter(user=self.request.user)\
             .exclude(status=2)\
             .exclude(type=1)\
-            .exclude(status=4)[:10]
+            .exclude(status=4)\
+            .select_related('inv__ticketid')\
+            .values('pk', 'id', 'inv__ticketid', 'title', 'modified_at') \
+            .order_by('-modified_at')[:10]
         kwargs['utasks'] = Task.objects.filter(status=1)\
             .exclude(type=1)\
-            .exclude(status=4)[:10]
+            .exclude(status=4) \
+            .values('pk', 'id', 'title', 'modified_at') \
+            .order_by('-modified_at')[:10]
         kwargs['otasks'] = Task.objects.exclude(user=self.request.user)\
             .exclude(status=2)\
             .exclude(type=1)\
-            .exclude(status=4)[:10]
+            .exclude(status=4) \
+            .select_related('user__username')\
+            .values('pk', 'id', 'user__username', 'title', 'modified_at') \
+            .order_by('-modified_at')[:10]
         kwargs['rtasks'] = Task.objects.filter(user=self.request.user)\
             .exclude(status=1)\
             .exclude(status=3)\
-            .exclude(status=5)\
+            .exclude(status=5) \
+            .select_related('inv__ticketid').values('pk', 'id', 'inv__ticketid', 'title', 'modified_at')\
             .order_by('-modified_at')[:10]
         # kwargs['suspiciousemailplaybook'] = PlaybookTemplate.objects.filter(name="Suspicious Email")
         return super(HomePage, self).get_context_data(**kwargs)

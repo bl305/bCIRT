@@ -54,6 +54,12 @@ urlpatterns = [
     url(r'^connectionitemfield/remove/(?P<pk>\d+)/$', views.ConnectionItemFieldRemoveView.as_view(),
         name='connitemf_remove'),
 
+    url(r"^settingsuser$", views.SettingsUserListView.as_view(), name='settingsuser_list'),
+    url(r'^settingsuser/edit/(?P<pk>\d+)/$', views.SettingsUserUpdateView.as_view(),
+        name='settingsuser_edit'),
+
+    url(r"settingssystem$", views.SettingsSystemListView.as_view(), name='settingssystem_list'),
+
     url(r"systemupdates$", views.SystemUpdatesPage.as_view(), name='conf_systemupdates'),
     url(r"logging$", views.ConfigurationLoggingPage.as_view(), name='conf_logging'),
     url(r"about$", views.ConfigurationAboutPage.as_view(), name='conf_about'),

@@ -28,19 +28,63 @@ class TinyMCEWidget(TinyMCE):
         return False
 
 
+# the forms generate too many DB queries, this class is to replace db queries with a list
+# https://stackoverflow.com/questions/32082945/django-multiple-forms-with-modelchoicefield-too-many-queries
+class ListModelChoiceField(forms.ChoiceField):
+    """
+    special field using list instead of queryset as choices
+    """
+    def __init__(self, model, *args, **kwargs):
+        self.model = model
+        super(ListModelChoiceField, self).__init__(*args, **kwargs)
+
+    def to_python(self, value):
+        if value in self.empty_values:
+            return None
+        try:
+            value = self.model.objects.get(id=value)
+        except self.model.DoesNotExist:
+             # XXXXXX(self.error_messages['invalid_choice'], code='invalid_choice')
+            print("Wrong Model Name")
+        return value
+
+
+    def valid_value(self, value):
+        "Check to see if the provided value is a valid choice"
+
+        if any(choice[0] == "" or value.id == int(choice[0]) for choice in self.choices):
+            return True
+        return False
+
+    def to_choicelist(self):
+        value = None
+        if value in self.empty_values:
+            return None
+        try:
+            value = self.model.objects.all()
+        except self.model.DoesNotExist:
+             # XXXXXX(self.error_messages['invalid_choice'], code='invalid_choice')
+            print("Wrong Model Name")
+            value = self.model.objects.none()
+        return value
+
 # class CustomClearableFileInput(ClearableFileInput):
 #     template_name = 'invs/customclearablefileinput.html'
 class InvForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop("user", None)
+        # pparent is needed to replace the X query i nthe form, "x" being the number of investigations
+        pparent = kwargs.pop("pparent", None)
 
         super(InvForm, self).__init__(*args, **kwargs)
         logger.info("InvForm - "+str(user))
 
-        if kwargs.get('instance'):
-            current_pk = kwargs.get('instance').pk
-            self.fields['parent'].queryset = Inv.objects.all().exclude(pk=current_pk)
+        # if kwargs.get('instance'):
+        #     current_pk = kwargs.get('instance').pk
+        #     self.fields['parent'].queryset = Inv.objects.all().exclude(pk=current_pk)
+        # else:
+        #     self.fields['parent'].queryset = Inv.objects.all()
         self.fields['user'].initial = user
         self.fields['status'].initial = 3
         self.fields['phase'].initial = 1
@@ -48,6 +92,24 @@ class InvForm(forms.ModelForm):
         self.fields['priority'].initial = 1
         self.fields['losscurrency'].initial = 1
         self.fields['numofvictims'].initial = None
+        self.fields['parent'] = ListModelChoiceField(Inv,
+                                                     choices=pparent,
+                                                     label='Parent',
+                                                     # empty_label="--Select--",
+                                                     # queryset overwritten above
+                                                     # queryset=Inv.objects.all(),
+                                                     required=False,
+                                                     widget=forms.Select(
+                                                         attrs={
+                                                             'class': 'selectpicker show-tick form-control',  # form-control
+                                                             'data-live-search': 'true',
+                                                             'data-width': 'auto',
+                                                             'data-style': 'btn-outline-secondary btn-sm',
+                                                             'style': 'width:50%',
+                                                         }
+                                                     )
+
+                                                     )
 
     status = forms.ModelChoiceField(
         label='Status*',
@@ -81,22 +143,24 @@ class InvForm(forms.ModelForm):
         )
     )
 
-    parent = forms.ModelChoiceField(
-        label='Parent',
-        empty_label="--Select--",
-        # queryset overwritten above
-        queryset=Inv.objects.all(),
-        required=False,
-        widget=forms.Select(
-            attrs={
-                'class': 'selectpicker show-tick form-control',  # form-control
-                'data-live-search': 'true',
-                'data-width': 'auto',
-                'data-style': 'btn-outline-secondary btn-sm',
-                'style': 'width:50%',
-            }
-        )
-    )
+
+
+    # parent = forms.ModelChoiceField(
+    #     label='Parent',
+    #     empty_label="--Select--",
+    #     # queryset overwritten above
+    #     queryset=Inv.objects.all(),
+    #     required=False,
+    #     widget=forms.Select(
+    #         attrs={
+    #             'class': 'selectpicker show-tick form-control',  # form-control
+    #             'data-live-search': 'true',
+    #             'data-width': 'auto',
+    #             'data-style': 'btn-outline-secondary btn-sm',
+    #             'style': 'width:50%',
+    #         }
+    #     )
+    # )
 
     phase = forms.ModelChoiceField(
         label='Phase*',

@@ -45,13 +45,13 @@
                                                 </a>
                                             </td>
                                             <td>
-                                                {{ inv.attackvector.name }}
-                                            </td>
+<!--                                                 inv.attackvector.name }}-->
+                                                {{ inv.attackvector__name }}
                                             <td>
                                                 {{ inv.ticketid }}
                                             </td>
                                             <td>
-                                                {{ inv.user }}
+                                                {{ inv.user__username }}
                                             </td>
                                             <td>
                                                 {{ inv.modified_at|date:"Y/m/d H:i:s" }}
@@ -101,13 +101,13 @@
                                                 </a>
                                             </td>
                                             <td>
-                                                {{ inv.attackvector.name }}
+                                                {{ inv.attackvector__name }}
                                             </td>
                                             <td>
                                                 {{ inv.ticketid }}
                                             </td>
                                             <td>
-                                                {{ inv.user }}
+                                                {{ inv.user__username }}
                                             </td>
                                             <td>
                                                 {{ inv.modified_at|date:"Y/m/d H:i:s" }}
@@ -153,13 +153,13 @@
                                                 </a>
                                             </td>
                                             <td>
-                                                {{ invrev.attackvector.name }}
+                                                {{ invrev.attackvector__name }}
                                             </td>
                                             <td>
                                                 {{ invrev.ticketid }}
                                             </td>
                                             <td>
-                                                {{ invrev.status }}
+                                                {{ invrev.status__name }}
                                             </td>
                                             <td>
                                                 {{ invrev.modified_at|date:"Y/m/d H:i:s" }}
@@ -204,13 +204,13 @@
                                                 <a href="{% url 'invs:inv_detail' pk=inv.pk %}"><h6><span class="badge badge-pill badge-secondary">{{inv.id}}</span></h6></a>
                                             </td>
                                             <td>
-                                                {{ inv.attackvector.name }}
+                                                {{ inv.attackvector__name }}
                                             </td>
                                             <td>
                                                 {{ inv.ticketid }}
                                             </td>
                                             <td>
-                                                {{ inv.status }}
+                                                {{ inv.status__name }}
                                             </td>
                                             <td>
                                                 {{ inv.modified_at|date:"Y/m/d H:i:s" }}
@@ -251,7 +251,7 @@
                                             <a href="{% url 'tasks:tsk_detail' pk=task.pk %}"><h6><span class="badge badge-pill badge-secondary">{{ task.pk }}</span></h6></a>
                                         </td>
                                         <td>
-                                            {{ task.inv.ticketid }}
+                                            {{ task.inv__ticketid }}
                                         </td>
                                         <td>
                                             {{ task.title }}
@@ -295,7 +295,7 @@
                                             <a href="{% url 'tasks:tsk_detail' pk=task.pk %}"><h6><span class="badge badge-pill badge-secondary">{{ task.pk }}</span></h6></a>
                                         </td>
                                         <td>
-                                            {{ task.inv.ticketid }}
+                                            {{ task.inv__ticketid }}
                                         </td>
                                         <td>
                                             {{ task.title }}
@@ -344,13 +344,13 @@
                                             <a href="{% url 'invs:inv_detail' pk=uinv.pk %}"><h6><span class="badge badge-pill badge-secondary">{{uinv.id}}-{{ uinv.invid }}</span></h6></a>
                                         </td>
                                         <td>
-                                            {{ uinv.attackvector.name }}
+                                            {{ uinv.attackvector__name }}
                                         </td>
                                         <td>
                                             {{ uinv.ticketid }}
                                         </td>
                                         <td>
-                                            {{ uinv.status }}
+                                            {{ uinv.status__name }}
                                         </td>
                                         <td>
                                             {{ uinv.modified_at|date:"Y/m/d H:i:s" }}
@@ -458,17 +458,17 @@
                                         <a href="{% url 'invs:inv_detail' pk=oinv.pk %}"><h6><span class="badge badge-pill badge-secondary">{{ oinv.id }}</span></h6></a>
                                     </td>
                                     <td>
-                                        {{ oinv.attackvector.name }}
+                                        {{ oinv.attackvector__name }}
                                     </td>
                                     <td>
                                         {{ oinv.ticketid }}
                                     </td>
                                     <td>
-                                        {{ oinv.status }}
+                                        {{ oinv.status__name }}
                                     </td>
                                     <td>
-                                        {% if oinv.user %}
-                                            {{ oinv.user }}
+                                        {% if oinv.user__username %}
+                                            {{ oinv.user__username }}
                                         {% else %}
                                             -
                                         {% endif %}
@@ -519,8 +519,8 @@
                                             <a href="{% url 'tasks:tsk_detail' pk=otask.pk %}"><h6><span class="badge badge-pill badge-secondary">{{ otask.pk }}</span></h6></a>
                                         </td>
                                         <td>
-                                            {% if otask.user %}
-                                                {{ otask.user }}
+                                            {% if otask.user__username %}
+                                                {{ otask.user__username }}
                                             {% else %}
                                                 -
                                             {% endif %}

@@ -12,7 +12,7 @@
 # **********************************************************************;
 from django import forms
 from tinymce import TinyMCE
-from .models import UpdatePackage, ConnectionItem, ConnectionItemField
+from .models import UpdatePackage, ConnectionItem, ConnectionItemField, SettingsCategory, SettingsUser, SettingsSystem
 # Get the user so we can use this
 from django.contrib.auth import get_user_model
 import logging
@@ -148,6 +148,98 @@ class ConnectionItemFieldForm(forms.ModelForm):
             ),
             'connectionitemfieldvalue': forms.TextInput(attrs={
                 'size': 256,
+                'style': 'width:50%;',
+                'class': 'form-control'}
+            ),
+        }
+
+
+class SettingsUserForm(forms.ModelForm):
+    #  inv_pk and task_pk defaults to zero as they are not needed for updates
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop("user", None)
+        super(SettingsUserForm, self).__init__(*args, **kwargs)
+        logger.info("SettingsUserForm - "+str(user))
+        # self.fields['user'].initial = user
+
+    settingcategory = forms.ModelChoiceField(
+        label='Category',
+        queryset=SettingsCategory.objects.filter(enabled=True),
+        empty_label="--Select--",
+        widget=forms.Select(
+            attrs={
+                'class': 'selectpicker show-tick form-control',  # form-control
+                'data-live-search': 'true',
+                'data-width': 'auto',
+                'data-style': 'btn-default btn-sm',
+                'style': 'width:50%',
+            }
+        )
+    )
+
+    #   fileRef = forms.FileField(widget=CustomClearableFileInput)
+    class Meta:
+        fields = ("settingname", "settingvalue", "settingcategory", "enabled")
+        model = SettingsUser
+        labels = {
+            "settingname": "Name*",
+            "settingvalue": "Value",
+            "enabled": "Enabled*",
+        }
+        widgets = {
+            'settingname': forms.TextInput(attrs={
+                'size': 25,
+                'style': 'width:50%',
+                'class': 'form-control'}
+            ),
+            'settingvalue': forms.TextInput(attrs={
+                'size': 255,
+                'style': 'width:50%;',
+                'class': 'form-control'}
+            ),
+        }
+
+
+class SettingsSystemForm(forms.ModelForm):
+    #  inv_pk and task_pk defaults to zero as they are not needed for updates
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop("user", None)
+        super(SettingsSystemForm, self).__init__(*args, **kwargs)
+        logger.info("SettingsSystemForm - "+str(user))
+        # self.fields['user'].initial = user
+
+    settingcategory = forms.ModelChoiceField(
+        label='Category',
+        queryset=SettingsCategory.objects.filter(enabled=True),
+        empty_label="--Select--",
+        widget=forms.Select(
+            attrs={
+                'class': 'selectpicker show-tick form-control',  # form-control
+                'data-live-search': 'true',
+                'data-width': 'auto',
+                'data-style': 'btn-default btn-sm',
+                'style': 'width:50%',
+            }
+        )
+    )
+
+    #   fileRef = forms.FileField(widget=CustomClearableFileInput)
+    class Meta:
+        fields = ("settingname", "settingvalue", "settingcategory", "enabled")
+        model = SettingsSystem
+        labels = {
+            "settingname": "Name*",
+            "settingvalue": "Value",
+            "enabled": "Enabled*",
+        }
+        widgets = {
+            'settingname': forms.TextInput(attrs={
+                'size': 25,
+                'style': 'width:50%',
+                'class': 'form-control'}
+            ),
+            'settingvalue': forms.TextInput(attrs={
+                'size': 255,
                 'style': 'width:50%;',
                 'class': 'form-control'}
             ),

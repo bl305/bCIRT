@@ -11,11 +11,16 @@
 # 2019.11.23  Lendvay     1      Initial file
 # **********************************************************************;
 -->
-
-{% if inv.evidence_inv %}
- {% for invevidence in inv.evidence_inv.all %}
- {% for attr in invevidence.evattr_evidence.all %}
-
+{% load getevidencedata %}
+<!-- if inv.evidence_inv %}-->
+<!--  for invevidence in inv.evidence_inv.all %}-->
+{% if invevidences2 %}
+ {% for invevidence in invevidences2 %}
+<!--  for attr in invevidence.evattr_evidence.all %}-->
+{% if invevidence.evidence_inv__pk %}
+{% with invevidence.evidence_inv__pk|getattributelistvaluesbyevidence as attrlist %}
+ {% if attrlist %}
+    {% for attr in attrlist %}
         {% if attr.observable %}
             <tr>
               <td>
@@ -41,21 +46,24 @@
                         </div>
                         {% endif %}
               </td>
-
                 <td>
-                    {{attr.pk}}
+                    <a class="" href="{% url 'tasks:evattr_detail' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}"
+                        style="max-width: 800px;overflow: auto;text-overflow: word-wrap;overflow-wrap: break-word;"
+                        >
+                        <h6><span class="badge badge-pill badge-secondary">{{attr.pk}}</span></h6>
+                    </a>
                 </td>
               <td>
-                    {% if attr.attr_reputation.pk == 1 %}
+                    {% if attr.attr_reputation__pk == 1 %}
                   <span class="fas fa-question-circle" data-toggle="tooltip" data-placement="top" title="Unknown"></span>
                     {% else %}
-                        {% if attr.attr_reputation.pk == 2 %}
+                        {% if attr.attr_reputation__pk == 2 %}
                             <span class="fas fa-check-circle text-success" data-toggle="tooltip" data-placement="top" title="Clean"></span>
                         {% else %}
-                            {% if attr.attr_reputation.pk == 3 %}
+                            {% if attr.attr_reputation__pk == 3 %}
                                 <span class="fas fa-exclamation-circle text-danger" data-toggle="tooltip" data-placement="top" title="Suspicious"></span>
                             {% else %}
-                                {% if attr.attr_reputation.pk == 4 %}
+                                {% if attr.attr_reputation__pk == 4 %}
                                     <span class="fas fa-bomb text-danger" data-toggle="tooltip" data-placement="top" title="Malicious"></span>
                                 {% else %}
                                         <span data-toggle="tooltip" data-placement="top" title="-">-</span>
@@ -68,47 +76,54 @@
 
 <!--                       style="max-width: 800px;overflow: auto;text-overflow: word-wrap;overflow-wrap: break-word;"-->
 
-              <td>{{ attr.evattrformat }}</td>
+              <td>{{ attr.evattrformat__name }}</td>
                 <td>
-                    <a class="" href="{% url 'tasks:evattr_detail' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}"
-                    style="max-width: 800px;overflow: auto;text-overflow: word-wrap;overflow-wrap: break-word;"
-                    >
-                    <h6><span class="badge badge-pill badge-secondary">{{ attr.evattrvalue }}</span></h6>
-                    </a>
+                    <div class="container mw-100 d-inline-flex justify-content-start flex-row align-items-center align-content-center flex">
+                        <a class="" href="{% url 'tasks:evattr_detail' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}"
+                        style="max-width: 800px;overflow: auto;text-overflow: word-wrap;overflow-wrap: break-word;"
+                        >
+                        <h6><span class="badge badge-pill badge-secondary">{{ attr.evattrvalue }}</span></h6>
+                        </a>
+                    </div>
                 </td>
                 <td>
-                    {% if attr.get_sameitems_inv %}
-                        <div class="dropdown">
-                                <button class="btn btn-warning btn-xs dropdown-toggle" type="button" data-toggle="dropdown">
-                                        {{ attr.get_sameitems_inv|length }}
-                                    <span class="caret"></span>
-                                </button>
-                                <ul class="dropdown-menu dropdown-content" id="myDropdownRelated">
-                                        {% for sameitem in attr.get_sameitems_inv %}
-                                            <li>
-                                                    <a class="" href="{% url 'invs:inv_evidencetab' pk=sameitem.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                                       target="_blank"
-                                                    >
-                                                        <span class="badge badge-pill badge-warning">{{ sameitem.pk }} {{ sameitem.user}}</span>
-                                                    </a>
-                                            </li>
-                                        {% endfor %}
-                            <!--</div>-->
-                                </ul>
-                        </div>
-                    {% endif %}
+                    {% with attr.pk|getsameattributelistbyevidence as attribs %}
+                            {% if attribs %}
+                                <div class="dropdown">
+                                        <button class="btn btn-warning btn-xs dropdown-toggle" type="button" data-toggle="dropdown">
+                                                {{ attribs|length }}
+                                            <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-content" id="myDropdownRelated">
+                                                {% for sameitem in attribs %}
+                                                    <li>
+                                                            <a class="" href="{% url 'invs:inv_evidencetab' pk=sameitem.ev__inv__pk %}?next1={{ request.get_full_path|urlencode }}"
+                                                               target="_blank"
+                                                            >
+                                                                <span class="badge badge-pill badge-warning">{{sameitem.ev__inv__pk}} {{ sameitem.user__username}}</span>
+                                                            </a>
+                                                    </li>
+                                                {% endfor %}
+                                    <!--</div>-->
+                                        </ul>
+                                    </div>
+                            {% endif %}
+                    {% endwith %}
                 </td>
                 <td>
-                    {{ inv.modified_at|date:"Y/m/d H:i:s" }}
+                    {{ attr.modified_at|date:"Y/m/d H:i:s" }}
                 </td>
                 <td>
                     <a href="#item-inve{{ attr.ev.pk }}">
-                        <h6><span class="badge badge-pill badge-secondary">{{ attr.ev.pk}}</span></h6>
+                        <h6><span class="badge badge-pill badge-secondary">{{ attr.ev__pk}}</span></h6>
                     </a>
                 </td>
             </tr>
         {% endif %}
      {% endfor %}
+{% endif %}
+{% endwith %}
+{% endif %}
 {% endfor %}
 {% else %}
 <!-- empty %}-->

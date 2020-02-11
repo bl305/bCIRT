@@ -13,9 +13,10 @@
 # 2019.11.29  Lendvay     3      Added reviewers
 # **********************************************************************;
 from tasks.models import TaskTemplate, PlaybookTemplate, Action, ActionGroupMember
-from tasks.models import new_playbook, new_evidence, task_close
+from tasks.models import new_playbook, new_evidence, task_close, actiongroupmember_items, TasksInvDetailTabEvidences
 from django.core.exceptions import ValidationError
 from django.utils.timezone import now as timezone_now
+from .models import InvDetailTabEvidences
 # from django.utils.translation import gettext_lazy as _
 # from tasks.models import Task, Playbook
 import os
@@ -290,10 +291,24 @@ class InvListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView)
             logger.info(logmsg)
         super(InvListView, self).__init__(*args, **kwargs)
 
+    def get_queryset(self):
+        retval = Inv.objects.all()\
+            .select_related('status__name')\
+            .select_related('priority__name')\
+            .select_related('user__username')\
+            .select_related('phase__name') \
+            .select_related('parent__pk')\
+            .values('id', 'pk', 'status__name', 'priority__name', 'ticketid', 'refid', 'description_html', 'invid',
+                    'parent__pk', 'phase__name', 'user__username', 'starttime', 'created_at', 'modified_at',
+                    'modified_by')
+        return retval
+
     def get_context_data(self, **kwargs):
+        # kwargs['invclosed'] = InvStatus.objects.filter(pk=2)
         return super(InvListView, self).get_context_data(**kwargs)
 
 
+from .models import InvList
 class InvCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
     model = Inv
     form_class = InvForm
@@ -309,6 +324,8 @@ class InvCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateV
         elif LOGLEVEL == 3:
             logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
+        user = kwargs.pop("user", None)
+        logger.info("InvCreateView - "+str(user))
         super(InvCreateView, self).__init__(*args, **kwargs)
 
     def get_success_url(self):
@@ -351,6 +368,7 @@ class InvCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateV
         kwargs = super(InvCreateView, self).get_form_kwargs()
         # Update the kwargs with the user_id
         # kwargs['inv_pk'] = self.kwargs.get('inv_pk')
+        kwargs['pparent'] = InvList.get_invlist(self)
         kwargs['user'] = self.request.user
         return kwargs
 
@@ -368,6 +386,22 @@ class InvDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailV
             logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
             logger.info(logmsg)
         super(InvDetailView, self).__init__(*args, **kwargs)
+
+    def get_queryset(self):
+        retval = Inv.objects.filter(pk=self.kwargs.get('pk'))\
+            .select_related('status') \
+            .select_related('priority') \
+            .select_related('user') \
+            .select_related('phase')
+            # .select_related('status__name')
+            # .select_related('priority__name')\
+            # .select_related('user__username')\
+            # .select_related('phase__name') \
+            # .select_related('parent__pk')\
+            # .values('id', 'pk', 'status__name', 'priority__name', 'ticketid', 'refid', 'description_html', 'invid',
+            #         'parent__pk', 'phase__name', 'user__username', 'starttime', 'created_at', 'modified_at',
+            #         'modified_by')
+        return retval
 
     def get_context_data(self, **kwargs):
         kwargs['templatecategories'] = TaskTemplate.objects.filter(enabled=True)
@@ -387,20 +421,24 @@ class InvDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailV
         actiongroups_file = set()
         actiongroups_desc = set()
         actiongroups_attr = set()
-        if ActionGroupMember.objects.all():
-            for actgrpmember in ActionGroupMember.objects.all():
+        actiongroupmember_all = ActionGroupMember.objects.all()\
+            .select_related('actionid__enabled')\
+            .select_related('actionid__scriptinput')\
+            .values('pk', 'actionid__enabled', 'actionid__scriptinput', 'actiongroupid')
+        if actiongroupmember_all:
+            for actgrpmember in actiongroupmember_all.iterator():
                 # input is description scriptinput=1:
-                if actgrpmember.actionid.enabled is True and actgrpmember.actionid.scriptinput.pk == 1:
+                if actgrpmember['actionid__enabled'] is True and actgrpmember['actionid__scriptinput'] == 1:
                     # actiongrmember_desc.add(actgrpmember.actionid)
-                    actiongroups_desc.add(actgrpmember.actiongroupid)
+                    actiongroups_desc.add(actgrpmember['actiongroupid'])
                 # input is file scriptinput=2:
-                elif actgrpmember.actionid.enabled is True and actgrpmember.actionid.scriptinput.pk == 2:
+                elif actgrpmember['actionid__enabled'] is True and actgrpmember['actionid__scriptinput'] == 2:
                     # actiongrmember_file.add(actgrpmember.actionid)
-                    actiongroups_file.add(actgrpmember.actiongroupid)
+                    actiongroups_file.add(actgrpmember['actiongroupid'])
                 # input is attribute scriptinput=1:
-                elif actgrpmember.actionid.enabled is True and actgrpmember.actionid.scriptinput.pk == 3:
+                elif actgrpmember['actionid__enabled'] is True and actgrpmember['actionid__scriptinput'] == 3:
                     # actiongrmember_attr.add(actgrpmember.actionid)
-                    actiongroups_attr.add(actgrpmember.actiongroupid)
+                    actiongroups_attr.add(actgrpmember['actiongroupid'])
                 # input is none of the above:
                 else:
                     # print(actgrpmember.actionid.scriptinput.pk)
@@ -474,6 +512,17 @@ class InvUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateV
         self.object.save()
         return super(InvUpdateView, self).form_valid(form)
 
+    def get_form_kwargs(self):
+        """This method is what injects forms with their keyword
+            arguments."""
+        # grab the current set of form #kwargs
+        kwargs = super(InvUpdateView, self).get_form_kwargs()
+        # Update the kwargs with the user_id
+        # kwargs['inv_pk'] = self.kwargs.get('inv_pk')
+        kwargs['pparent'] = InvList.get_invlist(self)
+        kwargs['user'] = self.request.user
+        return kwargs
+
 
 class InvRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteView):
     model = Inv
@@ -494,7 +543,21 @@ class InvRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generic.DeleteV
         return reverse(self.success_url)
 
     def get_context_data(self, **kwargs):
-        return super(InvRemoveView, self).get_context_data(**kwargs)
+        context = super(InvRemoveView, self).get_context_data(**kwargs)
+        invevidences = InvDetailTabEvidences().inv_tab_evidences_invevidences(self.kwargs.get('pk'))
+        invevidences2 = invevidences
+        context['invevidences'] = invevidences
+        context['invevidences2'] = invevidences2
+        inv = Inv.objects.filter(pk=self.kwargs.get('pk')) \
+            .select_related('status')[0]
+        invtasks = inv.task_inv.all()\
+            .select_related('status')\
+            .select_related('action') \
+            .select_related('actiontarget')\
+            .select_related('playbook')\
+            .select_related('type')
+        context['invtasks'] = invtasks
+        return context
 
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
@@ -827,15 +890,15 @@ class InvSuspiciousEmailCreateView(LoginRequiredMixin, PermissionRequiredMixin, 
         cleandata = form.cleaned_data
         auser = self.request.user.get_username()
         auser_obj = self.request.user
-        cinvid = cleandata['invid']
+        cinvid = cleandata.get('invid')
         if cinvid is None or cinvid == "":
             cinvid = 'Phishing'
-        cdescription = cleandata['description']
+        cdescription = cleandata.get('description')
         if cdescription is None or cdescription == "":
             cdescription = 'Phishing'
-        cticket = cleandata['ticket']
-        creference = cleandata['reference']
-        cfileref = cleandata['fileRef']
+        cticket = cleandata.get('ticket')
+        creference = cleandata.get('reference')
+        cfileref = cleandata.get('fileRef')
         inv_obj = new_inv(puser=auser_obj,
                           pparent=None,
                           # pinvid="Suspicious Email",
@@ -1102,7 +1165,8 @@ class InvTabPlaybookView(LoginRequiredMixin, PermissionRequiredMixin, generic.Te
         kwargs['playbooks'] = PlaybookTemplate.objects.filter(enabled=True)
         return kwargs
 
-
+from django.db.models import Count
+from tasks.models import EvidenceAttr
 class InvTabTasksView(LoginRequiredMixin, PermissionRequiredMixin, generic.TemplateView):
     template_name = 'invs/inv_detail_tab_tasks_home.html'
     permission_required = ('invs.view_inv', 'tasks.view_task')
@@ -1120,9 +1184,49 @@ class InvTabTasksView(LoginRequiredMixin, PermissionRequiredMixin, generic.Templ
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
         context = super(InvTabTasksView, self).get_context_data(**kwargs)
-        kwargs['inv'] = Inv.objects.get(pk=self.kwargs.get('pk'))
-        kwargs['templatecategories'] = TaskTemplate.objects.filter(enabled=True)
-        # kwargs['actions'] = Action.objects.filter(enabled=True)
+        # kwargs['inv'] = Inv.objects.get(pk=self.kwargs.get('pk'))
+        inv_pk = self.kwargs.get('pk')
+        # inv = Inv.objects.filter(pk=self.kwargs.get('pk')).select_related('status')[0]
+        # invtasks = inv.task_inv.all()\
+        #     .select_related('status__name')\
+        #     .select_related('action__automationid') \
+        #     .select_related('action__pk')\
+        #     .select_related('action__scriptinput__pk')\
+        #     .select_related('actiontarget')\
+        #     .select_related('playbook__pk')\
+        #     .select_related('type__name')\
+        #     .select_related('evidence_task')\
+        #     .values('pk', 'status__name', 'action__pk', 'action__automationid', 'action__scriptinput__pk', 'title', 'playbook__pk',
+        #             'type__name', 'created_at', 'created_by', 'modified_at', 'modified_by', 'actiontarget').annotate(evidencecount=Count('evidence_task'))
+        inv = InvDetailTabEvidences().inv_tab_evidences_inv(inv_pk)
+        invtasks = inv.task_inv.all()\
+            .select_related('status')\
+            .select_related('action') \
+            .select_related('actiontarget')\
+            .select_related('playbook')\
+            .select_related('type')
+
+
+        #task.actiontarget.evidence_task.all.first.fileName
+        kwargs['inv'] = inv
+        kwargs['invtasks'] = invtasks
+
+        kwargs['templatecategories'] = TaskTemplate.objects.filter(enabled=True)\
+            .select_related('category__name')\
+            .values('pk', 'category__name', 'title')\
+            .iterator()
+        kwargs['actions'] = Action.objects.filter(enabled=True)\
+            .select_related('scriptinput__pk')\
+            .select_related('scriptinputattrtype__pk')\
+            .select_related('outputtarget__shortname')\
+            .values('pk', 'title', 'scriptinput__pk', 'scriptinputattrtype__pk', 'outputtarget__shortname')
+
+        ########################################3
+        # kwargs['attrs'] = EvidenceAttr.objects.filter(ev__inv__pk=self.kwargs.get('pk'))\
+        #     .select_related('ev__inv')\
+        #     .select_related('ev__task')\
+        #     .select_related('ev')
+
         return kwargs
 
 
@@ -1143,9 +1247,69 @@ class InvTabEvidencesView(LoginRequiredMixin, PermissionRequiredMixin, generic.T
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
         context = super(InvTabEvidencesView, self).get_context_data(**kwargs)
-        kwargs['inv'] = Inv.objects.get(pk=self.kwargs.get('pk'))
+        # inv = Inv.objects.get(pk=self.kwargs.get('pk'))
+        # inv = Inv.objects.filter(pk=self.kwargs.get('pk'))\
+        #     .select_related('status')[0].order_by('pk')
+        # invevidences = invs.evidence_inv.all()\
+        #     .select_related('task') \
+        #     .select_related('evidenceformat')\
+        #     .select_related('mitretactic') \
+        #     .select_related('parent') \
+        #     .select_related('parentattr')
+        # invevidences = invs.evidences_table()
+        # invevidences2 = invevidences
+        # kwargs['inv'] = invs
+        inv_pk = self.kwargs.get('pk')
+        # invevidences = Inv.objects.filter(pk=inv_pk)\
+        #     .select_related('evidence_inv__pk')\
+        #     .select_related('evidence_inv__fileRef')\
+        #     .select_related('evidence_inv__fileName')\
+        #     .select_related('evidence_inv__task__pk')\
+        #     .select_related('evidence_inv__task__title')\
+        #     .select_related('evidence_inv__created_at')\
+        #     .select_related('evidence_inv__created_by')\
+        #     .select_related('evidence_inv__modified_at')\
+        #     .select_related('evidence_inv__modified_by')\
+        #     .select_related('evidence_inv__mitretactic__name')\
+        #     .select_related('evidence_inv__parent__pk')\
+        #     .select_related('evidence_inv__parentattr__pk')\
+        #     .select_related('evidence_inv__evidenceformat__pk')\
+        #     .select_related('evidence_inv__description')\
+        #     .values('pk', 'evidence_inv__pk', 'evidence_inv__fileRef', 'evidence_inv__fileName',
+        #             'evidence_inv__task__pk', 'evidence_inv__task__title', 'evidence_inv__created_at',
+        #             'evidence_inv__created_by', 'evidence_inv__modified_at', 'evidence_inv__modified_by',
+        #             'evidence_inv__mitretactic__name', 'evidence_inv__parent__pk', 'evidence_inv__parentattr__pk',
+        #             'evidence_inv__evidenceformat__pk', 'evidence_inv__description')
+        invevidences = InvDetailTabEvidences().inv_tab_evidences_invevidences(inv_pk)
+        invevidences2 = invevidences
+        kwargs['inv'] = InvDetailTabEvidences().inv_tab_evidences_inv(inv_pk)
+        kwargs['invevidences'] = invevidences
+        kwargs['invevidences2'] = invevidences2
+        # kwargs['invevidences'] = invevidences.iterator()
+        # kwargs['invevidences2_exist'] = invevidences.exists()
+        # kwargs['invevidences2'] = invevidences2.iterator()
         # kwargs['templatecategories'] = TaskTemplate.objects.filter(enabled=True)
-        kwargs['actions'] = Action.objects.filter(enabled=True)
+        # kwargs['actions'] = Action.objects.filter(enabled=True)
+        # kwargs['actions'] = Action.objects\
+        #     .select_related('scriptinput')\
+        #     .select_related('outputtarget')\
+        #     .filter(enabled=True).iterator()
+        # kwargs['actions'] = Action.objects.filter(enabled=True) \
+        #     .select_related('scriptinput')\
+        #     .select_related('outputtarget')\
+        #     .select_related('scriptinputattrtype')
+        kwargs['actions'] = TasksInvDetailTabEvidences().inv_tab_evidences_actions()
+        # .select_related('scriptinput__pk')\
+            # .select_related('outputtarget__shortname')\
+            # .select_related('scriptinputattrtype__pk')\
+            # .values('pk', 'scriptinput__pk', 'title', 'outputtarget__shortname', 'scriptinputattrtype__pk').iterator()
+        actgrpitems = actiongroupmember_items()
+        kwargs['actiongroups_desc'] = actgrpitems['actiongroups_desc']
+        kwargs['actiongroups_file'] = actgrpitems['actiongroups_file']
+        kwargs['actiongroups_attr'] = actgrpitems['actiongroups_attr']
+
+
+
         return kwargs
 
 # ################################3

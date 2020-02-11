@@ -1,0 +1,19 @@
+python3 manage.py makemigrations
+python3 manage.py migrate
+python3 manage.py createsuperuser
+python3 manage.py runserver
+
+add Group: CIRT_Member
+
+
+python3 manage.py dumpdata --exclude auth.permission --exclude contenttypes --natural-foreign --natural-primary -e auth.Group -e admin > /tmp/dbnatural.json
+
+
+vim /tmp/dbnatural.json
+:%s/auth.user/users.user/g
+
+nano users.models.py
+comment out the receiver save method
+
+
+python3 manage.py loaddata /tmp/dbnatural.json

@@ -59,6 +59,7 @@ urlpatterns = [
     url(r"^evidences/new/(?P<inv_pk>\d+)/(?P<task_pk>\d+)/$", views.EvidenceCreateView.as_view(), name="ev_create"),
     url(r"^evidences/detail/(?P<pk>\d+)/$", views.EvidenceDetailView.as_view(), name="ev_detail"),
     # url(r'^(?P<pk>\d+)/(?P<inv_pk>\d+)/(?P<task_pk>\d+)/edit/$', views.EvidenceUpdateView.as_view(), name='ev_edit'),
+    url(r'^assign/(?P<pk>\d+)/(?P<task_pk>\d+)/$', views.EvidenceAssignTaskView.as_view(), name='ev_taskassign'),
     url(r'^evidences/edit/(?P<pk>\d+)/$', views.EvidenceUpdateView.as_view(), name='ev_edit'),
     url(r'^evidences/remove/(?P<pk>\d+)/$', views.EvidenceRemoveView.as_view(), name='ev_remove'),
 

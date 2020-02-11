@@ -10,10 +10,12 @@
 # Date        Author      Ref    Description
 # 2019.07.29  Lendvay     1      Initial file
 # **********************************************************************;
+from django.conf import settings
 from django.db import models
 from django.urls import reverse
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
+from django.db import transaction
 # HTML renderer
 import misaka
 from django.utils.timezone import now as timezone_now
@@ -156,7 +158,7 @@ def timediff(pdate1, pdate2):
 # Create your models here.
 class Inv(models.Model):
     objects = models.Manager()
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, default=None, null=True, blank=True,
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, default=None, null=True, blank=True,
                              related_name="inv_users")
     parent = models.ForeignKey('self', on_delete=models.SET_NULL, default=None,null=True, blank=True,
                                related_name="inv_parent")
@@ -165,9 +167,9 @@ class Inv(models.Model):
     ticketid = models.CharField(max_length=20, default="", null=True, blank=True)
     status = models.ForeignKey(InvStatus, on_delete=models.SET_DEFAULT, default="1",
                                related_name="inv_status")
-    reviewer1 = models.ForeignKey(User, on_delete=models.SET_NULL, default=None, blank=True, null=True,
+    reviewer1 = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, default=None, blank=True, null=True,
                                   related_name="inv_reviewer1")
-    reviewer2 = models.ForeignKey(User, on_delete=models.SET_NULL, default=None, blank=True, null=True,
+    reviewer2 = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, default=None, blank=True, null=True,
                                   related_name="inv_reviewer2")
     # reviewer1 = models.CharField(max_length=20, default="Pending")
     reviewer1comment = models.CharField(max_length=2000, default="", blank=True, null=True)
@@ -234,21 +236,26 @@ class Inv(models.Model):
         else:
             return False
 
+    @transaction.atomic
     # def save(self, *args, **kwargs):
     def save(self, force_insert=False, force_update=False, *args, **kwargs):
         # print("SAVING")
         #  this is to check if the status record has been changed or not
+        status_closed = self.status.name == "Closed"
+        status_assigned = self.status.name == "Assigned"
+        status_review1 = self.status.name == "Review1"
+        status_review2 = self.status.name == "Review2"
         if self.status != self.__original_status:
-            if self.status.name == "Closed":
+            if status_closed:
                 # status changed do something here
                 # some actions are performed in the "check" method
                 pass
-            elif self.status.name == "Assigned":
+            elif status_assigned:
                 # status changed to assigned
                 self.reviewed1_at = None
                 self.reviewed2_at = None
                 pass
-            elif self.status.name == "Review1":
+            elif status_review1:
                 # status changed to review1
                 # checking if needs review or not
                 # print("1REV1")
@@ -266,7 +273,7 @@ class Inv(models.Model):
                     else:
                         # print("1REV2 XXX")
                         self.autoreview2()
-            elif self.status.name == "Review2":
+            elif status_review2:
                 # print("2REV1")
                 # status changed to review2
                 # checking if needs review or not
@@ -278,7 +285,7 @@ class Inv(models.Model):
                     # no review is needed
                     # self.reviewer2 = User.objects.get(pk=1)
                     self.autoreview2()
-        if self.status.name == "Closed" or self.status.name == "Review1" or self.status.name == "Review2":
+        if status_closed or status_review1 or status_review2:
             # status changed to closed
             # set investigation close date
             if self.endtime is None:
@@ -301,6 +308,7 @@ class Inv(models.Model):
         super(Inv, self).save(force_insert, force_update, *args, **kwargs)
         self.__original_status = self.status
 
+    @transaction.atomic
     def getreviewer1(self):
         reviewers1 = User.objects.filter(profile__reviewer1=True)
         reviewers1list = set()
@@ -309,6 +317,7 @@ class Inv(models.Model):
         randomreviewer1 = reviewers1.order_by("?").first()
         self.reviewer1 = randomreviewer1
 
+    @transaction.atomic
     def getreviewer2(self):
         reviewers2 = User.objects.filter(profile__reviewer2=True)
         reviewers2list = set()
@@ -317,6 +326,7 @@ class Inv(models.Model):
         randomreviewer2 = reviewers2.order_by("?").first()
         self.reviewer2 = randomreviewer2
 
+    @transaction.atomic
     def autoreview1(self):
         self.reviewer1 = User.objects.get(pk=1)
         self.reviewed1_by = "autoreview"
@@ -324,6 +334,7 @@ class Inv(models.Model):
         self.reviewer2 = User.objects.get(pk=1)
         self.status = InvStatus.objects.get(name="Review2")
 
+    @transaction.atomic
     def autoreview2(self):
         self.reviewed2_by = "autoreview"
         self.reviewed2_at = timezone_now()
@@ -335,9 +346,11 @@ class Inv(models.Model):
         bypassreview = False
         bypasslist = None
         if revtype == 1:
-            bypasslist = InvReviewRules.objects.filter(bypassreview=True, review1=False)
+            bypasslist = InvReviewRules.objects.filter(bypassreview=True, review1=False)\
+                .select_related('severity')
         elif revtype == 2:
-            bypasslist = InvReviewRules.objects.filter(bypassreview=True, review2=False)
+            bypasslist = InvReviewRules.objects.filter(bypassreview=True, review2=False)\
+                .select_related('severity')
         for bypassrule in bypasslist:
             if bypassrule.bypassreview:
                 if (bypassrule.severity is None or int(bypassrule.severity.pk) >= int(self.severity.pk)) and \
@@ -353,9 +366,11 @@ class Inv(models.Model):
         if not bypassreview:
             invruleslist = None
             if revtype == 1:
-                invruleslist = InvReviewRules.objects.filter(bypassreview=False, review1=True)
+                invruleslist = InvReviewRules.objects.filter(bypassreview=False, review1=True)\
+                    .select_related('severity')
             elif revtype == 2:
-                invruleslist = InvReviewRules.objects.filter(bypassreview=False, review2=True)
+                invruleslist = InvReviewRules.objects.filter(bypassreview=False, review2=True)\
+                    .select_related('severity')
             if invruleslist:
                 for invrule in invruleslist:
                     if (invrule.severity is None or int(invrule.severity.pk) <= int(self.severity.pk)) and \
@@ -409,6 +424,24 @@ class Inv(models.Model):
                 "pk": self.pk
             })
 
+    def evidences_table(self):
+        retval = self.evidence_inv.all()\
+            .select_related('task') \
+            .select_related('evidenceformat')\
+            .select_related('mitretactic') \
+            .select_related('parent') \
+            .select_related('parentattr')
+        return retval
+
+    def tasks_table(self):
+        retval = self.task_inv.all()\
+            .select_related('status')\
+            .select_related('action') \
+            .select_related('actiontarget')\
+            .select_related('playbook')\
+            .select_related('type')
+        return retval
+
     def clean(self):
         # check if review1 were performed before review2
         # raise ValidationError(_("xx"+str(self.status)))
@@ -425,7 +458,8 @@ class Inv(models.Model):
                 raise ValidationError(_('No reviews were performed yet!'))
             if self.reviewed1_at is None and self.reviewed2_at is not None:
                 raise ValidationError(_('First review must happen first!'))
-            if self.task_inv.all():
+            task_inv_all = self.task_inv.select_related('status').all()
+            if task_inv_all.iterator():
                 # status changed to closed, check if all tasks are closed
                 anyopen = 0
                 for atask in self.task_inv.all():
@@ -446,6 +480,35 @@ class Inv(models.Model):
             raise ValidationError(_('If status is "Open", the "Assigned to" user must be empty too.'))
 
         super(Inv, self).clean()
+
+class InvDetailTabEvidences():
+    def inv_tab_evidences_inv(self, inv_pk):
+        retval = Inv.objects.filter(pk=inv_pk) \
+            .select_related('status')[0]
+        return retval
+
+    def inv_tab_evidences_invevidences(self, inv_pk):
+        retval = Inv.objects.filter(pk=inv_pk)\
+            .select_related('evidence_inv__pk')\
+            .select_related('evidence_inv__fileRef')\
+            .select_related('evidence_inv__fileName')\
+            .select_related('evidence_inv__task__pk')\
+            .select_related('evidence_inv__task__title')\
+            .select_related('evidence_inv__created_at')\
+            .select_related('evidence_inv__created_by')\
+            .select_related('evidence_inv__modified_at')\
+            .select_related('evidence_inv__modified_by')\
+            .select_related('evidence_inv__mitretactic__name')\
+            .select_related('evidence_inv__parent__pk')\
+            .select_related('evidence_inv__parentattr__pk')\
+            .select_related('evidence_inv__evidenceformat__pk')\
+            .select_related('evidence_inv__description')\
+            .values('pk', 'evidence_inv__pk', 'evidence_inv__fileRef', 'evidence_inv__fileName',
+                    'evidence_inv__task__pk', 'evidence_inv__task__title', 'evidence_inv__created_at',
+                    'evidence_inv__created_by', 'evidence_inv__modified_at', 'evidence_inv__modified_by',
+                    'evidence_inv__mitretactic__name', 'evidence_inv__parent__pk', 'evidence_inv__parentattr__pk',
+                    'evidence_inv__evidenceformat__pk', 'evidence_inv__description').order_by('evidence_inv__pk')
+        return retval
 
 
 class InvReviewRules(models.Model):
@@ -503,3 +566,28 @@ def new_inv(pstatus, ppriority, pdescription, pphase, pseverity, pcategory, patt
                                 numofvictims=pnumofvictims
                             )
     return new_inv_item
+
+class InvList():
+    def get_invlist(self, pexcl=None, allownull=False):
+        inv_obj = None
+        if pexcl:
+            inv_objs = Inv.objects.exclude(pk=pexcl)\
+                .select_related('attackvector__name')\
+                .select_related('user__username')\
+                .values_list('pk', 'attackvector__name', 'ticketid', 'user__username')
+        else:
+            inv_objs = Inv.objects.select_related('attackvector__name')\
+                .select_related('user__username')\
+                .values_list('pk', 'attackvector__name', 'ticketid', 'user__username')
+        outlist = list()
+        if allownull:
+            outlist.append(('', 'None'))
+        NoneType = type(None)
+        if inv_objs.exists():
+            for inv in inv_objs:
+                if type(inv[2]) == NoneType:
+                    outstr = "%s-%s-%s" % (int(inv[0]), str(inv[1]), str(inv[3])[0:2])
+                else:
+                    outstr = "%s-%s-%s-%s" % (int(inv[0]), str(inv[1]), str(inv[2]), str(inv[3])[0:2])
+                outlist.append((inv[0], outstr))
+        return outlist

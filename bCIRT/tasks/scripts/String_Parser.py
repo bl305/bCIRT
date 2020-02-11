@@ -36,7 +36,9 @@ class StringParser():
 
     def find_email(self, str1):
         #  ipattern = re.compile('([^[({@|\s]+@[^@]+\.[^])}@|\s]+)')
-        ipattern = re.compile('([^@":[>|<\s]+@[^@]+\.[^]>"<)\}@|\s]+)')
+        # ipattern = re.compile('([^@":[>|<\s]+@[^@]+\.[^]>"<)\}@|\s]+)')
+        #https://www.regular-expressions.info/refunicode.html
+        ipattern = re.compile(r'([\\p{L}\\p{M}\\p{S}\\p{N}\\p{P}a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)', re.UNICODE)
         imatches = re.findall(ipattern, str1)
         imatches = sorted(list(set(imatches)))
         return imatches

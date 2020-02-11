@@ -18,6 +18,7 @@ import os
 from stat import S_IREAD, S_IRGRP, S_IROTH, S_IWUSR, S_IWGRP
 import string
 import random
+from django.db import transaction
 from django.urls import reverse
 from django.dispatch import receiver
 import misaka
@@ -45,11 +46,11 @@ def upload_to_updates(instance, filename):
         filename_ext.lower()
     )
 
-
+from django.conf import settings
 # Create your models here.
 class UpdatePackage(models.Model):
     objects = models.Manager()
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, default=None, null=True, related_name="update_users")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, default=None, null=True, related_name="update_users")
     updateversion = models.CharField(max_length=15, null=False, blank=False)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.CharField(max_length=20, default="unknown")
@@ -72,6 +73,7 @@ class UpdatePackage(models.Model):
                 "pk": self.pk
             })
 
+    @transaction.atomic
     def save(self, *args, **kwargs):
         # this removes the filename if a file is not attached
         if not self.fileRef:
@@ -119,6 +121,7 @@ class ConnectionItemField(models.Model):
     def __str__(self):
         return str(self.connectionitemfieldname)
 
+    @transaction.atomic
     def save(self, *args, **kwargs):
         if self.encryptvalue:
             key = bCIRT_Encryption().generate_key_manual(ENCRYPTION_KEY_1, SALT_1)
@@ -165,6 +168,7 @@ def auto_make_readonly(sender, instance, **kwargs):
 
 
 @receiver(models.signals.pre_save, sender=UpdatePackage)
+@transaction.atomic
 def auto_delete_file_on_change(sender, instance, **kwargs):
     """Deletes file from filesystem
     when corresponding `InvestigationDetails` object is changed.
@@ -186,3 +190,105 @@ def auto_delete_file_on_change(sender, instance, **kwargs):
                 os.remove(old_file.path)
         except Exception:
             return False
+
+
+class SettingsCategory(models.Model):
+    objects = models.Manager()
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, default=None, null=True, blank=True,
+                             related_name="settingscategory_users")
+    categoryname = models.CharField(max_length=25, null=True, blank=True, default=None)
+    enabled = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.CharField(max_length=20, default="unknown")
+    modified_at = models.DateTimeField(auto_now=True)
+    modified_by = models.CharField(max_length=20, default="unknown")
+    description = models.CharField(max_length=255, null=True, blank=True, default=None)
+
+    def __str__(self):
+        # return self.description
+        return str(self.categoryname)
+
+    def get_absolute_url(self):
+        return reverse(
+            "configuration:conf_base",
+            kwargs={
+                # "username": self.user.username,
+                "pk": self.pk
+            })
+
+    @transaction.atomic
+    def save(self, *args, **kwargs):
+        super(SettingsCategory, self).save(*args, **kwargs)
+
+    def clean(self):
+        super(SettingsCategory, self).clean()
+
+
+class SettingsUser(models.Model):
+    objects = models.Manager()
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, default=None, null=True,
+                             related_name="settingsuser_users")
+    settingname = models.CharField(max_length=25, null=True, blank=True, default=None)
+    settingvalue = models.CharField(max_length=255, null=True, blank=True, default=None)
+    settingcategory = models.ForeignKey(SettingsCategory, on_delete=models.SET_NULL, blank=True, null=True,
+                                         default=None, related_name="settingsuser_settingscategory")
+    enabled = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.CharField(max_length=20, default="unknown")
+    modified_at = models.DateTimeField(auto_now=True)
+    modified_by = models.CharField(max_length=20, default="unknown")
+    description = models.CharField(max_length=255, null=True, blank=True, default=None)
+
+    def __str__(self):
+        # return self.description
+        return str(self.pk)
+
+    def get_absolute_url(self):
+        return reverse(
+            "configuration:conf_base",
+            kwargs={
+                # "username": self.user.username,
+                "pk": self.pk
+            })
+
+    @transaction.atomic
+    def save(self, *args, **kwargs):
+        super(SettingsUser, self).save(*args, **kwargs)
+
+    def clean(self):
+        super(SettingsUser, self).clean()
+
+
+class SettingsSystem(models.Model):
+    objects = models.Manager()
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, default=None, null=True,
+                             related_name="settingssystem_users")
+    settingname = models.CharField(max_length=25, null=True, blank=True, default=None)
+    settingvalue = models.CharField(max_length=255, null=True, blank=True, default=None)
+    settingcategory = models.ForeignKey(SettingsCategory, on_delete=models.SET_NULL, blank=True, null=True,
+                                         default=None, related_name="settingssystem_settingscategory")
+    enabled = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.CharField(max_length=20, default="unknown")
+    modified_at = models.DateTimeField(auto_now=True)
+    modified_by = models.CharField(max_length=20, default="unknown")
+    description = models.CharField(max_length=255, null=True, blank=True, default=None)
+
+    def __str__(self):
+        # return self.description
+        return str(self.pk)
+
+    def get_absolute_url(self):
+        return reverse(
+            "configuration:conf_base",
+            kwargs={
+                # "username": self.user.username,
+                "pk": self.pk
+            })
+
+    @transaction.atomic
+    def save(self, *args, **kwargs):
+        super(SettingsSystem, self).save(*args, **kwargs)
+
+    def clean(self):
+        super(SettingsSystem, self).clean()
