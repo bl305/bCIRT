@@ -144,8 +144,10 @@ misaka (MIT): https://pypi.org/project/misaka
 weasyprint (BSD): https://weasyprint.org PyPI: https://pypi.org/project/WeasyPrint  
 
 ### Screenshots
-![Pic1](https://github.com/bl305/bCIRT/blob/master/bCIRT_Screenshots/Screenshot%20from%202019-03-11%2023-18-13.png)
-![Pic2](https://github.com/bl305/bCIRT/blob/master/bCIRT_Screenshots/Screenshot%20from%202019-03-11%2023-18-45.png)
-![Pic3](https://github.com/bl305/bCIRT/blob/master/bCIRT_Screenshots/Screenshot%20from%202019-03-11%2023-19-36.png)
-![Pic4](https://github.com/bl305/bCIRT/blob/master/bCIRT_Screenshots/Screenshot%20from%202019-03-11%2023-20-24.png)
-![Pic5](https://github.com/bl305/bCIRT/blob/master/bCIRT_Screenshots/Screenshot%20from%202019-03-11%2023-20-49.png)
+![Pic1](https://github.com/bl305/bCIRT/blob/master/bCIRT_Screenshots/01_bCIRT_login.png)
+![Pic2](https://github.com/bl305/bCIRT/blob/master/bCIRT_Screenshots/02_bCIRT_index.png)
+![Pic3](https://github.com/bl305/bCIRT/blob/master/bCIRT_Screenshots/03_bCIRT_investigation_details.png)
+![Pic4](https://github.com/bl305/bCIRT/blob/master/bCIRT_Screenshots/04_bCIRT_tasks.png)
+![Pic5](https://github.com/bl305/bCIRT/blob/master/bCIRT_Screenshots/05_bCIRT_evidences.png)
+![Pic6](https://github.com/bl305/bCIRT/blob/master/bCIRT_Screenshots/06_bCIRT_actions.png)
+![Pic7](https://github.com/bl305/bCIRT/blob/master/bCIRT_Screenshots/07_bCIRT_automation.png)
