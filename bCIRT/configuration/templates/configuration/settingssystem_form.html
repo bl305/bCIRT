@@ -1,32 +1,33 @@
-{% extends "tasks/task_template.html" %}
+{% extends "configuration/configuration_template.html" %}
 <!--
 # **********************************************************************;
 # Project           : bCIRT
 # License           : GPL-3.0
-# Program name      : tasks/tasktemplate_form.html
+# Program name      : configuration/settingssystem_form.html
 # Author            : Balazs Lendvay
-# Date created      : 2019.07.27
+# Date created      : 2020.02.11
 # Purpose           : Template file for the bCIRT
 # Revision History  : v1
 # Date        Author      Ref    Description
-# 2019.07.29  Lendvay     1      Initial file
-# 2020.02.15  Lendvay     1      New style
+# 2020.02.11  Lendvay     1      Initial file
 # **********************************************************************;
 -->
+
 <!-- BL start -->
 {{ form.media }}
 <!-- BL end -->
-{% block task_alert %}
-{% endblock task_alert %}
 
-{% block task_buttons %}
-{% endblock task_buttons %}
+{% block configuration_alert %}
+{% endblock configuration_alert %}
 
-{% block task_title %}
-                        Edit a Task Template
-{% endblock task_title %}
+{% block configuration_buttons %}
+{% endblock configuration_buttons %}
 
-{% block task_body %}
+{% block configuration_title %}
+                        Edit System Setting {{ settingssystem.pk }}
+{% endblock configuration_title %}
+
+{% block configuration_body %}
                         {% if error_message %}
                             <p><strong>{{ error_message }}</strong></p>
                         {% endif %}
@@ -35,15 +36,19 @@
                             {% include 'invs/inv_form_template.html' %}
                             <!--To redirect to the previous page-->
                             <input type="hidden" name="next" value="{{ request.GET.next1 }}">
-                                <div class="form-group">
+                            <div class="form-group">
                                 <div class="col-sm-offset-1 col-sm-11">
-                                    <button type="submit" class="btn btn-success md">Save</button>
+                                    <button type="submit"
+                                            class="btn btn-success btn-sm">
+                                        Save
+                                    </button>
                                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                <a href="javascript:history.go(-1)" class="btn btn-primary pull-right">
-                                    <span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>
-                                    <span>Cancel</span>
-                                </a>
+                                    <a href="javascript:history.go(-1)"
+                                       class="btn btn-primary btn-sm">
+                                        <span class="fas fa-arrow-left" aria-hidden="true"></span>
+                                        <span>Cancel</span>
+                                    </a>
                                 </div>
                             </div>
                         </form>
-{% endblock task_body %}
+{% endblock configuration_body %}

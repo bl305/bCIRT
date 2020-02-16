@@ -11,6 +11,7 @@
 # 2019.07.29  Lendvay     1      Initial file
 # 2019.08.19  Lendvay     1      Added "enabled" ot the form for actions
 # 2019.11.17  Lendvay     1      Fixed the playbooktemplates
+# 2020.02.15  Lendvay     1      Fixed dropdown colors
 # **********************************************************************;
 from django import forms
 # from django.db.models import Count, Avg, Min, Max, Sum, F
@@ -803,7 +804,7 @@ class TaskTemplateForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-outline-secondary btn-sm',
+                'data-style': 'btn-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -868,7 +869,7 @@ class TaskTemplateForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-outline-secondary btn-sm',
+                'data-style': 'btn-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -883,7 +884,7 @@ class TaskTemplateForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-outline-secondary btn-sm',
+                'data-style': 'btn-secondary btn-sm',
                 'style': 'width:50%',
             }
         )
@@ -898,7 +899,7 @@ class TaskTemplateForm(forms.ModelForm):
                 'class': 'selectpicker show-tick form-control',  # form-control
                 'data-live-search': 'true',
                 'data-width': 'auto',
-                'data-style': 'btn-outline-secondary btn-sm',
+                'data-style': 'btn-secondary btn-sm',
                 'style': 'width:50%',
             }
         )

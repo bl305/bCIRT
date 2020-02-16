@@ -68,6 +68,16 @@ class Get_Report():
             .order_by('user__username')
         return retval
 
+    def invs_closed_recipients_top10(self):
+        retval = Inv.objects.filter(created_at__gte=self.astart)\
+            .filter(created_at__lte=self.aend) \
+            .filter(status=2) \
+            .exclude(profile_inv__email=None) \
+            .select_related('profile_inv')\
+            .values('profile_inv__email')\
+            .annotate(Count('profile_inv__email'))\
+            .order_by('profile_inv__email__count').reverse()[:10]
+        return retval
 
     def invs_closed(self):
         retval = Inv.objects.filter(created_at__gte=self.astart)\

@@ -413,6 +413,7 @@ class ReportsDashboardCustom(LoginRequiredMixin, PermissionRequiredMixin, Templa
                 # last90days = datetime.now()-timedelta(days=90)
                 invs_closed = Get_Report(searchstarttime, searchendtime).invs_closed()
                 invs_closed_by_user = Get_Report(searchstarttime, searchendtime).invs_closed_by_user_all()
+                invs_closed_recipients_top10 = Get_Report(searchstarttime, searchendtime).invs_closed_recipients_top10()
                 invs_all_summary = Get_Report(searchstarttime, searchendtime).invs_all_summary()
                 invs_closed_stats = Get_Report(searchstarttime, searchendtime).invduration()
                 invs_closed_stats_min = invs_closed_stats['min']
@@ -454,6 +455,7 @@ class ReportsDashboardCustom(LoginRequiredMixin, PermissionRequiredMixin, Templa
                            'searchendtime': searchendtime,
                            'invs_closed': invs_closed,
                            'invs_closed_by_user': invs_closed_by_user,
+                           'invs_closed_recipients_top10': invs_closed_recipients_top10,
                            'invs_all_summary': invs_all_summary,
                            'invs_closed_stats_min': invs_closed_stats_min,
                            'invs_closed_stats_max': invs_closed_stats_max,

@@ -17,7 +17,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.db import transaction
 from invs.models import Inv
-from tasks.models import EvidenceAttr
+from tasks.models import EvidenceAttr, Evidence
 # HTML renderer
 import misaka
 # Get the user so we can use this
@@ -169,9 +169,12 @@ def new_profile(pinv, pusername=None, puserid=None, pemail=None, phost=None, pip
     )
     return newprofile
 
+
 @transaction.atomic
 def new_create_profile_from_evattrs(pinv_pk, pevattr_pk, pev_pk, pusername):
     # Creating a new profile based on the attribute calling this function
+    # if the pev_pk = 0, it will add one attribute specified
+    # if the pev_pk has a value, it adds all attributes under the evidence
     invpk = pinv_pk
     invobj = Inv.objects.get(pk=invpk)
     evattrpk = pevattr_pk
@@ -183,7 +186,13 @@ def new_create_profile_from_evattrs(pinv_pk, pevattr_pk, pev_pk, pusername):
     if evpk == 0:
         attrpklist.append(evattr_obj)
     else:
-        attributes = EvidenceAttr.objects.filter(ev__pk=evpk)
+        from django.db.models import Q
+        attributes = EvidenceAttr.objects.filter(ev__pk=evpk)\
+            .filter(Q(evattrformat__name='Email')
+                    | Q(evattrformat__name="UserName")
+                    | Q(evattrformat__name="UserID")
+                    | Q(evattrformat__name="HostName")
+                    | Q(evattrformat__name="IPv4"))
         if attributes:
             for attritem in attributes:
                 attrpklist.append(attritem)
@@ -225,3 +234,17 @@ def new_create_profile_from_evattrs(pinv_pk, pevattr_pk, pev_pk, pusername):
             pmodified_by=pusername,
             pdescription="",
         )
+    return True
+
+
+@transaction.atomic
+def new_create_profile_from_evattrs_all(pev):
+    if pev is not None and pev != "0" and pev != 0:
+        ev_obj = Evidence.objects.filter(pk=pev)\
+            .select_related('inv__pk') \
+            .select_related('user__username') \
+            .values('inv__pk', 'user__username')[0]
+        pinv_pk = ev_obj['inv__pk']
+        pusername = ev_obj['user__username']
+        new_create_profile_from_evattrs(pinv_pk=pinv_pk, pevattr_pk=None, pev_pk=pev, pusername=pusername)
+    return True

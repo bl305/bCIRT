@@ -59,6 +59,8 @@ urlpatterns = [
         name='settingsuser_edit'),
 
     url(r"settingssystem$", views.SettingsSystemListView.as_view(), name='settingssystem_list'),
+    url(r'^settingssystem/edit/(?P<pk>\d+)/$', views.SettingsSystemUpdateView.as_view(),
+        name='settingssystem_edit'),
 
     url(r"systemupdates$", views.SystemUpdatesPage.as_view(), name='conf_systemupdates'),
     url(r"logging$", views.ConfigurationLoggingPage.as_view(), name='conf_logging'),

@@ -12,7 +12,7 @@
 # 2019.09.06  Lendvay     2      Added session security
 # **********************************************************************;
 # from django.shortcuts import render
-from .models import Host, Profile, new_create_profile_from_evattrs  # new_profile
+from .models import Host, Profile, new_create_profile_from_evattrs
 from .forms import HostForm, ProfileForm
 # from tasks.models import EvidenceAttr
 # from invs.models import Inv

@@ -28,7 +28,7 @@
 			<div class="card card-body bg-light">
                 <form method="POST">
                     {% csrf_token %}
-                    <button type="submit" id="month" class="btn btn-primary">Month</button>
+                    <button type="submit" id="month" class="btn btn-primary">All</button>
                      <input type="hidden" id="custId" name="month" value="1">
                 </form>
 
@@ -201,6 +201,34 @@
                             </td>
                             <td>
                                 {{ inv_closed_by_user.user__count }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+			</div>
+		</div>
+	</div>
+<hr class="thick">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card card-body bg-light">
+                <p><strong>Top Profiles</strong></p>
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>Email</th>
+                            <th>Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for invs_closed_recipients_top10_item in invs_closed_recipients_top10 %}
+                        <tr data-toggle="collapse" data-target="#myinvs{{invs_closed_recipients_top10_item.pk}}" class="accordion-toggle">
+                            <td>
+                                {{ invs_closed_recipients_top10_item.profile_inv__email }}
+                            </td>
+                            <td>
+                                {{ invs_closed_recipients_top10_item.profile_inv__email__count }}
                             </td>
                         </tr>
                         {% endfor %}

@@ -3,7 +3,7 @@
 # **********************************************************************;
 # Project           : bCIRT
 # License           : GPL-3.0
-# Program name      : configuration/settingsuser_list.html
+# Program name      : configuration/settingssystem_list.html
 # Author            : Balazs Lendvay
 # Date created      : 2020.02.10
 # Purpose           : Template file for the bCIRT
@@ -16,10 +16,11 @@
 {% endblock configuration_alert %}
 
 {% block configuration_buttons %}
+
 {% endblock configuration_buttons %}
 
 {% block configuration_title %}
-                        User Settings list at {% now "Y/m/d H:i:s" %} (UTC)
+                        System Settings list at {% now "Y/m/d H:i:s" %} (UTC)
 {% endblock configuration_title %}
 
 {% block configuration_body %}
@@ -54,7 +55,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                            {% include 'configuration/settingsuser_list_table.html' %}
+                            {% include 'configuration/settingssystem_list_table.html' %}
                         </tbody>
                     </table>
 {% endblock configuration_body %}

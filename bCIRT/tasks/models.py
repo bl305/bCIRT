@@ -2220,32 +2220,38 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
     elif action_obj.automationid.type.pk == 4:  # Script with b64 encrypted values to pass over
         results = run_script_class(interpreter, cmd, argument, timeout).runscript()
     elif action_obj.automationid.type.pk == 5:  # Internal command
-        from tasks.scripts import String_Parser
-        sp1 = String_Parser.StringParser
-        afuncoutput = getattr(sp1, action_obj.automationid.code)('', argument)
-        if action_obj.automationid.code == "check_malicious":
-            ismalicious = afuncoutput
-            if action_obj.scriptinput.pk == 1:
-                # description input
-                # add_evattr(
-                #     auser=actuser,
-                #     aev=oldev_obj,
-                #     aevattrvalue=afuncoutput,
-                #     aevattrformat=EvidenceAttrFormat.objects.get(name='Reputation'),
-                #     amodified_by=actusername,
-                #     acreated_by=actusername,
-                #     aattr_automatic=None
-                # )
-                pass
-            elif action_obj.scriptinput.pk == 2:
-                # file input
-                pass
-            elif action_obj.scriptinput.pk == 3:
-                # attribute input
-                # EvidenceAttr.objects.filter(pk=evattr_pk).update(attr_reputation = EvReputation.objects.get(pk=1))
-                pass
-        # if action_obj.automationid.code == "StringParser.extract_ipv4":
-        #     pass
+        afuncoutput = None
+        if action_obj.automationid.code == "add_all_to_profile":
+            from assets.models import new_create_profile_from_evattrs_all
+            new_create_profile_from_evattrs_all(pev=ev_pk)
+            afuncoutput = "adding evidence %s attributes to the profile " % ev_pk
+        else:
+            from tasks.scripts import String_Parser
+            sp1 = String_Parser.StringParser
+            afuncoutput = getattr(sp1, action_obj.automationid.code)('', argument)
+            if action_obj.automationid.code == "check_malicious":
+                ismalicious = afuncoutput
+                if action_obj.scriptinput.pk == 1:
+                    # description input
+                    # add_evattr(
+                    #     auser=actuser,
+                    #     aev=oldev_obj,
+                    #     aevattrvalue=afuncoutput,
+                    #     aevattrformat=EvidenceAttrFormat.objects.get(name='Reputation'),
+                    #     amodified_by=actusername,
+                    #     acreated_by=actusername,
+                    #     aattr_automatic=None
+                    # )
+                    pass
+                elif action_obj.scriptinput.pk == 2:
+                    # file input
+                    pass
+                elif action_obj.scriptinput.pk == 3:
+                    # attribute input
+                    # EvidenceAttr.objects.filter(pk=evattr_pk).update(attr_reputation = EvReputation.objects.get(pk=1))
+                    pass
+            # if action_obj.automationid.code == "StringParser.extract_ipv4":
+            #     pass
 
         results = {"command": str(cmd), "status": "1", "error": "0", "output": afuncoutput, "pid": 1}
         # if True: # SUCCESS

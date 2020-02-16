@@ -904,3 +904,56 @@ class SettingsSystemListView(LoginRequiredMixin, PermissionRequiredMixin, ListVi
 
     def get_context_data(self, **kwargs):
         return super(SettingsSystemListView, self).get_context_data(**kwargs)
+
+
+class SettingsSystemUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
+    login_url = '/'
+    # redirect_field_name = 'tasks/evidence_detail.html'
+    form_class = SettingsUserForm
+    model = SettingsUser
+    permission_required = ('configuration.change_settingssystem',)
+    success_url = 'configuration:settingssystem_list'
+
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
+            logger.info(logmsg)
+        super(SettingsSystemUpdateView, self).__init__(*args, **kwargs)
+
+    def get_success_url(self):
+        if 'next1' in self.request.GET:
+            redirect_to = self.request.GET['next1']
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
+                return reverse(self.success_url)
+        else:
+            return reverse(self.success_url)
+        return redirect_to
+
+    def get_context_data(self, **kwargs):
+        return super(SettingsSystemUpdateView, self).get_context_data(**kwargs)
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            # This will redirect to the login view
+            return self.handle_no_permission()
+        elif not self.request.user.has_perm('configuration.change_settingssystem'):
+            messages.error(self.request, "No permission to change a record !!!")
+            return redirect('configuration:settingssystem_detail', pk=self.kwargs.get('pk'))
+        # Checks pass, let http method handlers process the request
+        return super(SettingsSystemUpdateView, self).dispatch(request, *args, **kwargs)
+
+    # def form_valid(self, form):
+    #     self.object = form.save(commit=False)
+    #     self.object.save()
+    #     return super(ConnectionItemUpdateView, self).form_valid(form)
+
+    def get_form_kwargs(self):
+        # grab the current set of form #kwargs
+        kwargs = super(SettingsSystemUpdateView, self).get_form_kwargs()
+        # Update the kwargs with the user_id
+        kwargs['user'] = self.request.user
+        return kwargs

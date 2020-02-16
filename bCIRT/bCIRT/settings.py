@@ -329,6 +329,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 # ADDED FOR PDF SUPPORT ONLY
+# STATIC_ROOT = '/home/bali/PycharmProjects/bCIRT/static/'
 STATIC_ROOT = '/'
 # static root must be set to the full path, and calling "python3 manage.py collectstatic" to get the admin css
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
@@ -431,31 +432,31 @@ TASKS_ROOT = os.path.join(BASE_DIR, 'tasks')
 TASKS_URL = '/task/'
 FILE_UPLOAD_MAX_MEMORY_SIZE = 262144000  # =250 MB
 
-if DEBUG:
-    # INTERNAL_IPS = ('127.0.0.1', 'localhost',)
-    MIDDLEWARE += (
-       'debug_toolbar.middleware.DebugToolbarMiddleware',
-    )
-
-    INSTALLED_APPS += (
-       'debug_toolbar',
-    )
-
-    DEBUG_TOOLBAR_PANELS = [
-       'debug_toolbar.panels.versions.VersionsPanel',
-       'debug_toolbar.panels.timer.TimerPanel',
-       'debug_toolbar.panels.settings.SettingsPanel',
-       'debug_toolbar.panels.headers.HeadersPanel',
-       'debug_toolbar.panels.request.RequestPanel',
-       'debug_toolbar.panels.sql.SQLPanel',
-       'debug_toolbar.panels.staticfiles.StaticFilesPanel',
-       'debug_toolbar.panels.templates.TemplatesPanel',
-       'debug_toolbar.panels.cache.CachePanel',
-       'debug_toolbar.panels.signals.SignalsPanel',
-       'debug_toolbar.panels.logging.LoggingPanel',
-       'debug_toolbar.panels.redirects.RedirectsPanel',
-    ]
-
-    DEBUG_TOOLBAR_CONFIG = {
-       'INTERCEPT_REDIRECTS': False,
-    }
+# if DEBUG:
+#     # INTERNAL_IPS = ('127.0.0.1', 'localhost',)
+#     MIDDLEWARE += (
+#        'debug_toolbar.middleware.DebugToolbarMiddleware',
+#     )
+#
+#     INSTALLED_APPS += (
+#        'debug_toolbar',
+#     )
+#
+#     DEBUG_TOOLBAR_PANELS = [
+#        'debug_toolbar.panels.versions.VersionsPanel',
+#        'debug_toolbar.panels.timer.TimerPanel',
+#        'debug_toolbar.panels.settings.SettingsPanel',
+#        'debug_toolbar.panels.headers.HeadersPanel',
+#        'debug_toolbar.panels.request.RequestPanel',
+#        'debug_toolbar.panels.sql.SQLPanel',
+#        'debug_toolbar.panels.staticfiles.StaticFilesPanel',
+#        'debug_toolbar.panels.templates.TemplatesPanel',
+#        'debug_toolbar.panels.cache.CachePanel',
+#        'debug_toolbar.panels.signals.SignalsPanel',
+#        'debug_toolbar.panels.logging.LoggingPanel',
+#        'debug_toolbar.panels.redirects.RedirectsPanel',
+#     ]
+#
+#     DEBUG_TOOLBAR_CONFIG = {
+#        'INTERCEPT_REDIRECTS': False,
+#     }

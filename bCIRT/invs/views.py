@@ -16,7 +16,7 @@ from tasks.models import TaskTemplate, PlaybookTemplate, Action, ActionGroupMemb
 from tasks.models import new_playbook, new_evidence, task_close, actiongroupmember_items, TasksInvDetailTabEvidences
 from django.core.exceptions import ValidationError
 from django.utils.timezone import now as timezone_now
-from .models import InvDetailTabEvidences
+from .models import InvDetailTabEvidences, InvList
 # from django.utils.translation import gettext_lazy as _
 # from tasks.models import Task, Playbook
 import os
@@ -308,7 +308,6 @@ class InvListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView)
         return super(InvListView, self).get_context_data(**kwargs)
 
 
-from .models import InvList
 class InvCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
     model = Inv
     form_class = InvForm
