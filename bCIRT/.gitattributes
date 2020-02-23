@@ -1,2 +1,3 @@
 bCIRT/static/* linguist-vendored
+bCIRT_PackageReleases/* linguist-vendored
 *.js -linguist-vendored
