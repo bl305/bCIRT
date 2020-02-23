@@ -1,3 +1,4 @@
 bCIRT/static/* linguist-vendored
 bCIRT_PackageReleases/* linguist-vendored
+bCIRT/xBL_Sources/* linguis-vendored
 *.js -linguist-vendored
