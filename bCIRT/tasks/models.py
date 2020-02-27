@@ -17,6 +17,7 @@ from django.conf import settings
 from django.db import models
 from django.urls import reverse
 import tempfile
+from django.db.models import Q
 from django.db import transaction
 # HTML renderer
 import misaka
@@ -36,6 +37,7 @@ from django.db import transaction
 # import pathlib
 # from bCIRT.settings import PROJECT_ROOT
 from django.utils.timezone import now as timezone_now
+from configuration.models import SettingsSystem
 import random
 import string
 import magic
@@ -839,7 +841,8 @@ class EvidenceAttr(models.Model):
     def save(self, *args, **kwargs):
         # if the attribute is malicious, make the attribute an observable
         if self.attr_reputation:
-            if self.evattrformat.name != 'Reputation' and (self.attr_reputation.name == 'Suspicious' or self.attr_reputation.name == 'Malicious'):
+            if self.evattrformat.name != 'Reputation' and \
+                    (self.attr_reputation.name == 'Suspicious' or self.attr_reputation.name == 'Malicious'):
                 self.observable = True
         if self.ev:
             Evidence.objects.filter(pk=self.ev.pk).update(modified_at=timezone_now(), modified_by=self.modified_by)
@@ -852,12 +855,17 @@ class EvidenceAttr(models.Model):
         super(EvidenceAttr, self).save(*args, **kwargs)
 
     def get_sameitems_inv(self):
-        # similar_evattr = EvidenceAttr.objects.filter(evattrvalue__icontains=self.evattrvalue).exclude(ev__pk=self.ev.pk)
+        # similar_evattr = EvidenceAttr.objects.\
+        # filter(evattrvalue__icontains=self.evattrvalue).exclude(ev__pk=self.ev.pk)
+        exclusion_list = SettingsSystem.objects.filter(Q(settingname="excl.attr.alreadyseen") & Q(enabled=True)).values('settingvalue')
         similar_evattr = EvidenceAttr.objects.filter(evattrvalue=self.evattrvalue)\
             .exclude(ev=self.ev)\
-            .exclude(evattrvalue='d41d8cd98f00b204e9800998ecf8427e')\
-            .exclude(evattrvalue='da39a3ee5e6b4b0d3255bfef95601890afd80709')\
-            .exclude(evattrvalue='e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855')
+            .exclude(evattrvalue__in=exclusion_list)
+        # similar_evattr = EvidenceAttr.objects.filter(evattrvalue=self.evattrvalue)\
+        #     .exclude(ev=self.ev)
+            # .exclude(evattrvalue='d41d8cd98f00b204e9800998ecf8427e')\
+            # .exclude(evattrvalue='da39a3ee5e6b4b0d3255bfef95601890afd80709')\
+            # .exclude(evattrvalue='e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855')
 
         similar_evs = set()
         # print(similar_evattr)
@@ -872,16 +880,25 @@ class EvidenceAttr(models.Model):
         return similar_invs
 
     def get_sameitems_inv_values(self):
-        # similar_evattr = EvidenceAttr.objects.filter(evattrvalue__icontains=self.evattrvalue).exclude(ev__pk=self.ev.pk)
+        # similar_evattr = EvidenceAttr.objects.\
+        # filter(evattrvalue__icontains=self.evattrvalue).exclude(ev__pk=self.ev.pk)
+        # similar_evattr = EvidenceAttr.objects.filter(evattrvalue=self.evattrvalue)\
+        #     .exclude(ev=self.ev)\
+        #     .exclude(evattrvalue='d41d8cd98f00b204e9800998ecf8427e')\
+        #     .exclude(evattrvalue='da39a3ee5e6b4b0d3255bfef95601890afd80709')\
+        #     .exclude(evattrvalue='e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855')\
+        #     .select_related('user')\
+        #     .select_related('ev')\
+        #     .select_related('inv')
+            # .values('pk', 'user__username', 'ev', 'ev__pk')
+        exclusion_list = SettingsSystem.objects.filter(Q(settingname="excl.attr.alreadyseen") & Q(enabled=True))\
+            .values('settingvalue')
         similar_evattr = EvidenceAttr.objects.filter(evattrvalue=self.evattrvalue)\
             .exclude(ev=self.ev)\
-            .exclude(evattrvalue='d41d8cd98f00b204e9800998ecf8427e')\
-            .exclude(evattrvalue='da39a3ee5e6b4b0d3255bfef95601890afd80709')\
-            .exclude(evattrvalue='e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855')\
+            .exclude(evattrvalue__in=exclusion_list)\
             .select_related('user')\
             .select_related('ev')\
             .select_related('inv')
-            # .values('pk', 'user__username', 'ev', 'ev__pk')
 
         similar_evs = set()
         # print(similar_evattr)
@@ -904,7 +921,7 @@ class EvidenceAttr(models.Model):
         #         raise ValidationError(_('Task cannot be closed!'))
         if self.ev.inv and Inv.objects.filter(pk=self.ev.inv.pk).exists():
             if Inv.objects.get(pk=self.ev.inv.pk).status.name == "Closed" or \
-                Inv.objects.get(pk=self.ev.inv.pk).status.name == "Archived":
+                    Inv.objects.get(pk=self.ev.inv.pk).status.name == "Archived":
                 raise ValidationError(_('Investigation cannot be closed!'))
         pass
 
@@ -914,13 +931,29 @@ class EvidenceAttr(models.Model):
         ]
 
 def get_evidencesameitems_inv_values(pk):
+    pk=int(pk)
     # similar_evattr = EvidenceAttr.objects.filter(evattrvalue__icontains=self.evattrvalue).exclude(ev__pk=self.ev.pk)
+    # myattrvalue = EvidenceAttr.objects.filter(pk=pk).values('evattrvalue')[:1]
+    # similar_evattr = EvidenceAttr.objects.exclude(pk=pk) \
+    #     .filter(evattrvalue=myattrvalue)\
+    #     .exclude(evattrvalue='d41d8cd98f00b204e9800998ecf8427e') \
+    #     .exclude(evattrvalue='da39a3ee5e6b4b0d3255bfef95601890afd80709') \
+    #     .exclude(evattrvalue='e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855')\
+    #     .select_related('user__username')\
+    #     .select_related('attr_reputation__pk') \
+    #     .select_related('evattrformat__name') \
+    #     .select_related('evattrformat__pk') \
+    #     .select_related('ev__inv__pk') \
+    #     .values('pk', 'attr_reputation__pk', 'evattrformat__name', 'evattrformat__pk', 'observable', 'evattrvalue',
+    #             'user__username', 'ev__inv__pk')
+
+
+    exclusion_list = SettingsSystem.objects.filter(Q(settingname="excl.attr.alreadyseen") & Q(enabled=True))\
+        .values('settingvalue')
     myattrvalue = EvidenceAttr.objects.filter(pk=pk).values('evattrvalue')[:1]
     similar_evattr = EvidenceAttr.objects.exclude(pk=pk) \
-        .filter(evattrvalue=myattrvalue)\
-        .exclude(evattrvalue='d41d8cd98f00b204e9800998ecf8427e') \
-        .exclude(evattrvalue='da39a3ee5e6b4b0d3255bfef95601890afd80709') \
-        .exclude(evattrvalue='e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855')\
+        .filter(evattrvalue=myattrvalue) \
+        .exclude(evattrvalue__in=exclusion_list) \
         .select_related('user__username')\
         .select_related('attr_reputation__pk') \
         .select_related('evattrformat__name') \
@@ -2131,7 +2164,6 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
         newscript.seek(0)
         # print(newscript.name)
         # print(newscript.read())
-
     if argument != "None":
         if action_obj.scriptinput.pk == 1 or action_obj.scriptinput.pk == 3:
             # 1 represents description field as the input
@@ -2204,6 +2236,7 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
 
     else:
         cmdin = [interpreter, cmd]
+
     scripttype = action_obj.automationid.script_type
     actionq_startid = None
     results = ""
@@ -2370,7 +2403,7 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
         #     currevattrformat = EvidenceAttrFormat.objects.get(name=argumentoutput)
         # resoutput.split()
         # OUTPUT DELIMITER needs to be defined in the model - if empty, don't split...TBD
-        if isinstance(resoutput,list) or isinstance(resoutput,tuple):
+        if isinstance(resoutput, list) or isinstance(resoutput, tuple):
             # list type output
             for item1 in resoutput:
                 attr_rep = None
@@ -2395,7 +2428,7 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
                     cloneevidattr.pk = None
                     cloneevidattr.attr_reputation = attr_rep
                     newclone = cloneevidattr.save()
-        elif (isinstance(resoutput,str)):
+        elif (isinstance(resoutput, str)):
             for item1 in resoutput.splitlines():
                 # add_evattr(actuser, oldev_obj, item1, currevattrformat, actusername, actusername)
                 attr_rep = None

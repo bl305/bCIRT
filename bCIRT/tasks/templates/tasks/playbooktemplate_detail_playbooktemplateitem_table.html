@@ -84,8 +84,14 @@
 {% if not playbooktemplateitem.prevtask %}
                           <a href="{% url 'tasks:playittmp_remove' pk=playbooktemplateitem.pk %}?next1={{ request.get_full_path|urlencode }}"
                               class="btn btn-danger btn-xs">
-                          <span class="fas fa-trash-alt" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
+                          <span class="fas fa-trash-alt" data-toggle="tooltip" data-placement="top" title="Remove item"></span>
                           </a>
+{% else %}
+                          <button href="#"
+                              class="btn btn-xs">
+                          <span class="fas fa-trash-alt" data-toggle="tooltip" data-placement="top"
+                                title="Need to remove the previous step from this step to be able to delete"></span>
+                          </button>
 {% endif %}
                       </div>
                   </td>

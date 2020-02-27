@@ -103,7 +103,8 @@ class Get_Report():
     def invs_all_summary(self):
         retval = Inv.objects.filter(created_at__gte=self.astart)\
             .filter(created_at__lte=self.aend) \
-            .exclude(summary="Suspicious email")\
+            .exclude(summary="Suspicious email") \
+            .exclude(summary="<p>Suspicious email</p>") \
             .exclude(summary=None)\
             .values('summary', 'id', 'created_at')\
             .annotate(total=Count('id'))\

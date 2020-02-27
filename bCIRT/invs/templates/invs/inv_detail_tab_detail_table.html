@@ -21,7 +21,18 @@
                 -
             {% endif %}
         </td>
-        <td><strong>Severity</strong><br> {{ inv.severity }} </td>
+        <td>
+            <strong>Severity</strong>
+            <a href="{% url 'invs:inv_severities' %}" target="_blank">
+                <i class="text-primary fas fa-question-circle" id="severity">&nbsp;</i>
+            </a>
+            <br>
+            {% if severities.1.color %}
+                <font color="{{severities.1.color}}">{{ inv.severity }}</font>
+            {% else %}
+                {{ inv.severity }}
+            {% endif %}
+        </td>
         <td><strong>Priority</strong><br> {{ inv.priority }} </td>
         <td><strong>Parent</strong><br>
             {% if inv.parent %}
@@ -150,12 +161,15 @@
         <td><strong>Created on</strong><br> {{ inv.created_at|date:"Y/m/d H:i:s" }} </td>
         <td><strong>Created by</strong><br> {{ inv.created_by }} </td>
     </tr>
+{% if inv.status.name != "Closed" and inv.status.name != "Archived" %}
     <tr style="">
         <td colspan="7">
             <div class="container invdescription mw-100">
                 <strong>Review Comments #1</strong><br>
                 {% if inv.reviewer1comment %}
-                    <p class="text-warning">{{ inv.reviewer1comment|safe }}</p>
+                    <text class="text-danger">
+                        <p>{{ inv.reviewer1comment|safe }}</p>
+                    </text>
                 {% else %}
                     -
                 {% endif %}
@@ -167,13 +181,16 @@
             <div class="container invdescription mw-100" >
                 <strong>Review Comments #2</strong><br>
                 {% if inv.reviewer2comment %}
-                    <p class="text-warning">{{ inv.reviewer2comment|safe }}</p>
+                    <text class="text-danger">
+                        <p>{{ inv.reviewer2comment|safe }}</p>
+                    </text>
                 {% else %}
                     -
                 {% endif %}
             </div>
         </td>
     </tr>
+{% endif %}
     <tr>
         <td colspan="7">
             <div class="container invdescription mw-100" >
@@ -186,10 +203,10 @@
         <td colspan="7">
             <div class="container invdescription mw-100" >
                 <strong>Executive Summary</strong><br>
-                {% if inv.summary  %}
-                    {{ inv.summary|safe }}
+                {% if inv.summary_html %}
+                    {{ inv.summary_html|safe }}
                 {% else %}
-                    -
+                    {{ inv.summary|safe }}
                 {% endif %}
             </div>
         </td>
@@ -198,7 +215,11 @@
         <td colspan="7">
             <div class="container invdescription mw-100">
                 <strong>Process Improvements</strong><br>
-                {{ inv.processimprovement|safe }}
+                {% if inv.processimprovement_html %}
+                    {{ inv.processimprovement_html|safe }}
+                {% else %}
+                    {{ inv.processimprovement|safe }}
+                {% endif %}
             </div>
         </td>
     </tr>

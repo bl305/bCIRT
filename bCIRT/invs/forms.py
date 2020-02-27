@@ -358,24 +358,48 @@ class InvForm(forms.ModelForm):
                 'style': 'width:50%;',
                 'class': 'form-control'}
             ),
-            'description': forms.Textarea(attrs={
-                'rows': '5',
-                'cols': '68',
-                'style': 'width:90%',
-                'class': 'form-control'}
+            # 'description': forms.Textarea(attrs={
+            #     'rows': '5',
+            #     'cols': '68',
+            #     'style': 'width:90%',
+            #     'class': 'form-control'}
+            # ),
+            'description': TinyMCEWidget(
+                mce_attrs={
+                    'width': '95%',
+                },
+                attrs={
+                    'style': 'padding-right: 100px',
+                }
             ),
-            'processimprovement': forms.Textarea(attrs={
-                'rows': '5',
-                'cols': '68',
-                'style': 'width:90%',
-                'class': 'form-control'}
-            ),
-            'summary': forms.Textarea(attrs={
-                'rows': '5',
-                'cols': '68',
-                'style': 'width:90%',
-                'class': 'form-control'}
-            ),
+            # 'processimprovement': forms.Textarea(attrs={
+            #     'rows': '5',
+            #     'cols': '68',
+            #     'style': 'width:90%',
+            #     'class': 'form-control'}
+            # ),
+            # 'processimprovement': TinyMCEWidget(
+            #     mce_attrs={
+            #         'width': '95%',
+            #     },
+            #     attrs={
+            #         'style': 'padding-right: 100px',
+            #     }
+            # ),
+            # 'summary': forms.Textarea(attrs={
+            #     'rows': '5',
+            #     'cols': '68',
+            #     'style': 'width:90%',
+            #     'class': 'form-control'}
+            # ),
+            # 'summary': TinyMCEWidget(
+            #     mce_attrs={
+            #         'width': '95%',
+            #     },
+            #     attrs={
+            #         'style': 'padding-right: 100px',
+            #     }
+            # ),
             'comment': forms.TextInput(attrs={
                 'size': 50,
                 'style': 'width:50%',
@@ -583,11 +607,19 @@ class InvReviewer1Form(forms.ModelForm):
             'reviewer1comment': "Reviewer #1 Comments",
         }
         widgets = {
-            'reviewer1comment': forms.Textarea(attrs={
-                'rows': '5',
-                'cols': '68',
-                'style': 'width:90%',
-                'class': 'form-control'}
+            # 'reviewer1comment': forms.Textarea(attrs={
+            #     'rows': '5',
+            #     'cols': '68',
+            #     'style': 'width:90%',
+            #     'class': 'form-control'}
+            # ),
+            'reviewer1comment': TinyMCEWidget(
+                mce_attrs={
+                    'width': '95%',
+                },
+                attrs={
+                    'style': 'padding-right: 100px',
+                }
             ),
         }
 
@@ -608,10 +640,18 @@ class InvReviewer2Form(forms.ModelForm):
             'reviewer2comment': "Reviewer #2 Comments",
         }
         widgets = {
-            'reviewer2comment': forms.Textarea(attrs={
-                'rows': '5',
-                'cols': '68',
-                'style': 'width:90%',
-                'class': 'form-control'}
+            # 'reviewer2comment': forms.Textarea(attrs={
+            #     'rows': '5',
+            #     'cols': '68',
+            #     'style': 'width:90%',
+            #     'class': 'form-control'}
+            # ),
+            'reviewer2comment': TinyMCEWidget(
+                mce_attrs={
+                    'width': '95%',
+                },
+                attrs={
+                    'style': 'padding-right: 100px',
+                }
             ),
         }

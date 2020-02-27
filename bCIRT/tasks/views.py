@@ -2664,7 +2664,6 @@ class PlaybookTemplateItemCreateView(LoginRequiredMixin, PermissionRequiredMixin
             pass
         else:
             play_pk = 0
-
         kwargs['play_pk'] = play_pk
         kwargs['user'] = self.request.user
         return kwargs

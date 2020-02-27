@@ -1,0 +1,31 @@
+{% extends "invs/inv_detail_tab_template.html" %}
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : inv/inv_detail_tab_severities.html
+# Author            : Balazs Lendvay
+# Date created      : 2020.02.27
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2020.02.27  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+    <div class="row">
+        <div class="col-sm-12 col-md-12">
+{% block invtmp_buttons %}
+{% endblock invtmp_buttons %}
+
+{% block invtmp_title %}
+&nbsp;Severity - {{ severities.1.name }}
+{% endblock invtmp_title %}
+
+{% block invtmp_body %}
+                    {% if error_message %}
+                        <p><strong>{{ error_message }}</strong></p>
+                    {% endif %}
+                    {% include 'invs/inv_detail_tab_severities_table.html' %}
+{% endblock invtmp_body %}
+        </div>
+    </div>

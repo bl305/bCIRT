@@ -30,6 +30,8 @@ urlpatterns = [
     url(r'^review1complete/(?P<pk>\d+)/$', views.InvReview1CompleteView.as_view(), name='inv_review1complete'),
     url(r'^review2complete/(?P<pk>\d+)/$', views.InvReview2CompleteView.as_view(), name='inv_review2complete'),
 
+    url(r'^severities/$', views.InvSeveritiesView.as_view(), name='inv_severities'),
+
     url(r"^detailtab/(?P<pk>\d+)/$", views.InvTabDetailView.as_view(), name="inv_detailtab"),
     url(r"^profiletab/(?P<pk>\d+)/$", views.InvTabProfileView.as_view(), name="inv_profiletab"),
     url(r"^playbooktab/(?P<pk>\d+)/$", views.InvTabPlaybookView.as_view(), name="inv_playbooktab"),

@@ -227,7 +227,7 @@
                                                         <input type="text" placeholder="Search.." id="myInputEvAttr" onkeyup="filterFunctionEvAttr()">
                                                         <li>
                                                             {% if attr.evattrformat.name == "UserName" or attr.evattrformat.name == "UserID" or attr.evattrformat.name == "Email" or attr.evattrformat.name == "HostName" or attr.evattrformat.name == "IPv4" or attr.evattrformat.name == "IPv6" %}
-                                                                <a href="{% url 'assets:profile_autoadd' inv_pk=inv.pk evattr_pk=attr.pk ev_pk=0 %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ evidence.pk }}"
+                                                                <a href="{% url 'assets:profile_autoadd' inv_pk=taskevidence.inv.pk evattr_pk=attr.pk ev_pk=0 %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ evidence.pk }}"
                                                                 class="">
                                                                       I - Add To Profile
                                                                 </a>
@@ -237,9 +237,9 @@
                                                                   {% for actiongroup in actiongroups_attr|dictsort:"0" %}
                                                                   <li>
                                                                     {% if evidence.task %}
-                                                                        <a href="{% url 'tasks:act_exec_scriptgroup' pk=actiongroup.pk inv_pk=inv.pk task_pk=evidence.task.pk ev_pk=evidence.pk evattr_pk=attr.pk %}?attr={{attr.pk}}&next1={{ request.get_full_path|urlencode }}#item-inve{{ evidence.pk }}">
+                                                                        <a href="{% url 'tasks:act_exec_scriptgroup' pk=actiongroup.pk inv_pk=taskevidemce.inv.pk task_pk=evidence.task.pk ev_pk=evidence.pk evattr_pk=attr.pk %}?attr={{attr.pk}}&next1={{ request.get_full_path|urlencode }}#item-inve{{ evidence.pk }}">
                                                                     {% else %}
-                                                                        <a href="{% url 'tasks:act_exec_scriptgroup' pk=actiongroup.pk inv_pk=inv.pk task_pk=0 ev_pk=evidence.pk evattr_pk=attr.pk %}?attr={{attr.pk}}&next1={{ request.get_full_path|urlencode }}#item-inve{{ evidence.pk }}">
+                                                                        <a href="{% url 'tasks:act_exec_scriptgroup' pk=actiongroup.pk inv_pk=taskevidence.inv.pk task_pk=0 ev_pk=evidence.pk evattr_pk=attr.pk %}?attr={{attr.pk}}&next1={{ request.get_full_path|urlencode }}#item-inve{{ evidence.pk }}">
                                                                     {% endif %}
                                                                       <span></span>
                                                                           G{{ actiongroup.pk}} - {{ actiongroup }}
@@ -252,9 +252,9 @@
                                                                 {% if actid.scriptinput.pk == 3 %}
                                                                     {% if attr.evattrformat.pk == actid.scriptinputattrtype.pk or actid.scriptinputattrtype.pk is None %}
                                                                         {% if evidence.task %}
-                                                                            <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=inv.pk task_pk=evidence.task.pk ev_pk=evidence.pk evattr_pk=attr.pk %}?attr={{attr.pk}}&next1={{ request.get_full_path|urlencode }}#item-inve{{ evidence.pk }}">
+                                                                            <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=taskevidence.inv.pk task_pk=evidence.task.pk ev_pk=evidence.pk evattr_pk=attr.pk %}?attr={{attr.pk}}&next1={{ request.get_full_path|urlencode }}#item-inve{{ evidence.pk }}">
                                                                         {% else %}
-                                                                            <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=inv.pk task_pk=0 ev_pk=evidence.pk evattr_pk=attr.pk %}?attr={{attr.pk}}&next1={{ request.get_full_path|urlencode }}#item-inve{{ evidence.pk }}">
+                                                                            <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=taskevidence.inv.pk task_pk=0 ev_pk=evidence.pk evattr_pk=attr.pk %}?attr={{attr.pk}}&next1={{ request.get_full_path|urlencode }}#item-inve{{ evidence.pk }}">
                                                                         {% endif %}
                                                                         <span></span>
                                                                         {{ actid.pk }} - {{ actid.title }} ({{ actid.outputtarget.shortname }})
@@ -271,8 +271,8 @@
                                                 <li>&nbsp;</li>
                                                 <li>
                                                       <a href="{% url 'tasks:evattr_remove' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ evidence.pk }}"
-                                                          class="btn btn-secondary btn-sm btn-block">
-                                                      <span class="font-weight-bold text-danger" data-toggle="tooltip" data-placement="top" title="Delete item">
+                                                          class="btn btn-danger btn-sm btn-block">
+                                                      <span class="font-weight-bold text-light" data-toggle="tooltip" data-placement="top" title="Delete item">
                                                           <i class="fas fa-trash-alt"></i>
                                                           Delete
                                                       </span>

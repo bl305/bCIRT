@@ -1216,7 +1216,6 @@ class PlaybookTemplateItemForm(forms.ModelForm):
                                                    aggregate(Max('itemorder'))['itemorder__max'])+1
         else:
             self.fields['itemorder'].initial = 100
-
         # This means that we are editing
         if kwargs.get('instance'):
             currentitem_pk = kwargs.get('instance').pk
@@ -1242,15 +1241,17 @@ class PlaybookTemplateItemForm(forms.ModelForm):
 
         # This means we are creating a new item
         else:
-            if self.play_pk != "0":
+            if self.play_pk != "0" and self.play_pk is not None:
                 try:
-                    if PlaybookTemplateItem.objects.filter(playbooktemplateid=self.play_pk):
+                    if PlaybookTemplateItem.objects.filter(playbooktemplateid__pk=self.play_pk).exists():
                         actual_playbooktemplate_obj = PlaybookTemplate.objects.get(pk=self.play_pk)
                         # actual_playbooktemplate = actual_playbooktemplate_obj.pk
                         actual_alltasks = actual_playbooktemplate_obj.playbooktemplateitem_playbooktemplate.all()
                         self.fields['nexttask'].queryset = actual_alltasks
                         self.fields['prevtask'].queryset = actual_alltasks
-
+                    else:
+                        self.fields['prevtask'].queryset = PlaybookTemplateItem.objects.none()
+                        self.fields['nexttask'].queryset = PlaybookTemplateItem.objects.none()
                 except Exception:
                     self.fields['prevtask'].queryset = PlaybookTemplateItem.objects.filter(enabled=True)
                     self.fields['nexttask'].queryset = PlaybookTemplateItem.objects.filter(enabled=True)

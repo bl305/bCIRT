@@ -137,6 +137,7 @@ mybuttonbottom = document.getElementById("myBtnBottom");
 <!--                             endif %}-->
                             <a class="dropdown-item" href="{% url 'invs:inv_create' %}"><i class="fas fa-folder-plus">&nbsp;</i>New Investigation</a>
                             <a class="dropdown-item" href="{% url 'invs:inv_list' %}"><i class="fas fa-list-ol">&nbsp;</i>Investigations</a>
+                            <a class="dropdown-item" href="{% url 'invs:inv_severities' %}"><i class="fas fa-list-ol">&nbsp;</i>Severities</a>
                         </div>
                     </li>
                     <li class="nav-item dropdown {% block tasks_active %}{% endblock tasks_active%}">

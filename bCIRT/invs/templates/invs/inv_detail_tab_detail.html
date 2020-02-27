@@ -90,8 +90,8 @@
                                             <li>&nbsp;</li>
                                             <li>
                                                   <a tabindex="-1" href="{% url 'invs:inv_remove' pk=inv.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                                      class="btn btn-secondary btn-sm btn-block">
-                                                  <span class="font-weight-bold text-danger" data-toggle="tooltip" data-placement="top" title="Delete item">
+                                                      class="btn btn-danger btn-sm btn-block">
+                                                  <span class="font-weight-bold text-light" data-toggle="tooltip" data-placement="top" title="Delete item">
                                                       <i class="fas fa-trash-alt"></i>
                                                       Delete
                                                   </span>
@@ -120,4 +120,5 @@ $(document).ready(function(){
   });
 });
 </script>
+
 {% endblock invtmp_body %}

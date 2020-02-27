@@ -909,8 +909,8 @@ class SettingsSystemListView(LoginRequiredMixin, PermissionRequiredMixin, ListVi
 class SettingsSystemUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateView):
     login_url = '/'
     # redirect_field_name = 'tasks/evidence_detail.html'
-    form_class = SettingsUserForm
-    model = SettingsUser
+    form_class = SettingsSystemForm
+    model = SettingsSystem
     permission_required = ('configuration.change_settingssystem',)
     success_url = 'configuration:settingssystem_list'
 

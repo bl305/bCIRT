@@ -12,7 +12,8 @@
 # **********************************************************************;
 # TBD
 # add settingsuser, settingssystem, settingscategory
-
+# add InvSeverityCriteriaCategory, InvSeverityCriteria
+# add InvSeverityContact, InvSeverityContactRef
 
 # https://github.com/django-import-export/django-import-export/issues/397
 #

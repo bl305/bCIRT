@@ -1,0 +1,161 @@
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : inv/inv_tab_severities_tablebody.html
+# Author            : Balazs Lendvay
+# Date created      : 2020.02.27
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2020.02.27  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+    <div class="table-responsive text-dark">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Severity</th>
+                    <th>Risk Category</th>
+                    <th>Description</th>
+                    <th>Notification <br>frequency hours</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% with severities as severitieslist %}
+                    {% for severity in severitieslist %}
+                        {% if severity.color %}
+                            <tr bgcolor="{{severity.color}}">
+                        {% else %}
+                            <tr>
+                        {% endif %}
+                                <th rowspan="1" scope="row" class="text-left align-middle">
+                                    {% if severity.name %}
+                                        {{severity.name}}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </th>
+                                <td rowspan="1" class="text-left align-middle">
+                                    {% if severity.invseveritycriteria_invseverity__criteriacategory__name %}
+                                        {{ severity.invseveritycriteria_invseverity__criteriacategory__name }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td class="text-left align-middle">
+                                    {% if severity.invseveritycriteria_invseverity__description %}
+                                        {{severity.invseveritycriteria_invseverity__description }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td class="text-left align-middle">
+                                    {% if severity.notificationfrequency %}
+                                        {{severity.notificationfrequency}}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                        </tr>
+                    {% endfor %}
+                {% endwith %}
+            </tbody>
+        </table>
+    </div>
+
+    <h4 class="text-center text-danger">Contacts to Notify</h4>
+    <div class="table-responsive text-dark">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Severity</th>
+                    <th>Title</th>
+                    <th>First name</th>
+                    <th>Last name</th>
+                    <th>Location</th>
+                    <th>Desk phone</th>
+                    <th>Mobile phone</th>
+                    <th>Email</th>
+                    <th>Modified at</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% with contacts as contactlist %}
+                    {% for contact in contactlist %}
+                        {% if contact.color %}
+                            <tr bgcolor="{{contact.color}}">
+                        {% else %}
+                            <tr>
+                        {% endif %}
+                                <th scope="row" class="text-left align-middle">
+                                    {% if contact.name %}
+                                        {{contact.name}}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </th>
+                                <td>
+                                    {% if contact.invseveritycontactref_invseverity__contact__title %}
+                                        {{contact.invseveritycontactref_invseverity__contact__title}}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if contact.invseveritycontactref_invseverity__contact__firstname %}
+                                        {{contact.invseveritycontactref_invseverity__contact__firstname}}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if contact.invseveritycontactref_invseverity__contact__lastname %}
+                                        {{contact.invseveritycontactref_invseverity__contact__lastname}}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if contact.invseveritycontactref_invseverity__contact__location %}
+                                        {{contact.invseveritycontactref_invseverity__contact__location}}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if contact.invseveritycontactref_invseverity__contact__deskphone %}
+                                        {{contact.invseveritycontactref_invseverity__contact__deskphone}}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if contact.invseveritycontactref_invseverity__contact__mobilephone %}
+                                        {{contact.invseveritycontactref_invseverity__contact__mobilephone}}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if contact.invseveritycontactref_invseverity__contact__emailaddress %}
+                                    <a href="mailto:{{contact.invseveritycontactref_invseverity__contact__emailaddress}}">
+                                        {{contact.invseveritycontactref_invseverity__contact__emailaddress}}
+                                    </a>
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if contact.invseveritycontactref_invseverity__contact__modified_at|date:"Y/m/d H:i:s" %}
+                                        {{contact.invseveritycontactref_invseverity__contact__modified_at|date:"Y/m/d H:i:s"}}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                        </tr>
+                    {% endfor %}
+                {% endwith %}
+            </tbody>
+        </table>
+    </div>

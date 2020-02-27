@@ -165,8 +165,8 @@
 <!--                                        because of the modal need to redirect-->
 <!--                                        <a href="{% url 'tasks:ev_remove' pk=invevidence.evidence_inv__pk %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ invevidence.evidence_inv__pk }}"-->
                                         <a href="{% url 'tasks:ev_remove' pk=invevidence.evidence_inv__pk %}?next1=/invs/evidencetab/{{inv.pk}}/#thebottom"
-                                            class="btn btn-secondary btn-sm btn-block">
-                                            <span class="font-weight-bold text-danger" data-toggle="tooltip" data-placement="top" title="Delete item">
+                                            class="btn btn-danger btn-sm btn-block">
+                                            <span class="font-weight-bold text-light" data-toggle="tooltip" data-placement="top" title="Delete item">
                                                 <i class="fas fa-trash-alt"></i>
                                                 Delete
                                             </span>
@@ -429,8 +429,8 @@
                                                     <li>&nbsp;</li>
                                                     <li>
                                                           <a href="{% url 'tasks:evattr_remove' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ invevidence.evidence_inv__pk }}"
-                                                              class="btn btn-secondary btn-sm btn-block">
-                                                          <span class="font-weight-bold text-danger" data-toggle="tooltip" data-placement="top" title="Delete item">
+                                                              class="btn btn-danger btn-sm btn-block">
+                                                          <span class="font-weight-bold text-light" data-toggle="tooltip" data-placement="top" title="Delete item">
                                                               <i class="fas fa-trash-alt"></i>
                                                               Delete
                                                           </span>

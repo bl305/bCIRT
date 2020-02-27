@@ -14,6 +14,7 @@
 # **********************************************************************;
 from tasks.models import TaskTemplate, PlaybookTemplate, Action, ActionGroupMember
 from tasks.models import new_playbook, new_evidence, task_close, actiongroupmember_items, TasksInvDetailTabEvidences
+from invs.models import SeverityHelper
 from django.core.exceptions import ValidationError
 from django.utils.timezone import now as timezone_now
 from .models import InvDetailTabEvidences, InvList
@@ -42,7 +43,7 @@ from django.template.loader import render_to_string
 
 from .forms import InvForm, InvSuspiciousEmailForm, InvReviewer1Form, InvReviewer2Form
 from .models import Inv, InvStatus, new_inv, InvCategory, InvAttackVector, InvPhase, InvSeverity, CurrencyType,\
-    InvPriority  # , InvReviewRules
+    InvPriority, InvSeverityCriteria, InvSeverityContactRef  # , InvReviewRules
 # from django.shortcuts import redirect, reverse    # ,render, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.mixins import (
@@ -127,9 +128,9 @@ class InvDetailPrintView(LoginRequiredMixin, PermissionRequiredMixin, generic.De
         super(InvDetailPrintView, self).__init__(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        kwargs['templatecategories'] = TaskTemplate.objects.filter(enabled=True)
-        kwargs['playbooks'] = PlaybookTemplate.objects.filter(enabled=True)
-        kwargs['actions'] = Action.objects.filter(enabled=True)
+        kwargs['templatecategories'] = TaskTemplate.objects.filter(enabled=True).order_by('title')
+        kwargs['playbooks'] = PlaybookTemplate.objects.filter(enabled=True).order_by('created_at')
+        kwargs['actions'] = Action.objects.filter(enabled=True).order_by('title')
         return super(InvDetailPrintView, self).get_context_data(**kwargs)
 
     def dispatch(self, request, *args, **kwargs):
@@ -276,10 +277,39 @@ class ExportInvFilesView(LoginRequiredMixin, PermissionRequiredMixin, generic.Vi
 
 # #############################################################################3
 # Investigation related views
+class InvSeveritiesView(LoginRequiredMixin, PermissionRequiredMixin, generic.TemplateView):
+    template_name = "invs/inv_severities_table.html"
+    permission_required = ('invs.view_inv')
+
+    def get_context_data(self, **kwargs):
+        # kwargs['user'] = self.request.user
+        # kwargs['severities'] = InvSeverityCriteria.objects.all().\
+        #     select_related('criteriacategory').\
+        #     select_related('severity__name').\
+        #     select_related('severity__notificationfrequency').\
+        #     values('severity__name', 'criteriacategory__name', 'name', 'severity__notificationfrequency').\
+        #     order_by('severity__name', 'criteriacategory')
+        # kwargs['contacts'] = InvSeverityContactRef.objects.all().\
+        #     select_related('severity__name').\
+        #     select_related('contact__title').\
+        #     select_related('contact__firstname').\
+        #     select_related('contact__lastname').\
+        #     select_related('contact__location').\
+        #     select_related('contact__deskphone').\
+        #     select_related('contact__mobilephone').\
+        #     select_related('contact__emailaddress').\
+        #     select_related('contact__modified_at').\
+        #     values('severity__name', 'contact__title', 'contact__firstname', 'contact__lastname', 'contact__location',
+        #            'contact__deskphone', 'contact__mobilephone', 'contact__emailaddress', 'contact__modified_at')
+        kwargs['severities'] = SeverityHelper.getseverities()
+        kwargs['contacts'] = SeverityHelper.getcontacts()
+        return super(InvSeveritiesView, self).get_context_data(**kwargs)
+
+
 class InvListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
     model = Inv
     form_class = InvForm
-    permission_required = ('invs.view_inv',)
+    permission_required = ('invs.view_inv')
 
     def __init__(self, *args, **kwargs):
         if LOGLEVEL == 1:
@@ -403,9 +433,9 @@ class InvDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.DetailV
         return retval
 
     def get_context_data(self, **kwargs):
-        kwargs['templatecategories'] = TaskTemplate.objects.filter(enabled=True)
-        kwargs['playbooks'] = PlaybookTemplate.objects.filter(enabled=True)
-        kwargs['actions'] = Action.objects.filter(enabled=True)
+        kwargs['templatecategories'] = TaskTemplate.objects.filter(enabled=True).order_by('title')
+        kwargs['playbooks'] = PlaybookTemplate.objects.filter(enabled=True).order_by('created_at')
+        kwargs['actions'] = Action.objects.filter(enabled=True).order_by('title')
         # inv_obj = Inv.objects.get(pk=self.kwargs.get('pk'))
         # ev_obj = inv_obj.evidence_inv.all()
         # evattr_set = set()
@@ -1118,7 +1148,12 @@ class InvTabDetailView(LoginRequiredMixin, PermissionRequiredMixin, generic.Temp
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
         context = super(InvTabDetailView, self).get_context_data(**kwargs)
-        kwargs['inv'] = Inv.objects.get(pk=self.kwargs.get('pk'))
+        inv_pk = self.kwargs.get('pk')
+        inv_obj = Inv.objects.get(pk=inv_pk)
+        kwargs['inv'] = inv_obj
+
+        kwargs['severities'] = SeverityHelper.getseverities(sev_pk=inv_obj.severity.pk)
+        kwargs['contacts'] = SeverityHelper.getcontacts(sev_pk=inv_obj.severity.pk)
         return kwargs
 
 
@@ -1161,7 +1196,7 @@ class InvTabPlaybookView(LoginRequiredMixin, PermissionRequiredMixin, generic.Te
         # Call the base implementation first to get a context
         context = super(InvTabPlaybookView, self).get_context_data(**kwargs)
         kwargs['inv'] = Inv.objects.get(pk=self.kwargs.get('pk'))
-        kwargs['playbooks'] = PlaybookTemplate.objects.filter(enabled=True)
+        kwargs['playbooks'] = PlaybookTemplate.objects.filter(enabled=True).order_by('name')
         return kwargs
 
 from django.db.models import Count
@@ -1213,12 +1248,14 @@ class InvTabTasksView(LoginRequiredMixin, PermissionRequiredMixin, generic.Templ
         kwargs['templatecategories'] = TaskTemplate.objects.filter(enabled=True)\
             .select_related('category__name')\
             .values('pk', 'category__name', 'title')\
+            .order_by('title')\
             .iterator()
         kwargs['actions'] = Action.objects.filter(enabled=True)\
             .select_related('scriptinput__pk')\
             .select_related('scriptinputattrtype__pk')\
             .select_related('outputtarget__shortname')\
-            .values('pk', 'title', 'scriptinput__pk', 'scriptinputattrtype__pk', 'outputtarget__shortname')
+            .values('pk', 'title', 'scriptinput__pk', 'scriptinputattrtype__pk', 'outputtarget__shortname')\
+            .order_by('title')
 
         ########################################3
         # kwargs['attrs'] = EvidenceAttr.objects.filter(ev__inv__pk=self.kwargs.get('pk'))\

@@ -85,6 +85,8 @@ class InvSeverity(models.Model):
     objects = models.Manager()
     name = models.CharField(max_length=40)
     enabled = models.BooleanField(default=True)
+    notificationfrequency = models.PositiveSmallIntegerField(default=0, blank=False, null=False)
+    color = models.CharField(max_length=6, default=None, null=True, blank=True)
     description = models.CharField(max_length=500, default="")
     description_html = models.TextField(max_length=750, editable=True, default='', blank=True)
 
@@ -94,6 +96,126 @@ class InvSeverity(models.Model):
     def save(self, *args, **kwargs):
         self.description_html = misaka.html(self.description)
         super(InvSeverity, self).save(*args, **kwargs)
+
+
+class InvSeverityContact(models.Model):
+    objects = models.Manager()
+    title = models.CharField(max_length=50)
+    firstname = models.CharField(max_length=25)
+    lastname = models.CharField(max_length=25)
+    location = models.CharField(max_length=25)
+    deskphone = models.CharField(max_length=25)
+    mobilephone = models.CharField(max_length=25)
+    emailaddress = models.CharField(max_length=50)
+    description = models.CharField(max_length=500, default="")
+    description_html = models.TextField(max_length=750, editable=True, default='', blank=True)
+    modified_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return str(self.title)
+
+    def save(self, *args, **kwargs):
+        self.description_html = misaka.html(self.description)
+        super(InvSeverityContact, self).save(*args, **kwargs)
+
+
+class InvSeverityContactRef(models.Model):
+    objects = models.Manager()
+    severity = models.ForeignKey(InvSeverity,
+                                 on_delete=models.SET_NULL,
+                                 default=None,
+                                 blank=True,
+                                 null=True,
+                                 related_name="invseveritycontactref_invseverity")
+    contact = models.ForeignKey(InvSeverityContact,
+                                 on_delete=models.SET_NULL,
+                                 default=None,
+                                 blank=True,
+                                 null=True,
+                                 related_name="invseveritycontactref_invseveritycontact")
+
+    def __str__(self):
+        return str(self.pk) + " - " + str(self.severity) + " - " + str(self.contact)
+
+    def save(self, *args, **kwargs):
+        super(InvSeverityContactRef, self).save(*args, **kwargs)
+
+
+class InvSeverityCriteriaCategory(models.Model):
+    objects = models.Manager()
+    name = models.CharField(max_length=40)
+    enabled = models.BooleanField(default=True)
+    description = models.CharField(max_length=500, default="")
+    description_html = models.TextField(max_length=750, editable=True, default='', blank=True)
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        self.description_html = misaka.html(self.description)
+        super(InvSeverityCriteriaCategory, self).save(*args, **kwargs)
+
+
+class InvSeverityCriteria(models.Model):
+    objects = models.Manager()
+    severity = models.ForeignKey(InvSeverity,
+                                 on_delete=models.SET_NULL,
+                                 default=None,
+                                 blank=True,
+                                 null=True,
+                                 related_name="invseveritycriteria_invseverity")
+    criteriacategory = models.ForeignKey(InvSeverityCriteriaCategory,
+                                         on_delete=models.SET_NULL,
+                                         default=None,
+                                         blank=True,
+                                         null=True,
+                                         related_name="invseveritycriteria_invseveritycriteriacategory")
+    enabled = models.BooleanField(default=True)
+    description = models.TextField(max_length=500, editable=True, default="", blank=False, null=True)
+
+    def __str__(self):
+        return self.description
+
+    def save(self, *args, **kwargs):
+        super(InvSeverityCriteria, self).save(*args, **kwargs)
+
+
+class SeverityHelper:
+
+    def getseverities(sev_pk=None):
+        retval = InvSeverity.objects.filter(enabled=True) \
+            .select_related('invseveritycriteria_invseverity__description') \
+            .select_related('invseveritycriteria_invseverity__criteriacategory__name') \
+            .values('name',
+                    'color',
+                    'invseveritycriteria_invseverity__description',
+                    'invseveritycriteria_invseverity__criteriacategory__name',
+                    'notificationfrequency') \
+            .order_by('name', 'invseveritycriteria_invseverity__criteriacategory__name')
+        if sev_pk:
+            retval = retval.filter(pk=sev_pk)
+        return retval
+
+    def getcontacts(sev_pk=None):
+        retval = InvSeverity.objects.all().\
+            select_related('invseveritycontactref_invseverity').\
+            values('name',
+                   'color',
+                   'invseveritycontactref_invseverity__contact__title',
+                   'invseveritycontactref_invseverity__contact__firstname',
+                   'invseveritycontactref_invseverity__contact__lastname',
+                   'invseveritycontactref_invseverity__contact__location',
+                   'invseveritycontactref_invseverity__contact__deskphone',
+                   'invseveritycontactref_invseverity__contact__mobilephone',
+                   'invseveritycontactref_invseverity__contact__emailaddress',
+                   'invseveritycontactref_invseverity__contact__modified_at',
+                   )\
+            .order_by('name', 'invseveritycontactref_invseverity__contact__title')
+        if sev_pk:
+            retval = retval.filter(pk=sev_pk)
+        return retval
+
+
 
 
 class InvCategory(models.Model):
@@ -172,9 +294,14 @@ class Inv(models.Model):
     reviewer2 = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, default=None, blank=True, null=True,
                                   related_name="inv_reviewer2")
     # reviewer1 = models.CharField(max_length=20, default="Pending")
-    reviewer1comment = models.CharField(max_length=2000, default="", blank=True, null=True)
+    # reviewer1comment = models.CharField(max_length=2000, default="", blank=True, null=True)
+    reviewer1comment = HTMLField(default="", blank=True, null=True)
+    reviewer1comment_html = HTMLField(default="", blank=True, null=True)
+
     # reviewer2 = models.CharField(max_length=20, default="Pending")
-    reviewer2comment = models.CharField(max_length=2000, default="", blank=True, null=True)
+    # reviewer2comment = models.CharField(max_length=2000, default="", blank=True, null=True)
+    reviewer2comment = HTMLField(default="", blank=True, null=True)
+    reviewer2comment_html = HTMLField(default="", blank=True, null=True)
     phase = models.ForeignKey(InvPhase, on_delete=models.SET_DEFAULT, default="1",
                               related_name="inv_phase")
     severity = models.ForeignKey(InvSeverity, on_delete=models.SET_DEFAULT, default="1",
@@ -189,9 +316,13 @@ class Inv(models.Model):
     # description_html = models.TextField(editable=True, default='', blank=True)
     description = HTMLField()
     description_html = HTMLField()
-    summary = models.CharField(max_length=2000, default="", blank=True, null=True)
+    # summary = models.CharField(max_length=2000, default="", blank=True, null=True)
+    summary = HTMLField(default="", blank=True, null=True)
+    summary_html = HTMLField(default="", blank=True, null=True)
     comment = models.CharField(max_length=50, default="", blank=True, null=True)
-    processimprovement = models.CharField(max_length=2000, default="", blank=True, null=True)
+    # processimprovement = models.CharField(max_length=2000, default="", blank=True, null=True)
+    processimprovement = HTMLField(default="", blank=True, null=True)
+    processimprovement_html = HTMLField(default="", blank=True, null=True)
     starttime = models.DateTimeField(auto_now=False, blank=True, null=True)
     endtime = models.DateTimeField(auto_now=False, blank=True, null=True)
     invduration = models.PositiveIntegerField(blank=True, null=True, default=None)
@@ -303,7 +434,26 @@ class Inv(models.Model):
         else:
             self.invduration = None
 
-        self.description_html = misaka.html(self.description)
+        if self.description:
+            self.description_html = misaka.html(self.description)
+        else:
+            self.description_html = ""
+        if self.reviewer1comment:
+            self.reviewer1comment_html = misaka.html(self.reviewer1comment)
+        else:
+            self.reviewer1comment = ""
+        if self.reviewer2comment:
+            self.reviewer2comment_html = misaka.html(self.reviewer2comment)
+        else:
+            self.reviewer2comment = ""
+        if self.summary:
+            self.summary_html = misaka.html(self.summary)
+        else:
+            self.summary = ""
+        if self.processimprovement:
+            self.processimprovement_html = misaka.html(self.processimprovement)
+        else:
+            self.processimprovement = ""
         # super(Inv, self).save(*args, **kwargs)
         super(Inv, self).save(force_insert, force_update, *args, **kwargs)
         self.__original_status = self.status

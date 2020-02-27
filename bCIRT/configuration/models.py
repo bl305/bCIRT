@@ -261,7 +261,7 @@ class SettingsUser(models.Model):
 
 class SettingsSystem(models.Model):
     objects = models.Manager()
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, default=None, null=True,
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, default=None, null=True, blank=True,
                              related_name="settingssystem_users")
     settingname = models.CharField(max_length=25, null=True, blank=True, default=None)
     settingvalue = models.CharField(max_length=255, null=True, blank=True, default=None)

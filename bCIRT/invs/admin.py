@@ -28,6 +28,10 @@ class GroupMemberInline(admin.TabularInline):
     model = models.Inv
     model = models.InvReviewRules
     model = models.CurrencyType
+    model = models.InvSeverityCriteria
+    model = models.InvSeverityCriteriaCategory
+    model = models.InvSeverityContact
+    model = models.InvSeverityContactRef
 
 # admin.site.register(models.Inv)
 # admin.site.register(models.InvAttackVector)
@@ -80,4 +84,24 @@ class InvAdmin(ImportExportModelAdmin):
 
 @admin.register(models.InvReviewRules)
 class InvReviewRulesAdmin(ImportExportModelAdmin):
+    pass
+
+
+@admin.register(models.InvSeverityCriteria)
+class InvSeverityCriteriaAdmin(ImportExportModelAdmin):
+    pass
+
+
+@admin.register(models.InvSeverityCriteriaCategory)
+class InvSeverityCriteriaCategoryAdmin(ImportExportModelAdmin):
+    pass
+
+
+@admin.register(models.InvSeverityContact)
+class InvSeverityContactAdmin(ImportExportModelAdmin):
+    pass
+
+
+@admin.register(models.InvSeverityContactRef)
+class InvSeverityContactRefAdmin(ImportExportModelAdmin):
     pass

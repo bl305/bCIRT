@@ -12,6 +12,8 @@
 # **********************************************************************;
 # TBD:
 # add settingsuser, settingssystem, settingscategory
+# add InvSeverityCriteriaCategory, InvSeverityCriteria
+# add InvSeverityContact, InvSeverityContactRef
 
 from django.core.management.base import BaseCommand, CommandError
 # from invs.models import InvStatus, InvPriority, InvAttackVector, InvCategory, InvPhase, InvSeverity
