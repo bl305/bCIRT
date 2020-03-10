@@ -397,7 +397,7 @@ class InvCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateV
         kwargs = super(InvCreateView, self).get_form_kwargs()
         # Update the kwargs with the user_id
         # kwargs['inv_pk'] = self.kwargs.get('inv_pk')
-        kwargs['pparent'] = InvList.get_invlist(self)
+        kwargs['pparent'] = InvList.get_invlist(self, pexcl=self.kwargs.get('inv_pk'), allownull=True)
         kwargs['user'] = self.request.user
         return kwargs
 
@@ -548,7 +548,8 @@ class InvUpdateView(LoginRequiredMixin, PermissionRequiredMixin, generic.UpdateV
         kwargs = super(InvUpdateView, self).get_form_kwargs()
         # Update the kwargs with the user_id
         # kwargs['inv_pk'] = self.kwargs.get('inv_pk')
-        kwargs['pparent'] = InvList.get_invlist(self)
+        # kwargs['pparent'] = InvList.get_invlist(self)
+        kwargs['pparent'] = InvList.get_invlist(self, pexcl=self.kwargs.get('inv_pk'), allownull=True)
         kwargs['user'] = self.request.user
         return kwargs
 

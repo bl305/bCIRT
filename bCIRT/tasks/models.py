@@ -2762,37 +2762,46 @@ def evidencereadonly(ev_pk):
     return retval
 
 class TaskList():
-    def get_tasklist(self, pinv, pexcltask, pallownull=False, porder_by='pk'):
+    def get_tasklist(self, pinv, pexcltask, pallownull=False, porder_by='pk', preadonly=None):
         task_obj = None
         if pinv != '0':
             if pexcltask:
                 task_objs = Task.objects.filter(inv__pk=pinv)\
                     .exclude(pk=pexcltask)\
                     .select_related('inv__pk') \
-                    .values_list('pk', 'inv__pk', 'title').order_by(porder_by)
+                    .select_related('status__name') \
+                    .values_list('pk', 'inv__pk', 'title', 'status__name').order_by(porder_by)
             else:
                 task_objs = Task.objects.filter(inv__pk=pinv)\
                     .select_related('inv__pk') \
-                    .values_list('pk', 'inv__pk', 'title').order_by(porder_by)
+                    .select_related('status__name') \
+                    .values_list('pk', 'inv__pk', 'title','status__name').order_by(porder_by)
         else:
             if pexcltask:
                 task_objs = Task.objects.exclude(pk=pexcltask)\
                     .select_related('inv__pk') \
-                    .values_list('pk', 'inv__pk', 'title').order_by(porder_by)
+                    .select_related('status__name') \
+                    .values_list('pk', 'inv__pk', 'title', 'status__name').order_by(porder_by)
             else:
                 task_objs = Task.objects.select_related('inv__pk') \
-                    .values_list('pk', 'inv__pk', 'title').order_by(porder_by)
+                    .select_related('status__name') \
+                    .values_list('pk', 'inv__pk', 'title', 'status__name').order_by(porder_by)
         outlist = list()
         if pallownull:
             outlist.append(('', 'None'))
         NoneType = type(None)
         if task_objs.exists():
             for task in task_objs:
-                if type(task[1]) == NoneType:
-                    outstr = "%s-%s (%s)" % (int(task[0]), str(task[2]), "NA")
+                if preadonly is True:
+                    areadonly = taskreadonly(task[3])
                 else:
+                    areadonly = False
+                if type(task[1]) != NoneType and areadonly:
                     outstr = "%s-%s (%s)" % (int(task[0]), str(task[2]), str(task[1]))
-                outlist.append((task[0], outstr))
+                else:
+                    outstr = "%s-%s (%s)" % (int(task[0]), str(task[2]), "NA")
+                if not taskreadonly(task[3]):
+                    outlist.append((task[0], outstr))
         return outlist
 
     def get_taskstatuslist(self):

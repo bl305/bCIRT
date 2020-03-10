@@ -3201,7 +3201,7 @@ class EvidenceCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Cr
         else:
             task_pk = 0
         kwargs['tasklist'] = TaskList.get_tasklist(Task.objects.none(), pinv=inv_pk, pexcltask=None, pallownull=True,
-                                                   porder_by='pk')
+                                                   porder_by='pk', preadonly=True)
         kwargs['inv_pk'] = inv_pk
         kwargs['task_pk'] = task_pk
         kwargs['user'] = self.request.user

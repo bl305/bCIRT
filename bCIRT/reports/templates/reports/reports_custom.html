@@ -532,7 +532,7 @@
                         {% for inv_all_summary in invs_all_summary %}
                         <tr data-toggle="collapse" data-target="#myinvs{{inv_all_summary.pk}}" class="accordion-toggle">
                             <td>
-                                {{ inv_all_summary.summary }}
+                                {{ inv_all_summary.summary|safe }}
                             </td>
                             <td>
                                 <a href="{% url 'invs:inv_detail' pk=inv_all_summary.id %}"><h6><span class="badge badge-pill badge-secondary">{{ inv_all_summary.id }}</span></h6></a>

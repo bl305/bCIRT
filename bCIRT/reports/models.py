@@ -92,6 +92,8 @@ class Get_Report():
         retval = EvidenceAttr.objects \
             .filter(attr_reputation__name='Malicious') \
             .filter(Q(evattrformat__name__startswith='Hash_') | Q(evattrformat__name='FileName')) \
+            .filter(ev__inv__created_at__gte=self.astart) \
+            .filter(ev__inv__created_at__lte=self.aend) \
             .filter(ev__inv__attackvector__name='Phishing') \
             .filter(ev__inv__status=2) \
             .values_list('ev__inv__created_at', 'ev__inv') \

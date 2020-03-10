@@ -88,7 +88,17 @@
         </td>
         <td><strong>Attack Vector</strong><br> {{ inv.attackvector }} </td>
         <td colspan="1"></td>
-        <td><strong>Victim Count</strong><br> {{ inv.numofvictims }} </td>
+        <td>
+            <strong>Victim Count</strong><br> {{ inv.numofvictims }}
+<!--<form>-->
+<!--<strong>Victim Count</strong><br>-->
+<!--<span name="displayText">{{ inv.numofvictims }}</span>-->
+<!--<input type="text" name="editText" value="{{ inv.numofvictims }}" style="display:none">-->
+<!--</form>-->
+<!--<input type="submit" name="save" value="Save">-->
+
+
+        </td>
         <td><strong>Investigation start</strong><br> {{ inv.starttime|date:"Y/m/d H:i:s" }} </td>
         <td><strong>Investigation end</strong><br>
             {% if inv.endtime %}
@@ -226,3 +236,10 @@
 {% else %}
     <tr><td>No Header available!</td></tr>
 {% endif %}
+
+<script>
+$('span[name=displayText]').click(function() {
+  $(this).hide();
+  $('input[name=editText]', $(this).closest('td')).show();
+});
+</script>
