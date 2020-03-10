@@ -57,12 +57,12 @@ Create the base directory structure:</p>
 </pre></div>
 </div>
 <p>Download example for v202:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">wget</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">bl305</span><span class="o">/</span><span class="n">bCIRT</span><span class="o">/</span><span class="n">raw</span><span class="o">/</span><span class="n">master</span><span class="o">/</span><span class="n">bCIRT_PackageReleases</span><span class="o">/</span><span class="mi">0111</span><span class="n">_bCIRT_v202_20200227</span><span class="o">.</span><span class="n">zip</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">wget</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">bl305</span><span class="o">/</span><span class="n">bCIRT</span><span class="o">/</span><span class="n">raw</span><span class="o">/</span><span class="n">master</span><span class="o">/</span><span class="n">bCIRT_PackageReleases</span><span class="o">/</span><span class="mi">0112</span><span class="n">_bCIRT_v202_20200310</span><span class="o">.</span><span class="n">zip</span>
 </pre></div>
 </div>
 <p>Unzip it with your tool, move it to the destination:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="o">/</span><span class="n">bcirt</span><span class="o">/</span><span class="n">releases</span>
-<span class="n">unzip</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">.</span><span class="n">zip</span><span class="o">&gt;</span>
+<span class="n">unzip</span> <span class="mi">0112</span><span class="n">_bCIRT_v202_20200310</span><span class="o">.</span><span class="n">zip</span>
 <span class="n">mv</span> <span class="o">/</span><span class="n">bcirt</span><span class="o">/</span><span class="n">releases</span><span class="o">/</span><span class="n">bCIRT</span> <span class="o">/</span><span class="n">bcirt</span><span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">www</span><span class="o">/</span>
 </pre></div>
 </div>
@@ -116,11 +116,11 @@ it should work most of the time:</p>
 </div>
 <div class="section" id="customizing-default-values">
 <h3>Customizing default values<a class="headerlink" href="#customizing-default-values" title="Permalink to this headline">¶</a></h3>
-<dl class="simple">
-<dt>First determine your hostname and IP::</dt><dd><p>hostname
-ifconfig</p>
-</dd>
-</dl>
+<p>First determine your hostname and IP:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">hostname</span>
+<span class="n">ifconfig</span>
+</pre></div>
+</div>
 <p><strong>Considering my local server IP is: 192.168.101.237</strong></p>
 <p>Go to the bCIRT/custom_params.py and modify it. Settings in this file will overwrite the settings.py values if set:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nano</span> <span class="o">/</span><span class="n">bcirt</span><span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">www</span><span class="o">/</span><span class="n">bCIRT</span><span class="o">/</span><span class="n">bCIRT</span><span class="o">/</span><span class="n">custom_variables</span><span class="o">.</span><span class="n">py</span>
@@ -157,19 +157,19 @@ ifconfig</p>
 </div>
 <div class="section" id="init-the-database">
 <h3>Init the database<a class="headerlink" href="#init-the-database" title="Permalink to this headline">¶</a></h3>
-<dl class="simple">
-<dt>To init the database with default values, run this command::</dt><dd><p>cd cd /bcirt/var/www/bCIRT/
-python3 manage.py makemigrations
-python3 manage.py migrate
-python3 manage.py createsuperuser
-#answer the questions
-#Username: admin
-#Email address: <a class="reference external" href="mailto:admin&#37;&#52;&#48;mydomain&#46;com">admin<span>&#64;</span>mydomain<span>&#46;</span>com</a>
-#Password:
-#Password (again):
-#Superuser created successfully.</p>
-</dd>
-</dl>
+<p>To init the database with default values, run this command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">cd</span> <span class="o">/</span><span class="n">bcirt</span><span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">www</span><span class="o">/</span><span class="n">bCIRT</span><span class="o">/</span>
+<span class="n">python3</span> <span class="n">manage</span><span class="o">.</span><span class="n">py</span> <span class="n">makemigrations</span>
+<span class="n">python3</span> <span class="n">manage</span><span class="o">.</span><span class="n">py</span> <span class="n">migrate</span>
+<span class="n">python3</span> <span class="n">manage</span><span class="o">.</span><span class="n">py</span> <span class="n">createsuperuser</span>
+<span class="c1">#answer the questions</span>
+<span class="c1">#Username: admin</span>
+<span class="c1">#Email address: admin@mydomain.com</span>
+<span class="c1">#Password:</span>
+<span class="c1">#Password (again):</span>
+<span class="c1">#Superuser created successfully.</span>
+</pre></div>
+</div>
 <p>At this point you should be seeing a new SQLITE database file called ‘db.sqlite3’:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ls</span>
 </pre></div>

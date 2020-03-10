@@ -34,12 +34,12 @@ Create the base directory structure::
 
 Download example for v202::
 
-    wget https://github.com/bl305/bCIRT/raw/master/bCIRT_PackageReleases/0111_bCIRT_v202_20200227.zip
+    wget https://github.com/bl305/bCIRT/raw/master/bCIRT_PackageReleases/0112_bCIRT_v202_20200310.zip
 
 Unzip it with your tool, move it to the destination::
 
     cd /bcirt/releases
-    unzip <file.zip>
+    unzip 0112_bCIRT_v202_20200310.zip
     mv /bcirt/releases/bCIRT /bcirt/var/www/
 
 Install the virtual environment for Python
@@ -94,6 +94,7 @@ Customizing default values
 --------------------------
 
 First determine your hostname and IP::
+
     hostname
     ifconfig
 
@@ -135,6 +136,7 @@ Init the database
 -----------------
 
 To init the database with default values, run this command::
+
     cd cd /bcirt/var/www/bCIRT/
     python3 manage.py makemigrations
     python3 manage.py migrate
