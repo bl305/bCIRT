@@ -55,6 +55,9 @@ Don't install this on a server where the users of it should not have admin acces
 9. workflow controls, like don't allow to close an investigation with open tasks
 10. a few more fixes
 
+## Documentation
+https://bcirt.readthedocs.io/en/latest/
+
 ## Install guide for demo-ing
 Key steps to get going:
 1. Dowload the source code
