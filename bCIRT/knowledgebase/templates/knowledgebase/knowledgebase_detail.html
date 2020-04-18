@@ -1,0 +1,32 @@
+{% extends "knowledgebase/knowledgebase_template.html" %}
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : knowledgebase/knowledgebase_detail.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.07.27
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.07.29  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+{% block knowledgebasetmp_alert %}
+{% endblock knowledgebasetmp_alert %}
+
+{% block knowledgebasetmp_buttons %}
+{% endblock knowledgebasetmp_buttons %}
+
+{% block knowledgebasetmp_title %}
+                             Knowledgebase # {{ knowledgebase.pk }}
+{% endblock knowledgebasetmp_title %}
+
+{% block knowledgebasetmp_body %}
+                        {% include "knowledgebase/knowledgebase_detail_table.html" %}
+                        <a href="javascript:history.go(-1)"
+                           class="btn btn-primary btn-sm">
+                            <span class="fas fa-arrow-left" aria-hidden="true"></span>
+                            <span>Back</span>
+                        </a>
+{% endblock knowledgebasetmp_body %}

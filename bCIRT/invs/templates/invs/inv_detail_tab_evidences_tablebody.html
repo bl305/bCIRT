@@ -40,23 +40,24 @@
                                 {% if not invreadonly %}
                                 <li>
 <!--                                    classic view-->
-<!--                                    <a href="{% url 'tasks:ev_create' inv_pk=inv.pk task_pk=0 %}?next1={{ request.get_full_path|urlencode }}"-->
-<!--                                    class="btn btn-secondary btn-sm btn-block text-left">-->
-<!--                                        <i class="fas fa-plus">&nbsp;</i>-->
-<!--                                        New Evidence-->
-<!--                                    </a>-->
+                                    <a href="{% url 'tasks:ev_create' inv_pk=inv.pk task_pk=0 %}?next1={{ request.get_full_path|urlencode }}#thebottom"
+                                    class="btn btn-secondary btn-sm btn-block text-left">
+                                        <i class="fas fa-plus">&nbsp;</i>
+                                        New Evidence
+                                    </a>
 <!--                                    AJAX view-->
-                                    <button type="button"
-                                            class="btn btn-secondary btn-sm btn-block text-left js-create-invev"
-                                            data-url="{% url 'tasks:invevaj_create' inv_pk=inv.pk task_pk=0 %}">
-                                      <span class="fas fa-plus"></span>
-                                      New Evidence
-                                    </button>
+<!--                                    <button type="button"-->
+<!--                                            class="btn btn-secondary btn-sm btn-block text-left js-create-invev"-->
+<!--                                            data-url="{% url 'tasks:invevaj_create' inv_pk=inv.pk task_pk=0 %}">-->
+<!--                                      <span class="fas fa-plus"></span>-->
+<!--                                      New Evidence-->
+<!--                                    </button>-->
                                 </li>
                                 {% endif %}
                                 {% if not invreadonly and not invevidencetaskreadonly %}
                                 <li>
-                                      <a href="{% url 'tasks:evattr_create' pk=invevidence.evidence_inv__pk %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ invevidence.evidence_inv__pk }}"
+<!--                                      <a href="{% url 'tasks:evattr_create' pk=invevidence.evidence_inv__pk %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ invevidence.evidence_inv__pk }}"-->
+                                      <a href="{% url 'tasks:evattr_create' pk=invevidence.evidence_inv__pk %}?next1=/invs/evidencetab/{{inv.pk}}/#item-inve{{ invevidence.evidence_inv__pk }}"
                                           class="btn btn-secondary btn-sm btn-block text-left">
                                           <span data-toggle="tooltip" data-placement="top" title="New item">
                                               <i class="fas fa-plus">&nbsp;</i>
@@ -66,7 +67,8 @@
                                 </li>
                                 {% endif %}
                                 <li>
-                                    <a href="{% url 'tasks:ev_detail' pk=invevidence.evidence_inv__pk %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ invevidence.evidence_inv__pk }}"
+<!--                                    <a href="{% url 'tasks:ev_detail' pk=invevidence.evidence_inv__pk %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ invevidence.evidence_inv__pk }}"-->
+                                    <a href="{% url 'tasks:ev_detail' pk=invevidence.evidence_inv__pk %}?next1=/invs/evidencetab/{{inv.pk}}#item-inve{{ invevidence.evidence_inv__pk }}"
                                         class="btn btn-secondary btn-sm btn-block text-left">
                                         <span data-toggle="tooltip" data-placement="top" title="Open item">
                                             <i class="fas fa-eye">&nbsp;</i>
@@ -100,7 +102,7 @@
                                     </a>
                                     <ul class="dropdown-menu dropdown-content" id="myDropdownEv">
                                         <input type="text" placeholder="Search.." id="myInputEv" onkeyup="filterFunctionEv()">
-                                        <a href="{% url 'assets:profile_autoadd' inv_pk=inv.pk evattr_pk=0 ev_pk=invevidence.evidence_inv__pk %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ invevidence.evidence_inv__pk }}"
+                                        <a href="{% url 'assets:profile_autoadd' inv_pk=inv.pk evattr_pk=0 ev_pk=invevidence.evidence_inv__pk %}?next1=/invs/evidencetab/{{inv.pk}}#item-inve{{ invevidence.evidence_inv__pk }}"
                                         class="btn btn-info btn-sm btn-block text-left">
                                               I - Add Attributes To Profile
                                         </a>
@@ -108,7 +110,7 @@
                                             {% for actiongroup in actiongroups_desc %}
                                                 {% if actiongroup.pk %}
                                                   <li>
-                                                      <a href="{% url 'tasks:act_exec_scriptgroup' pk=actiongroup.pk inv_pk=invevidence.pk task_pk=0 ev_pk=invevidence.evidence_inv__pk evattr_pk=0 %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ invevidence.evidence_inv__pk }}"
+                                                      <a href="{% url 'tasks:act_exec_scriptgroup' pk=actiongroup.pk inv_pk=invevidence.pk task_pk=0 ev_pk=invevidence.evidence_inv__pk evattr_pk=0 %}?next1=/invs/evidencetab/{{inv.pk}}#item-inve{{ invevidence.evidence_inv__pk }}"
                                                       class="btn btn-primary btn-sm btn-block text-left">
                                                       <span></span>
                                                           G{{ actiongroup.pk}} - {{ actiongroup.name }}
@@ -122,7 +124,7 @@
                                                   {% for actiongroup in actiongroups_file %}
                                                     {% if actiongroup.pk %}
                                                       <li>
-                                                          <a href="{% url 'tasks:act_exec_scriptgroup' pk=actiongroup.pk inv_pk=invevidence.pk task_pk=0 ev_pk=invevidence.evidence_inv__pk evattr_pk=0 %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ invevidence.evidence_inv__pk }}"
+                                                          <a href="{% url 'tasks:act_exec_scriptgroup' pk=actiongroup.pk inv_pk=invevidence.pk task_pk=0 ev_pk=invevidence.evidence_inv__pk evattr_pk=0 %}?next1=/invs/evidencetab/{{inv.pk}}#item-inve{{ invevidence.evidence_inv__pk }}"
                                                           class="btn btn-primary btn-sm btn-block text-left">
                                                           <span></span>
                                                               G{{ actiongroup.pk}} - {{ actiongroup }}
@@ -135,7 +137,7 @@
                                         {% for actid in actions %}
                                             {% if actid.scriptinput.pk == 1 %}
                                                 <li>
-                                                    <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=invevidence.pk task_pk=0 ev_pk=invevidence.evidence_inv__pk evattr_pk=0 %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ invevidence.evidence_inv__pk }}"
+                                                    <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=invevidence.pk task_pk=0 ev_pk=invevidence.evidence_inv__pk evattr_pk=0 %}?next1=/invs/evidencetab/{{inv.pk}}#item-inve{{ invevidence.evidence_inv__pk }}"
                                                     class="btn btn-secondary btn-sm btn-block text-left">
                                                     <span></span>
                                                     {{ actid.pk }} - {{ actid.title }} ({{ actid.outputtarget.shortname }})
@@ -145,7 +147,7 @@
                                             {% elif actid.scriptinput.pk == 2 %}
                                                 {% if invevidence.evidence_inv__fileRef %}
                                                       <li>
-                                                          <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=invevidence.pk task_pk=0 ev_pk=invevidence.evidence_inv__pk evattr_pk=0 %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ invevidence.evidence_inv__pk }}"
+                                                          <a href="{% url 'tasks:act_exec_script' pk=actid.pk inv_pk=invevidence.pk task_pk=0 ev_pk=invevidence.evidence_inv__pk evattr_pk=0 %}?next1=/invs/evidencetab/{{inv.pk}}#item-inve{{ invevidence.evidence_inv__pk }}"
                                                           class="btn btn-secondary btn-sm btn-block text-left">
                                                           <span></span>
                                                           {{ actid.pk }} - {{ actid.title }} ({{ actid.outputtarget.shortname }})

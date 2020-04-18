@@ -1,0 +1,65 @@
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : knowledgebase/knowledgebase_detail_table.html
+# Author            : Balazs Lendvay
+# Date created      : 2020.04.08
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2020.04.08  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+{% if knowledgebase.pk %}
+<table class="w-100">
+    <tr>
+        <td colspan="4" align="center"><h1>{{ knowledgebase.title }}</h1></td>
+    </tr>
+    <tr>
+        <td><strong>KB UUID:</strong> {{ knowledgebase.myuuid }} </td>
+        <td><strong>Format:</strong> {{ knowledgebase.kbformat }} </td>
+        <td><strong>Builtin:</strong> {{ knowledgebase.builtin }} </td>
+        <td><strong>Enabled:</strong> {{ knowledgebase.enabled }} </td>
+<!--        <td><strong>Owner</strong><br> {{ knowledgebase.user }} </td>-->
+    </tr>
+    <tr>
+        <td colspan="1"><strong>Created:</strong> {{ knowledgebase.created_by }} - {{ knowledgebase.created_at|date:"Y/m/d H:i:s" }} </td>
+        <td colspan="2"><strong>Modified:</strong> {{ knowledgebase.modified_by }} - {{ knowledgebase.modified_at|date:"Y/m/d H:i:s" }} </td>
+        <td></td>
+    </tr>
+    <tr>
+        <td colspan="4">
+            <strong>Attachment<br></strong>
+            {% if knowledgebase.fileRef %}
+                <a href="{{BASE_URL}}{{MEDIA_URL}}{{ knowledgebase.fileRef.name }}"
+                  class="btn btn-default btn-sm" target="_blank">
+                  <span class="fas fa-save">{{ knowledgebase.fileName }}</span>
+                </a>
+            {% else %}
+                None
+            {% endif %}
+        </td>
+    </tr>
+
+    <tr>
+        <td colspan="4">
+        <strong>Description<br></strong>
+        <div class="invdescription2" style="max-width:1200px;min-height:150px">
+            {% if knowledgebase.kbformat.pk == 2 %}
+                {{ knowledgebase.description|safe }}
+            {% else %}
+                {% if knowledgebase.kbformat.pk == 1 %}
+                    {{ knowledgebase.description|linebreaks }}
+                {% else %}
+                    Uknown knowledgebase format!!!
+                {% endif %}
+            {% endif %}
+        </div>
+        </td>
+
+    </tr>
+{% else %}
+    <tr><td colspan="4">No Header available!</td></tr>
+{% endif %}
+</table>

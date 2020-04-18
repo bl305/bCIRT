@@ -11,16 +11,21 @@
 # 2019.07.29  Lendvay     1      Initial file
 # 2019.08.19  Lendvay     1      Added domain to the attributes
 # 2019.12.13  Lendvay     1      Fixes
+# 2020.04.18  Lendvay     1      New tables
 # **********************************************************************;
-# TBD
-# add settingsuser, settingssystem, settingscategory
 
 from django.core.management.base import BaseCommand, CommandError
-from invs.models import InvStatus, InvPriority, InvCategory, InvPhase, InvSeverity, InvAttackVector, CurrencyType
+from invs.models import InvStatus, InvPriority, InvCategory, InvPhase, InvAttackVector, CurrencyType, InvReviewRules
+from invs.models import InvSeverity, InvSeverityCriteria, InvSeverityCriteriaCategory
+# InvSeverityContact, InvSeverityContactRef
 from tasks.models import MitreAttck_Tactics, MitreAttck_Techniques
 from tasks.models import TaskVarType, TaskVarCategory, TaskType, TaskCategory, TaskStatus, TaskPriority
 from tasks.models import ScriptOs, ScriptType, ScriptCategory, Action, Type, ActionQStatus, OutputTarget, ScriptOutput
+from tasks.models import Automation
 from tasks.models import EvidenceFormat, EvidenceAttrFormat, EvReputation, ScriptInput
+from users.models import Profile
+from knowledgebase.models import KnowledgeBase, KnowledgeBaseFormat
+from configuration.models import SettingsCategory, SettingsUser, SettingsSystem
 # from bCIRT.settings import PROJECT_ROOT
 # from os import path
 from django.contrib.auth import get_user_model
@@ -57,6 +62,10 @@ class Command(BaseCommand):
             self.populate_invphase()
             self.populate_invpriority()
             self.populate_invattackvector()
+            self.populate_InvSeverityCriteriaCategory()
+            self.populate_InvSeverityCriteria()
+            self.populate_userprofile()
+            self.populate_InvReviewRules()
 
             self.populate_taskstatus()
             self.populate_taskcategory()
@@ -75,6 +84,14 @@ class Command(BaseCommand):
             self.populate_acttype()
             self.populate_actionqstatus()
             # self.populate_action()
+            self.populate_automation()
+
+            self.populate_settingscategory()
+            self.populate_settingsuser()
+            self.populate_settingssystem()
+
+            self.populate_KnowledgeBaseFormat()
+            self.populate_KnowledgeBase()
 
             self.populate_mitreattck_tactics()
             # self.populate_mitreattck_techniques()
@@ -89,6 +106,10 @@ class Command(BaseCommand):
                 self.populate_invphase()
                 self.populate_invpriority()
                 self.populate_invattackvector()
+                self.populate_InvSeverityCriteriaCategory()
+                self.populate_InvSeverityCriteria()
+                self.populate_userprofile()
+                self.populate_InvReviewRules()
             elif p_table == "evidences":
                 self.populate_evidenceformat()
                 self.populate_evidenceattrformat()
@@ -111,11 +132,19 @@ class Command(BaseCommand):
                 self.populate_acttype()
                 self.populate_actionqstatus()
                 # self.populate_action()
+            elif p_table == "settings":
+                self.populate_settingscategory()
+                self.populate_settingsuser()
+                self.populate_settingssystem()
+            elif p_table == "knowledgebase":
+                self.populate_KnowledgeBaseFormat()
+                self.populate_KnowledgeBase()
             elif p_table == "mitre":
                 self.populate_mitreattck_tactics()
                 # self.populate_mitreattck_techniques()
             else:
-                print("Wrong parameter! Options:\ninvestigations / tasks / taskvars / actions / evidences / mitre\n")
+                print("Wrong parameter! Options:\ninvestigations / tasks / taskvars / actions / evidences / mitre"
+                      " / settings / knowledgebase \n")
         else:
             print(r"""
 usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
@@ -352,32 +381,44 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
             {
                 "name": "S0 Baseline",
                 "enabled": "1",
-                "description": "S0 Baseline"
+                "description": "S0 Baseline",
+                "color": "ffffff",
+                "notificationfrequency": "0",
             },
             {
                 "name": "S1 Low",
                 "enabled": "1",
-                "description": "S1 Low"
+                "description": "S1 Low",
+                "color": "9afc9f",
+                "notificationfrequency": "0",
             },
             {
                 "name": "S2 Medium",
                 "enabled": "1",
-                "description": "S2 Medium"
+                "description": "S2 Medium",
+                "color": "ace0fc",
+                "notificationfrequency": "8",
             },
             {
                 "name": "S3 High",
                 "enabled": "1",
-                "description": "S3 High"
+                "description": "S3 High",
+                "color": "fff200",
+                "notificationfrequency": "4",
             },
             {
                 "name": "S4 Severe",
                 "enabled": "1",
-                "description": "S4 Severe"
+                "description": "S4 Severe",
+                "color": "FFA500",
+                "notificationfrequency": "2",
             },
             {
                 "name": "S5 Emergency",
                 "enabled": "1",
-                "description": "S5 Emergency"
+                "description": "S5 Emergency",
+                "color": "ff6666",
+                "notificationfrequency": "1",
             },
         ]
 
@@ -387,7 +428,9 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
                 InvSeverity.objects.create(
                     name=invsevitem['name'],
                     enabled=invsevitem['enabled'],
-                    description=invsevitem['description']
+                    description=invsevitem['description'],
+                    color=invsevitem['color'],
+                    notificationfrequency=invsevitem['notificationfrequency']
                 )
         except Exception:
             raise CommandError("InvSeverity table could not be updated!")
@@ -603,6 +646,296 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
         except Exception:
             raise CommandError("InvAttackVector table could not be updated!")
 
+    def populate_InvSeverityCriteriaCategory(self):
+        invsevecitycriteriacategory = [
+            {
+                "name": "Business Impact",
+                "enabled": "1",
+                "description": "Determines the business impact",
+            },
+            {
+                "name": "Functional Impact",
+                "enabled": "1",
+                "description": "Determines the financial impact",
+            },
+            {
+                "name": "Manufacturing Impact",
+                "enabled": "1",
+                "description": "Determines the manufacturing impact",
+            },
+            {
+                "name": "Recoverability Impact",
+                "enabled": "1",
+                "description": "Determines the impact on the recover procedures",
+            },
+            {
+                "name": "Information Impact",
+                "enabled": "1",
+                "description": "Determines the impact on information security",
+            },
+        ]
+
+        try:
+            self.stdout.write("Initiating InvSeverityCriteriaCategory")
+            for invseveritycriteriacategoryitem in invsevecitycriteriacategory:
+                InvSeverityCriteriaCategory.objects.create(
+                    name=invseveritycriteriacategoryitem['name'],
+                    enabled=invseveritycriteriacategoryitem['enabled'],
+                    description=invseveritycriteriacategoryitem['description']
+                )
+        except Exception:
+            raise CommandError("InvSeverityCriteriaCategory table could not be updated!")
+
+    def populate_InvSeverityCriteria(self):
+        invsevecitycriteria = [
+            {
+                "severity": InvSeverity.objects.get(pk=1),
+                "criteriacategory": InvSeverityCriteriaCategory.objects.get(pk=1),
+                "enabled": "1",
+                "description": "Greater than 14 days without adversely impacting the business process it supports.",
+            },
+            {
+                "severity": InvSeverity.objects.get(pk=1),
+                "criteriacategory": InvSeverityCriteriaCategory.objects.get(pk=2),
+                "enabled": "1",
+                "description": "No effect to the organization’s ability to provide all services to all users.",
+            },
+            {
+                "severity": InvSeverity.objects.get(pk=1),
+                "criteriacategory": InvSeverityCriteriaCategory.objects.get(pk=3),
+                "enabled": "1",
+                "description": "Manufacturing is not degraded.",
+            },
+            {
+                "severity": InvSeverity.objects.get(pk=1),
+                "criteriacategory": InvSeverityCriteriaCategory.objects.get(pk=4),
+                "enabled": "1",
+                "description": "Time to recovery is predictable with existing resources.",
+            },
+            {
+                "severity": InvSeverity.objects.get(pk=1),
+                "criteriacategory": InvSeverityCriteriaCategory.objects.get(pk=5),
+                "enabled": "1",
+                "description": "No information was exfiltrated, changed, deleted, or otherwise compromised.",
+            },
+            {
+                "severity": InvSeverity.objects.get(pk=2),
+                "criteriacategory": InvSeverityCriteriaCategory.objects.get(pk=1),
+                "enabled": "1",
+                "description": "7 to 14 days without adversely impacting the business process it supports.",
+            },
+            {
+                "severity": InvSeverity.objects.get(pk=2),
+                "criteriacategory": InvSeverityCriteriaCategory.objects.get(pk=2),
+                "enabled": "1",
+                "description": "Non-critical system(s) availability is impacted.",
+            },
+            {
+                "severity": InvSeverity.objects.get(pk=2),
+                "criteriacategory": InvSeverityCriteriaCategory.objects.get(pk=3),
+                "enabled": "1",
+                "description": "Manufacturing is degraded but functioning.",
+            },
+            {
+                "severity": InvSeverity.objects.get(pk=2),
+                "criteriacategory": InvSeverityCriteriaCategory.objects.get(pk=4),
+                "enabled": "1",
+                "description": "Time to recovery is predictable with additional resources.",
+            },
+            {
+                "severity": InvSeverity.objects.get(pk=2),
+                "criteriacategory": InvSeverityCriteriaCategory.objects.get(pk=5),
+                "enabled": "1",
+                "description": "Sensitive information was accessed internally.",
+            },
+            {
+                "severity": InvSeverity.objects.get(pk=3),
+                "criteriacategory": InvSeverityCriteriaCategory.objects.get(pk=1),
+                "enabled": "1",
+                "description": "4 to 7 days without adversely impacting the business process it supports.",
+            },
+            {
+                "severity": InvSeverity.objects.get(pk=3),
+                "criteriacategory": InvSeverityCriteriaCategory.objects.get(pk=2),
+                "enabled": "1",
+                "description": "Critical services lost efficiency.",
+            },
+            {
+                "severity": InvSeverity.objects.get(pk=3),
+                "criteriacategory": InvSeverityCriteriaCategory.objects.get(pk=3),
+                "enabled": "1",
+                "description": "Manufacturing outage for less than 8 hours.",
+            },
+            {
+                "severity": InvSeverity.objects.get(pk=3),
+                "criteriacategory": InvSeverityCriteriaCategory.objects.get(pk=4),
+                "enabled": "1",
+                "description": "Time to recovery is predictable; additional resources and outside help are needed.",
+            },
+            {
+                "severity": InvSeverity.objects.get(pk=3),
+                "criteriacategory": InvSeverityCriteriaCategory.objects.get(pk=5),
+                "enabled": "1",
+                "description": "Sensitive information was accessed externally.",
+            },
+            {
+                "severity": InvSeverity.objects.get(pk=4),
+                "criteriacategory": InvSeverityCriteriaCategory.objects.get(pk=1),
+                "enabled": "1",
+                "description": "0 to 3 days likely impacting business process it supports.",
+            },
+            {
+                "severity": InvSeverity.objects.get(pk=4),
+                "criteriacategory": InvSeverityCriteriaCategory.objects.get(pk=2),
+                "enabled": "1",
+                "description": "Critical services not available to a subset of system users.",
+            },
+            {
+                "severity": InvSeverity.objects.get(pk=4),
+                "criteriacategory": InvSeverityCriteriaCategory.objects.get(pk=3),
+                "enabled": "1",
+                "description": "Manufacturing outage for more than 24 hours.",
+            },
+            {
+                "severity": InvSeverity.objects.get(pk=4),
+                "criteriacategory": InvSeverityCriteriaCategory.objects.get(pk=4),
+                "enabled": "1",
+                "description": "Time to recovery is unpredictable; additional resources and outside help are needed",
+            },
+            {
+                "severity": InvSeverity.objects.get(pk=4),
+                "criteriacategory": InvSeverityCriteriaCategory.objects.get(pk=5),
+                "enabled": "1",
+                "description": "Some sensitive information was exfiltrated.",
+            },
+            {
+                "severity": InvSeverity.objects.get(pk=5),
+                "criteriacategory": InvSeverityCriteriaCategory.objects.get(pk=1),
+                "enabled": "1",
+                "description": "Impacting systems always required to be available (24x7x365).",
+            },
+            {
+                "severity": InvSeverity.objects.get(pk=5),
+                "criteriacategory": InvSeverityCriteriaCategory.objects.get(pk=2),
+                "enabled": "1",
+                "description": "Critical services are not available.",
+            },
+            {
+                "severity": InvSeverity.objects.get(pk=5),
+                "criteriacategory": InvSeverityCriteriaCategory.objects.get(pk=3),
+                "enabled": "1",
+                "description": "Manufacturing is impacted for longer than 24 hours.",
+            },
+            {
+                "severity": InvSeverity.objects.get(pk=5),
+                "criteriacategory": InvSeverityCriteriaCategory.objects.get(pk=4),
+                "enabled": "1",
+                "description": "Recovery from the incident is not possible (e.g., sensitive data posted publicly).",
+            },
+            {
+                "severity": InvSeverity.objects.get(pk=5),
+                "criteriacategory": InvSeverityCriteriaCategory.objects.get(pk=5),
+                "enabled": "1",
+                "description": "Large amount of sensitive information was changed or deleted or exfiltrated.",
+            },
+            {
+                "severity": InvSeverity.objects.get(pk=6),
+                "criteriacategory": InvSeverityCriteriaCategory.objects.get(pk=1),
+                "enabled": "1",
+                "description": "",
+            },
+            {
+                "severity": InvSeverity.objects.get(pk=6),
+                "criteriacategory": InvSeverityCriteriaCategory.objects.get(pk=2),
+                "enabled": "1",
+                "description": "",
+            },
+            {
+                "severity": InvSeverity.objects.get(pk=6),
+                "criteriacategory": InvSeverityCriteriaCategory.objects.get(pk=3),
+                "enabled": "1",
+                "description": "",
+            },
+            {
+                "severity": InvSeverity.objects.get(pk=6),
+                "criteriacategory": InvSeverityCriteriaCategory.objects.get(pk=4),
+                "enabled": "1",
+                "description": "",
+            },
+            {
+                "severity": InvSeverity.objects.get(pk=6),
+                "criteriacategory": InvSeverityCriteriaCategory.objects.get(pk=5),
+                "enabled": "1",
+                "description": "",
+            },
+        ]
+
+        try:
+            self.stdout.write("Initiating InvSeverityCriteria")
+            for invseveritycriteriaitem in invsevecitycriteria:
+                InvSeverityCriteria.objects.create(
+                    severity=invseveritycriteriaitem['severity'],
+                    criteriacategory=invseveritycriteriaitem['criteriacategory'],
+                    enabled=invseveritycriteriaitem['enabled'],
+                    description=invseveritycriteriaitem['description']
+                )
+        except Exception:
+            raise CommandError("InvSeverityCriteria table could not be updated!")
+
+    def populate_userprofile(self):
+        pass
+
+
+    def populate_InvReviewRules(self):
+        invreviewrules = [
+            {
+                "bypassreview": "0",
+                "rulename": "default-no review",
+                "severity": InvSeverity.objects.get(pk=2),
+                "category": None,
+                "priority": None,
+                "attackvector": None,
+                "potentialloss": "0",
+                "monetaryloss": "0",
+                "review1": "0",
+                "review2": "0",
+                "enabled": "1",
+            },
+            {
+                "bypassreview": "0",
+                "rulename": "Bypass phishing rev2",
+                "severity": InvSeverity.objects.get(pk=2),
+                "category": None,
+                "priority": None,
+                "attackvector": InvAttackVector.objects.get(pk=8),
+                "potentialloss": "0",
+                "monetaryloss": "0",
+                "review1": "1",
+                "review2": "0",
+                "enabled": "0",
+            },
+        ]
+
+        try:
+            self.stdout.write("Initiating InvReviewRules")
+            for invreviewrulesitem in invreviewrules:
+                InvReviewRules.objects.create(
+                    bypassreview=invreviewrulesitem['bypassreview'],
+                    rulename=invreviewrulesitem['rulename'],
+                    severity=invreviewrulesitem['severity'],
+                    category=invreviewrulesitem['category'],
+                    priority=invreviewrulesitem['priority'],
+                    attackvector=invreviewrulesitem['attackvector'],
+                    potentialloss=invreviewrulesitem['potentialloss'],
+                    monetaryloss=invreviewrulesitem['monetaryloss'],
+                    review1=invreviewrulesitem['review1'],
+                    review2=invreviewrulesitem['review2'],
+                    enabled=invreviewrulesitem['enabled'],
+                )
+        except Exception:
+            raise CommandError("InvReviewRules table could not be updated!")
+
+
     def populate_actscriptos(self):
         actscriptos = [
             {
@@ -655,10 +988,26 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
             {
                 "name": "Python",
                 "enabled": "1",
-                "description": "Runs on all Linux with compatible Python",
-                "version": "3.6",
+                "description": "Runs the OS default Python",
+                "version": "any",
                 "os": ScriptOs.objects.get(pk=2),
-                "interpreter": "/usr/bin/python3"
+                "interpreter": "/usr/bin/python"
+            },
+            {
+                "name": "Custom Python 3.6 venv",
+                "enabled": "1",
+                "description": "Custom Python virtual environment",
+                "version": "3.6+",
+                "os": ScriptOs.objects.get(pk=2),
+                "interpreter": "/home/bali/PycharmProjects/bCIRT_venv_Actions/bin/python3"
+            },
+            {
+                "name": "Custom Python 2.6 venv",
+                "enabled": "1",
+                "description": "Custom Python virtual environment",
+                "version": "2.7",
+                "os": ScriptOs.objects.get(pk=2),
+                "interpreter": "/home/bali/PycharmProjects/bCIRT_venv2_Actions/bin/python2.7"
             },
             {
                 "name": "Bash",
@@ -1151,6 +1500,180 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
         except Exception:
             raise CommandError("InvStatus table could not be updated!")
 
+    def populate_automation(self):
+        automation = [
+            {
+                "enabled": "1",
+                "user": User.objects.get(pk=1),
+                "type": Type.objects.get(pk=3),
+                "name": "test",
+                "version": "1.0",
+                "script_type": ScriptType.objects.first(),
+                "script_category": ScriptCategory.objects.first(),
+                "code": "print(\"whoami\")",
+                "autorequirements": None,
+                "description": "Test automation",
+            },
+        ]
+        try:
+            self.stdout.write("Initiating Automation")
+            for automationitem in automation:
+                Automation.objects.create(
+                    enabled=automationitem['enabled'],
+                    user=automationitem['user'],
+                    type=automationitem['type'],
+                    name=automationitem['name'],
+                    version=automationitem['version'],
+                    script_type=automationitem['script_type'],
+                    script_category=automationitem['script_category'],
+                    code=automationitem['code'],
+                    autorequirements=automationitem['autorequirements'],
+                    description=automationitem['description']
+                )
+        except Exception:
+            raise CommandError("InvStatus table could not be updated!")
+
+    def populate_settingscategory(self):
+        settingscategory = [
+            {
+                "user": None,
+                "categoryname": "Generic",
+                "enabled": "1",
+                "description": ""
+            },
+            {
+                "user": None,
+                "categoryname": "Exclude",
+                "enabled": "1",
+                "description": ""
+            },
+        ]
+        try:
+            self.stdout.write("Initiating SettingsCategory")
+            for settingscategoryitem in settingscategory:
+                SettingsCategory.objects.create(
+                    user=settingscategoryitem['user'],
+                    categoryname=settingscategoryitem['categoryname'],
+                    enabled=settingscategoryitem['enabled'],
+                    description=settingscategoryitem['description']
+                )
+        except Exception:
+            raise CommandError("SettingsCategory table could not be updated!")
+
+
+    def populate_settingsuser(self):
+        settingsuser = [
+            {
+                "user": User.objects.first(),
+                "settingname": "GUITheme",
+                "settingvalue": None,
+                "settingcategory": SettingsCategory.objects.get(pk=1),
+                "enabled": "1",
+                "description": "Default GUI Theme"
+            },
+        ]
+        try:
+            self.stdout.write("Initiating SettingsUser")
+            for settingsuseritem in settingsuser:
+                SettingsUser.objects.create(
+                    user=settingsuseritem['user'],
+                    settingname=settingsuseritem['settingname'],
+                    settingvalue=settingsuseritem['settingvalue'],
+                    settingcategory=settingsuseritem['settingcategory'],
+                    enabled=settingsuseritem['enabled'],
+                    description=settingsuseritem['description']
+                )
+        except Exception:
+            raise CommandError("SettingsUser table could not be updated!")
+
+    def populate_settingssystem(self):
+        settingssystem = [
+            {
+                "user": None,
+                "settingname": "excl.attr.alreadyseen",
+                "settingvalue": "d41d8cd98f00b204e9800998ecf8427e",
+                "settingcategory": SettingsCategory.objects.get(pk=2),
+                "enabled": "1",
+                "description": "Known good hash"
+            },
+            {
+                "user": None,
+                "settingname": "excl.attr.alreadyseen",
+                "settingvalue": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+                "settingcategory": SettingsCategory.objects.get(pk=2),
+                "enabled": "1",
+                "description": "Known good hash"
+            },
+            {
+                "user": None,
+                "settingname": "excl.attr.alreadyseen",
+                "settingvalue": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                "settingcategory": SettingsCategory.objects.get(pk=2),
+                "enabled": "1",
+                "description": "Known good hash"
+            },
+        ]
+        try:
+            self.stdout.write("Initiating SettingsSystem")
+            for settingssystemitem in settingssystem:
+                SettingsSystem.objects.create(
+                    user=settingssystemitem['user'],
+                    settingname=settingssystemitem['settingname'],
+                    settingvalue=settingssystemitem['settingvalue'],
+                    settingcategory=settingssystemitem['settingcategory'],
+                    enabled=settingssystemitem['enabled'],
+                    description=settingssystemitem['description']
+                )
+        except Exception:
+            raise CommandError("SettingsSystem table could not be updated!")
+
+    def populate_KnowledgeBaseFormat(self):
+        knowledgebaseformat = [
+            {
+                "name": "RAW",
+                "enabled": "1",
+                "description": "RAW type of evidence"
+            },
+            {
+                "name": "TinyMCE",
+                "enabled": "1",
+                "description": "TinyMCE rich text/html"
+            },
+        ]
+        try:
+            self.stdout.write("Initiating KnowledgeBaseFormat")
+            for kbformatitem in knowledgebaseformat:
+                KnowledgeBaseFormat.objects.create(
+                    name=kbformatitem['name'],
+                    enabled=kbformatitem['enabled'],
+                    description=kbformatitem['description']
+                )
+        except Exception:
+            raise CommandError("KnowledgeBaseFormat table could not be updated!")
+
+    def populate_KnowledgeBase(self):
+        knowledgebase = [
+            {
+                "builtin": "1",
+                "enabled": "1",
+                "description": "First KnowledgeBase item - you can replace this!",
+                "kbformat": KnowledgeBaseFormat.objects.get(pk=1),
+                "title": "First KB Item!"
+            },
+        ]
+        try:
+            self.stdout.write("Initiating KnowledgeBase")
+            for kbitem in knowledgebase:
+                KnowledgeBase.objects.create(
+                    builtin=kbitem['builtin'],
+                    enabled=kbitem['enabled'],
+                    description=kbitem['description'],
+                    kbformat=kbitem['kbformat'],
+                    title=kbitem['title'],
+                )
+        except Exception:
+            raise CommandError("KnowledgeBase table could not be updated!")
+
     def populate_mitreattck_tactics(self):
         mitretactics = [
             {
@@ -1303,6 +1826,7 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
                 )
         except Exception:
             raise CommandError("MitreAttck_Tactics table could not be updated!")
+
 
     def populate_mitreattck_techniques(self):
         mitretechniques = [

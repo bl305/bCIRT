@@ -1,0 +1,82 @@
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : knowledgebase/knowledgebase_list_table.html
+# Author            : Balazs Lendvay
+# Date created      : 2020.03.29
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2020.03.29  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+{% if object_list %}
+{% for knowledgebase in object_list %}
+                <tr>
+                    <td>
+                        <a class="badge badge-secondary" href="{% url 'knowledgebase:kb_detail' pk=knowledgebase.pk %}#?next1={{ request.get_full_path|urlencode }}">{{ knowledgebase.pk }}</a>
+                    </td>
+                    <td>
+                        <a class="" href="{% url 'knowledgebase:kb_detail' pk=knowledgebase.pk %}#?next1={{ request.get_full_path|urlencode }}">{{ knowledgebase.title }}</a>
+                    </td>
+                    <td>
+                        {{ knowledgebase.fileName }}
+                    </td>
+                    <td>
+                        {{ knowledgebase.created_at | date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                        {{ knowledgebase.created_by }}
+                    </td>
+                    <td>
+                        {{ knowledgebase.modified_at | date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                        {{ knowledgebase.modified_by }}
+                    </td>
+                    <td>
+                            {% if knowledgebase.enabled %}
+                                <a href="#"
+                                  class="btn btn-outline-secondary btn-sm">
+                                    <span class="font-weight-bold text-success" data-toggle="tooltip" data-placement="top" title="Enabled">
+                                      <i class="fas fa-check-circle"></i>
+                                    </span>
+                                </a>
+                            {% else %}
+                                <a href="#"
+                                  class="btn btn-outline-secondary btn-sm">
+                                    <span class="font-weight-bold text-success" data-toggle="tooltip" data-placement="top" title="Disabled">
+                                      <i class="fas fa-times-circle"></i>
+                                    </span>
+                                </a>
+                            {% endif %}
+                    </td>
+                    <td>
+                        {{ knowledgebase.builtin }}
+                    </td>
+                    <td>
+	                	{% if user.is_authenticated %}
+                        <div>
+                                <a href="{% url 'knowledgebase:kb_edit' pk=knowledgebase.pk %}"
+                                  class="btn btn-outline-secondary btn-sm">
+                                    <span class="font-weight-bold text-primary" data-toggle="tooltip" data-placement="top" title="Edit">
+                                      <i class="fas fa-pen"></i>
+                                    </span>
+                                </a>
+                                <a href="{% url 'knowledgebase:kb_remove' pk=knowledgebase.pk %}"
+                                  class="btn btn-danger btn-sm">
+                                    <span class="font-weight-bold text-light" data-toggle="tooltip" data-placement="top" title="Delete">
+                                      <i class="fas fa-trash-alt"></i>
+                                    </span>
+                                </a>
+                        </div>
+                        {% endif %}
+                    </td>
+              </tr>
+{% endfor %}
+{% else %}
+          <tr>
+              <td colspan="10" class="text-center bg-warning">No Knowledgebase Articles</td>
+          </tr>
+{% endif %}

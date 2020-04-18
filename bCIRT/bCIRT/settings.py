@@ -101,6 +101,7 @@ INSTALLED_APPS = [
     'tasks',
     'assets',
     'reports',
+    'knowledgebase',
     'import_export',
     'users.apps.UsersConfig',  # new
 ]

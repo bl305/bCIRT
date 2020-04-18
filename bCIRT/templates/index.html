@@ -10,6 +10,7 @@
 # Revision History  : v1
 # Date        Author      Ref    Description
 # 2019.07.29  Lendvay     1      Initial file
+# 2020.04.09  Lendvay     1      Fixed the description |safe
 # **********************************************************************;
 -->
 {% block ptitle %}Home{% endblock %}
@@ -53,6 +54,145 @@
 <!--CCCCCCCCCCCC-->
 
         <div class="container mw-100 small">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card bg-light mb-3">
+                        <div class="card-header">My Investigations TOP10 ({{ invs.count }})</div>
+                            <div class="card-body">
+                                <table class="table table-sm table-condensed fittable" style="border-collapse:collapse;">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Attack vector</th>
+                                            <th>Ticket</th>
+                                            <th>Status</th>
+                                            <th>Modified</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for inv in invs %}
+                                        <tr data-toggle="collapse" data-target="#myinvs{{inv.pk}}" class="accordion-toggle">
+                                            <td>
+                                                <a href="{% url 'invs:inv_detail' pk=inv.pk %}"><h6><span class="badge badge-pill badge-secondary">{{inv.id}}</span></h6></a>
+                                            </td>
+                                            <td>
+                                                {{ inv.attackvector__name }}
+                                            </td>
+                                            <td>
+                                                {{ inv.ticketid }}
+                                            </td>
+                                            <td>
+                                                {{ inv.status__name }}
+                                            </td>
+                                            <td>
+                                                {{ inv.modified_at|date:"Y/m/d H:i:s" }}
+                                            </td>
+                                        </tr>
+                                        <tr >
+                                            <td colspan="5" class="hiddenRow">
+                                                <div class="accordian-body collapse" id="myinvs{{inv.pk}}">
+                                                    <div class="invdescription2" style="max-width:25vw">
+                                                    {{ inv.description|safe }}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-light mb-3">
+                        <div class="card-header">My Manual Tasks TOP10 ({{ tasks.count }})</div>
+                        <div class="card-body">
+                            <table class="table table-sm table-condensed fittable" style="border-collapse:collapse;">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Ticket</th>
+                                        <th>Title</th>
+                                        <th>Modified</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for task in tasks %}
+                                    <tr data-toggle="collapse" data-target="#mytasks{{task.pk}}" class="accordion-toggle">
+                                        <td>
+                                            <a href="{% url 'tasks:tsk_detail' pk=task.pk %}"><h6><span class="badge badge-pill badge-secondary">{{ task.pk }}</span></h6></a>
+                                        </td>
+                                        <td>
+                                            {{ task.inv__ticketid }}
+                                        </td>
+                                        <td>
+                                            {{ task.title }}
+                                        </td>
+                                        <td>
+                                            {{ task.modified_at|date:"Y/m/d H:i:s" }}
+                                        </td>
+                                    </tr>
+                                    <tr >
+                                        <td colspan="4" class="hiddenRow">
+                                            <div class="accordian-body collapse" id="mytasks{{task.pk}}">
+                                                <div class="invdescription2" style="max-width:25vw">
+                                                {{ task.title }}
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-light mb-3">
+                        <div class="card-header">Recently Closed Tasks TOP10</div>
+                        <div class="card-body">
+                            <table class="table table-sm table-condensed fittable" style="border-collapse:collapse;">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Ticket</th>
+                                        <th>Title</th>
+                                        <th>Modified</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for task in rtasks %}
+                                    <tr data-toggle="collapse" data-target="#mytasks{{task.pk}}" class="accordion-toggle">
+                                        <td>
+                                            <a href="{% url 'tasks:tsk_detail' pk=task.pk %}"><h6><span class="badge badge-pill badge-secondary">{{ task.pk }}</span></h6></a>
+                                        </td>
+                                        <td>
+                                            {{ task.inv__ticketid }}
+                                        </td>
+                                        <td>
+                                            {{ task.title }}
+                                        </td>
+                                        <td>
+                                            {{ task.modified_at|date:"Y/m/d H:i:s" }}
+                                        </td>
+                                    </tr>
+                                    <tr >
+                                        <td colspan="4" class="hiddenRow">
+                                            <div class="accordian-body collapse" id="myrtasks{{task.pk}}">
+                                                <div class="invdescription2" style="max-width:25vw">
+                                                {{ task.title }}
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+<!--            ROW 2-->
             <div class="row">
                 <div class="col-md-4">
                     <div class="card bg-light mb-3">
@@ -220,145 +360,6 @@
                     </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="card bg-light mb-3">
-                        <div class="card-header">My Investigations TOP10 ({{ invs.count }})</div>
-                            <div class="card-body">
-                                <table class="table table-sm table-condensed fittable" style="border-collapse:collapse;">
-                                    <thead>
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Attack vector</th>
-                                            <th>Ticket</th>
-                                            <th>Status</th>
-                                            <th>Modified</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for inv in invs %}
-                                        <tr data-toggle="collapse" data-target="#myinvs{{inv.pk}}" class="accordion-toggle">
-                                            <td>
-                                                <a href="{% url 'invs:inv_detail' pk=inv.pk %}"><h6><span class="badge badge-pill badge-secondary">{{inv.id}}</span></h6></a>
-                                            </td>
-                                            <td>
-                                                {{ inv.attackvector__name }}
-                                            </td>
-                                            <td>
-                                                {{ inv.ticketid }}
-                                            </td>
-                                            <td>
-                                                {{ inv.status__name }}
-                                            </td>
-                                            <td>
-                                                {{ inv.modified_at|date:"Y/m/d H:i:s" }}
-                                            </td>
-                                        </tr>
-                                        <tr >
-                                            <td colspan="5" class="hiddenRow">
-                                                <div class="accordian-body collapse" id="myinvs{{inv.pk}}">
-                                                    <div class="invdescription2" style="max-width:25vw">
-                                                    {{ inv.description }}
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card bg-light mb-3">
-                        <div class="card-header">My Manual Tasks TOP10 ({{ tasks.count }})</div>
-                        <div class="card-body">
-                            <table class="table table-sm table-condensed fittable" style="border-collapse:collapse;">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Ticket</th>
-                                        <th>Title</th>
-                                        <th>Modified</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for task in tasks %}
-                                    <tr data-toggle="collapse" data-target="#mytasks{{task.pk}}" class="accordion-toggle">
-                                        <td>
-                                            <a href="{% url 'tasks:tsk_detail' pk=task.pk %}"><h6><span class="badge badge-pill badge-secondary">{{ task.pk }}</span></h6></a>
-                                        </td>
-                                        <td>
-                                            {{ task.inv__ticketid }}
-                                        </td>
-                                        <td>
-                                            {{ task.title }}
-                                        </td>
-                                        <td>
-                                            {{ task.modified_at|date:"Y/m/d H:i:s" }}
-                                        </td>
-                                    </tr>
-                                    <tr >
-                                        <td colspan="4" class="hiddenRow">
-                                            <div class="accordian-body collapse" id="mytasks{{task.pk}}">
-                                                <div class="invdescription2" style="max-width:25vw">
-                                                {{ task.title }}
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card bg-light mb-3">
-                        <div class="card-header">Recently Closed Tasks TOP10</div>
-                        <div class="card-body">
-                            <table class="table table-sm table-condensed fittable" style="border-collapse:collapse;">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Ticket</th>
-                                        <th>Title</th>
-                                        <th>Modified</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for task in rtasks %}
-                                    <tr data-toggle="collapse" data-target="#mytasks{{task.pk}}" class="accordion-toggle">
-                                        <td>
-                                            <a href="{% url 'tasks:tsk_detail' pk=task.pk %}"><h6><span class="badge badge-pill badge-secondary">{{ task.pk }}</span></h6></a>
-                                        </td>
-                                        <td>
-                                            {{ task.inv__ticketid }}
-                                        </td>
-                                        <td>
-                                            {{ task.title }}
-                                        </td>
-                                        <td>
-                                            {{ task.modified_at|date:"Y/m/d H:i:s" }}
-                                        </td>
-                                    </tr>
-                                    <tr >
-                                        <td colspan="4" class="hiddenRow">
-                                            <div class="accordian-body collapse" id="myrtasks{{task.pk}}">
-                                                <div class="invdescription2" style="max-width:25vw">
-                                                {{ task.title }}
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-<!--            ROW 2-->
             <div class="row">
                 <div class="col-md-4">
                     <div class="card bg-light mb-3">

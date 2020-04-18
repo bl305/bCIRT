@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+<!--https://www.techiediaries.com/python-django-ajax/-->
+<!--https://simpleisbetterthancomplex.com/tutorial/2016/08/29/how-to-work-with-ajax-request-with-django.html-->
+<!--https://simpleisbetterthancomplex.com/tutorial/2016/11/15/how-to-implement-a-crud-using-ajax-and-json.html-->
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : knowledgebase/knowledgebase_base.html
+# Author            : Balazs Lendvay
+# Date created      : 2020.03.29
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2020.03.29  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+{% block ptitle %}Knowledgebase{% endblock %}
+
+{% block knowledgebase_active %}active{% endblock knowledgebase_active %}
+
+{% load bootstrap4 %}
+
+{% block title %}{% endblock title %}
+
+{% block content %}
+
+    {% block preknowledgebase %}{% endblock preknowledgebase %}
+    {% block knowledgebase_content %}{% endblock knowledgebase_content %}
+    {% block postknowledgebase %}{% endblock postknowledgebase %}
+
+{% endblock %}

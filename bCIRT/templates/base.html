@@ -174,7 +174,7 @@ mybuttonbottom = document.getElementById("myBtnBottom");
                         </div>
                     </li>
                     <li class="nav-item dropdown {% block assets_active %}{% endblock assets_active%}">
-                        <a class="nav-link dropdown-toggle" href="#" id="dropdownAss" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-book"></i> Assets</a>
+                        <a class="nav-link dropdown-toggle" href="#" id="dropdownAss" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-boxes"></i> Assets</a>
                         <div class="dropdown-menu" aria-labelledby="dropdownAssets">
                             <a class="dropdown-item" href="{% url 'assets:prof_list' %}"><i class="fas fa-user">&nbsp;</i>Profiles</a>
                             <a class="dropdown-item" href="{% url 'assets:host_list' %}"><i class="fas fa-desktop">&nbsp;</i>Hosts</a>
@@ -186,6 +186,13 @@ mybuttonbottom = document.getElementById("myBtnBottom");
                         <a class="nav-link dropdown-toggle" href="#" id="dropdownRep" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-chart-bar"></i>&nbsp;Reports</a>
                         <div class="dropdown-menu" aria-labelledby="dropdownRep">
                             <a class="dropdown-item" href="{% url 'reports:rep_dashboard' %}"><i class="fas fa-chart-bar">&nbsp;</i>Dashboard</a>
+                        </div>
+                    </li>
+                    <li class="nav-item dropdown {% block knowledgebase_active %}{% endblock knowledgebase_active%}">
+                        <a class="nav-link dropdown-toggle" href="#" id="dropdownKB" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-book"></i> KB</a>
+                        <div class="dropdown-menu" aria-labelledby="dropdownKnowledgeBase">
+                            <a class="dropdown-item" href="{% url 'knowledgebase:kb_create' %}"><i class="fas fa-plus">&nbsp;</i>New</a>
+                            <a class="dropdown-item" href="{% url 'knowledgebase:kb_list' %}"><i class="fas fa-list">&nbsp;</i>List</a>
                         </div>
                     </li>
                     <li class="nav-item dropdown navbar-right">
@@ -235,7 +242,12 @@ mybuttonbottom = document.getElementById("myBtnBottom");
             </div>
         </div>
         <nav class="navbar navbar-expand-lg navbar-light bg-light myfooter fixed-bo">
-            <p class="w-100">bCIRT {% include 'version.html' %} | Balazs Lendvay</p>
+            <p class="w-100">
+                <a href="https://www.bcirt.com">bCIRT </a>
+                <a href="https://github.com/bl305/bCIRT">v{% include 'version.html' %}</a>
+                 |
+                <a href="https://www.linkedin.com/in/lendvaybalazs/">Balazs Lendvay</a>
+            </p>
         </nav>
 
 <!--  <div class="modal fade" id="modal-host" style="min-width:95%;">-->

@@ -17,7 +17,9 @@ from django.contrib.auth.mixins import (
     LoginRequiredMixin,
     PermissionRequiredMixin,
 )
-from tasks.models import PlaybookTemplate
+from django.db.models import Q
+
+# from tasks.models import PlaybookTemplate
 from invs.models import Inv
 from tasks.models import Task
 # check remaining session time
@@ -55,7 +57,8 @@ class HomePage(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
             .select_related('attackvector__name')\
             .select_related('user__username') \
             .select_related('status__name') \
-            .values('pk', 'id', 'attackvector__name', 'ticketid', 'user__username', 'status__name', 'modified_at', 'description')[:10]
+            .values('pk', 'id', 'attackvector__name', 'ticketid', 'user__username', 'status__name', 'modified_at',
+                    'description')[:10]
         if amireviewer1:
             kwargs['reviews1'] = Inv.objects.filter(status=5)\
                 .select_related('attackvector__name')\
@@ -66,16 +69,23 @@ class HomePage(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
                 .select_related('attackvector__name')\
                 .select_related('user__username')\
                 .values('pk', 'id', 'attackvector__name', 'ticketid', 'user__username', 'modified_at', 'description')
-        kwargs['reviewlist'] = Inv.objects.filter(user=self.request.user, status=5)\
+        # kwargs['reviewlist'] = Inv.objects.filter(user=self.request.user, status=5)\
+        #                           .select_related('attackvector__name') \
+        #                           .select_related('user__username') \
+        #                           .values('pk', 'id', 'attackvector__name', 'ticketid', 'user__username',
+        #                           'modified_at', 'description')[:10]\
+        #                        | Inv.objects.filter(user=self.request.user, status=6) \
+        #                             .select_related('attackvector__name') \
+        #                             .select_related('user__username') \
+        #                             .values('pk', 'id', 'attackvector__name', 'ticketid', 'user__username',
+        #                                     'modified_at', 'description')[:10]
+        kwargs['reviewlist'] = Inv.objects.filter(user=self.request.user) \
+                                  .filter(Q(status=5) | Q(status=6)) \
                                   .select_related('attackvector__name') \
                                   .select_related('user__username') \
-                                  .values('pk', 'id', 'attackvector__name', 'ticketid', 'user__username', 'modified_at',
-                                          'description')[:10]\
-                               | Inv.objects.filter(user=self.request.user, status=6) \
-                                    .select_related('attackvector__name') \
-                                    .select_related('user__username') \
-                                    .values('pk', 'id', 'attackvector__name', 'ticketid', 'user__username', 'modified_at',
-                                            'description')[:10]
+                                  .select_related('status__name') \
+                                  .values('pk', 'id', 'attackvector__name', 'ticketid', 'user__username',
+                                          'status__name', 'modified_at', 'description')[:10]
         kwargs['uinvs'] = Inv.objects.exclude(status=3)\
                              .exclude(status=2)\
                              .exclude(status=5)\

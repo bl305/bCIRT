@@ -1,0 +1,44 @@
+{% extends "knowledgebase/knowledgebase_base.html" %}
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : knowledgebase/knowledgebase_template.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.10.17
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.10.17  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+{% block knowledgebase_active %}active{% endblock knowledgebase_active %}
+
+{% block preknowledgebase %}
+    {% block knowledgebasetmp_alert %}{% endblock knowledgebasetmp_alert %}
+{% endblock preknowledgebase %}
+
+{% block knowledgebase_content %}
+    <div class="row w-100">
+        <div class="col-sm-12">
+            <div class="card card-primary w-100">
+                <div class="card-header text-primary">
+                    <div class="row w-100">
+                        <div class="card-title w-100">
+                            <div class="container mw-100 d-inline-flex justify-content-start flex-row align-items-center align-content-center flex-nowrap">
+                                    {% block knowledgebasetmp_buttons %}{% endblock knowledgebasetmp_buttons %}
+                                <div class="container d-inline-flex flex-row align-items-center justify-content-center align-content-center flex-nowrap">
+                                    <p class="h4">&nbsp;{% block knowledgebasetmp_title %}{% endblock knowledgebasetmp_title %}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body inv-card-body">
+                    {% block knowledgebasetmp_body %}{% endblock knowledgebasetmp_body %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock knowledgebase_content %}

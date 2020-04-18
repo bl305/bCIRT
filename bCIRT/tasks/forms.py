@@ -1694,7 +1694,7 @@ class EvidenceForm(forms.ModelForm):
 
     parent = forms.ModelChoiceField(
         label='Parent',
-        queryset=Evidence.objects.all(),
+        queryset=Evidence.objects.all(), # todo exclude itself
         empty_label="--Select--",
         required=False,
         widget=forms.Select(

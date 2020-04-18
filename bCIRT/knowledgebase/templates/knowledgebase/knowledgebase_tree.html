@@ -1,0 +1,100 @@
+{% extends "knowledgebase/knowledgebase_base.html" %}
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : knowledgebase/knowledgebase_dashboard.html
+# Author            : Balazs Lendvay
+# Date created      : 2020.04.08
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2020.04.08  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+
+# vacata-jstree-3.3.9-0
+{% load static %}
+
+{% block preknowledgebase %}
+<div class="container-fluid">
+	<div class="col-md-12 text-center">
+		<div class="content">
+			<h2>Knowledgebase Tree</h2>
+		</div>
+	</div>
+{% endblock %}
+{% block knowledgebase_content %}
+<style>
+    #toc_container {
+        background: #f9f9f9 none repeat scroll 0 0;
+        border: 1px solid #aaa;
+        display: table;
+        font-size: 95%;
+        margin-bottom: 1em;
+        padding: 20px;
+        width: auto;
+    }
+
+    .toc_title {
+        font-weight: 700;
+        text-align: center;
+    }
+
+    #toc_container li, #toc_container ul, #toc_container ul li{
+        list-style: outside none none !important;
+    }
+</style>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card card-body bg-light text-left justify-content-left">
+
+
+{% for book in books %}
+    {% if book.parent is None %}
+    MAIN
+    {%endif%}
+{{book}}<br>
+
+{%endfor%}
+
+
+
+<div id="toc_container">
+<p class="toc_title">KnowledgeBase</p>
+<ul class="toc_list">
+
+  <li><a href="#First_Point_Header">1 First Point Header</a>
+  <ul>
+    <li><a href="#First_Sub_Point_1">1.1 First Sub Point 1</a></li>
+    <li><a href="#First_Sub_Point_2">1.2 First Sub Point 2</a></li>
+  </ul>
+</li>
+<li><a href="#Second_Point_Header">2 Second Point Header</a></li>
+<li><a href="#Third_Point_Header">3 Third Point Header</a></li>
+
+</ul>
+</div>
+
+
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card card-body bg-light text-left justify-content-left">
+
+
+xxx
+
+
+            </div>
+        </div>
+
+
+
+    </div>
+    <hr class="thick">
+</div>
+{% endblock knowledgebase_content %}
+</div>

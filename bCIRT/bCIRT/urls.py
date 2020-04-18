@@ -43,6 +43,7 @@ urlpatterns = [
     url(r"^evidences/", include("tasks.urls", namespace="evidences")),
     url(r"^actions/", include("tasks.urls", namespace="actions")),
     url(r"^assets/", include("assets.urls", namespace="assets")),
+    url(r"^knowledgebase/", include("knowledgebase.urls", namespace="knowledgebase")),
 
     url(r'^tinymce/', include('tinymce.urls')),
 
