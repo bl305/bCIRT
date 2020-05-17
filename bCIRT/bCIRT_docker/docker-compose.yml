@@ -1,0 +1,26 @@
+version: '3.1'
+
+services:
+  web:
+    build: ./bCIRT
+    command: python3 manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./bCIRT/:/bCIRT/var/www/bCIRT
+    ports:
+      - 8000:8000
+    env_file:
+      - ./env.dev
+# docker container run -it --rm --name test -p 8000:8000 --mount type=bind,source=/stuff/docker_containers_custom/bCIRT01/bCIRT,target=/usr/src/bCIRT alpine:3.8
+#--mount type=bind,source=/stuff/docker_containers_custom/bCIRT01/bCIRT,target=/usr/src/bCIRT
+#docker container exec -it bcirt01_web_1 sh
+#   db:
+#     image: postgres:12.2-alpine
+#     volumes:
+#       - postgres_data:/var/lib/postgresql/data/
+#     environment:
+#       - POSTGRES_USER=hello_django
+#       - POSTGRES_PASSWORD=hello_django
+#       - POSTGRES_DB=hello_django_dev
+
+# volumes:
+#   postgres_data:

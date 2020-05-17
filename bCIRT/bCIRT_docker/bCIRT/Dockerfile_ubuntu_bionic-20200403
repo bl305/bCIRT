@@ -1,0 +1,56 @@
+# pull official base image
+#FROM python:3.8.2-buster
+#sudo docker stop $(sudo docker ps -a -q)
+#sudo docker rm $(sudo docker ps -a -q)
+FROM ubuntu:bionic-20200403
+
+#RUN mkdir /bCIRT
+# set work directory
+WORKDIR /usr/src/bCIRT
+
+# set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+# install dependencies
+RUN apt-get update && apt-get install -yq --no-install-recommends \
+    apt-utils \
+    nano \
+    unzip \
+    ufw \
+    wget \
+    locales \
+    openssl \
+    python2.7 python3 python3-magic python3-pip python3-venv python-setuptools python3-setuptools python-magic \
+    gcc \
+    python-dev python3-dev build-essential libssl-dev libffi-dev libxml2-dev libxslt1-dev zlib1g-dev python-pip \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+RUN locale-gen en_US.UTF-8 en_GB.UTF-8
+#RUN mkdir -p /bCIRT/venvs \
+#&& mkdir -p /bCIRT/var/www \
+#&& mkdir /bCIRT/var/www/bCIRT
+#WORKDIR /bCIRT/venvs
+#RUN python3.6 -m venv django_venv
+
+#WORKDIR /bCIRT/var/www/bCIRT
+#RUN wget https://github.com/bl305/bCIRT/raw/master/bCIRT_PackageReleases/0113_bCIRT_v203_20200418.zip -O /bCIRT/bCIRT.zip \
+#&& unzip bCIRT.zip
+COPY ./requirements.txt /usr/src/bCIRT/requirements.txt
+#WORKDIR /bCIRT/var/www/bCIRT
+RUN pip3 install --no-cache-dir -r requirements.txt
+# && python3 manage.py makemigrations \
+# && python3 manage.py migrate \
+# && python manage.py syncdb --noinput \
+# && echo "from django.contrib.auth.models import User; User.objects.create_superuser('admin', 'admin@example.com', 'pass')" | python manage.py shell \
+# && python3 manage.py initdb -a
+
+# copy entrypoint.sh
+COPY ./entrypoint.sh /usr/src/bCIRT/entrypoint.sh
+#RUN source /bCIRT/venvs/django_venv/bin/activate
+# copy project
+COPY . /usr/src/bCIRT/
+RUN ["chmod", "+x", "/usr/src/bCIRT/entrypoint.sh"]
+
+ENTRYPOINT ["/usr/src/bCIRT/entrypoint.sh"]
+

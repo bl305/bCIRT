@@ -58,7 +58,7 @@ def user_logged_in_callback(sender, request, user, **kwargs):
         UserAudit.objects.create(eventtype='account_login',
                                  action='success',
                                  ip=ip,
-                                 host=request.META['HTTP_HOST'],
+                                 host=request.META.get('HTTP_HOST', 'localhost').split(':')[0],
                                  user=user,
                                  username=user.username,
                                  session_id=request.session.session_key
@@ -73,6 +73,8 @@ def user_logged_in_callback(sender, request, user, **kwargs):
         error_log.error("log_user_logged_in request: %s, error: %s" % (request, Exception))
 
 
+
+
 @receiver(user_logged_out)
 def user_logged_out_callback(sender, request, user, **kwargs):
     try:
@@ -80,7 +82,7 @@ def user_logged_out_callback(sender, request, user, **kwargs):
         UserAudit.objects.create(eventtype='account_logout',
                                  action='success',
                                  ip=ip,
-                                 host=request.META['HTTP_HOST'],
+                                 host=request.META.get('HTTP_HOST', 'localhost').split(':')[0],
                                  user=user,
                                  username=user.username,
                                  session_id=request.session.session_key

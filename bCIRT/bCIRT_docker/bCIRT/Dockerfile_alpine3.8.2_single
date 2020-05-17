@@ -1,0 +1,31 @@
+# pull official base image
+#FROM python:3.8.2-buster
+FROM python:3.8.2-alpine
+
+# set work directory
+WORKDIR /usr/src/bCIRT
+
+# set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+# install psycopg2 dependencies
+RUN apk update \
+    && apk add nano postgresql-dev gcc python3-dev musl-dev \
+    libffi-dev build-base py2-pip python2-dev
+
+# install dependencies
+RUN pip3 install --upgrade pip wheel
+# wget https://github.com/bl305/bCIRT/raw/master/bCIRT_PackageReleases/0113_bCIRT_v203_20200418.zip
+COPY ./requirements.txt /usr/src/bCIRT/requirements.txt
+RUN pip3 install --no-cache-dir -r requirements.txt
+
+# copy entrypoint.sh
+COPY ./entrypoint.sh /usr/src/bCIRT/entrypoint.sh
+
+# copy project
+COPY . /usr/src/bCIRT/
+RUN ["chmod", "+x", "/usr/src/bCIRT/entrypoint.sh"]
+
+# run entrypoint.sh
+ENTRYPOINT ["/usr/src/bCIRT/entrypoint.sh"]

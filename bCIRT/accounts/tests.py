@@ -2,7 +2,7 @@
 # **********************************************************************;
 # Project           : bCIRT
 # License           : GPL-3.0
-# Program name      : accounts/tests.py
+# Program name      : accounts/test_models.py
 # Author            : Balazs Lendvay
 # Date created      : 2019.07.27
 # Purpose           : Test file for the bCIRT

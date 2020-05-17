@@ -10,6 +10,7 @@
 # Date        Author      Ref    Description
 # 2019.07.29  Lendvay     1      Initial file
 # 2019.09.06  Lendvay     2      Added session security
+# 2020.05.16  Lendvay     3      taskstatuslist excluded Completed in newtask, so a task cannot be created as completed
 # **********************************************************************;
 from .models import Task, TaskTemplate, TaskType, TaskPriority, TaskCategory, TaskStatus
 from .models import TaskVar, TaskList  # , TaskVarType, TaskVarCategory
@@ -1462,7 +1463,7 @@ class TaskCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.Create
         #     kwargs['invlist'] = InvList.get_invlist(Inv.objects.none(), pexcl=None, allownull=True)
             inv_pk = 0
         kwargs['invlist'] = InvList.get_invlist(Inv.objects.none(), pexcl=None, allownull=True)
-        kwargs['taskstatuslist'] = TaskList.get_taskstatuslist(TaskStatus.objects.none())
+        kwargs['taskstatuslist'] = TaskList.get_taskstatuslist(TaskStatus.objects.none(), anew=True)
         kwargs['inv_pk'] = inv_pk
         thetasklist = TaskList.get_tasklist(Task.objects.none(), pinv=inv_pk, pexcltask=None, pallownull=True,
                                             porder_by='pk')

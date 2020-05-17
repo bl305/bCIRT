@@ -10,8 +10,9 @@
 # Date        Author      Ref    Description
 # 2019.07.29  Lendvay     1      Initial file
 # 2019.08.13  Lendvay     2      Added temp folder for each action and connections, removed action file
-# 2019.08.30  Lendvay     1      Added playbooktemplate graph
-# 2019.09.03  Lendvay     1      Fixed add new playbook
+# 2019.08.30  Lendvay     3      Added playbooktemplate graph
+# 2019.09.03  Lendvay     4      Fixed add new playbook
+# 2020.05.16  Lendvay     5      autorun automation on attribute save
 # **********************************************************************;
 from django.conf import settings
 from django.db import models
@@ -919,10 +920,66 @@ class EvidenceAttr(models.Model):
         #     if Task.objects.get(pk=self.ev.task.pk).status.name == "Completed" or \
         #          Task.objects.get(pk=self.ev.task.pk).status.name == "Skipped":
         #         raise ValidationError(_('Task cannot be closed!'))
+        inv_pk = None
         if self.ev.inv and Inv.objects.filter(pk=self.ev.inv.pk).exists():
+            inv_pk = self.ev.inv.pk
             if Inv.objects.get(pk=self.ev.inv.pk).status.name == "Closed" or \
                     Inv.objects.get(pk=self.ev.inv.pk).status.name == "Archived":
                 raise ValidationError(_('Investigation cannot be closed!'))
+            else:
+                # Submitting to any threat intel collection tools
+                # submit somehow....iterate through the items
+                # This will read the system parameters and replace the $ATTRIBUTE$ string
+                # with the atrribute value in the system settings value and will call a script
+                # if self.evattrformat.name == "Email":
+                #     if SettingsSystem.objects.filter(settingname="autosend.attr.Email"):
+                #         actionitems = SettingsSystem.objects.filter(settingname="autosend.attr.Email")
+                #         for actionitem in actionitems:
+                #             newaction = (actionitem.settingvalue).replace('$ATTRIBUTE$', self.evattrvalue)
+                #             newaction_actpk, newaction = newaction.split('|')
+                #             # print("%s - %s"%(newaction_actpk, newaction))
+                #             runres = run_action(
+                #                 pactuser=self.user,
+                #                 pactusername="action",
+                #                 pev_pk=self.ev.pk,
+                #                 pevattr_pk=self.pk,
+                #                 ptask_pk=None,
+                #                 pact_pk=int(newaction_actpk),
+                #                 pinv_pk=self.ev.inv.pk,
+                #                 pargdyn='',
+                #                 pattr=''
+                #             )
+
+                # second solution is to have a field in the actions, saying run this when attribute save.
+                # this function need to find all actions where the attribute save is set and the attribute matches
+                # the filter
+                # in the action
+                # match whitelisted patterns
+                if Action.objects.filter(runonsaveattr=True).exists():
+                    actionslist = Action.objects.filter(runonsaveattr=True)
+                    for actionitem in actionslist:
+                        if actionitem.scriptinputattrtype == self.evattrformat \
+                                or actionitem.scriptinputattrtype is None:
+                            runaction = True
+                            if actionitem.skipregex:
+                                regexp = re.compile(r'%s'%actionitem.skipregex)
+                                # regexp = re.compile(r'[a-zA-Z-.]@example.com$')
+                                if regexp.search(self.evattrvalue):
+                                    # skipping since it's whitelisted
+                                    runaction = False
+                                    pass
+                            if runaction:
+                                run_action(
+                                    pactuser=self.user,
+                                    pactusername="action",
+                                    pev_pk=self.ev.pk,
+                                    pevattr_pk=self.pk,
+                                    ptask_pk=None,
+                                    pact_pk=actionitem.pk,
+                                    pinv_pk=self.ev.inv.pk,
+                                    pargdyn='',
+                                    pattr=''
+                                )
         pass
 
     class Meta:
@@ -1289,12 +1346,14 @@ class Action(models.Model):
                                     related_name="action_scriptinput")
     scriptinputattrtype = models.ForeignKey(EvidenceAttrFormat, on_delete=models.SET_NULL, default=None, blank=True,
                                             null=True, related_name="action_scriptinputattrtype")
+    runonsaveattr = models.BooleanField(default=False)
+    skipregex = models.CharField(max_length=255, default=None, blank=True, null=True)
     scriptinputattrtypeall = models.BooleanField(default=False)
     outputtarget = models.ForeignKey(OutputTarget, on_delete=models.SET_DEFAULT, default=1, blank=True, null=True,
                                      related_name="action_outputtarget")
     outputdescformat = models.ForeignKey(EvidenceFormat, on_delete=models.SET_DEFAULT, default=1, blank=True, null=True,
                                          related_name="action_outputdescformat")
-    argument = models.CharField(max_length=2048, default=None, blank=True, null=True)
+    argument = models.CharField(max_length=4096, default=None, blank=True, null=True)
     connectionitemid = models.ForeignKey(ConnectionItem, on_delete=models.SET_NULL, default=None, blank=True, null=True,
                                          related_name="action_connectionitem")
 
@@ -1982,6 +2041,10 @@ def auto_make_readonly(sender, instance, **kwargs):
                 aforce=False
             )
 
+# @receiver(models.signals.post_save, sender=EvidenceAttr)
+# def auto_submit_ioc(sender, instance, **kwargs):
+#     print("XXXX")
+
 
 @receiver(models.signals.pre_save, sender=Evidence)
 @transaction.atomic
@@ -2249,6 +2312,7 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
     elif action_obj.automationid.type.pk == 2:  # Executable
         pass
     elif action_obj.automationid.type.pk == 3:  # Script
+        print("XXX %s | %s "%(cmd,argument))
         results = run_script_class(interpreter, cmd, argument, timeout).runscript()
     elif action_obj.automationid.type.pk == 4:  # Script with b64 encrypted values to pass over
         results = run_script_class(interpreter, cmd, argument, timeout).runscript()
@@ -2626,7 +2690,7 @@ class ActionQ(models.Model):
     title = models.CharField(max_length=50, default=None, blank=True, null=True)
     scripttype = models.CharField(max_length=60, blank=False, null=False)
     command = models.CharField(max_length=2048, blank=False, null=False)
-    argument = models.CharField(max_length=2048, default=None, blank=True, null=True)
+    argument = models.CharField(max_length=4096, default=None, blank=True, null=True)
     argumentdynamic = models.CharField(max_length=255, default=None, blank=True, null=True)
     cmderror = models.TextField(default=None, blank=True, null=True)
     cmdstatus = models.TextField(default=None, blank=True, null=True)
@@ -2804,8 +2868,12 @@ class TaskList():
                     outlist.append((task[0], outstr))
         return outlist
 
-    def get_taskstatuslist(self):
-        retval = TaskStatus.objects.values_list('pk', 'name').order_by('pk')
+    def get_taskstatuslist(self, anew=False):
+        retval = None
+        if anew:
+            retval = TaskStatus.objects.exclude(name="Completed").values_list('pk', 'name').order_by('pk')
+        else:
+            retval = TaskStatus.objects.values_list('pk', 'name').order_by('pk')
         return retval
 
     def get_actionlist(self, pallownull=True, porderby='title'):

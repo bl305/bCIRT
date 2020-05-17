@@ -107,6 +107,7 @@ class KnowledgeBase(models.Model):
         # if self.task and Task.objects.filter(pk=self.task.pk).exists:
         #     if self.task and Task.objects.get(pk=self.task.pk).readonly():
         #         raise ValidationError(_('Task cannot be closed!'))
+
         super(KnowledgeBase, self).clean()
 
 

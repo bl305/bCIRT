@@ -12,8 +12,8 @@
 # **********************************************************************;
 from django import forms
 # from django.db.models import Count, Avg, Min, Max, Sum, F
-from django.db.models import Max
-from invs.widgets import JQueryDateTimePickerInput
+# from django.db.models import Max
+# from invs.widgets import JQueryDateTimePickerInput
 from tinymce import TinyMCE
 from .models import KnowledgeBase, KnowledgeBaseFormat
 # Get the user so we can use this
@@ -44,13 +44,14 @@ class ListModelChoiceField(forms.ChoiceField):
         try:
             value = self.model.objects.get(id=value)
         except self.model.DoesNotExist:
-             # XXXXXX(self.error_messages['invalid_choice'], code='invalid_choice')
+            # XXXXXX(self.error_messages['invalid_choice'], code='invalid_choice')
             print("Wrong Model Name")
         return value
 
-
     def valid_value(self, value):
-        "Check to see if the provided value is a valid choice"
+        """
+        Check to see if the provided value is a valid choice
+        """
         # if self.choices[0][0] == "":
         #     return True
         if any(choice[0] == "" or value.id == int(choice[0]) for choice in self.choices):
@@ -66,7 +67,7 @@ class ListModelChoiceField(forms.ChoiceField):
         try:
             value = self.model.objects.all()
         except self.model.DoesNotExist:
-             # XXXXXX(self.error_messages['invalid_choice'], code='invalid_choice')
+            # XXXXXX(self.error_messages['invalid_choice'], code='invalid_choice')
             print("Wrong Model Name")
             value = self.model.objects.none()
         return value
@@ -74,10 +75,11 @@ class ListModelChoiceField(forms.ChoiceField):
 
 class KnowledgeBaseForm(forms.ModelForm):
     # evidenceformat=2
-    def __init__(self, kb_pk=0, *args, **kwargs):
+    # def __init__(self, kb_pk=0, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         user = kwargs.pop("user", None)
         super(KnowledgeBaseForm, self).__init__(*args, **kwargs)
-        logger.info("KnwoledgeBaseForm - "+str(user))
+        logger.info("KnowledgeBaseForm - "+str(user))
         # self.fields['inv'].initial = inv_pk
         # parentlist = kwargs.pop("parentlist", None)
         # self.fields['parent'].queryset = KnowledgeBase.objects.exclude(pk=kb_pk)
@@ -91,7 +93,7 @@ class KnowledgeBaseForm(forms.ModelForm):
         #                                           # initial=,
         #                                           widget=forms.Select(
         #                                               attrs={
-        #                                                   'class': 'selectpicker show-tick form-control',  # form-control
+        #                                                   'class': 'selectpicker show-tick form-control',
         #                                                   'data-live-search': 'true',
         #                                                   'data-width': 'auto',
         #                                                   'data-style': 'btn-outline-secondary btn-sm',
@@ -100,7 +102,7 @@ class KnowledgeBaseForm(forms.ModelForm):
         #                                           )
         #                                           )        # self.fields['task'].initial = task_pk
         if KnowledgeBaseFormat.objects.get(pk=2):
-            self.fields['knowledgebaseformat'].initial = KnowledgeBaseFormat.objects.get(pk=2)
+            self.fields['kbformat'].initial = KnowledgeBaseFormat.objects.get(pk=2)
 
     # parent = forms.ModelChoiceField(
     #     label='Parent',
@@ -118,7 +120,7 @@ class KnowledgeBaseForm(forms.ModelForm):
     #     )
     # )
 
-    knowledgebaseformat = forms.ModelChoiceField(
+    kbformat = forms.ModelChoiceField(
         label="KB format*",
         queryset=KnowledgeBaseFormat.objects.filter(enabled=True),  # .values_list('name',flat=True),
         empty_label="--None--",
@@ -139,9 +141,8 @@ class KnowledgeBaseForm(forms.ModelForm):
         )
     )
 
-
     class Meta:
-        fields = ("id", "enabled", "title", "knowledgebaseformat", "description", "fileRef")
+        fields = ("id", "enabled", "title", "kbformat", "description", "fileRef")
         model = KnowledgeBase
         labels = {
             # "parent": "Parent",

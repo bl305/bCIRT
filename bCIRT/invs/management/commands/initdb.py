@@ -1416,6 +1416,7 @@ usage: manage.py initdb [-h] [-a] [-c] [-i TABLE_NAME] [--version]
                 # "scriptoutputtype": EvidenceAttrFormat.objects.get(pk=1),
                 # "scriptinput": ScriptInput.objects.get(pk=1),
                 # "scriptinputattrtype": EvidenceAttrFormat.objects.get(pk=1),
+                # "runonsaveattr" : False,
                 # "scriptinputattrtypeall": False,
                 # "outputtarget": OutputTarget.objects.get(pk=1),
                 # "outputdescformat": EvidenceFormat.objects.get(pk=1),

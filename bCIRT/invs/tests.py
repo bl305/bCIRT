@@ -2,7 +2,7 @@
 # **********************************************************************;
 # Project           : bCIRT
 # License           : GPL-3.0
-# Program name      : invs/tests.py
+# Program name      : invs/test_models.py
 # Author            : Balazs Lendvay
 # Date created      : 2019.07.27
 # Purpose           : Tests file for the bCIRT

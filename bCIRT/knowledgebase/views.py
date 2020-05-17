@@ -182,7 +182,7 @@ class KnowledgeBaseUpdateView(LoginRequiredMixin, PermissionRequiredMixin, gener
         kwargs = super(KnowledgeBaseUpdateView, self).get_form_kwargs()
         # Update the kwargs with the user_id
         kwargs['user'] = self.request.user
-        kwargs['kb_pk'] = self.kwargs.get('pk')
+        # kwargs['kb_pk'] = self.kwargs.get('pk')
         return kwargs
 
 
