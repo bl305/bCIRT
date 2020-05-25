@@ -17,7 +17,7 @@ from .models import Task, TaskCategory, TaskPriority, TaskStatus, TaskType,\
     Evidence, EvidenceFormat, EvidenceAttr, EvidenceAttrFormat, EvReputation, \
     Action, Automation, ActionGroup, ActionGroupMember, \
     ScriptType, ScriptOs, ScriptCategory, ScriptOutput, OutputTarget, ScriptInput,\
-    Type, ActionQ, ActionQStatus, MitreAttck_Tactics, MitreAttck_Techniques
+    Type, ActionQ, ActionQStatus, MitreAttck_Tactics, MitreAttck_Techniques, EvidenceAttrIntel
 
 class EvidenceResource(resources.ModelResource):
     class Meta:
@@ -54,6 +54,11 @@ class EvidenceFormatResource(resources.ModelResource):
 class EvidenceAttrResource(resources.ModelResource):
     class Meta:
         model = EvidenceAttr
+
+
+class EvidenceAttrIntelResource(resources.ModelResource):
+    class Meta:
+        model = EvidenceAttrIntel
 
 
 class EvReputationResource(resources.ModelResource):

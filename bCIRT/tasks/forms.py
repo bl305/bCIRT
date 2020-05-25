@@ -236,7 +236,7 @@ class ActionForm(forms.ModelForm):
     #   fileRef = forms.FileField(widget=CustomClearableFileInput)
     class Meta:
         fields = ("user", "title", "version", "enabled", "automationid", "scriptinput", "scriptinputattrtype",
-                  "runonsaveattr", "skipregex", "scriptinputattrtypeall", "scriptoutput",  "scriptoutputtype", "outputtarget",
+                  "runonsaveattr", "skipregex", "reputationregex", "intelfeed", "scriptinputattrtypeall", "scriptoutput",  "scriptoutputtype", "outputtarget",
                   "outputdescformat", "argument", "connectionitemid", "timeout", "fileRef", "description")
         model = Action
         labels = {
@@ -250,6 +250,8 @@ class ActionForm(forms.ModelForm):
             'outputtarget': 'Output Target*',
             'runonsaveattr': 'Run when saving attribute type',
             'skipregex': 'Regex to skip when running on save',
+            'reputationregex': 'Regex to filter for reputation',
+            'intelfeed': 'Intelligence Feed',
             'scriptinputattrtypeall': 'Run on all filtered attributes',
         }
         widgets = {
@@ -264,6 +266,11 @@ class ActionForm(forms.ModelForm):
                 'class': 'form-control'}
             ),
             'skipregex': forms.TextInput(attrs={
+                'size': 255,
+                'style': 'width:50%',
+                'class': 'form-control'}
+            ),
+            'reputationregex': forms.TextInput(attrs={
                 'size': 255,
                 'style': 'width:50%',
                 'class': 'form-control'}

@@ -333,6 +333,28 @@
                                                                 {% endif %}
                                                             {% endif %}
                                                         {% endif %}
+                    {% with attr.pk|getattributeintellistvaluesbypk as attrintellist2 %}
+                        {% if attrintellist2 %}
+                            {% for attrintel2 in attrintellist2%}
+                                {% if 'high' in attrintel2.severity or 'critical' in attrintel2.severity %}
+                                    <span class="fas fa-bomb text-danger" data-toggle="tooltip" data-placement="top"
+                                    title='{{attrintel2.pk}} | {{attrintel2.intelsource}} | {{attrintel2.severity}} | {{attrintel2.confidence}} | {{attrintel2.state}} | {{attrintel2.date_last|date:"Y/m/d H:i:s"}} | {{attrintel2.itype}} | {{attrintel2.source}} | {{attrintel2.intelvalue}}'>
+<!--                                        <br>-->
+                                    </span>
+                                {% elif 'medium' in attrintel2.severity %}
+                                    <span class="fas fa-exclamation-circle text-danger" data-toggle="tooltip" data-placement="top"
+                                    title='{{attrintel2.pk}} | {{attrintel2.intelsource}} | {{attrintel2.severity}} | {{attrintel2.confidence}} | {{attrintel2.state}} | {{attrintel2.date_last|date:"Y/m/d H:i:s"}} | {{attrintel2.itype}} | {{attrintel2.source}} | {{attrintel2.intelvalue}}'>
+<!--                                        <br>-->
+                                    </span>
+                                {% else %}
+                                    <span class="" data-toggle="tooltip" data-placement="top"
+                                    title='{{attrintel2.pk}} | {{attrintel2.intelsource}} | {{attrintel2.severity}} | {{attrintel2.confidence}} | {{attrintel2.state}} | {{attrintel2.date_last|date:"Y/m/d H:i:s"}} | {{attrintel2.itype}} | {{attrintel2.source}} | {{attrintel2.intelvalue}}'>
+<!--                                        <br>-->
+                                    </span>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
                                                     {% else %}
                                                                     <span data-toggle="tooltip" data-placement="top" title="-">&nbsp;-&nbsp;</span>
                                                     {% endif %}

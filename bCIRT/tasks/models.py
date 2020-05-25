@@ -18,6 +18,7 @@ from django.conf import settings
 from django.db import models
 from django.urls import reverse
 import tempfile
+import json
 from django.db.models import Q
 from django.db import transaction
 # HTML renderer
@@ -38,6 +39,9 @@ from django.db import transaction
 # import pathlib
 # from bCIRT.settings import PROJECT_ROOT
 from django.utils.timezone import now as timezone_now
+from datetime import datetime
+# from django.conf import settings
+from django.utils.timezone import make_aware
 from configuration.models import SettingsSystem
 import random
 import string
@@ -747,16 +751,17 @@ class Evidence(models.Model):
                 #         aforce=False
                 #     )
                 # Creating a clone for the attribute item inspected
-                if self.parentattr:
-                    if self.parentattr:
-                        # cloneevidattr = EvidenceAttr.objects.get(pk=self.parentattr.pk)
-                        cloneevidattr = self.parentattr
-                        cloneevidattr.attr_reputation = attr_rep
-                        if cloneevidattr.attr_reputation.name == 'Suspicious' \
-                                or cloneevidattr.attr_reputation.name == 'Malicious':
-                            cloneevidattr.observable = True
-                        cloneevidattr.pk = None
-                        newclone = cloneevidattr.save()
+                # print("XXX broke here the loop, need to add reputation to the intel table instead")
+                # if self.parentattr and "xxx"=="aaa":
+                #     if self.parentattr:
+                #         # cloneevidattr = EvidenceAttr.objects.get(pk=self.parentattr.pk)
+                #         cloneevidattr = self.parentattr
+                #         cloneevidattr.attr_reputation = attr_rep
+                #         if cloneevidattr.attr_reputation.name == 'Suspicious' \
+                #                 or cloneevidattr.attr_reputation.name == 'Malicious':
+                #             cloneevidattr.observable = True
+                #         cloneevidattr.pk = None
+                #         newclone = cloneevidattr.save()
         super(Evidence, self).save(*args, **kwargs)
 
     def clean(self):
@@ -777,6 +782,7 @@ class Evidence(models.Model):
     def myattributes(self):
         retval = EvidenceAttr.objects.filter(ev=self).select_related('attr_reputation')
         return retval
+
 
 class EvidenceAttrFormat(models.Model):
     objects = models.Manager()
@@ -858,7 +864,8 @@ class EvidenceAttr(models.Model):
     def get_sameitems_inv(self):
         # similar_evattr = EvidenceAttr.objects.\
         # filter(evattrvalue__icontains=self.evattrvalue).exclude(ev__pk=self.ev.pk)
-        exclusion_list = SettingsSystem.objects.filter(Q(settingname="excl.attr.alreadyseen") & Q(enabled=True)).values('settingvalue')
+        exclusion_list = SettingsSystem.objects.filter(Q(settingname="excl.attr.alreadyseen") & Q(enabled=True))\
+            .values('settingvalue')
         similar_evattr = EvidenceAttr.objects.filter(evattrvalue=self.evattrvalue)\
             .exclude(ev=self.ev)\
             .exclude(evattrvalue__in=exclusion_list)
@@ -926,66 +933,85 @@ class EvidenceAttr(models.Model):
             if Inv.objects.get(pk=self.ev.inv.pk).status.name == "Closed" or \
                     Inv.objects.get(pk=self.ev.inv.pk).status.name == "Archived":
                 raise ValidationError(_('Investigation cannot be closed!'))
-            else:
+            elif self.pk:
                 # Submitting to any threat intel collection tools
                 # submit somehow....iterate through the items
                 # This will read the system parameters and replace the $ATTRIBUTE$ string
-                # with the atrribute value in the system settings value and will call a script
-                # if self.evattrformat.name == "Email":
-                #     if SettingsSystem.objects.filter(settingname="autosend.attr.Email"):
-                #         actionitems = SettingsSystem.objects.filter(settingname="autosend.attr.Email")
-                #         for actionitem in actionitems:
-                #             newaction = (actionitem.settingvalue).replace('$ATTRIBUTE$', self.evattrvalue)
-                #             newaction_actpk, newaction = newaction.split('|')
-                #             # print("%s - %s"%(newaction_actpk, newaction))
-                #             runres = run_action(
-                #                 pactuser=self.user,
-                #                 pactusername="action",
-                #                 pev_pk=self.ev.pk,
-                #                 pevattr_pk=self.pk,
-                #                 ptask_pk=None,
-                #                 pact_pk=int(newaction_actpk),
-                #                 pinv_pk=self.ev.inv.pk,
-                #                 pargdyn='',
-                #                 pattr=''
-                #             )
-
-                # second solution is to have a field in the actions, saying run this when attribute save.
-                # this function need to find all actions where the attribute save is set and the attribute matches
-                # the filter
-                # in the action
-                # match whitelisted patterns
-                if Action.objects.filter(runonsaveattr=True).exists():
-                    actionslist = Action.objects.filter(runonsaveattr=True)
-                    for actionitem in actionslist:
-                        if actionitem.scriptinputattrtype == self.evattrformat \
-                                or actionitem.scriptinputattrtype is None:
-                            runaction = True
-                            if actionitem.skipregex:
-                                regexp = re.compile(r'%s'%actionitem.skipregex)
-                                # regexp = re.compile(r'[a-zA-Z-.]@example.com$')
-                                if regexp.search(self.evattrvalue):
-                                    # skipping since it's whitelisted
-                                    runaction = False
-                                    pass
-                            if runaction:
-                                run_action(
-                                    pactuser=self.user,
-                                    pactusername="action",
-                                    pev_pk=self.ev.pk,
-                                    pevattr_pk=self.pk,
-                                    ptask_pk=None,
-                                    pact_pk=actionitem.pk,
-                                    pinv_pk=self.ev.inv.pk,
-                                    pargdyn='',
-                                    pattr=''
-                                )
+                # with the attribute value in the system settings value and will call a script
+                # there is also a check on post_save
+                run_auto_action_on_attribute(self)
         pass
 
     class Meta:
         indexes = [
             models.Index(fields=['evattrvalue'], name='evattrvalue_idx'),
         ]
+
+
+class EvidenceAttrIntel(models.Model):
+    objects = models.Manager()
+    severity = models.CharField(max_length=10, default=None, blank=True, null=True)
+    confidence = models.SmallIntegerField(default=None, blank=True, null=True)
+    state = models.CharField(max_length=10, default=None, blank=True, null=True)
+    #date_last = models.CharField(max_length=20)
+    date_last = models.DateTimeField(default=None, blank=True, null=True)
+    itype = models.CharField(max_length=20, default=None, blank=True, null=True)
+    source = models.CharField(max_length=100, default=None, blank=True, null=True)
+    intelvalue = models.CharField(max_length=255, default=None, blank=True, null=True)
+    evidenceattr = models.ForeignKey(EvidenceAttr, on_delete=models.CASCADE, default=None, blank=True, null=True,
+                           related_name="evidenceattrintel_evidenceattr")
+    created_at = models.DateTimeField(auto_now_add=True)
+    modified_at = models.DateTimeField(auto_now=True)
+    intelsource = models.CharField(max_length=100, default="unknown")
+
+    def __str__(self):
+        return str(self.pk)
+
+    def save(self, *args, **kwargs):
+        super(EvidenceAttrIntel, self).save(*args, **kwargs)
+
+
+def run_auto_action_on_attribute(self):
+    if Action.objects.filter(enabled=True).filter(runonsaveattr=True).exists():
+        actionslist = Action.objects.filter(enabled=True).filter(runonsaveattr=True)
+        for actionitem in actionslist:
+            # print(actionitem)
+            if actionitem.scriptinputattrtype == self.evattrformat \
+                    or actionitem.scriptinputattrtype is None:
+                runaction = True
+                if actionitem.reputationregex:
+                    regexp = re.compile(r'%s' % actionitem.reputationregex)
+                    # regexp = re.compile(r'[a-zA-Z-.]@example.com$')
+                    if regexp.search(str(self.attr_reputation)):
+                        # adding if matches
+                        runaction = True
+                    else:
+                        # blocking action if doesn't match reputation
+                        runaction = False
+                else:
+                    runaction = True
+                if actionitem.skipregex:
+                    regexp = re.compile(r'%s' % actionitem.skipregex)
+                    # regexp = re.compile(r'[a-zA-Z-.]@example.com$')
+                    if regexp.search(self.evattrvalue):
+                        # skipping since it's whitelisted
+                        runaction = False
+                if runaction:
+                    run_action(
+                        pactuser=self.user,
+                        pactusername="action",
+                        pev_pk=self.ev.pk,
+                        pevattr_pk=self.pk,
+                        ptask_pk=None,
+                        pact_pk=actionitem.pk,
+                        pinv_pk=self.ev.inv.pk,
+                        pargdyn='',
+                        pattr='',
+                        pcheckmalicious=False,
+                        paddevattrintel=actionitem.intelfeed,
+                        pnoclone=True
+                    )
+
 
 def get_evidencesameitems_inv_values(pk):
     pk=int(pk)
@@ -1004,9 +1030,9 @@ def get_evidencesameitems_inv_values(pk):
     #     .values('pk', 'attr_reputation__pk', 'evattrformat__name', 'evattrformat__pk', 'observable', 'evattrvalue',
     #             'user__username', 'ev__inv__pk')
 
-
     exclusion_list = SettingsSystem.objects.filter(Q(settingname="excl.attr.alreadyseen") & Q(enabled=True))\
         .values('settingvalue')
+
     myattrvalue = EvidenceAttr.objects.filter(pk=pk).values('evattrvalue')[:1]
     similar_evattr = EvidenceAttr.objects.exclude(pk=pk) \
         .filter(evattrvalue=myattrvalue) \
@@ -1348,6 +1374,8 @@ class Action(models.Model):
                                             null=True, related_name="action_scriptinputattrtype")
     runonsaveattr = models.BooleanField(default=False)
     skipregex = models.CharField(max_length=255, default=None, blank=True, null=True)
+    reputationregex = models.CharField(max_length=255, default=None, blank=True, null=True)
+    intelfeed = models.BooleanField(default=False)
     scriptinputattrtypeall = models.BooleanField(default=False)
     outputtarget = models.ForeignKey(OutputTarget, on_delete=models.SET_DEFAULT, default=1, blank=True, null=True,
                                      related_name="action_outputtarget")
@@ -1838,6 +1866,7 @@ def new_evidence(puser, ptask, pinv, pcreated_by, pmodified_by, pdescription, pf
             # fileName=pfilename,
             # fileRef=pfileref
         )
+
         # Saving the file attachments
         if pfilename and pfileref:
             newev[0].fileName=pfilename
@@ -1907,6 +1936,38 @@ def add_evattr(auser, aev, aevattrvalue, aevattrformat, amodified_by, acreated_b
         )
     return new_evattr
 
+
+def add_evattrintel(aseverity=None, aconfidence=None, astate=None, adate_last=None, aitype=None, asource=None,
+                    aintelvalue=None, aevidenceattr=None, aintelsource=None, aforce=False):
+    new_evattrintel = None
+    if aforce is False:
+        new_evattrintel = EvidenceAttrIntel.objects.update_or_create(
+            severity=aseverity,
+            confidence=aconfidence,
+            state=astate,
+            date_last=adate_last,
+            itype=aitype,
+            source=asource,
+            intelvalue=aintelvalue,
+            evidenceattr=aevidenceattr,
+            intelsource=aintelsource
+        )
+        new_evattrintel = new_evattrintel[0]
+    else:
+        new_evattrintel = EvidenceAttrIntel.objects.create(
+            severity=aseverity,
+            confidence=aconfidence,
+            state=astate,
+            date_last=adate_last,
+            itype=aitype,
+            source=asource,
+            intelvalue=aintelvalue,
+            evidenceattr=aevidenceattr,
+            intelsource=aintelsource
+        )
+    return new_evattrintel
+
+
 # Replace/delete files
 @receiver(models.signals.post_delete, sender=Evidence)
 def auto_delete_file_on_delete(sender, instance, **kwargs):
@@ -1920,6 +1981,19 @@ def auto_delete_file_on_delete(sender, instance, **kwargs):
             os.chmod(instance.fileRef.path, S_IWUSR | S_IREAD | S_IRGRP | S_IWGRP | S_IROTH)
             os.remove(instance.fileRef.path)
             instance.fileName = None
+
+@receiver(models.signals.post_save, sender=EvidenceAttr)
+def check_ifcreated(sender, instance, **kwargs):
+    created = False
+    #Workaround to signal being emitted twice on create and save
+    if 'created' in kwargs:
+        if kwargs['created']:
+            created=True
+            # print("XXX created")
+            run_auto_action_on_attribute(instance)
+    #If signal is from object creation, return
+    if created:
+        return
 
 # @receiver(models.signals.post_save, sender=Evidence)
 # def check_if_malicious(sender, instance, **kwargs):
@@ -2098,7 +2172,9 @@ def remove_html_markup(s):
 
 
 @transaction.atomic
-def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pinv_pk, pargdyn, pattr):
+def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pinv_pk, pargdyn, pattr,
+               pcheckmalicious=True, paddevattrintel=False, pnoclone=False):
+    # print("XXXX %s "%paddevattrintel)
     actuser = pactuser  # self.request.user
     actusername = pactusername  # self.request.user.get_username()
     oldev_file = None
@@ -2114,7 +2190,6 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
     ismalicious = None
     if evattr_pk != 0 and evattr_pk is not None:
         evattr_obj = EvidenceAttr.objects.get(pk=evattr_pk)
-
     # if ev_pk == '0' or ev_pk == None:
     if ev_pk == '0' or ev_pk is None:
         oldev_id = None
@@ -2312,7 +2387,6 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
     elif action_obj.automationid.type.pk == 2:  # Executable
         pass
     elif action_obj.automationid.type.pk == 3:  # Script
-        print("XXX %s | %s "%(cmd,argument))
         results = run_script_class(interpreter, cmd, argument, timeout).runscript()
     elif action_obj.automationid.type.pk == 4:  # Script with b64 encrypted values to pass over
         results = run_script_class(interpreter, cmd, argument, timeout).runscript()
@@ -2410,7 +2484,7 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
         )
         # print("EVID: %s" % (evid))
         # Add an attribute with reputation
-        if ismalicious:
+        if pcheckmalicious and ismalicious:
             # setobservable = False
             if EvReputation.objects.get(name=ismalicious):
                 attr_rep = EvReputation.objects.get(name=ismalicious)
@@ -2426,16 +2500,48 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
                 aattr_reputation=attr_rep,
                 aforce=False
             )
-            # Creating a clone for the attribute item inspected
-            if oldev_obj.parentattr:
-                cloneevidattr = oldev_obj.parentattr
-                # defuning PK as none will make sure a new item is created
-                cloneevidattr.pk = None
-                if cloneevidattr.evreputation.name == 'Suspicious' or cloneevidattr.evreputation.name == 'Malicious':
-                    cloneevidattr.observable = True
-                cloneevidattr.attr_reputation = attr_rep
-                newclone = cloneevidattr.save()
+            # print("XX noclone: %s"%pnoclone)
+            # disabled cloning
+            # if not pnoclone:
+            #     # Creating a clone for the attribute item inspected
+            #     if oldev_obj.parentattr:
+            #         cloneevidattr = oldev_obj.parentattr
+            #         # defuning PK as none will make sure a new item is created
+            #         cloneevidattr.pk = None
+            #         if cloneevidattr.evreputation.name == 'Suspicious' or cloneevidattr.evreputation.name == 'Malicious':
+            #             cloneevidattr.observable = True
+            #         cloneevidattr.attr_reputation = attr_rep
+            #         newclone = cloneevidattr.save()
 
+        if paddevattrintel:
+            # print("XXXX TBD add intel to the EvidenceAttrIntel")
+            # testtime = '2020-01-01T11:22:33'
+            # if it is empty, it will not add the results...
+            if resoutput:
+                outstr_0 = resoutput.rstrip()[1:][:-1].replace("\'", "\"")
+                outstr = json.loads(outstr_0)
+                date_format = "%Y-%m-%dT%H:%M:%S"
+                mytimestamp = datetime.strptime(outstr['date_last'], date_format)
+                # naive_datetime = datetime.datetime.now()
+                # naive_datetime.tzinfo  # None
+
+                # settings.TIME_ZONE  # 'UTC'
+                aware_datetime = make_aware(mytimestamp)
+                date_last = aware_datetime
+                # print(aware_datetime.tzinfo)  # <UTC>
+
+                add_evattrintel(
+                    aseverity=outstr['severity'],
+                    aconfidence=outstr['confidence'],
+                    astate=outstr['state'],
+                    adate_last=date_last,
+                    aitype=outstr['itype'],
+                    asource=outstr['source'],
+                    aintelvalue=outstr['value'],
+                    aevidenceattr=evattr_obj,
+                    aintelsource="%s-%s" % (action_obj.pk, action_obj.title),
+                    aforce=True
+                )
         ActionQ.objects.filter(pk=actionq_stopid.pk).update(evid=evid.pk)
 
         if oldev_obj:
@@ -2443,6 +2549,7 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
 
         actq = actionq_stopid.pk
     elif action_outputtarget == 2:
+
         # Attribute is target for output
         # create the actionQ item
         actionq_startid = new_actionq(actuser, action_obj, task_obj, inv_obj, oldev_obj, None, action_obj.title,
@@ -2467,6 +2574,7 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
         #     currevattrformat = EvidenceAttrFormat.objects.get(name=argumentoutput)
         # resoutput.split()
         # OUTPUT DELIMITER needs to be defined in the model - if empty, don't split...TBD
+        print("XXX we are here but why")
         if isinstance(resoutput, list) or isinstance(resoutput, tuple):
             # list type output
             for item1 in resoutput:
@@ -2521,6 +2629,7 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
 
         actq = actionq_stopid.pk
     elif action_outputtarget == 3:
+
         # File attachment is target for output
         # list of files to be saved
         outputfiles = os.listdir(destoutdirname)
@@ -2743,10 +2852,21 @@ def get_attribute_list_by_evidence_values(ev):
     if ev:
         retval = EvidenceAttr.objects.filter(ev__pk=ev)\
             .select_related('attr_reputation__pk')\
+            .select_related('attr_reputation__name')\
             .select_related('evattrformat__pk')\
             .select_related('evattrformat__name')\
-            .values('pk', 'attr_reputation__pk', 'evattrformat__pk', 'evattrformat__name', 'observable',
-                    'evattrvalue', 'ev__pk', 'modified_at')
+            .values('pk',
+                    'attr_reputation__pk',
+                    'attr_reputation__name',
+                    'evattrformat__pk',
+                    'evattrformat__name', 'observable', 'evattrvalue', 'ev__pk', 'modified_at')
+    return retval
+
+
+def get_attribute_intel_list_by_pk(attr_pk):
+    retval = EvidenceAttr.objects.none()
+    if attr_pk:
+        retval = EvidenceAttrIntel.objects.filter(evidenceattr=attr_pk).order_by('date_last').reverse()
     return retval
 
 

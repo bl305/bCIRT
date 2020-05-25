@@ -273,20 +273,21 @@ class GetFileRawView(LoginRequiredMixin, PermissionRequiredMixin, generic.Detail
         # filepath = None
         # fullpath = None
         http_response = HttpResponse('Record not found!!!')
+        try:
+            if Evidence.objects.filter(pk=ev_pk).exists():
+                origfilename = str(Evidence.objects.get(pk=ev_pk).fileName)
+                filepath = str(Evidence.objects.get(pk=ev_pk).fileRef)
+                fileroot = str(MYMEDIA_ROOT)
+                fullpath = os.path.join(fileroot, filepath)
 
-        if Evidence.objects.filter(pk=ev_pk).exists():
-            origfilename = str(Evidence.objects.get(pk=ev_pk).fileName)
-            filepath = str(Evidence.objects.get(pk=ev_pk).fileRef)
-            fileroot = str(MYMEDIA_ROOT)
-            fullpath = os.path.join(fileroot, filepath)
-
-            now = datetime.now()
-            # date_time = now.strftime("%Y%m%d-%H%M%S")
-            if filepath is not None:
-                http_response = FileResponse(open(fullpath, "rb"))
-                http_response['Content-Disposition'] = 'attachment; filename="%s"' % origfilename
-                # self.download_file_zipped("Evidence_"+ev_pk+"_"+date_time, fullpath, origfilename)
-
+                now = datetime.now()
+                # date_time = now.strftime("%Y%m%d-%H%M%S")
+                if filepath is not None:
+                    http_response = FileResponse(open(fullpath, "rb"))
+                    http_response['Content-Disposition'] = 'attachment; filename="%s"' % origfilename
+                    # self.download_file_zipped("Evidence_"+ev_pk+"_"+date_time, fullpath, origfilename)
+        except:
+            pass
         # http_response = HttpResponse("Result:"+fullpath, content_type="text/plain")
         # print(fileName)
         return http_response
@@ -314,19 +315,21 @@ class GetFileZippedView(LoginRequiredMixin, PermissionRequiredMixin, generic.Det
         # fullpath = None
         http_response = HttpResponse('Record not found!!!')
 
-        if Evidence.objects.filter(pk=ev_pk).exists():
-            origfilename = str(Evidence.objects.get(pk=ev_pk).fileName)
-        # self.context['ev_pk'] = self.get_object()
-        # self.context['user'] = self.request.user.get_username()
-            filepath = str(Evidence.objects.get(pk=ev_pk).fileRef)
-            fileroot = str(MYMEDIA_ROOT)
-            fullpath = os.path.join(fileroot, filepath)
+        try:
+            if Evidence.objects.filter(pk=ev_pk).exists():
+                origfilename = str(Evidence.objects.get(pk=ev_pk).fileName)
+            # self.context['ev_pk'] = self.get_object()
+            # self.context['user'] = self.request.user.get_username()
+                filepath = str(Evidence.objects.get(pk=ev_pk).fileRef)
+                fileroot = str(MYMEDIA_ROOT)
+                fullpath = os.path.join(fileroot, filepath)
 
-            now = datetime.now()
-            date_time = now.strftime("%Y%m%d-%H%M%S")
-            if filepath is not None:
-                http_response = self.download_file_zipped("Evidence_"+ev_pk+"_"+date_time, fullpath, origfilename)
-
+                now = datetime.now()
+                date_time = now.strftime("%Y%m%d-%H%M%S")
+                if filepath is not None:
+                    http_response = self.download_file_zipped("Evidence_"+ev_pk+"_"+date_time, fullpath, origfilename)
+        except:
+            pass
         # http_response = HttpResponse("Result:"+fullpath, content_type="text/plain")
         # print(fileName)
         return http_response

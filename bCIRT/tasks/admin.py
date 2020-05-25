@@ -45,6 +45,7 @@ class GroupMemberInline(admin.TabularInline):
     model = models.EvidenceFormat
     model = models.EvidenceAttr
     model = models.EvidenceAttrFormat
+    model = models.EvidenceAttrIntel
     model = models.EvReputation
     model = models.MitreAttck_Tactics
     model = models.MitreAttck_Techniques
@@ -96,6 +97,11 @@ class EvidenceAttrAdmin(ImportExportModelAdmin):
 
 @admin.register(models.EvidenceAttrFormat)
 class EvidenceAttrFormatAdmin(ImportExportModelAdmin):
+    pass
+
+
+@admin.register(models.EvidenceAttrIntel)
+class EvidenceAttrIntelAdmin(ImportExportModelAdmin):
     pass
 
 

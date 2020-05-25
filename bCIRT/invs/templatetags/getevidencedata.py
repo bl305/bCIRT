@@ -16,7 +16,8 @@ from django.template.defaultfilters import stringfilter
 from tasks.models import get_actionq_list_by_evidence,\
     get_attribute_list_by_evidence,\
     get_attribute_list_by_evidence_values,\
-    get_evidencesameitems_inv_values
+    get_evidencesameitems_inv_values,\
+    get_attribute_intel_list_by_pk
 
 register = template.Library()
 
@@ -34,6 +35,12 @@ def getattributelistbyevidence(value):
 @stringfilter
 def getattributelistvaluesbyevidence(value):
     return get_attribute_list_by_evidence_values(value)
+
+@register.filter(name='getattributeintellistvaluesbypk')
+@stringfilter
+def getattributeintellistvaluesbypk(value):
+    return get_attribute_intel_list_by_pk(value)
+
 
 @register.filter(name='getsameattributelistbyevidence')
 @stringfilter

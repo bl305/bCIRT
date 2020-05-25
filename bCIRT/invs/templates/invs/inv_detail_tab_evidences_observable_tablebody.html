@@ -55,7 +55,7 @@
                 </td>
               <td>
                     {% if attr.attr_reputation__pk == 1 %}
-                  <span class="fas fa-question-circle" data-toggle="tooltip" data-placement="top" title="Unknown"></span>
+                        <span class="fas fa-question-circle" data-toggle="tooltip" data-placement="top" title="Unknown"></span>
                     {% else %}
                         {% if attr.attr_reputation__pk == 2 %}
                             <span class="fas fa-check-circle text-success" data-toggle="tooltip" data-placement="top" title="Clean"></span>
@@ -71,18 +71,45 @@
                             {% endif %}
                         {% endif %}
                     {% endif %}
-                    {{ attr.attr_reputation }}
+                    {{ attr.attr_reputation__name }}
               </td>
+                <td>
+                    {% with attr.pk|getattributeintellistvaluesbypk as attrintellist %}
+                        {% if attrintellist %}
+                            {% for attrintel in attrintellist%}
+                                {% if 'high' in attrintel.severity or 'critical' in attrintel.severity %}
+                                    <span class="fas fa-bomb text-danger" data-toggle="tooltip" data-placement="top" title="High"></span>
+                                    <span class="text-danger" title='{{attrintel.pk}} | {{attrintel.intelsource}} | {{attrintel.severity}} | {{attrintel.confidence}} | {{attrintel.state}} | {{attrintel.date_last|date:"Y/m/d H:i:s"}} | {{attrintel.itype}} | {{attrintel.source}} | {{attrintel.intelvalue}}'>
+                                        {{ attrintel.severity}} - {{ attrintel.itype}}<br>
+                                    </span>
+                                {% elif 'medium' in attrintel.severity %}
+                                    <span class="fas fa-exclamation-circle text-danger" data-toggle="tooltip" data-placement="top" title="Medium"></span>
+                                    <span class="text-danger" title='{{attrintel.pk}} | {{attrintel.intelsource}} | {{attrintel.severity}} | {{attrintel.confidence}} | {{attrintel.state}} | {{attrintel.date_last|date:"Y/m/d H:i:s"}}  | {{attrintel.itype}} | {{attrintel.source}} | {{attrintel.intelvalue}}'>
+                                        {{ attrintel.severity}} - {{ attrintel.itype}}<br>
+                                    </span>
+                                {% else %}
+                                    <span class="" data-toggle="tooltip" data-placement="top" title="Low"></span>
+                                    <span class="" title='{{attrintel.pk}} | {{attrintel.intelsource}} | {{attrintel.severity}} | {{attrintel.confidence}} | {{attrintel.state}} | {{attrintel.date_last|date:"Y/m/d H:i:s"}} | {{attrintel.itype}} | {{attrintel.source}} | {{attrintel.intelvalue}}'>
+                                        {{ attrintel.severity}} - {{ attrintel.itype}}<br>
+                                    </span>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                </td>
 
 <!--                       style="max-width: 800px;overflow: auto;text-overflow: word-wrap;overflow-wrap: break-word;"-->
 
               <td>{{ attr.evattrformat__name }}</td>
+
                 <td>
                     <div class="container mw-100 d-inline-flex justify-content-start flex-row align-items-center align-content-center flex">
                         <a class="" href="{% url 'tasks:evattr_detail' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}"
                         style="max-width: 800px;overflow: auto;text-overflow: word-wrap;overflow-wrap: break-word;"
                         >
-                        <h6><span class="badge badge-pill badge-secondary">{{ attr.evattrvalue }}</span></h6>
+                        <h6>
+                            <span class="badge badge-pill badge-secondary" title="">{{ attr.evattrvalue }}</span>
+                        </h6>
                         </a>
                     </div>
                 </td>
@@ -128,7 +155,7 @@
 {% else %}
 <!-- empty %}-->
           <tr>
-            <td colspan="8" class="text-center bg-warning">No matching record found</td>
+            <td colspan="9" class="text-center bg-warning">No matching record found</td>
           </tr>
 {% endif %}
 <!-- endfor %}-->
