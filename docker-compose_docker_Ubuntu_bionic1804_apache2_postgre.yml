@@ -1,0 +1,56 @@
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : bCIRT_docker/docker-compose_Ubuntu1804.yml
+# Author            : Balazs Lendvay
+# Date created      : 2020.06.07
+# Purpose           : docker-compose.yml file for the bCIRT
+# Revision History  : v1
+# Info              : All in one Ubuntu Apache2 Postgres
+# Date        Author      Ref    Description
+# 2020.06.07  Lendvay     1      Initial file
+# **********************************************************************;
+
+version: '3.1'
+
+services:
+  bcirt_u1804_web:
+    container_name: bcirt
+    build:
+      context: .
+      dockerfile: ./Dockerfile_Ubuntu_bionic1804_apache2_postgre
+    command: apachectl -D FOREGROUND
+    volumes:
+      - bcirt_home:/bCIRT
+    ports:
+      - 443:443
+    environment:
+      - bCIRT_DEBUG=False
+      - bCIRT_PATH=/bCIRT/var/www/html/bCIRT
+      - bCIRT_ENCRYPTION_KEY_1=b"qDqiih0JQgtr6ahdKR0yieQf59MtweBYJ7GbDIA9cWgWBh53cT8j0Zvr1hFsgup"
+      - bCIRT_SALT_1="Pr1YFcgFTIQMZERvJf0ySpUEiAniiiRS6NEOkcVbHLQ="
+      - bCIRT_SECRET_KEY=moyg9_u$c$gg=0y_ou557!w8kkq7z4ze4_ua*0(l*i(39%*c*p
+      - bCIRT_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
+      # - bCIRT_SQL_ENGINE=django.db.backends.postgresql
+      - bCIRT_SQL_ENGINE=django.db.backends.postgresql_psycopg2
+      - bCIRT_SQL_DATABASE=bcirt2
+      - bCIRT_SQL_USER=svc_bcirt
+      - bCIRT_SQL_PASSWORD='0i8D6g@XWCVu^5'
+      - bCIRT_SQL_HOST=bcirt_db
+      - bCIRT_SQL_PORT=5432
+      - bCIRT_DATABASE=postgres
+    depends_on:
+      - bcirt_db
+
+  bcirt_db:
+    container_name: bcirt_db
+    image: postgres:12.2-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=svc_bcirt
+      - POSTGRES_PASSWORD='0i8D6g@XWCVu^5'
+      - POSTGRES_DB=bcirt2
+volumes:
+  bcirt_home:
+  postgres_data:

@@ -1,0 +1,78 @@
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : bCIRT_docker/Dockerfile
+# Author            : Balazs Lendvay
+# Date created      : 2020.05.31
+# Purpose           : Dockerfile file for the bCIRT
+# Revision History  : v1
+# Info              : Alpine version for development using local sqlite
+# Date        Author      Ref    Description
+# 2020.05.31  Lendvay     1      Initial file
+# **********************************************************************; 
+# pull official base image
+#FROM python:3.8.2-buster
+FROM python:3.8.2-alpine
+
+# set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+#PYTHONDONTWRITEBYTECODE: Prevents Python from writing pyc files to disc (equivalent to python -B option)
+#PYTHONUNBUFFERED: Prevents Python from buffering stdout and stderr (equivalent to python -u option)
+
+# default home for all the settings
+ENV bCIRT_ROOT=/bCIRT/
+# vurtual environments
+ENV bCIRT_VIRTUAL_ENV_HOME=${bCIRT_ROOT}/venvs/
+# virtual environment foldername for the django app
+ENV bCIRT_VENV=django_venv
+# virtual environment path for the django app
+ENV bCIRT_VIRTUAL_ENV=${bCIRT_VIRTUAL_ENV_HOME}/$bCIRT_VENV
+# virtual environment for the actions pythonv2
+# ENV bCIRT_VENV_ACTIONS_v2=actions_v2
+# virtual environment for the actions pythonv3
+ENV bCIRT_VENV_ACTIONS_v3=actions_v3
+
+# web root
+ENV bCIRT_HOME=/bCIRT/var/www/bCIRT/
+ENV PATH="$bCIRT_VIRTUAL_ENV/bin:$PATH"
+
+# set work directory
+WORKDIR ${bCIRT_HOME}
+
+# install psycopg2 dependencies
+RUN apk update \
+    && apk add nano postgresql-dev gcc python3-dev musl-dev \
+    libffi-dev build-base py2-pip python2-dev
+
+# create django home virtual environment
+RUN mkdir -p ${bCIRT_VIRTUAL_ENV_HOME}
+WORKDIR ${bCIRT_VIRTUAL_ENV_HOME}
+RUN python3 -m venv ${bCIRT_VENV}
+
+# install dependencies
+RUN source $bCIRT_VIRTUAL_ENV/bin/activate && $bCIRT_VIRTUAL_ENV/bin/pip3 install --upgrade pip wheel
+
+# wget https://github.com/bl305/bCIRT/raw/master/bCIRT_PackageReleases/0113_bCIRT_v203_20200418.zip
+COPY ./requirements_docker_dev_postgre.txt ${bCIRT_HOME}/requirements.txt
+RUN source $bCIRT_VIRTUAL_ENV/bin/activate && $bCIRT_VIRTUAL_ENV/bin/pip3 install --no-cache-dir -r ${bCIRT_HOME}/requirements.txt
+COPY ./requirements_postgre.txt ${bCIRT_HOME}/requirements_postgre.txt
+RUN source $bCIRT_VIRTUAL_ENV/bin/activate && $bCIRT_VIRTUAL_ENV/bin/pip3 install --no-cache-dir -r ${bCIRT_HOME}/requirements_postgre.txt
+
+# create actions virtual environments v3
+RUN mkdir -p ${bCIRT_VIRTUAL_ENV_HOME}
+RUN python3 -m venv ${bCIRT_VENV_ACTIONS_v3}
+# install dependencies
+RUN source ${bCIRT_VIRTUAL_ENV_HOME}/${bCIRT_VENV_ACTIONS_v3}/bin/activate && ${bCIRT_VIRTUAL_ENV_HOME}/${bCIRT_VENV_ACTIONS_v3}/bin/pip3 install --upgrade pip wheel
+
+# copy entrypoint.sh
+COPY ./docker_entrypoint_docker_dev_postgre.sh ${bCIRT_HOME}/entrypoint.sh
+
+# copy project
+COPY . ${bCIRT_HOME}
+
+WORKDIR ${bCIRT_HOME}
+COPY ./bCIRT/settings_docker_dev_postgre.py ${bCIRT_HOME}/bCIRT/settings.py
+COPY ./bCIRT/custom_variables_docker_dev_postgre.py ${bCIRT_HOME}/bCIRT/custom_variables.py
+# run entrypoint.sh
+ENTRYPOINT ["/bCIRT/var/www/bCIRT/entrypoint.sh"]

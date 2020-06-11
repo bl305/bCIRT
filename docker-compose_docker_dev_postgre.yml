@@ -1,0 +1,59 @@
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : bCIRT_docker/docker-compose.yml
+# Author            : Balazs Lendvay
+# Date created      : 2020.05.31
+# Purpose           : docker-compose.yml file for the bCIRT
+# Revision History  : v1
+# Info              : Alpine version for development using local sqlite
+# Date        Author      Ref    Description
+# 2020.05.31  Lendvay     1      Initial file
+# **********************************************************************; 
+version: '3.1'
+
+services:
+  web:
+    build: 
+      context: .
+      dockerfile: ./Dockerfile_docker_dev_postgre
+    command: python3 manage.py runserver 0.0.0.0:8000
+    volumes:
+      # this is to add a volume for the media files
+      - bCIRT_media:/bCIRT/var/www/bCIRT/media/
+      # the one below allowed direct access to the host dir
+      # - ./bCIRT/:/bCIRT/var/www/bCIRT
+    ports:
+      - 8000:8000
+    environment:
+      - bCIRT_DEBUG=False
+      - bCIRT_PATH=/bCIRT/var/www/bCIRT
+      - bCIRT_ENCRYPTION_KEY_1=b"qDqiih0JQgtr6ahdKR0yieQf59MtweBYJ7GbDIA9cWgWBh53cT8j0Zvr1hFsgup"
+      - bCIRT_SALT_1="Pr1YFcgFTIQMZERvJf0ySpUEiAniiiRS6NEOkcVbHLQ="
+      - bCIRT_SECRET_KEY=moyg9_u$c$gg=0y_ou557!w8kkq7z4ze4_ua*0(l*i(39%*c*p
+      - bCIRT_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
+      # - bCIRT_SQL_ENGINE=django.db.backends.postgresql
+      - bCIRT_SQL_ENGINE=django.db.backends.postgresql_psycopg2
+      - bCIRT_SQL_DATABASE=bcirt_dev
+      - bCIRT_SQL_USER=bcirt_dev
+      - bCIRT_SQL_PASSWORD=Password1.
+      - bCIRT_SQL_HOST=db
+      - bCIRT_SQL_PORT=5432
+      - bCIRT_DATABASE=postgres
+    depends_on:
+      - db    
+# docker container run -it --rm --name test -p 8000:8000 --mount type=bind,source=/stuff/docker_containers_custom/bCIRT01/bCIRT,target=/usr/src/bCIRT alpine:3.8
+#--mount type=bind,source=/stuff/docker_containers_custom/bCIRT01/bCIRT,target=/usr/src/bCIRT
+#docker container exec -it bcirt01_web_1 sh
+  db:
+    image: postgres:12.2-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=bcirt_dev
+      - POSTGRES_PASSWORD=Password1.
+      - POSTGRES_DB=bcirt_dev
+
+volumes:
+  postgres_data:
+  bCIRT_media:

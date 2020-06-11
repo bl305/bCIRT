@@ -1,0 +1,67 @@
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : inv/inv_form_template.html
+# Author            : Balazs Lendvay
+# Date created      : 2019.07.27
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2019.07.29  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+{% load field_type %}
+
+{% load static %}
+                            {% if form.errors %}
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                        <div class="alert alert-danger">
+                                            <strong>{{ error|escape }}</strong>
+                                        </div>
+                                    {% endfor %}
+                                {% endfor %}
+                                {% for error in form.non_field_errors %}
+                                    <div class="alert alert-danger">
+                                        <strong>{{ error|escape }}</strong>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+
+                            <table class="table table-sm table-borderless">
+                                {% for field in form %}
+                                    <!--                                <div class="form-group">-->
+                                    <tr class="form-group">
+                                        <th><label class='col-form-label' for="Inv_id">{{field.label_tag }}</label></th>
+                                        <td class="d-flex justify-content-left">
+                                            {% if field|field_type == 'ClearableFileInput' %}
+                                            <div>
+                                                {{ field }}
+                                            </div>
+                                            {% elif field|field_type == 'TinyMCEWidget' %}
+                                                <link href="/tinymce/tinymce4.css" type="text/css" media="all" rel="stylesheet">
+                                                <script type="text/javascript" src="{% static '/tinymce/js/tinymce/tinymce.min.js'%}"></script>
+                                                {{ field }}
+                                            {% elif field|field_type == 'DateTimeInput' %}
+                                                {{ field }}
+                                            {% else %}
+                                                {{ field }}
+                                            {% endif %}
+                                        </td>
+                                     </tr>
+<!--                                </div>-->
+                                {% endfor %}
+                          </table>
+
+<script>
+$(function()
+{
+  $('#submitForm').submit(function(){
+    $("button[type='submit']", this)
+      .text("Please Wait...")
+      .attr('disabled', 'disabled');
+    return true;
+  });
+});
+</script>

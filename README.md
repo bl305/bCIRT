@@ -58,9 +58,22 @@ Don't install this on a server where the users of it should not have admin acces
 ## Documentation
 https://bcirt.readthedocs.io/en/latest/
 
+## Docker version
+1. Clone the repo: git clone https://github.com/bl305/bCIRT
+2. Install docker and docker-compose in your host
+3. If you want your own certificates for prod, put them in the ./bCIRT/osbuilds/certs in the proper directory
+4. If you want to generate new certificates (you should), use the script ./bCIRT/osbuilds/certs/certgen.sh after 
+setting the  proper values in the certconf* files.  
+3. Make sure you are in the bCIRT root
+4. To build development accessible on "http://127.0.0.1:8000": 
+./mydocker_build_docker_dev_postgre.sh
+5. To build production accessible on "https://127.0.0.1:443":
+ ./mydocker_build_Ubuntu_bionic1804_apache2_postgre.sh
+6. Default credentials are set in the "docker-compose*" files: 'admin'/'Password1.' 
+
 ## Install guide for demo-ing
 Key steps to get going:
-1. Dowload the source code
+1. Download the source code
 2. Install virtual envrionment
 3. Install Django and install supporting python dependency packages
 4. Change defaults
@@ -102,8 +115,8 @@ Go to the bCIRT/custom_variables.py and change:
 ALLOWED_HOSTS = ['127.0.0.1']
 
 Optionally also modify:
-MYPATH
-MYMEDIA_ROOT
+BCIRT_PATH
+BCIRT_MEDIA_ROOT
 MYDB
 
 ```
