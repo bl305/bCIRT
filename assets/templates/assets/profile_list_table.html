@@ -9,92 +9,30 @@
 # Revision History  : v1
 # Date        Author      Ref    Description
 # 2019.07.29  Lendvay     1      Initial file
+# 2020.06.14  Lendvay     2      Filter
 # **********************************************************************;
 -->
-{% if object_list %}
-{% for profile in object_list %}
-                <tr>
-                    <td>
-                        <a class="badge badge-secondary" href="{% url 'assets:prof_detail' pk=profile.pk %}#?next1={{ request.get_full_path|urlencode }}">
-                            {{ profile.pk }}
-                        </a>
-                    </td>
-                    <td>
-                        {% if profile.username %}
-                            {{ profile.username }}
-                        {% else %}
-                            -
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if profile.userid %}
-                            {{ profile.userid }}
-                        {% else %}
-                            -
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if profile.email %}
-                            {{ profile.email }}
-                        {% else %}
-                            -
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if profile.host %}
-                            {{ profile.host }}
-                        {% else %}
-                            -
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if profile.ip %}
-                            {{ profile.ip }}
-                        {% else %}
-                            -
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if profile.inv %}
-                        <a class="badge badge-secondary" href="{% url 'invs:inv_detail' pk=profile.inv.pk %}#?next1={{ request.get_full_path|urlencode }}">
-                            {{ profile.inv }}
-                        </a>
-                        {% else %}
-                            -
-                        {% endif %}
-                    </td>
-                    <td>
-                        {{ profile.created_at|date:"Y/m/d H:i:s" }}
-                    </td>
-                    <td>
-                        {{ profile.created_by }}
-                    </td>
-                    <td>
-                        {{ profile.modified_at|date:"Y/m/d H:i:s" }}
-                    </td>
-                    <td>
-                        {{ profile.modified_by }}
-                    </td>
-                    <td>
-	                	{% if user.is_authenticated %}
-                        <div>
-                            <a href="{% url 'assets:prof_edit' pk=profile.pk %}"
-                               class="btn btn-warning btn-xs">
-                                <span class="fas fa-pen"></span>
-                            </a>
-                            <a href="{% url 'assets:prof_remove' pk=profile.pk %}" title="delete"
-                               class="btn btn-danger btn-xs pull-right">
-                                <span class="fas fa-trash-alt" aria-hidden="true"></span>
-                                <span class="icon-label"></span>
-                            </a>
-                        </div>
-                        {% endif %}
-
-                    </td>
-              </tr>
-{% endfor %}
-{% else %}
-          <tr>
-              <td colspan="12" class="text-center bg-warning">No Profiles</td>
-          </tr>
-{% endif %}
+{% include 'assets/profile_pagination_template.html' %}
+                    <table class="table table-sm table-hover display order-column" id="ajax-table"
+                           style="min-height:45vh;"
+                    >
+                        <thead>
+                        <tr>
+                            <th data-field="id">ID</th>
+                            <th data-field="username">Username</th>
+                            <th data-field="userid">UserID</th>
+                            <th data-field="email">email</th>
+                            <th data-field="host">Host</th>
+                            <th data-field="ip">IP</th>
+                            <th data-field="inv">Inv</th>
+                            <th data-field="created">Created (UTC)</th>
+                            <th data-field="createdby">Created by</th>
+                            <th data-field="modified">Modified (UTC)</th>
+                            <th data-field="modifiedby">Modified by</th>
+                            <th data-field="actions">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            {% include 'assets/profile_list_tablebody.html' %}
+                        </tbody>
+                    </table>

@@ -9,6 +9,7 @@
 # Revision History  : v1
 # Date        Author      Ref    Description
 # 2019.07.29  Lendvay     1      Initial file
+# 2020.06.13  Lendvay     2      Autofocus
 # **********************************************************************;
 from .widgets import JQueryDateTimePickerInput
 
@@ -344,6 +345,7 @@ class InvForm(forms.ModelForm):
         }
         widgets = {
             'invid': forms.TextInput(attrs={
+                'autofocus': 'autofocus',
                 'size': 20,
                 'style': 'width:50%;',
                 'class': 'form-control'}
@@ -573,6 +575,7 @@ class InvSuspiciousEmailForm(forms.Form):
         label='Ticket*',
         max_length=50,
         widget=forms.TextInput(attrs={
+            'autofocus': 'autofocus',
             'size': 20,
             'style': 'width:50%;',
             'class': 'form-control'}

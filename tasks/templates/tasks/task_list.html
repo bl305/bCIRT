@@ -59,44 +59,5 @@
 {% endblock task_title %}
 
 {% block task_body %}
-
-                        <table class="table table-sm table-hover display order-column" id="investigations-invi"
-                               style="min-height:45vh"
-                        data-toggle="table"
-                        data-classes="table table-no-bordered"
-                        data-pagination="true"
-                        data-pagination-h-align="left"
-                        data-search="true"
-                        data-search-align="left"
-                        data-show-refresh="true"
-                        data-show-toggle="true"
-                        data-show-columns="true"
-                        data-minimum-count-columns="2"
-                        data-show-pagination-switch="true"
-                        data-id-field="id"
-                        data-page-list="[10, 25, 50, 100, ALL]"
-                        data-show-footer="false"
-                        data-side-pagination="client"
-                        data-buttons-align="left"
-                        >
-                        <thead>
-                        <tr>
-                            <th data-field="id" data-sortable="true">Task ID</th>
-                            <th data-field="name" data-sortable="true">Task Name</th>
-                            <th data-field="desc" data-sortable="true" data-visible="false">Description</th>
-                            <th data-field="stat" data-sortable="true">Status</th>
-                            <th data-field="pri" data-sortable="true">Priority</th>
-                            <th data-field="ass" data-sortable="true">Assigned</th>
-                            <th data-field="playbook" data-sortable="true">Playbook</th>
-                            <th data-field="start" data-sortable="true">Task Start</th>
-                            <th data-field="cre" data-sortable="true">Created (UTC)</th>
-                            <th data-field="mod" data-sortable="true">Modified (UTC)</th>
-                            <th data-field="modby" data-sortable="true">Modified by</th>
-                            <th data-field="par" data-sortable="true">Parent</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                                {% include 'tasks/task_list_table.html' %}
-                        </tbody>
-                    </table>
+    {% include 'tasks/task_list_table.html' %}
 {% endblock task_body %}

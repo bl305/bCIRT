@@ -10,7 +10,8 @@
 # Date        Author      Ref    Description
 # 2019.07.29  Lendvay     1      Initial file
 # 2019.09.06  Lendvay     2      Added session security
-# 2020.05.31  Lendvay     2      pip no cache dir, initdb.check file
+# 2020.05.31  Lendvay     3      pip no cache dir, initdb.check file
+# 2020.06.12  Lendvay     4      python3 pip update iterate through all
 # **********************************************************************;
 from django.views.generic import TemplateView, CreateView, ListView, DetailView, UpdateView, DeleteView
 from django.contrib.auth.mixins import (
@@ -33,6 +34,7 @@ from os import path
 from bCIRT.custom_variables import LOGLEVEL, LOGSEPARATOR
 import logging
 from django.contrib.auth import get_user_model
+from tasks.models import ScriptType
 
 logger = logging.getLogger('log_file_verbose')
 User = get_user_model()
@@ -142,11 +144,24 @@ class SystemUpdatesPage(LoginRequiredMixin, TemplateView):
             self.osupdates = resoutput
             # self.osupdates
             # Getting OS update info
+        elif "SUSE" in resoutput:
+            cmd = "zypper list-patches"
+            argument = ""
+            timeout = 30
+            results = run_script_class("", cmd, argument, timeout).runcmd()
+            # rescommand = results.get('command')
+            # reserror = results.get('error')
+            # resstatus = results.get('status')
+            resoutput = results.get('output')
+            # respid = results.get('pid')
+            self.osupdates = resoutput
+            # self.osupdates
+            # Getting OS update info
         else:
+            self.osupdates = "Not supported OS"
             print("UNSUPPORTED OS")
 
-
-
+        # checking django bcirt venv
         cmd="pip3 list -o --format columns --no-cache-dir"
         argument=""
         timeout=30
@@ -160,7 +175,25 @@ class SystemUpdatesPage(LoginRequiredMixin, TemplateView):
         # self.osupdates
         # Getting OS update info
 
+        # checking action environments
+        python_items = ScriptType.objects.filter(scriptgroup="python3")
+        python_envs = tuple()
+        for item in python_items:
+            # need to get the base for the interpreter
+            python_env = (path.join(path.dirname(item.interpreter),'pip'))
 
+            cmd2="%s list -o --format columns --no-cache-dir" % python_env
+            argument2=""
+            timeout2=30
+            results2 = run_script_class("", cmd2, argument2, timeout2).runcmd()
+            # rescommand = results.get('command')
+            # reserror = results.get('error')
+            # resstatus = results.get('status')
+            resoutput2 = results2.get('output')
+            # respid = results.get('pid')
+            python_envs += ("%s\n%s\n\n%s" % (item.name, python_env, resoutput2)),
+        self.pythonvenvactionudates = python_envs
+        print(python_envs)
 
         super(SystemUpdatesPage, self).__init__(*args, **kwargs)
 
@@ -169,6 +202,7 @@ class SystemUpdatesPage(LoginRequiredMixin, TemplateView):
         kwargs['osupdates'] = self.osupdates
         kwargs['osversion'] = self.osversion
         kwargs['pythonvenvupdates'] = self.pythonvenvudates
+        kwargs['pythonvenvactionupdates'] = self.pythonvenvactionudates
         return super(SystemUpdatesPage, self).get_context_data(**kwargs)
 
 

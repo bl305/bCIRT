@@ -4,3 +4,4 @@
 ./03_clean_pycache_files.sh
 ./04_clean_db.sh
 mkdir -p ./media/tmp
+mkdir -p ./media/graphs

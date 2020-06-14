@@ -30,6 +30,7 @@ import logging
 from bCIRT.custom_variables import LOGSEPARATOR, LOGLEVEL
 from django.utils.http import is_safe_url
 from bCIRT.settings import ALLOWED_HOSTS
+from django.db.models import Q
 
 # check remaining session time
 # from django.contrib.sessions.models import Session
@@ -245,9 +246,27 @@ class HostRemoveView(LoginRequiredMixin, PermissionRequiredMixin, generic.Delete
 # #############################################################################3
 # Investigation related views
 class ProfileListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
+    # model = Profile
+    # form_class = ProfileForm
+    # permission_required = ('assets.view_profile',)
+    #
+    # def __init__(self, *args, **kwargs):
+    #     if LOGLEVEL == 1:
+    #         pass
+    #     elif LOGLEVEL == 2:
+    #         pass
+    #     elif LOGLEVEL == 3:
+    #         logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
+    #         logger.info(logmsg)
+    #     super(ProfileListView, self).__init__(*args, **kwargs)
+    #
+    # def get_context_data(self, **kwargs):
+    #
+    #     return super(ProfileListView, self).get_context_data(**kwargs)
     model = Profile
     form_class = ProfileForm
     permission_required = ('assets.view_profile',)
+    paginate_by = 25
 
     def __init__(self, *args, **kwargs):
         if LOGLEVEL == 1:
@@ -259,10 +278,88 @@ class ProfileListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListV
             logger.info(logmsg)
         super(ProfileListView, self).__init__(*args, **kwargs)
 
+    def get_queryset(self):
+        result = super(ProfileListView, self).get_queryset()
+        # search related stuff
+        pager_raw = self.request.GET.get("pager")
+        if pager_raw == "25":
+            self.paginate_by = 25
+        elif pager_raw == "50":
+            self.paginate_by = 50
+        elif pager_raw == "100":
+            self.paginate_by = 100
+        order_by = self.request.GET.get("order")
+        if order_by == "id":
+            order_by = "id"
+        elif order_by == "created":
+            order_by = "created_at"
+        elif order_by == "modified":
+            order_by = "modified_at"
+        elif order_by == "username":
+            order_by = "username"
+        elif order_by == "userid":
+            order_by = "userid"
+        elif order_by == "email":
+            order_by = "email"
+        elif order_by == "host":
+            order_by = "host"
+        elif order_by == "ip":
+            order_by = "ip"
+        elif order_by == "location":
+            order_by = "location"
+        elif order_by == "department":
+            order_by = "department"
+        elif order_by == "location_contact":
+            order_by = "location_contact"
+        elif order_by == "investigation":
+            order_by = "inv__pk"
+        elif order_by == "description":
+            order_by = "description"
+        else:
+            order_by = "id"
+        queryset_list = Profile.objects.all().order_by(order_by)
+        result = queryset_list
+        query = self.request.GET.get("q")
+        if query:
+            queryset_list = queryset_list.filter(
+                    Q(pk__icontains=query) |
+                    Q(modified_by__icontains=query) |
+                    Q(description__icontains=query) |
+                    Q(created_by__icontains=query) |
+                    Q(username__icontains=query) |
+                    Q(userid__icontains=query) |
+                    Q(email__icontains=query) |
+                    Q(host__icontains=query) |
+                    Q(ip__icontains=query) |
+                    Q(location__icontains=query) |
+                    Q(department__icontains=query) |
+                    Q(location_contact__icontains=query) |
+                    Q(inv__pk__icontains=query) |
+                    Q(created_at__icontains=query) |
+                    Q(modified_at__icontains=query) |
+                    Q(description__icontains=query)
+                    ).distinct().order_by(order_by)
+            result = queryset_list
+        return result
+
     def get_context_data(self, **kwargs):
+        kwargs['pager'] = self.paginate_by
+        itemnum = Profile.objects.all().count()
+        divresult = divmod(itemnum, self.paginate_by)
+        if divresult[1]:
+            finres = divresult[0] + 1
+        else:
+            finres = 0
+        kwargs['allcount'] = finres
+        if self.request.GET.get('q'):
+            kwargs['q'] = str(self.request.GET.get('q'))
+        if self.request.GET.get('page'):
+            kwargs['page'] = int(self.request.GET.get('page'))
+        if self.request.GET.get('order'):
+            kwargs['order'] = str(self.request.GET.get('order'))
 
-        return super(ProfileListView, self).get_context_data(**kwargs)
-
+        context = super(ProfileListView, self).get_context_data(**kwargs)
+        return context
 
 class ProfileCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
     model = Profile

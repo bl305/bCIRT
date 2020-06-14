@@ -1,5 +1,4 @@
 {% extends "tasks/evidence_template.html" %}
-
 <!--
 # **********************************************************************;
 # Project           : bCIRT
@@ -31,41 +30,5 @@
 {% endblock evidencetmp_title %}
 
 {% block evidencetmp_body %}
-                    <table class="table table-sm table-hover display order-column" id="evidences-evi"
-                        data-toggle="table"
-                        data-classes="table table-no-bordered"
-                        data-pagination="true"
-                        data-pagination-h-align="left"
-                        data-search="true"
-                        data-search-align="left"
-                        data-show-refresh="true"
-                        data-show-toggle="true"
-                        data-show-columns="true"
-                        data-minimum-count-columns="2"
-                        data-show-pagination-switch="true"
-                        data-id-field="id"
-                        data-page-list="[10, 25, 50, 100, ALL]"
-                        data-show-footer="false"
-                        data-side-pagination="client"
-                        data-buttons-align="left"
-                    >
-                        <thead>
-                        <tr>
-                            <th data-field="id" data-sortable="true">ID</th>
-                            <th data-field="assigned" data-sortable="true">Assigned</th>
-                            <th data-field="observable" data-sortable="true">Obsrv</th>
-                            <th data-field="evidence" data-sortable="true">Evidence</th>
-                            <th data-field="reputation" data-sortable="true">Reputation</th>
-                            <th data-field="value" data-sortable="true">Value</th>
-                            <th data-field="format" data-sortable="true">Type</th>
-                            <th data-field="created" data-sortable="true" data-visible="false">Created (UTC)</th>
-                            <th data-field="createdby" data-sortable="true" data-visible="false">Created by</th>
-                            <th data-field="modified" data-sortable="true">Modified (UTC)</th>
-                            <th data-field="modifiedby" data-sortable="true">Modified by</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                            {% include 'tasks/evidenceattr_list_table.html' %}
-                        </tbody>
-                    </table>
+    {% include 'tasks/evidenceattr_list_table.html' %}
 {% endblock evidencetmp_body %}

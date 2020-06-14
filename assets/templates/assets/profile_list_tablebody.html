@@ -1,0 +1,100 @@
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : assets/profile_list_tablebody.html
+# Author            : Balazs Lendvay
+# Date created      : 2020.06.14
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2020.06.14  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+{% if object_list %}
+{% for profile in object_list %}
+                <tr>
+                    <td>
+                        <a class="badge badge-secondary" href="{% url 'assets:prof_detail' pk=profile.pk %}#?next1={{ request.get_full_path|urlencode }}">
+                            {{ profile.pk }}
+                        </a>
+                    </td>
+                    <td>
+                        {% if profile.username %}
+                            {{ profile.username }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if profile.userid %}
+                            {{ profile.userid }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if profile.email %}
+                            {{ profile.email }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if profile.host %}
+                            {{ profile.host }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if profile.ip %}
+                            {{ profile.ip }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if profile.inv %}
+                        <a class="badge badge-secondary" href="{% url 'invs:inv_detail' pk=profile.inv.pk %}#?next1={{ request.get_full_path|urlencode }}">
+                            {{ profile.inv }}
+                        </a>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ profile.created_at|date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                        {{ profile.created_by }}
+                    </td>
+                    <td>
+                        {{ profile.modified_at|date:"Y/m/d H:i:s" }}
+                    </td>
+                    <td>
+                        {{ profile.modified_by }}
+                    </td>
+                    <td>
+	                	{% if user.is_authenticated %}
+                        <div>
+                            <a href="{% url 'assets:prof_edit' pk=profile.pk %}"
+                               class="btn btn-warning btn-xs">
+                                <span class="fas fa-pen"></span>
+                            </a>
+                            <a href="{% url 'assets:prof_remove' pk=profile.pk %}" title="delete"
+                               class="btn btn-danger btn-xs pull-right">
+                                <span class="fas fa-trash-alt" aria-hidden="true"></span>
+                                <span class="icon-label"></span>
+                            </a>
+                        </div>
+                        {% endif %}
+
+                    </td>
+              </tr>
+{% endfor %}
+{% else %}
+          <tr>
+              <td colspan="12" class="text-center bg-warning">No Profiles</td>
+          </tr>
+{% endif %}

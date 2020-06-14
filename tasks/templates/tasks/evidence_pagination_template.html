@@ -1,0 +1,107 @@
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : tasks/evidence_pagination_template.html
+# Author            : Balazs Lendvay
+# Date created      : 2020.06.13
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2020.06.13  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+
+<div>
+<ul class="pagination">
+        <li class="page-item">
+            <div class="container">
+                    <form class="form-horizontal" action="{% url 'tasks:ev_list' %}" method="get">
+
+                        <div class="form-inline align-items-center">
+    <!--                        <div class="col-auto my-1">-->
+                                <button type="submit" class="btn btn-secondary"><i class="fas fa-search"></i> Search</button>
+    <!--                        </div>-->
+    <!--                        <div class="col-auto my-1">-->
+                                <input value="{{ request.GET.q }}" class="searchfield form-control" id="search_box" type="text" name="q"  placeholder="Search..." >
+<!--                                <input value="{{request.GET.pager}}" name="pager" type="hidden">-->
+<!--                                <input value="{{request.GET.page}}" name="page" type="hidden">-->
+                                <input value="{{request.GET.order}}" name="order" type="hidden">
+    <!--                        </div>-->
+                        </div>
+                    </form>
+            </div>
+        </li>
+
+    {% if is_paginated %}
+        <li class="page-item">
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Display {{pager}}
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item" href="?q={{ q }}&page={{ num }}&order={{ order }}&pager=25">25</a>
+                    <a class="dropdown-item" href="?q={{ q }}&page={{ num }}&order={{ order }}&pager=50">50</a>
+                    <a class="dropdown-item" href="?q={{ q }}&page={{ num }}&order={{ order }}&pager=100">100</a>
+                </div>
+            </div>
+        </li>
+
+        <li class="page-item">
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Order {{ order }}
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
+                    <a class="dropdown-item" href="?q={{ q }}&page={{ num }}&pager={{ pager }}&order=id">ID</a>
+                    <a class="dropdown-item" href="?q={{ q }}&page={{ num }}&pager={{ pager }}&order=assigned">Assigned</a>
+                    <a class="dropdown-item" href="?q={{ q }}&page={{ num }}&pager={{ pager }}&order=created">Created</a>
+                    <a class="dropdown-item" href="?q={{ q }}&page={{ num }}&pager={{ pager }}&order=modified">Modified</a>
+                    <a class="dropdown-item" href="?q={{ q }}&page={{ num }}&pager={{ pager }}&order=filename">FileName</a>
+                    <a class="dropdown-item" href="?q={{ q }}&page={{ num }}&pager={{ pager }}&order=investigation">Investigation</a>
+                    <a class="dropdown-item" href="?q={{ q }}&page={{ num }}&pager={{ pager }}&order=task">Task</a>
+                </div>
+            </div>
+        </li>
+    <li>&nbsp;&nbsp;&nbsp;</li>
+        {% if page_obj.has_previous %}
+            <li class="page-item" >
+                <a class="page-link text-secondary" href="?q={{ q }}&page=1&pager={{ pager }}&order={{ order }}">First</a>
+            </li>
+            <li class="page-item" >
+                <a class="page-link text-secondary" href="?q={{ q }}&page={{ page_obj.previous_page_number }}&pager={{ pager }}&order={{ order }}">&laquo; </a>
+            </li>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+
+            {% if page_obj.number == num %}
+                <li class="page-item active" >
+                    <a class="page-link bg-secondary text-light" href="?q={{ q }}&page={{ num }}&pager={{ pager }}&order={{ order }}">{{ num }}</a>
+                </li>
+            {% elif num > page_obj.number|add:'-5' and num < page_obj.number|add:'5' %}
+                <li class="page-item" >
+                    <a class="page-link text-secondary" href="?q={{ q }}&page={{ num }}&pager={{ pager }}&order={{ order }}">{{ num }}</a>
+                </li>
+            {% endif %}
+
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+            <li class="page-item" >
+                <a class="page-link text-secondary" href="?q={{ q }}&page={{ page_obj.next_page_number }}&pager={{ pager }}&order={{ order }}">  &raquo;</a>
+            </li>
+            <li class="page-item" >
+                <a class="page-link text-secondary" href="?q={{ q }}&page={{ page_obj.paginator.num_pages }}&pager={{ pager }}&order={{ order }}">Last ({{ allcount }})</a>
+            </li>
+            <li class="page-item">
+            </li>
+        {% endif %}
+            <li class="page-item">
+                <div class="page-link disabled text-secondary">
+                    {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ page_obj.paginator.count }}
+                </div>
+            </li>
+    {% endif %}
+</ul>
+</div>

@@ -10,6 +10,7 @@
 # Revision History  : v1
 # Date        Author      Ref    Description
 # 2019.12.17  Lendvay     1      Initial file
+# 2020.06.12  Lendvay     1      Added venv checks
 # **********************************************************************;
 -->
 
@@ -27,7 +28,12 @@
 		<p><strong>Operating system version:</strong> {{ osversion }}</p>
 		<p><strong>Operating system updates available:</strong>
 				{{ osupdates | linebreaks}}</p>
-		<p><strong>Python Virtual Environment updates available:</strong>
+		<p><strong>bCIRT Python Virtual Environment updates available:</strong>
 				{{ pythonvenvupdates | linebreaks}}</p>
+		{% for items in pythonvenvactionupdates %}
+		<p><strong>bCIRT Python Actions Virtual Environment updates available:</strong>
+				{{ items | linebreaks}}</p>
+		{% endfor %}
+
 {% endblock configuration_body %}
 

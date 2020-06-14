@@ -320,6 +320,7 @@ class ActionGroupForm(forms.ModelForm):
         }
         widgets = {
             'name': forms.TextInput(attrs={
+                'autofocus': 'autofocus',
                 'size': 50,
                 'style': 'width:50%',
                 'class': 'form-control'}
@@ -771,6 +772,7 @@ class TaskForm(forms.ModelForm):
         }
         widgets = {
             'title': forms.TextInput(attrs={
+                'autofocus': 'autofocus',
                 'size': 50,
                 'style': 'width:50%',
                 'class': 'form-control'}
@@ -945,6 +947,7 @@ class TaskTemplateForm(forms.ModelForm):
         }
         widgets = {
             'tasktemplatename': forms.TextInput(attrs={
+                'autofocus': 'autofocus',
                 'size': 50,
                 'style': 'width:50%',
                 'class': 'form-control'}
@@ -1078,6 +1081,7 @@ class TaskVarForm(forms.ModelForm):
         }
         widgets = {
             'name': forms.TextInput(attrs={
+                'autofocus': 'autofocus',
                 'size': 50,
                 'style': 'width:50%',
                 'class': 'form-control'}
@@ -1153,6 +1157,7 @@ class PlaybookForm(forms.ModelForm):
                     'width': '90%',
                 },
                 attrs={
+                    'autofocus': 'autofocus',
                     'style': 'padding-right: 100px',
                 }
             ),
@@ -1192,6 +1197,7 @@ class PlaybookTemplateForm(forms.ModelForm):
         }
         widgets = {
             'name': forms.TextInput(attrs={
+                'autofocus': 'autofocus',
                 'size': 50,
                 'style': 'width:30%;',
                 'class': 'form-control'}
@@ -1385,6 +1391,7 @@ class PlaybookTemplateItemForm(forms.ModelForm):
                     'width': '90%',
                 },
                 attrs={
+                    'autofocus': 'autofocus',
                     'style': 'padding-right: 100px',
                 }
             ),
@@ -1406,6 +1413,7 @@ class HostForm(forms.ModelForm):
         }
         widgets = {
             'name': forms.TextInput(attrs={
+                'autofocus': 'autofocus',
                 'size': 30,
                 'style': 'width:50%',
                 'class': 'form-control'}
@@ -1438,6 +1446,7 @@ class HostnameForm(forms.ModelForm):
         }
         widgets = {
             'name': forms.TextInput(attrs={
+                'autofocus': 'autofocus',
                 'size': 50,
                 'style': 'width:50%',
                 'class': 'form-control'}
@@ -1524,6 +1533,7 @@ class ProfileForm(forms.ModelForm):
         }
         widgets = {
             'username': forms.TextInput(attrs={
+                'autofocus': 'autofocus',
                 'size': 50,
                 'style': 'width:50%',
                 'class': 'form-control'}
@@ -1871,6 +1881,7 @@ class EvidenceAttrForm(forms.ModelForm):
                 }
             ),
             'evattrvalue': forms.TextInput(attrs={
+                'autofocus': 'autofocus',
                 'size': 100,
                 'style': 'width:50%',
                 'class': 'form-control'}
@@ -1975,6 +1986,7 @@ class AutomationForm(forms.ModelForm):
         }
         widgets = {
             'name': forms.TextInput(attrs={
+                'autofocus': 'autofocus',
                 'size': 50,
                 'style': 'width:50%',
                 'class': 'form-control'}
@@ -2018,6 +2030,7 @@ class AddTicketAndCloseForm(forms.Form):
         label='Ticket*',
         max_length=50,
         widget=forms.TextInput(attrs={
+            'autofocus': 'autofocus',
             'size': 20,
             'style': 'width:50%;',
             'class': 'form-control'}

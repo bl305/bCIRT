@@ -12,196 +12,27 @@
 # 2020.02.09  Lendvay     1      Optimized query
 # **********************************************************************;
 -->
-{% if object_list %}
-{% for task in object_list %}
-{% with task.status.name as task_status_name %}
-                <tr data-toggle="collapse" data-target="#mytasks{{task.pk}}" class="accordion-toggle" id="item-task-{{task.pk}}">
-                    <td>
-                        <div class="dropdown" onclick="incrow({{task.pk}},'item-task-','150px')">
-                            <!--<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Dropdown <span class="caret"></span></a>-->
-                            <!--<button class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">-->
-                                <!--Dropdown -->
-                                <!--<span class="caret"></span>-->
-                            <!--</button>-->
-                            <div>
-                             <button class="btn btn-default btn-sm dropdown-toggle dropdown-toggle-split" onclick="filterFunctionTask()" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
-                                {{ task.pk }}<span class="caret"></span>
-                            </button>
-
-                                <ul class="dropdown-menu" role="menu">
-                                    {% if task.status__name != "Completed" %}
-                                        <li>
-                                            {% if task.inv__pk %}
-                                            <a href="{% url 'tasks:ev_create' inv_pk=task.inv__pk task_pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                                class="btn btn-secondary btn-sm btn-block text-left">
-                                                <span class="fas fa-plus" data-toggle="tooltip" data-placement="top" title="View item"></span>
-                                                New Evidence
-                                            </a>
-                                            {% else %}
-                                            <a href="{% url 'tasks:ev_create' inv_pk=0 task_pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                                class="btn btn-secondary btn-sm btn-block text-left">
-                                                <span class="fas fa-plus" data-toggle="tooltip" data-placement="top" title="View item"></span>
-                                                New Evidence
-                                            </a>
-                                            {% endif %}
-                                        </li>
-                                    {% endif %}
-                                    <li>
-                                        <a href="{% url 'tasks:tsk_detail' pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                            class="btn btn-secondary btn-sm btn-block text-left">
-                                            <span class="fas fa-eye" data-toggle="tooltip" data-placement="top" title="Open item"></span>
-                                            View&nbsp;
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="{% url 'tasks:tsk_edit' pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                            class="btn btn-secondary btn-sm btn-block text-left">
-                                          <span class="fas fa-pen" data-toggle="tooltip" data-placement="top" title="Edit item"></span>
-                                          Edit&nbsp;
-                                        </a>
-                                    </li>
-                                        <li>
-                                            {% if task.action__automationid and task_status_name != 'Completed' %}
-                                                {% if task.actev %}
-                                                    {% if task.action.scriptinput.pk == 2 and task.actiontarget.evidence_task.all.first.fileName or task.action.scriptinput.pk == 1 %}
-                                                        {% if inv %}
-                                                            <a href="{% url 'tasks:act_exec_script' pk=task.action.pk inv_pk=inv.pk task_pk=task.pk ev_pk=task.actev evattr_pk=0 %}"
-                                                               class="btn btn-secondary btn-sm btn-block text-left">
-                                                                <span>
-                                                                    Run&nbsp;
-                                                                    <i class="fas fa-play"></i>
-                                                                </span>
-                                                            </a>
-                                                        {% else %}
-                                                            <a href="{% url 'tasks:act_exec_script' pk=task.action.pk inv_pk=0 task_pk=task.pk ev_pk=task.actev evattr_pk=0 %}"
-                                                               class="btn btn-secondary btn-sm btn-block text-left">
-                                                                <span class="glyphicon glyphicon-play">
-                                                                    Run&nbsp;
-                                                                    <i class="fas fa-play"></i>
-                                                                </span>
-                                                            </a>
-                                                        {% endif %}
-                                                    {% else %}
-                                                        (No file)
-                                                    {% endif %}
-                                                {% else %}
-                                                    <a href="#"
-                                                        class="btn btn-secondary btn-sm btn-block text-left">
-                                                        <span class="" data-toggle="tooltip" data-placement="top" title="Toggle Observable item">
-                                                            <i class="fas fa-ban">&nbsp;</i>
-                                                            Action
-                                                        </span>
-                                                    </a>
-                                                {% endif %}
-                                            {% endif %}
-                                        </li>
-                                    <li>&nbsp;</li>
-                                    <li>
-                                          <a href="{% url 'tasks:tsk_remove' pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                              class="btn btn-secondary btn-sm btn-block text-danger">
-                                          <span class="fas fa-trash-alt" data-toggle="tooltip" data-placement="top" title="Edit item">
-                                              Delete
-                                          </span>
-                                          </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div> <!-- .dropdown -->
-
-                    </td>
-                    <td>
-                        <a class="badge badge-secondary" href="{% url 'tasks:tsk_detail' pk=task.pk %}?next1={{ request.get_full_path|urlencode }}">
-                            {{ task.title }}
-                        </a>
-                    </td>
-                    <td>
-                        <div class="container inv-index">
-                            {{ task.description_html|safe }}
-
-                        </div>
-                    </td>
-                    <td>
-                        <div class="dropdown">
-                            <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown" role="button" aria-expanded="false">
-                                {{ task.status__name }}
-                                <span class="caret"></span>
-                            </button>
-                                <ul class="dropdown-menu" role="menu">
-                                    <li>
-                                          <a href="{% url 'tasks:tsk_open' pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                              class="btn btn-secondary btn-sm btn-block text-left">
-                                              Open
-                                              <span></span>
-                                          </span>
-                                          </a>
-                                    </li>
-                                    <li>&nbsp;</li>
-                                    <li>
-                                          <a href="{% url 'tasks:tsk_assign' pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                              class="btn btn-secondary btn-sm btn-block text-left">
-                                              Assign
-                                              <span></span>
-                                          </a>
-                                    </li>
-                                    <li>&nbsp;</li>
-                                    <li>
-                                        <a href="{% url 'tasks:tsk_close' pk=task.pk %}?next1={{ request.get_full_path|urlencode }}"
-                                            class="btn btn-secondary btn-sm btn-block text-left">
-                                            Complete
-                                              <span></span>
-                                        </a>
-                                    </li>
-                                </ul>
-                        </div> <!-- .dropdown -->
-
-                    </td>
-                    <td>
-                        {{ task.priority__name }}
-                    </td>
-                    <td>
-                        {% if task.user__username %}
-                            {{ task.user__username }}
-                        {% else %}
-                            -
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if task.playbook__name %}
-                        <a class="badge badge-secondary" href="{% url 'tasks:play_detail' pk=task.playbook__pk %}?next1={{ request.get_full_path|urlencode }}">
-                            {{ task.playbook__pk }} - {{ task.playbook__name }}
-                        </a>
-                        {% else %}
-                            -
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if task.starttime %}
-                            {{ task.starttime|date:"Y/m/d H:i:s" }}
-                        {% else %}
-                            -
-                        {% endif %}
-                    </td>
-                    <td>
-                        {{ task.created_at|date:"Y/m/d H:i:s" }}
-                    </td>
-                    <td>
-                        {{ task.modified_at|date:"Y/m/d H:i:s" }}
-                    </td>
-                    <td>
-                        {{ task.modified_by }}
-                    </td>
-                    <td>
-                        {% if task.parent %}
-                            {{ task.parent }}
-                        {% else %}
-                            -
-                        {% endif %}
-                    </td>
-                </tr>
-{% endwith %}
-{% endfor %}
-{% else %}
-          <tr>
-            <td colspan="12" class="text-center bg-warning">No Tasks</td>
-          </tr>
-{% endif %}
+{% include 'tasks/task_pagination_template.html' %}
+                    <table class="table table-sm table-hover display order-column" id="ajax-table"
+                           style="min-height:45vh;"
+                    >
+                        <thead>
+                        <tr>
+                            <th data-field="id">Task ID</th>
+                            <th data-field="name">Task Name</th>
+                            <th data-field="desc">Description</th>
+                            <th data-field="stat">Status</th>
+                            <th data-field="pri">Priority</th>
+                            <th data-field="ass">Assigned</th>
+                            <th data-field="playbook">Playbook</th>
+                            <th data-field="start">Task Start</th>
+                            <th data-field="cre">Created (UTC)</th>
+                            <th data-field="mod">Modified (UTC)</th>
+                            <th data-field="modby">Modified by</th>
+                            <th data-field="par">Parent</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                                {% include 'tasks/task_list_tablebody.html' %}
+                        </tbody>
+                    </table>

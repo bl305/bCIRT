@@ -11,6 +11,7 @@
 # 2019.07.29  Lendvay     1      Initial file
 # 2019.09.06  Lendvay     2      Added session security
 # 2020.05.16  Lendvay     3      taskstatuslist excluded Completed in newtask, so a task cannot be created as completed
+# 2020.06.12  Lendvay     2      Attribute filters
 # **********************************************************************;
 from .models import Task, TaskTemplate, TaskType, TaskPriority, TaskCategory, TaskStatus
 from .models import TaskVar, TaskList  # , TaskVarType, TaskVarCategory
@@ -1367,9 +1368,45 @@ class ActionCloneRedirectView(LoginRequiredMixin, PermissionRequiredMixin, gener
 
 
 class TaskListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
+    # model = Task
+    # form_class = TaskTemplateForm
+    # permission_required = ('tasks.view_task',)
+    #
+    # def __init__(self, *args, **kwargs):
+    #     if LOGLEVEL == 1:
+    #         pass
+    #     elif LOGLEVEL == 2:
+    #         pass
+    #     elif LOGLEVEL == 3:
+    #         logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
+    #         logger.info(logmsg)
+    #     super(TaskListView, self).__init__(*args, **kwargs)
+    #
+    # def get_queryset(self):
+    #     retval = Task.objects.all()\
+    #         .select_related('status__name')\
+    #         .select_related('priority__name')\
+    #         .select_related('user__username')\
+    #         .select_related('playbook__pk') \
+    #         .select_related('playbook__name') \
+    #         .select_related('inv__pk') \
+    #         .select_related('parent__pk') \
+    #         .select_related('action__automationid') \
+    #         .values('id', 'pk', 'title', 'description_html', 'inv__pk', 'status__name', 'priority__name',
+    #                 'user__username', 'playbook__pk', 'playbook__name', 'created_at', 'modified_at', 'modified_by',
+    #                 'parent', 'action__automationid', 'starttime')
+    #     return retval
+    #
+    # def get_context_data(self, **kwargs):
+    #     # create_task()
+    #     kwargs['templatecategories'] = TaskTemplate.objects.filter(enabled=True).select_related('category__catid')\
+    #         .select_related('category__name')\
+    #         .values('pk', 'category__catid', 'category__name', 'title')
+    #     return super(TaskListView, self).get_context_data(**kwargs)
     model = Task
-    form_class = TaskTemplateForm
+    form_class = TaskForm
     permission_required = ('tasks.view_task',)
+    paginate_by = 25
 
     def __init__(self, *args, **kwargs):
         if LOGLEVEL == 1:
@@ -1382,7 +1419,42 @@ class TaskListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView
         super(TaskListView, self).__init__(*args, **kwargs)
 
     def get_queryset(self):
-        retval = Task.objects.all()\
+        result = super(TaskListView, self).get_queryset()
+        # search related stuff
+        pager_raw = self.request.GET.get("pager")
+        if pager_raw == "25":
+            self.paginate_by = 25
+        elif pager_raw == "50":
+            self.paginate_by = 50
+        elif pager_raw == "100":
+            self.paginate_by = 100
+        order_by = self.request.GET.get("order")
+        if order_by == "id":
+            order_by = "id"
+        elif order_by == "created":
+            order_by = "created_at"
+        elif order_by == "modified":
+            order_by = "modified_at"
+        elif order_by == "assigned":
+            order_by = "user__username"
+        elif order_by == "description":
+            order_by = "description"
+        elif order_by == "priority":
+            order_by = "priority__name"
+        elif order_by == "playbook":
+            order_by = "playbook__name"
+        elif order_by == "investigation":
+            order_by = "inv__pk"
+        elif order_by == "title":
+            order_by = "title"
+        elif order_by == "status":
+            order_by = "status__name"
+        elif order_by == "start":
+            order_by = "starttime"
+        else:
+            order_by = "id"
+        # queryset_list = Task.objects.all().order_by(order_by)
+        queryset_list = Task.objects.all()\
             .select_related('status__name')\
             .select_related('priority__name')\
             .select_related('user__username')\
@@ -1393,16 +1465,51 @@ class TaskListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView
             .select_related('action__automationid') \
             .values('id', 'pk', 'title', 'description_html', 'inv__pk', 'status__name', 'priority__name',
                     'user__username', 'playbook__pk', 'playbook__name', 'created_at', 'modified_at', 'modified_by',
-                    'parent', 'action__automationid', 'starttime')
-        return retval
+                    'parent', 'action__automationid', 'starttime').order_by(order_by)
+
+        result = queryset_list
+        query = self.request.GET.get("q")
+        if query:
+            queryset_list = queryset_list.filter(
+                Q(pk__icontains=query) |
+                Q(user__username__icontains=query) |
+                Q(modified_by__icontains=query) |
+                Q(description__icontains=query) |
+                Q(created_by__icontains=query) |
+                Q(priority__name__icontains=query) |
+                Q(playbook__name__icontains=query) |
+                Q(title__icontains=query) |
+                Q(inv__pk__icontains=query) |
+                Q(status__name__icontains=query) |
+                Q(starttime__icontains=query)
+            ).distinct().order_by(order_by)
+            result = queryset_list
+        return result
 
     def get_context_data(self, **kwargs):
-        # create_task()
+        #     # create_task()
         kwargs['templatecategories'] = TaskTemplate.objects.filter(enabled=True).select_related('category__catid')\
             .select_related('category__name')\
             .values('pk', 'category__catid', 'category__name', 'title')
-        return super(TaskListView, self).get_context_data(**kwargs)
+        # kwargs['actions'] = Action.objects.filter(enabled=True).order_by('title')
+        # search related stuff
+        kwargs['pager'] = self.paginate_by
+        itemnum = Task.objects.all().count()
+        divresult = divmod(itemnum, self.paginate_by)
+        if divresult[1]:
+            finres = divresult[0] + 1
+        else:
+            finres = 0
+        kwargs['allcount'] = finres
+        if self.request.GET.get('q'):
+            kwargs['q'] = str(self.request.GET.get('q'))
+        if self.request.GET.get('page'):
+            kwargs['page'] = int(self.request.GET.get('page'))
+        if self.request.GET.get('order'):
+            kwargs['order'] = str(self.request.GET.get('order'))
 
+        context = super(TaskListView, self).get_context_data(**kwargs)
+        return context
 
 # @method_decorator(csrf_exempt, name='dispatch')
 class TaskCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
@@ -3082,7 +3189,7 @@ class EvidenceListView(LoginRequiredMixin, PermissionRequiredMixin, generic.List
         elif order_by == "filename":
             order_by = "fileName"
         elif order_by == "assigned":
-            order_by = "user"
+            order_by = "user__username"
         elif order_by == "investigation":
             order_by = "investigation"
         elif order_by == "task":
@@ -3090,6 +3197,7 @@ class EvidenceListView(LoginRequiredMixin, PermissionRequiredMixin, generic.List
         else:
             order_by = "id"
         queryset_list = Evidence.objects.all().order_by(order_by)
+        result = queryset_list
         query = self.request.GET.get("q")
         if query:
             queryset_list = queryset_list.filter(
@@ -3097,7 +3205,8 @@ class EvidenceListView(LoginRequiredMixin, PermissionRequiredMixin, generic.List
                     Q(fileName__icontains=query) |
                     Q(modified_by__icontains=query) |
                     Q(description__icontains=query) |
-                    Q(created_by__icontains=query)
+                    Q(created_by__icontains=query) |
+                    Q(user__username__icontains=query)
                     ).distinct().order_by(order_by)
             result = queryset_list
         return result
@@ -3456,9 +3565,27 @@ class EvidenceAssignTaskView(LoginRequiredMixin, PermissionRequiredMixin, generi
 
 # ############ Attributes
 class EvidenceAttrListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
+    # model = EvidenceAttr
+    # form_class = EvidenceAttrForm
+    # permission_required = ('tasks.view_evidenceattr',)
+    #
+    # def __init__(self, *args, **kwargs):
+    #     if LOGLEVEL == 1:
+    #         pass
+    #     elif LOGLEVEL == 2:
+    #         pass
+    #     elif LOGLEVEL == 3:
+    #         logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
+    #         logger.info(logmsg)
+    #     super(EvidenceAttrListView, self).__init__(*args, **kwargs)
+    #
+    # def get_context_data(self, **kwargs):
+    #     kwargs['actions'] = Action.objects.filter(enabled=True).order_by('title')
+    #     return super(EvidenceAttrListView, self).get_context_data(**kwargs)
     model = EvidenceAttr
     form_class = EvidenceAttrForm
     permission_required = ('tasks.view_evidenceattr',)
+    paginate_by = 25
 
     def __init__(self, *args, **kwargs):
         if LOGLEVEL == 1:
@@ -3470,10 +3597,73 @@ class EvidenceAttrListView(LoginRequiredMixin, PermissionRequiredMixin, generic.
             logger.info(logmsg)
         super(EvidenceAttrListView, self).__init__(*args, **kwargs)
 
-    def get_context_data(self, **kwargs):
-        kwargs['actions'] = Action.objects.filter(enabled=True).order_by('title')
-        return super(EvidenceAttrListView, self).get_context_data(**kwargs)
+    def get_queryset(self):
+        result = super(EvidenceAttrListView, self).get_queryset()
+        # search related stuff
+        pager_raw = self.request.GET.get("pager")
+        if pager_raw == "25":
+            self.paginate_by = 25
+        elif pager_raw == "50":
+            self.paginate_by = 50
+        elif pager_raw == "100":
+            self.paginate_by = 100
+        order_by = self.request.GET.get("order")
+        if order_by == "id":
+            order_by = "id"
+        elif order_by == "created":
+            order_by = "created_at"
+        elif order_by == "modified":
+            order_by = "modified_at"
+        elif order_by == "value":
+            order_by = "evattrvalue"
+        elif order_by == "format":
+            order_by = "evattrformat__name"
+        elif order_by == "observable":
+            order_by = "observable"
+        elif order_by == "reputation":
+            order_by = "attr_reputation__name"
+        elif order_by == "user":
+            order_by = "user__username"
+        elif order_by == "evidence":
+            order_by = "ev__pk"
+        else:
+            order_by = "id"
+        queryset_list = EvidenceAttr.objects.all().order_by(order_by)
+        result = queryset_list
+        query = self.request.GET.get("q")
+        if query:
+            queryset_list = queryset_list.filter(
+                Q(pk__icontains=query) |
+                Q(ev__pk__icontains=query) |
+                Q(evattrvalue__icontains=query) |
+                Q(modified_by__icontains=query) |
+                Q(evattrformat__name__icontains=query) |
+                Q(attr_reputation__name__icontains=query) |
+                Q(created_by__icontains=query)
+                ).distinct().order_by(order_by)
+            result = queryset_list
+        return result
 
+    def get_context_data(self, **kwargs):
+        #     kwargs['actions'] = Action.objects.filter(enabled=True).order_by('title')
+        # search related stuff
+        kwargs['pager'] = self.paginate_by
+        itemnum = EvidenceAttr.objects.all().count()
+        divresult = divmod(itemnum, self.paginate_by)
+        if divresult[1]:
+            finres = divresult[0] + 1
+        else:
+            finres = 0
+        kwargs['allcount'] = finres
+        if self.request.GET.get('q'):
+            kwargs['q'] = str(self.request.GET.get('q'))
+        if self.request.GET.get('page'):
+            kwargs['page'] = int(self.request.GET.get('page'))
+        if self.request.GET.get('order'):
+            kwargs['order'] = str(self.request.GET.get('order'))
+
+        context = super(EvidenceAttrListView, self).get_context_data(**kwargs)
+        return context
 
 class EvidenceAttrCreateView(LoginRequiredMixin, PermissionRequiredMixin, generic.CreateView):
     # fields = ("inv", "user", "description", "fileRef")

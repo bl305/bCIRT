@@ -54,6 +54,9 @@ from base64 import b64encode
 from bCIRT.settings import MEDIA_ROOT
 from configuration.models import ConnectionItem, ConnectionItemField, decrypt_string
 from .scriptmanager.run_script import run_script_class
+
+from tasks.scripts import String_Parser
+
 import logging
 logger = logging.getLogger('log_file_verbose')
 
@@ -685,6 +688,14 @@ class Evidence(models.Model):
     fileName = models.CharField(max_length=255, default="", null=True, blank=True)
     fileRef = models.FileField(upload_to=upload_to_evidence, null=True, blank=True)
     filecreated_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    # visibility controls what is displayed by default
+    # 0 visible: is default, and is displayed for everyone
+    # 1 not-displayed: is not displayed by default but available and printed
+    # 2 print-only: only appears in print
+    # 3 hidden: not displayed and not printed
+    # above one is controlled access, whoever has the same visibility number in his profile can view it. This requires
+    # a field in the profile also and that one to be managed
+    # visibility = models.PositiveIntegerField(default=0, null=False, blank=False)
 
     #    class Meta:
     #        ordering = ['-id']
@@ -1216,6 +1227,12 @@ class ScriptCategory(models.Model):
 
 
 class ScriptType(models.Model):
+    OTHER = 'other'
+    PYTHON3 = 'python3'
+    scriptgroup = [
+        (OTHER, 'other'),
+        (PYTHON3, 'python3'),
+    ]
     objects = models.Manager()
     enabled = models.BooleanField(default=True)
     name = models.CharField(max_length=20)
@@ -1223,6 +1240,12 @@ class ScriptType(models.Model):
     os = models.ForeignKey(ScriptOs, on_delete=models.SET_DEFAULT, default='1', blank=False, null=False,
                            related_name="scripttype_scriptos")
     interpreter = models.CharField(max_length=255, default=None, null=True)
+    # scripttype = models.CharField(max_length=20, default=None, null=True, blank=True)
+    scriptgroup = models.CharField(
+        max_length=20,
+        choices=scriptgroup,
+        default=OTHER,
+    )
     description = models.TextField(max_length=500, default="")
     description_html = models.TextField(editable=True, default='', blank=True)
 
@@ -1783,9 +1806,9 @@ def generate_graph_PlaybookTemplate(sender, instance, **kwargs):
         pngfile = "pbtmp_%s.png"%(curr_pk)
         pngfilepath = path.join(MEDIA_ROOT, "graphs", pngfile)
         graph.write_png(pngfilepath)
-        # print("H1")
-    except Exception:
-        errormsg = "Graphcreate exception %s" % (str(Exception))
+        print("H1")
+    except Exception as error:
+        errormsg = "Graphcreate exception %s" % (str(error))
         logger.error(errormsg)
 
 
@@ -2394,6 +2417,11 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
         pass
     elif action_obj.automationid.type.pk == 3:  # Script
         results = run_script_class(interpreter, cmd, argument, timeout).runscript()
+        # need to add the remote processing here and allow a new field in actions maybe to select remote computer with
+        # credentials etc. Need to copy the contents of the tempdir to the remote place, run the tool and copy back
+        # the results. Since this is async, will need to wait.
+        # e.g. https://hackersandslackers.com/automate-ssh-scp-python-paramiko/
+        # https://github.com/hackersandslackers/paramiko-tutorial
     elif action_obj.automationid.type.pk == 4:  # Script with b64 encrypted values to pass over
         results = run_script_class(interpreter, cmd, argument, timeout).runscript()
     elif action_obj.automationid.type.pk == 5:  # Internal command
@@ -2403,7 +2431,6 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
             new_create_profile_from_evattrs_all(pev=ev_pk)
             afuncoutput = "adding evidence %s attributes to the profile " % ev_pk
         else:
-            from tasks.scripts import String_Parser
             sp1 = String_Parser.StringParser
             afuncoutput = getattr(sp1, action_obj.automationid.code)('', argument)
             if action_obj.automationid.code == "check_malicious":
