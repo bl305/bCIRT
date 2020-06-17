@@ -361,7 +361,6 @@ def new_playbook(pplaybooktemplate, pname, pversion, puser, pinv, pdescription, 
             amodified_by=str(puser),
             acreated_by=str(puser)
         )
-
         if TaskVar.objects.filter(tasktemplate=tmp_to_copy.pk):
             taskvars = TaskVar.objects.filter(tasktemplate=tmp_to_copy.pk)
             for taskvaritem in taskvars:
@@ -1844,13 +1843,17 @@ def generate_graph_Playbook(sender, instance, **kwargs):
         graphfilecontents += aitem
     graphfilecontents += "\n}\n}"
     # https://renenyffenegger.ch/notes/tools/Graphviz/examples/index
+
     try:
         (graph,) = pydot.graph_from_dot_data(graphfilecontents)
         pngfile = "pb_%s.png" % (curr_pk)
         pngfilepath = path.join(MEDIA_ROOT, "graphs", pngfile)
+        # need this line, otherwise the tempdir remains the last set and messes up graph
+        tempfile.tempdir = path.join(MEDIA_ROOT, "tmp")
         graph.write_png(pngfilepath)
-    except Exception:
-        logger.error(Exception)
+    except Exception as error:
+        errormsg = "Graphcreate exception %s" % (str(error))
+        logger.error(errormsg)
 
 
 def add_task_from_template(atitle, astatus, aplaybook, auser, ainv, aaction, aactiontarget,
@@ -2308,7 +2311,6 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
     #    replace('$FILE$', destfile)
     # replace('$EVIDENCE$', destfile)
     # replace('$OUTDIR$', destfile)
-
     connectionitemfields = ConnectionItemField.objects.filter(connectionitemid=action_obj.connectionitemid)
     if connectionitemfields:
         for connitemfield in connectionitemfields:
@@ -2371,6 +2373,7 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
                 destoutdir = tempfile.mkdtemp()
                 destoutdirname = str(destoutdir) + "/"
                 argument = argument.replace('$OUTDIR$', destoutdirname)
+
         elif action_obj.scriptinput.pk == 2 and oldev_file:
             # this represents file type so reads the file from the evidence
             # need to have a file to work on, that's "2"
@@ -2765,13 +2768,11 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
             #  Output to the attribute in the same evidence
             ActionQ.objects.filter(pk=actionq_stopid.pk).update(evid=oldev_obj.pk)
             actq = actionq_stopid.pk
-
     else:
         # Output to be dropped
         pass
     # actq = actionq_stopid.pk
     newscript.close()
-
     return actq
 
 
