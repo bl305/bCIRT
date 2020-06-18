@@ -49,7 +49,7 @@ services:
       - postgres_data:/var/lib/postgresql/data/
     environment:
       - POSTGRES_USER=svc_bcirt
-      - POSTGRES_PASSWORD='0i8D6g@XWCVu^5'
+      - POSTGRES_PASSWORD='Password1.'
       - POSTGRES_DB=bcirt2
 volumes:
   bcirt_home:
