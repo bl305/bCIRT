@@ -35,7 +35,7 @@ services:
       - bCIRT_SQL_ENGINE=django.db.backends.postgresql_psycopg2
       - bCIRT_SQL_DATABASE=bcirt2
       - bCIRT_SQL_USER=svc_bcirt
-      - bCIRT_SQL_PASSWORD='0i8D6g@XWCVu^5'
+      - bCIRT_SQL_PASSWORD='Password1.'
       - bCIRT_SQL_HOST=bcirt_db
       - bCIRT_SQL_PORT=5432
       - bCIRT_DATABASE=postgres

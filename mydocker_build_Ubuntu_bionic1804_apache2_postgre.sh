@@ -1,3 +1,3 @@
 #!/bin/bash
-docker-compose -f Ubuntu_bionic1804_apache2_postgre up --build
+docker-compose -f ./docker-compose_docker_Ubuntu_bionic1804_apache2_postgre.yml up --build
 
