@@ -2554,29 +2554,36 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
             # if it is empty, it will not add the results...
             if resoutput:
                 outstr_0 = resoutput.rstrip()[1:][:-1].replace("\'", "\"")
-                outstr = json.loads(outstr_0)
-                date_format = "%Y-%m-%dT%H:%M:%S"
-                mytimestamp = datetime.strptime(outstr['date_last'], date_format)
-                # naive_datetime = datetime.datetime.now()
-                # naive_datetime.tzinfo  # None
+                outstr = dict()
+                try:
+                    outstr = json.loads(outstr_0)
 
-                # settings.TIME_ZONE  # 'UTC'
-                aware_datetime = make_aware(mytimestamp)
-                date_last = aware_datetime
-                # print(aware_datetime.tzinfo)  # <UTC>
+                    date_format = "%Y-%m-%dT%H:%M:%S"
+                    mytimestamp = datetime.strptime(outstr['date_last'], date_format)
+                    # naive_datetime = datetime.datetime.now()
+                    # naive_datetime.tzinfo  # None
 
-                add_evattrintel(
-                    aseverity=outstr['severity'],
-                    aconfidence=outstr['confidence'],
-                    astate=outstr['state'],
-                    adate_last=date_last,
-                    aitype=outstr['itype'],
-                    asource=outstr['source'],
-                    aintelvalue=outstr['value'],
-                    aevidenceattr=evattr_obj,
-                    aintelsource="%s-%s" % (action_obj.pk, action_obj.title),
-                    aforce=True
-                )
+                    # settings.TIME_ZONE  # 'UTC'
+                    aware_datetime = make_aware(mytimestamp)
+                    date_last = aware_datetime
+                    # print(aware_datetime.tzinfo)  # <UTC>
+
+                    add_evattrintel(
+                        aseverity=outstr['severity'],
+                        aconfidence=outstr['confidence'],
+                        astate=outstr['state'],
+                        adate_last=date_last,
+                        aitype=outstr['itype'],
+                        asource=outstr['source'],
+                        aintelvalue=outstr['value'],
+                        aevidenceattr=evattr_obj,
+                        aintelsource="%s-%s" % (action_obj.pk, action_obj.title),
+                        aforce=True
+                    )
+                except Exception as error:
+                    print("Script Error: %s" % error)
+                    outstr = {"error": "Cannot parse output"}
+
 # ADD to observables when the intel is matching high or so....testxxxxxxxxxxxxxxxx
 #                 setevidenceattrobservable(pattrpk=evattr_pk, avalue=True)
 
