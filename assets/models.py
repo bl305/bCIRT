@@ -18,6 +18,8 @@ from django.utils.translation import gettext_lazy as _
 from django.db import transaction
 from invs.models import Inv
 from tasks.models import EvidenceAttr, Evidence
+from tasks.scripts.LDAP_integration import LDAP_interface
+from bCIRT.custom_variables import ldapvars
 # HTML renderer
 import misaka
 # Get the user so we can use this
@@ -110,12 +112,14 @@ class Profile(models.Model):
     username = models.CharField(blank=True, null=True, default='', max_length=50)
     userid = models.CharField(blank=True, null=True, default='', max_length=30)
     email = models.EmailField(blank=True, null=True, max_length=50)
+    jobtitle = models.EmailField(blank=True, null=True, max_length=50)
     host = models.CharField(blank=True, null=True, default='', max_length=30)
     ip = models.GenericIPAddressField(blank=True, null=True, default='')
     location = models.CharField(blank=True, null=True, default='', max_length=30)
     department = models.CharField(blank=True, null=True, default='', max_length=30)
     location_contact = models.CharField(blank=True, null=True, default='', max_length=30)
-    inv = models.ForeignKey(Inv, on_delete=models.SET_NULL, default=None, null=True, blank=True, related_name="profile_inv")
+    inv = models.ForeignKey(Inv, on_delete=models.SET_NULL, default=None, null=True, blank=True,
+                            related_name="profile_inv")
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.CharField(max_length=20, default="unknown")
     modified_at = models.DateTimeField(auto_now=True)
@@ -128,6 +132,37 @@ class Profile(models.Model):
 
     def save(self, *args, **kwargs):
         self.description_html = misaka.html(self.description)
+        # self.full_clean()
+        ldapres = None
+        try:
+            if self.email:
+                myquery = ldapvars().get_aquery_userinfo_by_email(pemail=self.email)
+                ldapres = LDAP_interface(pUSERNAME=ldapvars.myusername,
+                                         pPASSWORD=ldapvars.mypassword,
+                                         pDOMAIN=ldapvars.mydomain,
+                                         pSERVER=ldapvars.myserver).ldap_query_custom(pquery=myquery)
+                if self.userid is None and ldapres['sAMAccountName'] != []:
+                    self.userid = ldapres['sAMAccountName']
+            elif self.userid:
+                myquery = ldapvars().get_aquery_userinfo_by_userid(puserid=self.userid)
+                ldapres = LDAP_interface(pUSERNAME=ldapvars.myusername,
+                                         pPASSWORD=ldapvars.mypassword,
+                                         pDOMAIN=ldapvars.mydomain,
+                                         pSERVER=ldapvars.myserver).ldap_query_custom(pquery=myquery)
+                if self.email is None and ldapres['mail'] != []:
+                    self.email = ldapres['mail']
+            #     myquery = ldapvars().get_aquery_userinfo_by_email(pemail=self.email)
+            # {'displayName': 'test1', 'sAMAccountName': 'test1', 'mail': 'test1@lendvay.local'}
+            # https://www.manageengine.com/products/ad-manager/help/csv-import-management/active-directory-ldap-attributes.html
+            if self.username is None and ldapres['displayName'] != []:
+                self.username = ldapres['displayName']
+            if self.department is None and ldapres['department'] != []:
+                self.department = ldapres['department']
+            if self.location is None and ldapres['physicalDeliveryOfficeName'] != []:
+                self.location = ldapres['physicalDeliveryOfficeName']
+        except Exception as e:
+            print("Error with LDAP query: %s" % e)
+
         super(Profile, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
@@ -146,6 +181,8 @@ class Profile(models.Model):
                 self.host is None and \
                 self.ip == "":
             raise ValidationError(_('You must fill in one of the fields: Username, UserID, Email, Host, IP'))
+        else:
+            pass
 
     class Meta:
         ordering = ["id"]
@@ -248,3 +285,4 @@ def new_create_profile_from_evattrs_all(pev):
         pusername = ev_obj['user__username']
         new_create_profile_from_evattrs(pinv_pk=pinv_pk, pevattr_pk=None, pev_pk=pev, pusername=pusername)
     return True
+

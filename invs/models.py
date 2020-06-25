@@ -741,3 +741,59 @@ class InvList():
                     outstr = "%s-%s-%s-%s" % (int(inv[0]), str(inv[1]), str(inv[2]), str(inv[3])[0:2])
                 outlist.append((inv[0], outstr))
         return outlist
+
+
+class Get_InspectionData():
+    def __init__(self):
+        pass
+
+    def inv_username_list(self, ausername=None):
+        if ausername:
+            retval = Inv.objects.all()\
+                .filter(user__username__iexact=ausername) \
+                .order_by('user__username')
+            # retval = Inv.objects.all()\
+            #     .filter(user__username=ausername) \
+            #     .select_related('user__username') \
+            #     .values('pk', 'created_at', 'user__username', 'invid')\
+            #     .order_by('user__username')
+        else:
+            retval = Inv.objects.none()
+            # retval = Inv.objects.all()\
+            #     .values('pk', 'created_at', 'user__username', 'invid')\
+            #     .order_by('user__username')
+        return retval
+
+    def profile_username_list(self, ausername=None):
+        if ausername:
+            retval = list()
+            retvallist = Inv.objects.all()
+            for i in retvallist:
+                for j in i.profile_inv.all().filter(username__iexact=ausername):
+                    retval.append(j)
+        else:
+            retval = Inv.objects.none()
+        return retval
+
+    def profile_userid_list(self, auserid=None):
+        if auserid:
+            retval = list()
+            retvallist = Inv.objects.all()
+            for i in retvallist:
+                for j in i.profile_inv.all().filter(userid__iexact=auserid):
+                    retval.append(j)
+        else:
+            retval = Inv.objects.none()
+        return retval
+
+
+    def profile_email_list(self, aemail=None):
+        if aemail:
+            retval = list()
+            retvallist = Inv.objects.all()
+            for i in retvallist:
+                for j in i.profile_inv.all().filter(email__iexact=aemail):
+                    retval.append(j)
+        else:
+            retval = Inv.objects.none()
+        return retval

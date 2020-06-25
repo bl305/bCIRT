@@ -20,7 +20,8 @@ from invs.models import InvDetailTabEvidences, Inv, InvList
 from .models import TasksInvDetailTabEvidences
 # from .models import Inv
 from .models import Evidence, EvidenceAttr  # , EvidenceAttrFormat, EvidenceFormat
-from .models import add_task_from_template, run_action, evidenceattrobservabletoggle, clone_action, new_evidence
+from .models import add_task_from_template, run_action, evidenceattrobservabletoggle, clone_action, \
+    new_evidence, evidenceattrmalicioustoggle
 from .models import Action, ActionQ, ActionGroup, ActionGroupMember, Automation
 from tasks.models import playbooktemplateitem_check_delete_condition
 from .forms import TaskForm, TaskTemplateForm, TaskVarForm, AddTicketAndCloseForm
@@ -3912,6 +3913,42 @@ class EvidenceAttrObservableToggleView(LoginRequiredMixin, PermissionRequiredMix
         # return reverse('tasks:tsk_list')
         # return super().get_redirect_url(*args, **kwargs)
 
+
+class EvidenceAttrMaliciousToggleView(LoginRequiredMixin, PermissionRequiredMixin, generic.RedirectView):
+    permission_required = ('tasks.view_evidenceattr', 'tasks.change_evidenceattr')
+    success_url = 'tasks:evattr_list'
+
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
+            logger.info(logmsg)
+        super(EvidenceAttrMaliciousToggleView, self).__init__(*args, **kwargs)
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            # This will redirect to the login view
+            return self.handle_no_permission()
+        elif not self.request.user.has_perm('tasks.change_evidenceattr'):
+            messages.error(self.request, "No permission to change a record !!!")
+            return redirect('tasks:evattr_list')
+        evattr_pk = self.kwargs.get('pk')
+        evidenceattrmalicioustoggle(evattr_pk)
+        return super(EvidenceAttrMaliciousToggleView, self).dispatch(request, *args, **kwargs)
+
+    def get_redirect_url(self, *args, **kwargs):
+        if 'next1' in self.request.GET:
+            redirect_to = self.request.GET['next1']
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
+                return reverse(self.success_url)
+        else:
+            return reverse(self.success_url)
+        return redirect_to
+        # return reverse('tasks:tsk_list')
+        # return super().get_redirect_url(*args, **kwargs)
 
 # #######################################################
 class AddToProfileRedirectView(LoginRequiredMixin, PermissionRequiredMixin, generic.RedirectView):

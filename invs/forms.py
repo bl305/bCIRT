@@ -658,3 +658,35 @@ class InvReviewer2Form(forms.ModelForm):
                 }
             ),
         }
+
+
+class InspectorForm(forms.Form):
+
+    username = forms.CharField(
+        required=False
+    )
+    userid = forms.CharField(
+        required=False
+    )
+    email = forms.EmailField(
+        required=False
+    )
+
+    # starttime = forms.DateTimeField(
+    #     input_formats=['%Y-%m-%d %H:%M:%S'],
+    #     required=False,
+    #     widget=JQueryDateTimePickerInput(
+    #         attrs={
+    #             'class': 'form-control',
+    #             'style': 'width:200px',
+    #         }
+    #     )
+    # )
+    #     name = forms.CharField()
+    #     message = forms.CharField(widget=forms.Textarea)
+
+class InvLookupForm(forms.Form):
+
+    username = forms.CharField(
+        required=False
+    )

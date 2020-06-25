@@ -1,0 +1,79 @@
+{% extends "invs/inv_base.html" %}
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : inv/inv_lookup.html
+# Author            : Balazs Lendvay
+# Date created      : 2020.06.20
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2020.06.20  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+{% block ptitle %}Lookup {% endblock %}
+
+{% block invslist_active %}active{% endblock invslist_active%}
+
+{% block preinvs %}
+
+{% endblock preinvs %}
+
+{% block invs_content %}
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-md-12">
+			<div class="card card-body bg-light">
+                <form method="POST">
+                {% csrf_token %}
+                {% for field in form %}
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <span class="text-danger small">{{ field.errors }}</span>
+                        </div>
+                        <div class="row container mw-100 d-inline-flex justify-content-start flex-row align-items-start align-content-start flex-nowrap">
+                            <label class="control-label col-sm-2" for="Inv_id">{{ field.label_tag }}</label>
+                            <div class="col-sm-10">
+                                {{ field }}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+                <button type="submit">Search</button>
+                </form>
+			</div>
+		</div>
+	</div>
+    <hr class="thick">
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card card-body bg-light">
+                <p><strong>LDAP</strong></p>
+
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                UserID
+                            </td>
+                            <td>
+                                xxx
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <hr class="thick">
+
+</div>
+
+{% endblock invs_content %}

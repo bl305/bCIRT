@@ -314,8 +314,10 @@
                                             <div class="container mw-100 d-inline-flex justify-content-start flex-row align-items-center align-content-center flex-nowrap">
                                                 <div class="btn btn-sm">
                                                     {% if attr %}
+                                                        <a href="{% url 'tasks:evattr_malicioustoggle' pk=attr.pk %}?next1={{ request.get_full_path|urlencode }}#item-inve{{ invevidence.evidence_inv__pk }}"
+                                                        >
                                                         {% if attr.attr_reputation__pk == 1 %}
-                                                        <span class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="Unknown"></span>
+                                                            <span class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="Unknown"></span>
                                                         {% else %}
                                                             {% if attr.attr_reputation__pk == 2 %}
                                                                 <span style="color:green;" class="fa fa-check-circle" data-toggle="tooltip" data-placement="top" title="Clean"></span>
@@ -326,13 +328,17 @@
                                                                     </strong>
                                                                 {% else %}
                                                                     {% if attr.attr_reputation__pk == 4 %}
-                                                                    <span class="fa fa-bomb text-danger" data-toggle="tooltip" data-placement="top" title="Malicious"></span>
+                                                                        <span class="fa fa-bomb text-danger" data-toggle="tooltip" data-placement="top" title="Malicious"></span>
                                                                     {% else %}
-                                                                    <span data-toggle="tooltip" data-placement="top" title="-">&nbsp;-&nbsp;</span>
+<!--                                                                    <span data-toggle="tooltip" data-placement="top" title="-">&nbsp;-&nbsp;</span>-->
+                                                                        <span class="fa fa-circle" data-toggle="tooltip" data-placement="top" title="N/A">
+
+                                                                        </span>
                                                                     {% endif %}
                                                                 {% endif %}
                                                             {% endif %}
                                                         {% endif %}
+                                                        </a>
                     {% with attr.pk|getattributeintellistvaluesbypk as attrintellist2 %}
                         {% if attrintellist2 %}
                             {% for attrintel2 in attrintellist2%}

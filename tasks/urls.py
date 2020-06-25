@@ -79,6 +79,8 @@ urlpatterns = [
     url(r'^evidences/evattr/remove/(?P<pk>\d+)/$', views.EvidenceAttrRemoveView.as_view(), name='evattr_remove'),
     url(r'^evidences/evattr/obstoggle/(?P<pk>\d+)/$', views.EvidenceAttrObservableToggleView.as_view(),
         name='evattr_observabletoggle'),
+    url(r'^evidences/evattr/maltoggle/(?P<pk>\d+)/$', views.EvidenceAttrMaliciousToggleView.as_view(),
+        name='evattr_malicioustoggle'),
 
     url(r"^$", views.TaskListView.as_view(), name="tsk_list"),
     url(r"^new/(?P<inv_pk>\d+)/$", views.TaskCreateView.as_view(), name="tsk_create"),

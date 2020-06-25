@@ -14,7 +14,11 @@
 # **********************************************************************;
 from tasks.models import TaskTemplate, PlaybookTemplate, Action, ActionGroupMember
 from tasks.models import new_playbook, new_evidence, task_close, actiongroupmember_items, TasksInvDetailTabEvidences
-from invs.models import SeverityHelper
+from tasks.models import run_action
+from invs.models import SeverityHelper, Get_InspectionData
+
+from django.urls import reverse_lazy
+from django.shortcuts import render
 from django.core.exceptions import ValidationError
 from django.utils.timezone import now as timezone_now
 from .models import InvDetailTabEvidences, InvList
@@ -41,7 +45,7 @@ from django.template.loader import render_to_string
 # from django.shortcuts import render
 ##############
 
-from .forms import InvForm, InvSuspiciousEmailForm, InvReviewer1Form, InvReviewer2Form
+from .forms import InvForm, InvSuspiciousEmailForm, InvReviewer1Form, InvReviewer2Form, InspectorForm, InvLookupForm
 from .models import Inv, InvStatus, new_inv, InvCategory, InvAttackVector, InvPhase, InvSeverity, CurrencyType,\
     InvPriority, InvSeverityCriteria, InvSeverityContactRef  # , InvReviewRules
 # from django.shortcuts import redirect, reverse    # ,render, get_object_or_404
@@ -305,6 +309,112 @@ class InvSeveritiesView(LoginRequiredMixin, PermissionRequiredMixin, generic.Tem
         kwargs['contacts'] = SeverityHelper.getcontacts()
         return super(InvSeveritiesView, self).get_context_data(**kwargs)
 
+
+class InvInspectorView(LoginRequiredMixin, PermissionRequiredMixin, generic.TemplateView):
+    template_name = "invs/inv_inspector.html"
+    permission_required = ('assets.view_profile')
+    form_class = InspectorForm
+    initial = {'key': 'value'}
+    success_url = reverse_lazy('invs:inv_inspector')
+
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
+            logger.info(logmsg)
+        super(InvInspectorView, self).__init__(*args, **kwargs)
+
+
+    def get_initial(self):
+        initial = super(InvInspectorView, self).get_initial()
+        if self.request.user.is_authenticated:
+            initial.update({'name': self.request.user.get_full_name()})
+        return initial
+
+    def get(self, request, *args, **kwargs):
+        form = InspectorForm()
+        context = {'form': form}
+        return render(request, 'invs/inv_inspector.html', context)
+
+    def post(self, request, *args, **kwargs):
+        form = InspectorForm(data=request.POST)
+        if form.is_valid():
+            # self.send_mail(form.cleaned_data)
+            if form.data:
+                datatmp = form.cleaned_data
+                ausername = None
+                auserid = None
+                aemail = None
+                if datatmp.get('username'):
+                    ausername = datatmp.get('username')
+                if datatmp.get('userid'):
+                    auserid = datatmp.get('userid')
+                if datatmp.get('email'):
+                    aemail = datatmp.get('email')
+                form = InspectorForm()
+                inv_username_list = Get_InspectionData().inv_username_list(ausername=ausername)
+                profile_username_list = Get_InspectionData().profile_username_list(ausername=ausername)
+                profile_userid_list = Get_InspectionData().profile_userid_list(auserid=auserid)
+                profile_email_list = Get_InspectionData().profile_email_list(aemail=aemail)
+                # invs_closed_tasks_auto_min = invs_closed_tasks_auto['min']
+                context = {'form': form,
+                           'searchusername': ausername,
+                           'searchuserid': auserid,
+                           'searchemail': aemail,
+                           'inv_username_list': inv_username_list,
+                           'profile_username_list': profile_username_list,
+                           'profile_userid_list': profile_userid_list,
+                           'profile_email_list': profile_email_list,
+                           }
+            else:
+                context = {'': ''}
+            return render(request, 'invs/inv_inspector.html', context)
+        return render(request, 'invs/inv_inspector.html', {'form': form})
+
+    def get_success_url(self):
+        if 'next1' in self.request.GET:
+            redirect_to = self.request.GET['next1']
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
+                return reverse(self.success_url)
+        else:
+            return reverse(self.success_url)
+        return redirect_to
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        # context = super(ReportsDashboardCustom, self).get_context_data(**kwargs)
+        kwargs['user'] = self.request.user
+
+        return super(InvInspectorView, self).get_context_data(**kwargs)
+
+    def form_valid(self, form):
+        cleandata = form.cleaned_data
+        return super(InvInspectorView, self).form_valid(form)
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            # This will redirect to the login view
+            return self.handle_no_permission()
+        elif not self.request.user.has_perm('assets.view_profile'):
+            messages.error(self.request, "No permission to access a record !!!")
+            return redirect('ins:inv_inspect')
+        else:
+            pass
+        # Checks pass, let http method handlers process the request
+        return super(InvInspectorView, self).dispatch(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        """This method is what injects forms with their keyword
+            arguments."""
+        # grab the current set of form #kwargs
+        kwargs = super(InvInspectorView, self).get_form_kwargs()
+        # Update the kwargs with the user_id
+        # kwargs['inv_pk'] = self.kwargs.get('inv_pk')
+        kwargs['user'] = self.request.user
+        return kwargs
 
 class InvListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
     model = Inv
@@ -1068,8 +1178,8 @@ class InvSuspiciousEmailCreateView(LoginRequiredMixin, PermissionRequiredMixin, 
                         with source, target:
                             try:
                                 shutil.copyfileobj(source, target)
-                            except Exception:
-                                print("Error:%s" % Exception)
+                            except Exception as e:
+                                print("Error: %s" % e)
 
                         # print(os.path.join(destoutdirpath,filename))
 
@@ -1461,6 +1571,102 @@ class InvCreateAjaxView(LoginRequiredMixin, PermissionRequiredMixin, generic.Cre
             arguments."""
         # grab the current set of form #kwargs
         kwargs = super(InvCreateAjaxView, self).get_form_kwargs()
+        # Update the kwargs with the user_id
+        # kwargs['inv_pk'] = self.kwargs.get('inv_pk')
+        kwargs['user'] = self.request.user
+        return kwargs
+
+
+class InvLookupView(LoginRequiredMixin, PermissionRequiredMixin, generic.TemplateView):
+    template_name = "invs/inv_lookup.html"
+    permission_required = ('invs.view_inv')
+    form_class = InvLookupForm
+    initial = {'key': 'value'}
+    success_url = reverse_lazy('invs:inv_lookup')
+
+    def __init__(self, *args, **kwargs):
+        if LOGLEVEL == 1:
+            pass
+        elif LOGLEVEL == 2:
+            pass
+        elif LOGLEVEL == 3:
+            logmsg = "na" + LOGSEPARATOR + "call" + LOGSEPARATOR + self.__class__.__name__
+            logger.info(logmsg)
+        super(InvLookupView, self).__init__(*args, **kwargs)
+
+
+    def get_initial(self):
+        initial = super(InvLookupView, self).get_initial()
+        if self.request.user.is_authenticated:
+            initial.update({'name': self.request.user.get_full_name()})
+        return initial
+
+    def get(self, request, *args, **kwargs):
+        form = InvLookupForm()
+        context = {'form': form}
+        return render(request, 'invs/inv_lookup.html', context)
+
+    def post(self, request, *args, **kwargs):
+        form = InvLookupForm(data=request.POST)
+        if form.is_valid():
+            # self.send_mail(form.cleaned_data)
+            if form.data:
+                datatmp = form.cleaned_data
+                ausername = None
+                if datatmp.get('username'):
+                    ausername = datatmp.get('username')
+                form = InvLookupForm()
+                # inv_username_list = Get_InspectionData().inv_username_list(ausername=ausername)
+                # xxx = run_action(User, 'admin', None, None, None, None, None, None, None, False, False, False)
+                # print("XXX")
+                # print(xxx)
+                # invs_closed_tasks_auto_min = invs_closed_tasks_auto['min']
+                context = {'form': form,
+                           'searchusername': ausername,
+                           # 'inv_username_list': inv_username_list,
+                           }
+            else:
+                context = {'': ''}
+            return render(request, 'invs/inv_lookup.html', context)
+        return render(request, 'invs/inv_lookup.html', {'form': form})
+
+    def get_success_url(self):
+        if 'next1' in self.request.GET:
+            redirect_to = self.request.GET['next1']
+            if not is_safe_url(url=redirect_to, allowed_hosts=ALLOWED_HOSTS):
+                return reverse(self.success_url)
+        else:
+            return reverse(self.success_url)
+        return redirect_to
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        # context = super(ReportsDashboardCustom, self).get_context_data(**kwargs)
+        kwargs['user'] = self.request.user
+
+        return super(InvLookupView, self).get_context_data(**kwargs)
+
+    def form_valid(self, form):
+        cleandata = form.cleaned_data
+        return super(InvLookupView, self).form_valid(form)
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            # This will redirect to the login view
+            return self.handle_no_permission()
+        elif not self.request.user.has_perm('invs.view_inv'):
+            messages.error(self.request, "No permission to access a record !!!")
+            return redirect('ins:inv_lookup')
+        else:
+            pass
+        # Checks pass, let http method handlers process the request
+        return super(InvLookupView, self).dispatch(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        """This method is what injects forms with their keyword
+            arguments."""
+        # grab the current set of form #kwargs
+        kwargs = super(InvLookupView, self).get_form_kwargs()
         # Update the kwargs with the user_id
         # kwargs['inv_pk'] = self.kwargs.get('inv_pk')
         kwargs['user'] = self.request.user

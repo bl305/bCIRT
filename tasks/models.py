@@ -34,6 +34,8 @@ import ipaddress
 import re
 import pydot
 from tasks.scripts.String_Parser import StringParser
+from tasks.scripts.LDAP_integration import LDAP_interface
+from django.db.models import Max
 from django.db import transaction
 
 # import pathlib
@@ -55,7 +57,7 @@ from bCIRT.settings import MEDIA_ROOT
 from configuration.models import ConnectionItem, ConnectionItemField, decrypt_string
 from .scriptmanager.run_script import run_script_class
 
-from tasks.scripts import String_Parser
+# from tasks.scripts import String_Parser
 
 import logging
 logger = logging.getLogger('log_file_verbose')
@@ -869,6 +871,8 @@ class EvidenceAttr(models.Model):
             if Evidence.objects.get(pk=self.ev.pk).inv:
                 inv_pk = Evidence.objects.get(pk=self.ev.pk).inv.pk
                 Inv.objects.filter(pk=inv_pk).update(modified_at=timezone_now(), modified_by=self.modified_by)
+            run_auto_action_on_attribute(self)
+        # self.full_clean()
         super(EvidenceAttr, self).save(*args, **kwargs)
 
     def get_sameitems_inv(self):
@@ -949,7 +953,8 @@ class EvidenceAttr(models.Model):
                 # This will read the system parameters and replace the $ATTRIBUTE$ string
                 # with the attribute value in the system settings value and will call a script
                 # there is also a check on post_save
-                run_auto_action_on_attribute(self)
+                # run_auto_action_on_attribute(self)
+                pass
         pass
 
     class Meta:
@@ -1075,6 +1080,22 @@ def evidenceattrobservabletoggle(pattrpk):
     evattr_obj.save()
 
 
+@transaction.atomic
+def evidenceattrmalicioustoggle(pattrpk):
+    evattr_obj = EvidenceAttr.objects.get(pk=pattrpk)
+
+    if evattr_obj.attr_reputation:
+        currep = evattr_obj.attr_reputation.pk
+        allrep = EvReputation.objects.all()
+        maxrep = int(allrep.aggregate(Max('pk'))['pk__max'])
+        nextrep = currep-1
+        if nextrep == 0:
+            nextrep = maxrep
+        evattr_obj.attr_reputation = EvReputation.objects.get(pk=nextrep)
+    else:
+        evattr_obj.attr_reputation = EvReputation.objects.get(pk=4)
+    evattr_obj.save()
+
 # @transaction.atomic
 # def setevidenceattrobservable(pattrpk, avalue=True):
 #     evattr_obj = EvidenceAttr.objects.get(pk=pattrpk)
@@ -1083,115 +1104,115 @@ def evidenceattrobservabletoggle(pattrpk):
 #     EvidenceAttr.objects.filter(pk=pattrpk).update(observable=avalue)
 
 
-class ExtractAttr():
-    '''
-    This class holds the data extractor functions
-    pselector selects which data source to use
-    '''
-
-    def __init__(self, pevidence, puser, pusername, pevattr=None, pselector=1):
-        self.currev = Evidence.objects.get(pk=pevidence)
-        self.curruser = puser
-        self.currusername = pusername
-        if pevattr:
-            self.currattr = EvidenceAttr.objects.get(pk=pevattr)
-        self.pfile = None
-        self.pselector = pselector
-
-    def find_ipv4(self, str1):
-        ipattern = re.compile(
-            '(?:(?:1\d\d|2[0-5][0-5]|2[0-4]\d|0?[1-9]\d|0?0?\d)\.){3}(?:1\d\d|2[0-5][0-5]|2[0-4]\d|0?[1-9]\d|0?0?\d)')
-        imatches = re.findall(ipattern, str1)
-        imatches = sorted(list(set(imatches)))
-        return imatches
-
-    def find_ipv6(self, str1):
-        ipattern = re.compile('(?:[A-F0-9]{1,4}:){7}[A-F0-9]{1,4}')
-        imatches = re.findall(ipattern, str1)
-        imatches = sorted(list(set(imatches)))
-        return imatches
-
-    def ip_check(self, address):
-        try:
-            ipver = ipaddress.ip_address(address)
-            return ipver
-        except Exception:
-            return False
-
-    def find_email(self, str1):
-        #  ipattern = re.compile('([^[({@|\s]+@[^@]+\.[^])}@|\s]+)')
-        # ipattern = re.compile('([^@":[>|<\s]+@[^@]+\.[^]>"<)\}@|\s]+)')
-        #https://www.regular-expressions.info/refunicode.html
-        ipattern = re.compile(r'([\\p{L}\\p{M}\\p{S}\\p{N}\\p{P}a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)', re.UNICODE)
-        imatches = re.findall(ipattern, str1)
-        imatches = sorted(list(set(imatches)))
-        return imatches
-
-    def extract_ip(self):
-        ip4 = None
-        ip6 = None
-        if self.pselector == 1:
-            #  run on the evidence description
-            ip4 = self.find_ipv4(self.currev.description)
-            ip6 = self.find_ipv6(self.currev.description)
-            pass
-        elif self.pselector == 2:
-            #  run on the attribute
-            ip4 = self.find_ipv4(self.currattr.evattrvalue)
-            ip6 = self.find_ipv6(self.currattr.evattrvalue)
-            pass
-        elif self.pselector == 3:
-            #  run on the file attachment
-            # print("file")
-            pass
-        # add_evattr(self, self.pevidence, self.pattr, self.pfile, 2, 1, 1)
-        for oneip in ip4:
-            currevattrformat = EvidenceAttrFormat.objects.get(name="IPv4")
-            ip4 = ipaddress.ip_address(oneip)
-            add_evattr(self.curruser, self.currev, ip4, currevattrformat, self.currusername, self.currusername)
-        for oneip in ip6:
-            currevattrformat = EvidenceAttrFormat.objects.get(name="IPv6")
-            ip6 = ipaddress.ip_address(oneip)
-            add_evattr(self.curruser, self.currev, ip6, currevattrformat, self.currusername, self.currusername)
-        # add_evattr(auser, aev, aevattrvalue, aevattrformat, amodified_by, acreated_by):
-
-    def extract_email(self):
-        emails = []
-        if self.pselector == 1:
-            #  run on the evidence description
-            emails = self.find_email(self.currev.description)
-        elif self.pselector == 2:
-            #  run on the attribute
-            emails = self.find_email(self.currattr.evattrvalue)
-        elif self.pselector == 3:
-            #  run on the file attachment
-            # print("file")
-            pass
-        for onemail in emails:
-            currevattrformat = EvidenceAttrFormat.objects.get(name="Email")
-            add_evattr(self.curruser, self.currev, onemail, currevattrformat, self.currusername, self.currusername)
-
-    def extract_all(self):
-        self.extract_email()
-        self.extract_ip()
-
-    def print_value(self):
-        if self.pselector == 1:
-            #  run on the evidence description
-            print(self.currev.description)
-        elif self.pselector == 2:
-            #  run on the attribute
-            print(self.currattr.evattrvalue)
-            print(self.currattr.ev.pk)
-        elif self.pselector == 3:
-            #  run on the file attachment
-            # print("file")
-            pass
-
-        return self.currev.description
-
-    def print_res(self):
-        pass
+# class ExtractAttr():
+#     '''
+#     This class holds the data extractor functions
+#     pselector selects which data source to use
+#     '''
+#
+#     def __init__(self, pevidence, puser, pusername, pevattr=None, pselector=1):
+#         self.currev = Evidence.objects.get(pk=pevidence)
+#         self.curruser = puser
+#         self.currusername = pusername
+#         if pevattr:
+#             self.currattr = EvidenceAttr.objects.get(pk=pevattr)
+#         self.pfile = None
+#         self.pselector = pselector
+#
+#     def find_ipv4(self, str1):
+#         ipattern = re.compile(
+#             '(?:(?:1\d\d|2[0-5][0-5]|2[0-4]\d|0?[1-9]\d|0?0?\d)\.){3}(?:1\d\d|2[0-5][0-5]|2[0-4]\d|0?[1-9]\d|0?0?\d)')
+#         imatches = re.findall(ipattern, str1)
+#         imatches = sorted(list(set(imatches)))
+#         return imatches
+#
+#     def find_ipv6(self, str1):
+#         ipattern = re.compile('(?:[A-F0-9]{1,4}:){7}[A-F0-9]{1,4}')
+#         imatches = re.findall(ipattern, str1)
+#         imatches = sorted(list(set(imatches)))
+#         return imatches
+#
+#     def ip_check(self, address):
+#         try:
+#             ipver = ipaddress.ip_address(address)
+#             return ipver
+#         except Exception:
+#             return False
+#
+#     def find_email(self, str1):
+#         #  ipattern = re.compile('([^[({@|\s]+@[^@]+\.[^])}@|\s]+)')
+#         # ipattern = re.compile('([^@":[>|<\s]+@[^@]+\.[^]>"<)\}@|\s]+)')
+#         #https://www.regular-expressions.info/refunicode.html
+#         ipattern = re.compile(r'([\\p{L}\\p{M}\\p{S}\\p{N}\\p{P}a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)', re.UNICODE)
+#         imatches = re.findall(ipattern, str1)
+#         imatches = sorted(list(set(imatches)))
+#         return imatches
+#
+#     def extract_ip(self):
+#         ip4 = None
+#         ip6 = None
+#         if self.pselector == 1:
+#             #  run on the evidence description
+#             ip4 = self.find_ipv4(self.currev.description)
+#             ip6 = self.find_ipv6(self.currev.description)
+#             pass
+#         elif self.pselector == 2:
+#             #  run on the attribute
+#             ip4 = self.find_ipv4(self.currattr.evattrvalue)
+#             ip6 = self.find_ipv6(self.currattr.evattrvalue)
+#             pass
+#         elif self.pselector == 3:
+#             #  run on the file attachment
+#             # print("file")
+#             pass
+#         # add_evattr(self, self.pevidence, self.pattr, self.pfile, 2, 1, 1)
+#         for oneip in ip4:
+#             currevattrformat = EvidenceAttrFormat.objects.get(name="IPv4")
+#             ip4 = ipaddress.ip_address(oneip)
+#             add_evattr(self.curruser, self.currev, ip4, currevattrformat, self.currusername, self.currusername)
+#         for oneip in ip6:
+#             currevattrformat = EvidenceAttrFormat.objects.get(name="IPv6")
+#             ip6 = ipaddress.ip_address(oneip)
+#             add_evattr(self.curruser, self.currev, ip6, currevattrformat, self.currusername, self.currusername)
+#         # add_evattr(auser, aev, aevattrvalue, aevattrformat, amodified_by, acreated_by):
+#
+#     def extract_email(self):
+#         emails = []
+#         if self.pselector == 1:
+#             #  run on the evidence description
+#             emails = self.find_email(self.currev.description)
+#         elif self.pselector == 2:
+#             #  run on the attribute
+#             emails = self.find_email(self.currattr.evattrvalue)
+#         elif self.pselector == 3:
+#             #  run on the file attachment
+#             # print("file")
+#             pass
+#         for onemail in emails:
+#             currevattrformat = EvidenceAttrFormat.objects.get(name="Email")
+#             add_evattr(self.curruser, self.currev, onemail, currevattrformat, self.currusername, self.currusername)
+#
+#     def extract_all(self):
+#         self.extract_email()
+#         self.extract_ip()
+#
+#     def print_value(self):
+#         if self.pselector == 1:
+#             #  run on the evidence description
+#             print(self.currev.description)
+#         elif self.pselector == 2:
+#             #  run on the attribute
+#             print(self.currattr.evattrvalue)
+#             print(self.currattr.ev.pk)
+#         elif self.pselector == 3:
+#             #  run on the file attachment
+#             # print("file")
+#             pass
+#
+#         return self.currev.description
+#
+#     def print_res(self):
+#         pass
 
 
 class ScriptOs(models.Model):
@@ -2016,17 +2037,20 @@ def auto_delete_file_on_delete(sender, instance, **kwargs):
             os.remove(instance.fileRef.path)
             instance.fileName = None
 
-@receiver(models.signals.post_save, sender=EvidenceAttr)
-def check_ifcreated(sender, instance, **kwargs):
-    created = False
-    #Workaround to signal being emitted twice on create and save
-    if 'created' in kwargs:
-        if kwargs['created']:
-            created=True
-            run_auto_action_on_attribute(instance)
-    #If signal is from object creation, return
-    if created:
-        return
+# @receiver(models.signals.post_save, sender=EvidenceAttr)
+# def check_ifcreated(sender, instance, **kwargs):
+#     created = False
+#     # xxxxxxxxxx
+#     #Workaround to signal being emitted twice on create and save
+#     if 'created' in kwargs:
+#         if kwargs['created']:
+#             created=True
+#             run_auto_action_on_attribute(instance)
+#     else:
+#         pass
+#     #If signal is from object creation, return
+#     if created:
+#         return
 
 # @receiver(models.signals.post_save, sender=Evidence)
 # def check_if_malicious(sender, instance, **kwargs):
@@ -2434,31 +2458,51 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
             new_create_profile_from_evattrs_all(pev=ev_pk)
             afuncoutput = "adding evidence %s attributes to the profile " % ev_pk
         else:
-            sp1 = String_Parser.StringParser
-            afuncoutput = getattr(sp1, action_obj.automationid.code)('', argument)
-            if action_obj.automationid.code == "check_malicious":
-                ismalicious = afuncoutput
-                if action_obj.scriptinput.pk == 1:
-                    # description input
-                    # add_evattr(
-                    #     auser=actuser,
-                    #     aev=oldev_obj,
-                    #     aevattrvalue=afuncoutput,
-                    #     aevattrformat=EvidenceAttrFormat.objects.get(name='Reputation'),
-                    #     amodified_by=actusername,
-                    #     acreated_by=actusername,
-                    #     aattr_automatic=None
-                    # )
+            try:
+                splitcode = action_obj.automationid.code.split('.', 1)
+                sp1 = splitcode[0]
+                code1 = splitcode[1]
+                try:
+                    sp1 = StringParser
+                    # afuncoutput = getattr(sp1, action_obj.automationid.code)('', argument)
+                    afuncoutput = getattr(sp1, code1)('', argument)
+                except Exception as e:
                     pass
-                elif action_obj.scriptinput.pk == 2:
-                    # file input
-                    pass
-                elif action_obj.scriptinput.pk == 3:
-                    # attribute input
-                    # EvidenceAttr.objects.filter(pk=evattr_pk).update(attr_reputation = EvReputation.objects.get(pk=1))
-                    pass
-            # if action_obj.automationid.code == "StringParser.extract_ipv4":
-            #     pass
+                if not afuncoutput:
+                    try:
+                        sp1 = LDAP_interface
+                        print("Calling LDAP %s %s %s" %(sp1, code1, argument))
+                        # afuncoutput = getattr(sp1, action_obj.automationid.code)('', argument)
+                        afuncoutput = getattr(sp1, code1)('', argument)
+                    except Exception as e:
+                        pass
+                if code1 == "check_malicious":
+                    ismalicious = afuncoutput
+                    if action_obj.scriptinput.pk == 1:
+                        # description input
+                        # add_evattr(
+                        #     auser=actuser,
+                        #     aev=oldev_obj,
+                        #     aevattrvalue=afuncoutput,
+                        #     aevattrformat=EvidenceAttrFormat.objects.get(name='Reputation'),
+                        #     amodified_by=actusername,
+                        #     acreated_by=actusername,
+                        #     aattr_automatic=None
+                        # )
+                        pass
+                    elif action_obj.scriptinput.pk == 2:
+                        # file input
+                        pass
+                    elif action_obj.scriptinput.pk == 3:
+                        # attribute input
+                        # EvidenceAttr.objects.filter(pk=evattr_pk).update(attr_reputation = EvReputation.objects.get(pk=1))
+                        pass
+                # if action_obj.automationid.code == "StringParser.extract_ipv4":
+                #     pass
+            except Exception as e:
+                afuncoutput = "Cannot process internal command: %s" % e
+            if afuncoutput == None:
+                afuncoutput = "No output"
 
         results = {"command": str(cmd), "status": "1", "error": "0", "output": afuncoutput, "pid": 1}
         # if True: # SUCCESS
@@ -2619,7 +2663,6 @@ def run_action(pactuser, pactusername, pev_pk, pevattr_pk, ptask_pk, pact_pk, pi
         #     currevattrformat = EvidenceAttrFormat.objects.get(name=argumentoutput)
         # resoutput.split()
         # OUTPUT DELIMITER needs to be defined in the model - if empty, don't split...TBD
-        print("XXX we are here but why")
         if isinstance(resoutput, list) or isinstance(resoutput, tuple):
             # list type output
             for item1 in resoutput:

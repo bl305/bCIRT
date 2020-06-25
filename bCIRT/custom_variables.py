@@ -80,6 +80,48 @@ LOGLEVEL = 0  # off
 # LOGLEVEL = 3 #verbose
 LOGSEPARATOR = ";"
 
+class ldapvars():
+
+    myusername = "administrator"
+    mypassword = "Password1."
+    myserver = "ldap://192.168.11.72"
+    mydomain = 'lendvay'
+    # userinfo_by_userid
+    mysearchbasedn_userinfo_by_userid = 'ou=Test,dc=lendvay,dc=local'
+    # mysearchfilter_userinfo_by_userid = '(objectclass=Person)'
+    mysearchfilter_userinfo_by_userid = '(& (objectCategory=person)(objectClass=user)(sAMAccountName=XXX))'
+    mysearchattributes_userinfo_by_userid = ['sAMAccountName', 'mail', 'displayName',
+                                             'department', 'physicalDeliveryOfficeName']
+    mysearchpagesize_userinfo_by_userid = 5
+
+    def get_aquery_userinfo_by_userid(self, puserid):
+        self.mysearchfilter_userinfo_by_userid = self.mysearchfilter_userinfo_by_userid.replace("XXX", puserid)
+        retval = {'search_base': self.mysearchbasedn_userinfo_by_userid,
+                  'search_filter': self.mysearchfilter_userinfo_by_userid,
+                  'attributes': self.mysearchattributes_userinfo_by_userid,
+                  'paged_size': self.mysearchpagesize_userinfo_by_userid,
+                  'generator': False,
+                  }
+        return retval
+
+    mysearchbasedn_userinfo_by_email = 'ou=Test,dc=lendvay,dc=local'
+    # mysearchfilter_userinfo_by_userid = '(objectclass=Person)'
+    mysearchfilter_userinfo_by_email = '(& (objectCategory=person)(objectClass=user)(mail=XXX))'
+    mysearchattributes_userinfo_by_email = ['sAMAccountName', 'mail', 'displayName',
+                                            'department', 'physicalDeliveryOfficeName']
+    mysearchpagesize_userinfo_by_email = 5
+
+    def get_aquery_userinfo_by_email(self, pemail):
+        self.mysearchfilter_userinfo_by_email = self.mysearchfilter_userinfo_by_email.replace("XXX", pemail)
+        retval = {'search_base': self.mysearchbasedn_userinfo_by_email,
+                  'search_filter': self.mysearchfilter_userinfo_by_email,
+                  'attributes': self.mysearchattributes_userinfo_by_email,
+                  'paged_size': self.mysearchpagesize_userinfo_by_email,
+                  'generator': False,
+                  }
+        return retval
+
+
 class bcolors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'

@@ -1,0 +1,259 @@
+{% extends "invs/inv_base.html" %}
+<!--
+# **********************************************************************;
+# Project           : bCIRT
+# License           : GPL-3.0
+# Program name      : inv/inv_inspector.html
+# Author            : Balazs Lendvay
+# Date created      : 2020.06.20
+# Purpose           : Template file for the bCIRT
+# Revision History  : v1
+# Date        Author      Ref    Description
+# 2020.06.20  Lendvay     1      Initial file
+# **********************************************************************;
+-->
+{% block ptitle %}Inspector {% endblock %}
+
+{% block invslist_active %}active{% endblock invslist_active%}
+
+{% block preinvs %}
+
+{% endblock preinvs %}
+
+{% block invs_content %}
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-md-12">
+			<div class="card card-body bg-light">
+                <form method="POST">
+                {% csrf_token %}
+                {% for field in form %}
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <span class="text-danger small">{{ field.errors }}</span>
+                        </div>
+                        <div class="row container mw-100 d-inline-flex justify-content-start flex-row align-items-start align-content-start flex-nowrap">
+                            <label class="control-label col-sm-2" for="Inv_id">{{ field.label_tag }}</label>
+                            <div class="col-sm-10">
+                                {{ field }}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+                <button type="submit">Search</button>
+                </form>
+			</div>
+		</div>
+	</div>
+    <hr class="thick">
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card card-body bg-light">
+                <p><strong>Search criterias</strong></p>
+
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-toggle="collapse" class="accordion-toggle">
+                            <td>
+                                Username
+                            </td>
+                            <td>
+                                {{ searchusername }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                UserID
+                            </td>
+                            <td>
+                                {{ searchuserid }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Email
+                            </td>
+                            <td>
+                                {{ searchemail }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <hr class="thick">
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card card-body bg-light">
+                <p><strong>User appearing in investigations</strong></p>
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>Investigation</th>
+                            <th>Created</th>
+                            <th>UserName</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for inv_username in inv_username_list %}
+                        <tr data-toggle="collapse" data-target="#myinspection_inv{{inv_username.pk}}" class="accordion-toggle">
+                            <td>
+                                <a href="{% url 'invs:inv_detail' pk=inv_username.pk %}?next1={{ request.get_full_path|urlencode }}">
+                                    <h6><span class="badge badge-pill badge-secondary">{{ inv_username.pk }} - {{ inv_username.invid }}</span></h6>
+                                </a>
+                            </td>
+                            <td>
+                                {{ inv_username.created_at|date:"Y/m/d H:i:s" }}
+                            </td>
+                            <td>
+                                {{ inv_username.user.username }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <hr class="thick">
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card card-body bg-light">
+                <p><strong>User appearing in Profiles</strong></p>
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>Profile #</th>
+                            <th>Investigation</th>
+                            <th>Created</th>
+                            <th>UserName</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for profile_username in profile_username_list %}
+                        <tr data-toggle="collapse" data-target="#myinspectionprofile{{profile_username.pk}}" class="accordion-toggle">
+                            <td>
+                                <a href="{% url 'invs:inv_detail' pk=profile_username.pk %}?next1={{ request.get_full_path|urlencode }}">
+                                    <h6><span class="badge badge-pill badge-secondary">{{ profile_username.pk }}</span></h6>
+                                </a>
+                            </td>
+                            <td>
+                                <a href="{% url 'invs:inv_detail' pk=profile_username.inv.pk %}?next1={{ request.get_full_path|urlencode }}">
+                                    <h6><span class="badge badge-pill badge-secondary">{{ profile_username.inv.pk }} - {{ profile_username.inv.invid }}</span></h6>
+                                </a>
+
+                            </td>
+                            <td>
+                                {{ profile_username.created_at|date:"Y/m/d H:i:s" }}
+                            </td>
+                            <td>
+                                {{ profile_username.username }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <hr class="thick">
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card card-body bg-light">
+                <p><strong>UserID appearing in Profiles</strong></p>
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>Profile #</th>
+                            <th>Investigation</th>
+                            <th>Created</th>
+                            <th>UserID</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for profile_userid in profile_userid_list %}
+                        <tr data-toggle="collapse" data-target="#myinspectionprofile{{profile_userid.pk}}" class="accordion-toggle">
+                            <td>
+                                <a href="{% url 'invs:inv_detail' pk=profile_userid.pk %}?next1={{ request.get_full_path|urlencode }}">
+                                    <h6><span class="badge badge-pill badge-secondary">{{ profile_userid.pk }}</span></h6>
+                                </a>
+                            </td>
+                            <td>
+                                <a href="{% url 'invs:inv_detail' pk=profile_userid.inv.pk %}?next1={{ request.get_full_path|urlencode }}">
+                                    <h6><span class="badge badge-pill badge-secondary">{{ profile_userid.inv.pk }} - {{ profile_userid.inv.invid }}</span></h6>
+                                </a>
+
+                            </td>
+                            <td>
+                                {{ profile_userid.created_at|date:"Y/m/d H:i:s" }}
+                            </td>
+                            <td>
+                                {{ profile_userid.userid }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <hr class="thick">
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card card-body bg-light">
+                <p><strong>Email appearing in Profiles</strong></p>
+                <table class="table table-condensed" style="border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>Profile #</th>
+                            <th>Investigation</th>
+                            <th>Created</th>
+                            <th>Email</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for profile_email in profile_email_list %}
+                        <tr data-toggle="collapse" data-target="#myinspectionprofile{{profile_email.pk}}" class="accordion-toggle">
+                            <td>
+                                <a href="{% url 'invs:inv_detail' pk=profile_email.pk %}?next1={{ request.get_full_path|urlencode }}">
+                                    <h6><span class="badge badge-pill badge-secondary">{{ profile_email.pk }}</span></h6>
+                                </a>
+                            </td>
+                            <td>
+                                <a href="{% url 'invs:inv_detail' pk=profile_email.inv.pk %}?next1={{ request.get_full_path|urlencode }}">
+                                    <h6><span class="badge badge-pill badge-secondary">{{ profile_email.inv.pk }} - {{ profile_email.inv.invid }}</span></h6>
+                                </a>
+
+                            </td>
+                            <td>
+                                {{ profile_email.created_at|date:"Y/m/d H:i:s" }}
+                            </td>
+                            <td>
+                                {{ profile_email.email }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <hr class="thick">
+
+
+</div>
+
+{% endblock invs_content %}

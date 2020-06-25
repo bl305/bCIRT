@@ -14,6 +14,9 @@ import re
 import ipaddress
 
 class StringParser():
+    def stringparsertest(self):
+        return "TEST stringparsertest SUCCESS"
+
     def find_ipv4(self, str1):
         ipattern = re.compile(
             '(?:(?:1\d\d|2[0-5][0-5]|2[0-4]\d|0?[1-9]\d|0?0?\d)\.){3}(?:1\d\d|2[0-5][0-5]|2[0-4]\d|0?[1-9]\d|0?0?\d)')
@@ -60,7 +63,7 @@ class StringParser():
         self.extract_ip()
 
     def check_malicious(self, str1):
-        str1 = str1.lower()
+        str1 = str(str1).lower()
         ipatternU = re.compile(r'\'malicious\':\W+\'unknown\'')
         ipatternC = re.compile(r'\'malicious\':\W+\'clean\'')
         ipatternS = re.compile(r'\'malicious\':\W+\'suspicious\'')
@@ -76,3 +79,14 @@ class StringParser():
         else:
             imatches = "Unknown"
         return imatches
+
+    def find_urls(self, pinput):
+        import urllib
+        urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', pinput)
+        allurls = set()
+        for url in urls:
+            url_clean = urllib.parse.unquote(url)
+            allurls.add(url_clean)
+        # allurls = tuple(allurls)
+        allurls = sorted(list(allurls))
+        return allurls

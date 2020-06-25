@@ -128,11 +128,12 @@ class ProfileForm(forms.ModelForm):
     )
 
     class Meta:
-        fields = ("username", "userid", "email", "host", "ip", "location", "department", "location_contact", "inv",
-                  "description")
+        fields = ("username", "userid", "email", "jobtitle", "host", "ip", "location",
+                  "department", "location_contact", "inv", "description")
         model = Profile
         labels = {
             "description": "Description",
+            "jobtitle": "Job Title",
             "location_contact": "Location Contact",
         }
         widgets = {
@@ -143,6 +144,11 @@ class ProfileForm(forms.ModelForm):
             ),
             'userid': forms.TextInput(attrs={
                 'size': 30,
+                'style': 'width:50%',
+                'class': 'form-control'}
+            ),
+            'jobtitle': forms.TextInput(attrs={
+                'size': 50,
                 'style': 'width:50%',
                 'class': 'form-control'}
             ),
